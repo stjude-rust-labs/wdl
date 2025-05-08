@@ -399,6 +399,8 @@ impl DocsTree {
             key: String,
             /// The display name of the node.
             display_name: String,
+            /// The path from the root to the node.
+            path: String,
             /// The search name of the node.
             search_name: String,
             /// The image of the node.
@@ -420,6 +422,7 @@ impl DocsTree {
                     r#"{{
                         key: '{}',
                         display_name: '{}',
+                        path: '{}',
                         search_name: '{}',
                         img: '{}',
                         href: {},
@@ -428,6 +431,7 @@ impl DocsTree {
                     }}"#,
                     self.key,
                     self.display_name,
+                    self.path,
                     self.search_name,
                     self.img,
                     if let Some(href) = &self.href {
@@ -446,16 +450,24 @@ impl DocsTree {
             .iter()
             .skip(1) // Skip the root node
             .map(|node| {
+                let key = make_key(node.path(), root.path());
                 let display_name = match node.page() {
                     Some(page) => page.name().to_string(),
                     None => node.name().to_string(),
                 };
+                let inner_path = node
+                    .path()
+                    .strip_prefix(root.path())
+                    .expect("path should be in the docs directory")
+                    .parent()
+                    .expect("path should have a parent")
+                    .to_string_lossy()
+                    .to_string();
                 let search_name = if node.page().is_none() {
                     "".to_string()
                 } else {
                     node.name().to_string()
                 };
-                let key = make_key(node.path(), root.path());
                 let href = match node.page() {
                     Some(page) => match page.page_type() {
                         PageType::Index(_) => Some(
@@ -537,6 +549,7 @@ impl DocsTree {
                 JsNode {
                     key,
                     display_name,
+                    path: inner_path,
                     search_name: search_name.clone(),
                     img,
                     href,
@@ -641,7 +654,7 @@ impl DocsTree {
                 form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
                     div class="flex flex-row items-center h-full w-full" {
                         img src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="flex size-8" alt="Search icon";
-                        input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300";
+                        input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300 pl-2";
                     }
                 }
                 div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
@@ -670,9 +683,12 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-row items-center gap-x-1" {
-                                img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
-                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50 bg-slate-800' : 'hover:text-slate-50 hover:bg-slate-700'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                            li class="flex flex-col hover:bg-slate-700 border-b pl-2" {
+                                p class="truncate" x-text="node.path" {}
+                                div class="flex flex-row items-center gap-x-1 mb-2" {
+                                    img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
+                                    p class="truncate text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                }
                             }
                         }
                         li class="flex place-content-center pr-8" {
