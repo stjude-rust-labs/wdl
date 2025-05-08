@@ -95,7 +95,7 @@ async fn main() {
             continue;
         }
 
-        if expected_file.extension().and_then(|e| e.to_str()) == Some("png") {
+        if expected_file.extension().and_then(|e| e.to_str()) == Some("svg") {
             // Ignore image files
             continue;
         }
