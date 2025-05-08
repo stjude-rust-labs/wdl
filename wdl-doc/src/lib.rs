@@ -43,82 +43,75 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
-/// The CSS stylesheet to use for the generated documentation.
-const STYLESHEET: &str = include_str!("../theme/dist/style.css");
-/// The "sprocket" logo.
-const SPROCKET_LOGO: &[u8] = include_bytes!("../theme/assets/sprocket-logo.svg");
-/// The "category selected" icon.
-const CATEGORY_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/category-selected.svg");
-/// The "list bullet" selected icon.
-const LIST_BULLET_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/list-bullet-selected.svg");
-/// The "list bullet" unselected icon.
-const LIST_BULLET_UNSELECTED_ICON: &[u8] =
-    include_bytes!("../theme/assets/list-bullet-unselected.svg");
-/// The "folder" selected icon.
-const FOLDER_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/folder-selected.svg");
-/// The "folder" unselected icon.
-const FOLDER_UNSELECTED_ICON: &[u8] = include_bytes!("../theme/assets/folder-unselected.svg");
-/// The "search" icon.
-const SEARCH_ICON: &[u8] = include_bytes!("../theme/assets/search.svg");
-/// The "directory selected" icon.
-const DIR_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/dir-selected.svg");
-/// The "directory unselected" icon.
-const DIR_UNSELECTED_ICON: &[u8] = include_bytes!("../theme/assets/dir-unselected.svg");
-/// The "struct selected" icon.
-const STRUCT_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/struct-selected.svg");
-/// The "struct unselected" icon.
-const STRUCT_UNSELECTED_ICON: &[u8] = include_bytes!("../theme/assets/struct-unselected.svg");
-/// The "task selected" icon.
-const TASK_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/task-selected.svg");
-/// The "task unselected" icon.
-const TASK_UNSELECTED_ICON: &[u8] = include_bytes!("../theme/assets/task-unselected.svg");
-/// The "workflow selected" icon.
-const WORKFLOW_SELECTED_ICON: &[u8] = include_bytes!("../theme/assets/workflow-selected.svg");
-/// The "workflow unselected" icon.
-const WORKFLOW_UNSELECTED_ICON: &[u8] = include_bytes!("../theme/assets/workflow-unselected.svg");
-
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     let dir = dir.as_ref();
     let assets_dir = dir.join("assets");
     std::fs::create_dir_all(&assets_dir)?;
-    std::fs::write(dir.join("style.css"), STYLESHEET)?;
+    std::fs::write(
+        dir.join("style.css"),
+        include_str!("../theme/dist/style.css"),
+    )?;
 
-    std::fs::write(assets_dir.join("sprocket-logo.svg"), SPROCKET_LOGO)?;
+    std::fs::write(
+        assets_dir.join("sprocket-logo.svg"),
+        include_bytes!("../theme/assets/sprocket-logo.svg"),
+    )?;
     std::fs::write(
         assets_dir.join("category-selected.svg"),
-        CATEGORY_SELECTED_ICON,
+        include_bytes!("../theme/assets/category-selected.svg"),
     )?;
     std::fs::write(
         assets_dir.join("list-bullet-selected.svg"),
-        LIST_BULLET_SELECTED_ICON,
+        include_bytes!("../theme/assets/list-bullet-selected.svg"),
     )?;
     std::fs::write(
         assets_dir.join("list-bullet-unselected.svg"),
-        LIST_BULLET_UNSELECTED_ICON,
+        include_bytes!("../theme/assets/list-bullet-unselected.svg"),
     )?;
-    std::fs::write(assets_dir.join("folder-selected.svg"), FOLDER_SELECTED_ICON)?;
+    std::fs::write(
+        assets_dir.join("folder-selected.svg"),
+        include_bytes!("../theme/assets/folder-selected.svg"),
+    )?;
     std::fs::write(
         assets_dir.join("folder-unselected.svg"),
-        FOLDER_UNSELECTED_ICON,
+        include_bytes!("../theme/assets/folder-unselected.svg"),
     )?;
-    std::fs::write(assets_dir.join("search.svg"), SEARCH_ICON)?;
-    std::fs::write(assets_dir.join("dir-selected.svg"), DIR_SELECTED_ICON)?;
-    std::fs::write(assets_dir.join("dir-unselected.svg"), DIR_UNSELECTED_ICON)?;
-    std::fs::write(assets_dir.join("struct-selected.svg"), STRUCT_SELECTED_ICON)?;
+    std::fs::write(
+        assets_dir.join("search.svg"),
+        include_bytes!("../theme/assets/search.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-selected.svg"),
+        include_bytes!("../theme/assets/dir-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-unselected.svg"),
+        include_bytes!("../theme/assets/dir-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("struct-selected.svg"),
+        include_bytes!("../theme/assets/struct-selected.svg"),
+    )?;
     std::fs::write(
         assets_dir.join("struct-unselected.svg"),
-        STRUCT_UNSELECTED_ICON,
+        include_bytes!("../theme/assets/struct-unselected.svg"),
     )?;
-    std::fs::write(assets_dir.join("task-selected.svg"), TASK_SELECTED_ICON)?;
-    std::fs::write(assets_dir.join("task-unselected.svg"), TASK_UNSELECTED_ICON)?;
+    std::fs::write(
+        assets_dir.join("task-selected.svg"),
+        include_bytes!("../theme/assets/task-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("task-unselected.svg"),
+        include_bytes!("../theme/assets/task-unselected.svg"),
+    )?;
     std::fs::write(
         assets_dir.join("workflow-selected.svg"),
-        WORKFLOW_SELECTED_ICON,
+        include_bytes!("../theme/assets/workflow-selected.svg"),
     )?;
     std::fs::write(
         assets_dir.join("workflow-unselected.svg"),
-        WORKFLOW_UNSELECTED_ICON,
+        include_bytes!("../theme/assets/workflow-unselected.svg"),
     )?;
 
     Ok(())
