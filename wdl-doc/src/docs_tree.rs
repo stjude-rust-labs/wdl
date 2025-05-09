@@ -697,7 +697,7 @@ impl DocsTree {
                             img x-show="search !== '' && searchedNodes.length === 0" src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="size-8" alt="Search icon";
                         }
                         li class="flex place-content-center pr-8" {
-                            p x-show="search !== '' && searchedNodes.length === 0" class="" { "No results found for \"" p class="text-slate-50" x-text="search" {} "\"" }
+                            p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
                     ul x-cloak x-show="showWorkflows && search === ''" class="" {
