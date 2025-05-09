@@ -470,7 +470,11 @@ impl DocsTree {
                 let search_name = if node.page().is_none() {
                     "".to_string()
                 } else {
-                    node.name().to_string()
+                    node.path()
+                        .strip_prefix(root.path())
+                        .expect("path should be in the docs directory")
+                        .to_string_lossy()
+                        .to_string()
                 };
                 let href = match node.page() {
                     Some(page) => match page.page_type() {
