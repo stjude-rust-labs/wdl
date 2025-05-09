@@ -674,12 +674,14 @@ impl DocsTree {
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
-                            li class="flex flex-row items-center gap-x-1" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
                                 }
-                                img x-show="showSelfCache[node.key]" x-on:click="toggleChildren(node.key)" x-data="{ hover: false }" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" x-bind:src="hover && (children(node.key).length > 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon";
-                                p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50 bg-slate-800' : (node.search_name === '') ? '' : 'hover:text-slate-50 hover:bg-slate-700'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
+                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon";
+                                    p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                }
                             }
                         }
                         template x-for="node in searchedNodes" {
