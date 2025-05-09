@@ -409,6 +409,8 @@ impl DocsTree {
             href: Option<String>,
             /// Whether the node is selected.
             selected: bool,
+            /// Whether the node is the current page.
+            current: bool,
             /// The nest level of the node.
             nest_level: usize,
             /// The children of the node.
@@ -427,6 +429,7 @@ impl DocsTree {
                         img: '{}',
                         href: {},
                         selected: {},
+                        current: {},
                         nest_level: {}
                     }}"#,
                     self.key,
@@ -440,6 +443,7 @@ impl DocsTree {
                         "null".to_string()
                     },
                     self.selected,
+                    self.current,
                     self.nest_level
                 )
             }
@@ -486,6 +490,7 @@ impl DocsTree {
                     None => None,
                 };
                 let selected = path.starts_with(node.path());
+                let current = path == node.path();
                 let img = match node.page() {
                     Some(page) => match page.page_type() {
                         PageType::Task(_) => self
@@ -554,6 +559,7 @@ impl DocsTree {
                     img,
                     href,
                     selected,
+                    current,
                     nest_level,
                     children,
                 }
@@ -674,7 +680,7 @@ impl DocsTree {
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
                                 }
