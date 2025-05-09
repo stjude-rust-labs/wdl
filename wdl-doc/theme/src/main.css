@@ -10,6 +10,12 @@
 /* Custom theme variables */
 @theme {
   --font-sans: "DM Sans";
+  --text-base: 14px;
+  --text-base--line-height: 22px;
+}
+
+[x-cloak] {
+  display: none !important;
 }
 
 /* Scan Rust source code */
