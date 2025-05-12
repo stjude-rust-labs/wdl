@@ -351,18 +351,31 @@ impl DocsTree {
                     }
                     ul class="" {
                         @for node in workflows {
-                            li class="flex flex-row items-center gap-x-1" {
+                            li x-data=(format!(r#"{{
+                                hover: false,
+                                node: {{
+                                    selected: {},
+                                    img: '{}',
+                                }}
+                            }}"#,
+                            node.path() == destination,
+                            self.assets_relative_to(base)
+                                .join(if node.path() == destination {
+                                    "workflow-selected.svg"
+                                } else {
+                                    "workflow-unselected.svg"
+                                })
+                                .to_string_lossy()
+                                .to_string(),
+                            )) class="flex flex-row items-center gap-x-1" x-bind:class="node.selected ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
                                             div class="w-px h-6 mr-2" {}
                                             div class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
-                                            @if destination.starts_with(node.path()) {
-                                                img src=(self.assets_relative_to(base).join("workflow-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                                                p class="truncate text-slate-50" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
-                                            } @else {
-                                                img src=(self.assets_relative_to(base).join("workflow-unselected.svg").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                                                p class="truncate hover:text-slate-300" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                            div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
+                                                img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
+                                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
