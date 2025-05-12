@@ -682,11 +682,11 @@ impl DocsTree {
                 }
                 div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
                     div class="flex items-center gap-x-1 pr-4" {
-                        div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("list-bullet-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
-                        div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("folder-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -702,7 +702,7 @@ impl DocsTree {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
-                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon";
+                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : node.img" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
                                     p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
                                 }
                             }
