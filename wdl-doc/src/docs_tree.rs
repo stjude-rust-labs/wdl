@@ -371,8 +371,8 @@ impl DocsTree {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
-                                            div class="w-px h-6 mr-2" {}
-                                            div class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
+                                            div class="w-px h-6 mr-2 flex-none" {}
+                                            div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-500" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
                                                 p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
