@@ -122,15 +122,15 @@ pub trait Callable {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return html! {
-                h3 { "Required Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
+                h3 class="workflow__section-subheader" { "Required Inputs" }
+                table class="workflow__table" {
+                    thead { tr {
                         th { "Name" }
                         th { "Type" }
                         th { "Description" }
                         th { "Additional Meta" }
                     }}
-                    tbody class="border" {
+                    tbody {
                         @for param in iter {
                             (param.render())
                         }
@@ -145,16 +145,16 @@ pub trait Callable {
     fn render_group_inputs(&self) -> Markup {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
-                h3 { (group.0) }
-                table class="border" {
-                    thead class="border" { tr {
+                h3 class="workflow__section-subheader" { (group.0) }
+                table class="workflow__table" {
+                    thead { tr {
                         th { "Name" }
                         th { "Type" }
                         th { "Default" }
                         th { "Description" }
                         th { "Additional Meta" }
                     }}
-                    tbody class="border" {
+                    tbody {
                         @for param in self.inputs_in_group(&group) {
                             (param.render())
                         }
@@ -174,16 +174,16 @@ pub trait Callable {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
             return html! {
-                h3 { "Other Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
+                h3 class="workflow__section-subheader" { "Other Inputs" }
+                table class="workflow__table" {
+                    thead { tr {
                         th { "Name" }
                         th { "Type" }
                         th { "Default" }
                         th { "Description" }
                         th { "Additional Meta" }
                     }}
-                    tbody class="border" {
+                    tbody {
                         @for param in iter {
                             (param.render())
                         }
@@ -197,28 +197,32 @@ pub trait Callable {
     /// Render the inputs of the callable.
     fn render_inputs(&self) -> Markup {
         html! {
-            h2 { "Inputs" }
-            (self.render_required_inputs())
-            (self.render_group_inputs())
-            (self.render_other_inputs())
+            section class="workflow__section" {
+                h2 class="workflow__section-header" { "Inputs" }
+                (self.render_required_inputs())
+                (self.render_group_inputs())
+                (self.render_other_inputs())
+            }
         }
     }
 
     /// Render the outputs of the callable.
     fn render_outputs(&self) -> Markup {
         html! {
-            h2 { "Outputs" }
-            table  {
-                thead class="border" { tr {
-                    th { "Name" }
-                    th { "Type" }
-                    th { "Expression" }
-                    th { "Description" }
-                    th { "Additional Meta" }
-                }}
-                tbody class="border" {
-                    @for param in self.outputs() {
-                        (param.render())
+            section class="workflow__section" {
+                h2 class="workflow__section-header" { "Outputs" }
+                table class="workflow__table" {
+                    thead { tr {
+                        th { "Name" }
+                        th { "Type" }
+                        th { "Expression" }
+                        th { "Description" }
+                        th { "Additional Meta" }
+                    }}
+                    tbody {
+                        @for param in self.outputs() {
+                            (param.render())
+                        }
                     }
                 }
             }
