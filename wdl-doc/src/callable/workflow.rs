@@ -93,11 +93,13 @@ impl Workflow {
             .peekable();
         html! {
             @if kv.peek().is_some() {
-                div {
-                    h2 { "Meta" }
-                    @for (key, value) in kv {
-                        p {
-                            b { (key) ":" } " " (render_value(value))
+                div class="workflow__section" {
+                    h2 class="workflow__section-header" { "Meta" }
+                    ul class="workflow__meta-records" {
+                        @for (key, value) in kv {
+                            li class="workflow__meta-record" {
+                                b { (key) ":" } " " (render_value(value))
+                            }
                         }
                     }
                 }
@@ -108,12 +110,16 @@ impl Workflow {
     /// Render the workflow as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div class="flex flex-col gap-y-6" {
-                h1 { (self.pretty_name()) }
-                @if let Some(category) = self.category() {
-                    h2 { "Category: " (category) }
+            div class="workflow__container" {
+                section class="workflow__section" {
+                    h1 class="workflow__title" { (self.pretty_name()) }
+                    @if let Some(category) = self.category() {
+                        h2 class="workflow__section-subheader" { "Category: " (category) }
+                    }
+                    p class="workflow__section-text" {
+                        (self.description())
+                    }
                 }
-                (self.description())
                 (self.render_meta())
                 (self.render_inputs())
                 (self.render_outputs())
