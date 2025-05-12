@@ -659,7 +659,7 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) class="flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-scroll overflow-x-clip" {
+            div x-data=(data) class="flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-auto overflow-x-clip" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
                 form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
                     div class="flex flex-row items-center h-full w-full" {
@@ -780,14 +780,14 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                div class="flex flex-row items-start" {
-                    div class="flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky" {
+                div class="layout__container" {
+                    div class="layout__sidebar-left" {
                         (left_sidebar)
                     }
-                    div class="flex grow p-4 ml-4" {
+                    div class="layout__main-center" {
                         (content)
                     }
-                    div class="flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky" {
+                    div class="layout__sidebar-right" {
                         (self.render_right_sidebar())
                     }
                 }
@@ -819,14 +819,14 @@ impl DocsTree {
         let html = full_page(
             page.name(),
             html! {
-                div class="flex flex-row items-start" {
-                    div class="flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky" {
+                div class="layout__container" {
+                    div class="layout__sidebar-left" {
                         (left_sidebar)
                     }
-                    div class="flex grow p-4 ml-4" {
+                    div class="layout__main-center" {
                         (content)
                     }
-                    div class="flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky" {
+                    div class="layout__sidebar-right" {
                         (self.render_right_sidebar())
                     }
                 }
