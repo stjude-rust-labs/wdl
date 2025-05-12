@@ -129,21 +129,21 @@ impl Parameter {
     pub fn render(&self) -> Markup {
         if self.required() == Some(true) {
             html! {
-                tr class="border" {
-                    td class="border" { (self.name()) }
-                    td class="border" { code { (self.ty()) } }
-                    td class="border" { (self.description()) }
-                    td class="border" { (self.render_remaining_meta()) }
+                tr {
+                    td { (self.name()) }
+                    td { code { (self.ty()) } }
+                    td { (self.description()) }
+                    td { (self.render_remaining_meta()) }
                 }
             }
         } else {
             html! {
-                tr class="border" {
-                    td class="border" { (self.name()) }
-                    td class="border" { code { (self.ty()) } }
-                    td class="border" { code { (self.expr()) } }
-                    td class="border" { (self.description()) }
-                    td class="border" { (self.render_remaining_meta()) }
+                tr {
+                    td { (self.name()) }
+                    td { code { (self.ty()) } }
+                    td { code { (self.expr()) } }
+                    td { (self.description()) }
+                    td { (self.render_remaining_meta()) }
                 }
             }
         }
