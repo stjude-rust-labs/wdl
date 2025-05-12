@@ -286,11 +286,8 @@
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
-  .overflow-x-clip {
-    overflow-x: clip !important;
-  }
-  .overflow-y-auto {
-    overflow-y: auto !important;
+  .overflow-auto {
+    overflow: auto !important;
   }
   .rounded-md {
     border-radius: var(--radius-md) !important;
