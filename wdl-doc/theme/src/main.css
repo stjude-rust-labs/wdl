@@ -1,17 +1,12 @@
+/* FIXME: remove !important, known anti-pattern that leads to CSS specificity wars */
 @import "tailwindcss" important;
-@import "tailwindcss/preflight";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Local imports */
-@import "./headings.css";
-
 /* Custom theme variables */
 @theme {
   --font-sans: "DM Sans";
-  --text-base: 14px;
-  --text-base--line-height: 22px;
 }
 
 [x-cloak] {
@@ -20,3 +15,79 @@
 
 /* Scan Rust source code */
 @source "../../src/";
+
+@layer base {
+  body {
+    @apply text-sm;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply leading-none;
+  }
+
+  h1 {
+    @apply text-5xl; /* 48px */
+  }
+
+  h2 {
+    @apply text-4xl; /* 36px */
+  }
+
+  h3 {
+    @apply text-3xl; /* 30px */
+  }
+
+  h4 {
+    @apply text-2xl; /* 24px */
+  }
+}
+
+@layer components {
+  .layout__container {
+    @apply flex flex-row items-start;
+  }
+  .layout__sidebar-left {
+    @apply flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky;
+  }
+  .layout__main-center {
+    @apply flex grow p-4 ml-4 bg-slate-950 text-slate-300;
+  }
+  .layout__sidebar-right {
+    @apply flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky;
+  }
+
+  .workflow__container {
+    @apply flex flex-col gap-y-6;
+  }
+
+  .workflow__title {
+    @apply text-5xl text-slate-50;
+  }
+  .workflow__section {
+    @apply flex flex-col;
+  }
+  .workflow__section-header {
+    @apply text-2xl text-slate-50;
+  }
+  .workflow__section-subheader {
+    @apply mt-8 text-lg text-slate-50;
+  }
+  .workflow__section-text {
+    @apply mt-3 text-slate-300 text-sm;
+  }
+  .workflow__table {
+    @apply mt-3;
+  }
+  .workflow__table th {
+    @apply text-slate-50 text-left py-3.5 border-b border-b-slate-700 pr-5;
+  }
+  .workflow__table td {
+    @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
+  }
+  .workflow__table td code {
+    @apply inline text-slate-200 border border-slate-700 bg-slate-800 rounded-md font-mono text-[0.8em] p-[0.2em];
+  }
+  /* workflow meta-specific, renders <ul> + <li> */
+  .workflow__meta-records {}
+  .workflow__meta-record {}
+}
