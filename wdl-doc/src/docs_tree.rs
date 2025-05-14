@@ -672,7 +672,7 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) class="flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-auto" {
+            div x-data=(data) class="docs-tree__container" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
                 form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
                     div class="flex flex-row items-center h-full w-full" {
