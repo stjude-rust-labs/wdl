@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
 use serde::Deserialize;
@@ -13,9 +12,11 @@ use tracing::warn;
 
 use crate::DockerBackend;
 use crate::LocalBackend;
-use crate::SYSTEM;
 use crate::TaskExecutionBackend;
-use crate::convert_unit_string;
+
+pub mod backend;
+
+pub use backend::BackendConfig;
 
 /// The inclusive maximum number of task retries the engine supports.
 pub const MAX_RETRIES: u64 = 100;
@@ -327,130 +328,11 @@ impl TaskConfig {
     }
 }
 
-/// Represents supported task execution backends.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", tag = "type")]
-pub enum BackendConfig {
-    /// Use the local task execution backend.
-    Local(LocalBackendConfig),
-    /// Use the Docker task execution backend.
-    Docker(DockerBackendConfig),
-}
-
-impl Default for BackendConfig {
-    fn default() -> Self {
-        Self::Docker(Default::default())
-    }
-}
-
-impl BackendConfig {
-    /// Validates the backend configuration.
-    pub fn validate(&self) -> Result<()> {
-        match self {
-            Self::Local(config) => config.validate(),
-            Self::Docker(config) => config.validate(),
-        }
-    }
-}
-
-/// Represents configuration for the local task execution backend.
-///
-/// <div class="warning">
-/// Warning: the local task execution backend spawns processes on the host
-/// directly without the use of a container; only use this backend on trusted
-/// WDL. </div>
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", deny_unknown_fields)]
-pub struct LocalBackendConfig {
-    /// Set the number of CPUs available for task execution.
-    ///
-    /// Defaults to the number of logical CPUs for the host.
-    ///
-    /// The value cannot be zero or exceed the host's number of CPUs.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cpu: Option<u64>,
-
-    /// Set the total amount of memory for task execution as a unit string (e.g.
-    /// `2 GiB`).
-    ///
-    /// Defaults to the total amount of memory for the host.
-    ///
-    /// The value cannot be zero or exceed the host's total amount of memory.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub memory: Option<String>,
-}
-
-impl LocalBackendConfig {
-    /// Validates the local task execution backend configuration.
-    pub fn validate(&self) -> Result<()> {
-        if let Some(cpu) = self.cpu {
-            if cpu == 0 {
-                bail!("local backend configuration value `cpu` cannot be zero");
-            }
-
-            let total = SYSTEM.cpus().len() as u64;
-            if cpu > total {
-                bail!(
-                    "local backend configuration value `cpu` cannot exceed the virtual CPUs \
-                     available to the host ({total})"
-                );
-            }
-        }
-
-        if let Some(memory) = &self.memory {
-            let memory = convert_unit_string(memory).with_context(|| {
-                format!("local backend configuration value `memory` has invalid value `{memory}`")
-            })?;
-
-            if memory == 0 {
-                bail!("local backend configuration value `memory` cannot be zero");
-            }
-
-            let total = SYSTEM.total_memory();
-            if memory > total {
-                bail!(
-                    "local backend configuration value `memory` cannot exceed the total memory of \
-                     the host ({total} bytes)"
-                );
-            }
-        }
-
-        Ok(())
-    }
-}
-
-/// Gets the default value for the docker `cleanup` field.
-const fn cleanup_default() -> bool {
-    true
-}
-
-/// Represents configuration for the Docker backend.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", deny_unknown_fields)]
-pub struct DockerBackendConfig {
-    /// Whether or not to remove a task's container after the task completes.
-    ///
-    /// Defaults to `true`.
-    #[serde(default = "cleanup_default")]
-    pub cleanup: bool,
-}
-
-impl DockerBackendConfig {
-    /// Validates the Docker backend configuration.
-    pub fn validate(&self) -> Result<()> {
-        Ok(())
-    }
-}
-
-impl Default for DockerBackendConfig {
-    fn default() -> Self {
-        Self { cleanup: true }
-    }
-}
-
 #[cfg(test)]
 mod test {
     use pretty_assertions::assert_eq;
+
+    use crate::config::backend::LocalBackendConfig;
 
     use super::*;
 
