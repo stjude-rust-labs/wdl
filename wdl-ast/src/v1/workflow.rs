@@ -97,7 +97,7 @@ impl<N: TreeNode> WorkflowDefinition<N> {
                         {
                             match i.value() {
                                 WorkflowHintsItemValue::Boolean(v) => Some(v.value()),
-                                _ => Some(false),
+                                _ => None,
                             }
                         } else {
                             None
@@ -121,7 +121,7 @@ impl<N: TreeNode> WorkflowDefinition<N> {
                     if i.name().text() == WORKFLOW_HINT_ALLOW_NESTED_INPUTS {
                         match i.value() {
                             MetadataValue::Boolean(v) => Some(v.value()),
-                            _ => Some(false),
+                            _ => None,
                         }
                     } else {
                         None
