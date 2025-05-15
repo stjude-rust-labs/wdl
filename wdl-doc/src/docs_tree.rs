@@ -372,7 +372,7 @@ impl DocsTree {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
                                             div class="w-px h-6 mr-2 flex-none" {}
-                                            div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-500" {}
+                                            div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
                                                 p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
@@ -672,16 +672,17 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) class="flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-auto" {
-                img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
-                form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
-                    div class="flex flex-row items-center h-full w-full" {
-                        img src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="flex size-8" alt="Search icon";
-                        input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300 pl-2";
+            div x-data=(data) class="flex flex-col h-screen w-full text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400" {
+                div class="" {
+                    img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none sticky mb-4" alt="Sprocket logo";
+                    form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] sticky rounded-md border border-slate-700 mb-4" {
+                        div class="flex flex-row items-center h-full w-full" {
+                            img src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="flex size-6" alt="Search icon";
+                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300 pl-2";
+                            img src=(self.assets_relative_to(base).join("x-mark.svg").to_string_lossy()) class="flex size-6 hover:cursor-pointer ml-2 pr-2" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
+                        }
                     }
-                }
-                div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
-                    div class="flex items-center gap-x-1 pr-4" {
+                    div class="flex items-center sticky gap-x-1 pr-4" {
                         div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("list-bullet-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
@@ -691,28 +692,30 @@ impl DocsTree {
                             p { "Full Directory" }
                         }
                     }
-                    ul x-cloak x-show="! showWorkflows || search != ''" class="" {
+                }
+                div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pt-2 pl-2 overflow-x-hidden overflow-y-scroll" {
+                    ul x-cloak x-show="! showWorkflows || search != ''" class="pr-4" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center truncate gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
-                                    div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
+                                    div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
                                     img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : node.img" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
-                                    p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                    p x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
                                 }
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-col hover:bg-slate-700 border-b pl-2" {
-                                p class="truncate" x-text="node.path" {}
+                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 truncate pl-2" {
+                                p class="text-xs" x-text="node.path" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
-                                    p class="truncate text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                    p class="text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
                                 }
                             }
                         }
@@ -723,7 +726,7 @@ impl DocsTree {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
-                    ul x-cloak x-show="showWorkflows && search === ''" class="" {
+                    ul x-cloak x-show="showWorkflows && search === ''" class="pr-4" {
                         (self.sidebar_workflows_view(path))
                     }
                 }
