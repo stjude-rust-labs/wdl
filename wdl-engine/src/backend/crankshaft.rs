@@ -1,4 +1,4 @@
-//! Implementation of the Docker backend.
+//! Implementation of the Crankshaft backend.
 
 use std::collections::HashMap;
 use std::fs;
@@ -16,6 +16,7 @@ use crankshaft::engine::service::name::GeneratorIterator;
 use crankshaft::engine::service::name::UniqueAlphanumeric;
 use crankshaft::engine::service::runner::Backend;
 use crankshaft::engine::service::runner::backend::docker;
+use crankshaft::engine::service::runner::backend::generic;
 use crankshaft::engine::task::Execution;
 use crankshaft::engine::task::Input;
 use crankshaft::engine::task::Output;
@@ -23,6 +24,7 @@ use crankshaft::engine::task::Resources;
 use crankshaft::engine::task::input::Contents;
 use crankshaft::engine::task::input::Type as InputType;
 use crankshaft::engine::task::output::Type as OutputType;
+use figment::providers::Serialized;
 use futures::FutureExt;
 use futures::future::BoxFuture;
 use nonempty::NonEmpty;
@@ -49,7 +51,7 @@ use crate::Value;
 use crate::WORK_DIR_NAME;
 use crate::config::DEFAULT_TASK_SHELL;
 use crate::config::TaskConfig;
-use crate::config::backend::DockerBackendConfig;
+use crate::config::backend::CrankshaftBackendConfig;
 use crate::http::Downloader;
 use crate::http::HttpDownloader;
 use crate::http::Location;
@@ -84,11 +86,11 @@ const GUEST_STDERR_PATH: &str = "/stderr";
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
 #[derive(Debug)]
-struct DockerTaskRequest {
+struct CrankshaftTaskRequest {
     /// The inner task spawn request.
     inner: TaskSpawnRequest,
     /// The underlying Crankshaft backend.
-    backend: Arc<docker::Backend>,
+    backend: Arc<dyn crankshaft::engine::service::runner::Backend>,
     /// The name of the task.
     name: String,
     /// The optional shell to use.
@@ -107,7 +109,7 @@ struct DockerTaskRequest {
     token: CancellationToken,
 }
 
-impl TaskManagerRequest for DockerTaskRequest {
+impl TaskManagerRequest for CrankshaftTaskRequest {
     fn cpu(&self) -> f64 {
         self.cpu
     }
@@ -262,10 +264,10 @@ impl TaskManagerRequest for DockerTaskRequest {
     }
 }
 
-/// Represents the Docker backend.
-pub struct DockerBackend {
+/// Represents the Crankshaft backend.
+pub struct CrankshaftBackend {
     /// The underlying Crankshaft backend.
-    inner: Arc<docker::Backend>,
+    inner: Arc<dyn Backend>,
     /// The shell to use.
     shell: Arc<Option<String>>,
     /// The default container to use.
@@ -277,61 +279,114 @@ pub struct DockerBackend {
     /// The maximum memory for any of one node.
     max_memory: u64,
     /// The task manager for the backend.
-    manager: TaskManager<DockerTaskRequest>,
+    manager: TaskManager<CrankshaftTaskRequest>,
     /// The name generator for tasks.
     generator: Arc<Mutex<GeneratorIterator<UniqueAlphanumeric>>>,
 }
 
-impl DockerBackend {
-    /// Constructs a new Docker task execution backend with the given
+impl CrankshaftBackend {
+    /// Constructs a new Crankshaft task execution backend with the given
     /// configuration.
-    pub async fn new(task: &TaskConfig, config: &DockerBackendConfig) -> Result<Self> {
+    pub async fn new(
+        task: &TaskConfig,
+        config: &CrankshaftBackendConfig,
+        embedded: &crankshaft::Config,
+    ) -> Result<Self> {
         task.validate()?;
         config.validate()?;
+        embedded.validate()?;
 
-        info!("initializing Docker backend");
+        let combined: crankshaft::Config = crankshaft::Config::default_sources()
+            .admerge(Serialized::defaults(embedded))
+            .extract()?;
 
-        let backend = docker::Backend::initialize_default_with(
-            backend::docker::Config::builder()
-                .cleanup(config.cleanup)
-                .build(),
-        )
-        .await
-        .map_err(|e| anyhow!("{e:#}"))
-        .context("failed to initialize Docker backend")?;
-
-        let resources = *backend.resources();
-        let cpu = resources.cpu();
-        let max_cpu = resources.max_cpu();
-        let memory = resources.memory();
-        let max_memory = resources.max_memory();
-
-        // If a service is being used, then we're going to be spawning into a cluster
-        // For the purposes of resource tracking, treat it as unlimited resources and
-        // let Docker handle resource allocation
-        let manager = if resources.use_service() {
-            TaskManager::new_unlimited(max_cpu, max_memory)
+        let crankshaft_config = if let Some(name) = &config.backend {
+            // Start by trying to pull out the specified backend name.
+            match combined
+                .into_backends()
+                .find(|config| config.name() == name)
+            {
+                Some(config) => config,
+                None => bail!("Crankshaft backend with name `{name}` not found"),
+            }
+        } else if let Some(config) = combined.into_backends().next() {
+            // If no name is specified, use the first configuration found.
+            config
         } else {
-            TaskManager::new(cpu, max_cpu, memory, max_memory)
+            // When all else fails, use the default Docker backend.
+            crankshaft::config::backend::Config::builder()
+                .name("docker")
+                .kind(crankshaft::config::backend::Kind::Docker(
+                    crankshaft::config::backend::docker::Config::default(),
+                ))
+                .build()
         };
 
-        Ok(Self {
-            inner: Arc::new(backend),
-            shell: Arc::new(task.shell.clone()),
-            container: task.shell.clone(),
-            max_concurrency: cpu,
-            max_cpu,
-            max_memory,
-            manager,
-            generator: Arc::new(Mutex::new(GeneratorIterator::new(
-                UniqueAlphanumeric::default_with_expected_generations(INITIAL_EXPECTED_NAMES),
-                INITIAL_EXPECTED_NAMES,
-            ))),
-        })
+        let generator = Arc::new(Mutex::new(GeneratorIterator::new(
+            UniqueAlphanumeric::default_with_expected_generations(INITIAL_EXPECTED_NAMES),
+            INITIAL_EXPECTED_NAMES,
+        )));
+
+        info!("initializing Crankshaft backend");
+
+        match crankshaft_config.into_kind() {
+            backend::Kind::Docker(config) => {
+                let backend = docker::Backend::initialize_default_with(config)
+                    .await
+                    .map_err(|e| anyhow!("{e:#}"))
+                    .context("failed to initialize Crankshaft's Docker backend")?;
+
+                let resources = *backend.resources();
+                let cpu = resources.cpu();
+                let max_cpu = resources.max_cpu();
+                let memory = resources.memory();
+                let max_memory = resources.max_memory();
+
+                // If a service is being used, then we're going to be spawning into a cluster
+                // For the purposes of resource tracking, treat it as unlimited resources and
+                // let Crankshaft handle resource allocation
+                let manager = if resources.use_service() {
+                    TaskManager::new_unlimited(max_cpu, max_memory)
+                } else {
+                    TaskManager::new(cpu, max_cpu, memory, max_memory)
+                };
+
+                Ok(Self {
+                    inner: Arc::new(backend),
+                    shell: Arc::new(task.shell.clone()),
+                    container: task.shell.clone(),
+                    max_concurrency: cpu,
+                    max_cpu,
+                    max_memory,
+                    manager,
+                    generator,
+                })
+            }
+            backend::Kind::Generic(config) => {
+                let backend = generic::Backend::initialize(config, None)
+                    .await
+                    .map_err(|e| anyhow!("{e:#}"))
+                    .context("failed to initialize Crankshaft's generic backend")?;
+
+                Ok(Self {
+                    inner: Arc::new(backend),
+                    shell: Arc::new(task.shell.clone()),
+                    container: task.shell.clone(),
+                    max_concurrency: u64::MAX,
+                    max_cpu: u64::MAX,
+                    max_memory: u64::MAX,
+                    manager: TaskManager::new_unlimited(u64::MAX, u64::MAX),
+                    generator,
+                })
+            }
+            // backend::Kind::Generic(config) => Arc::new(
+            // ),
+            backend::Kind::TES(_) => todo!("implement TES execution backend"),
+        }
     }
 }
 
-impl TaskExecutionBackend for DockerBackend {
+impl TaskExecutionBackend for CrankshaftBackend {
     fn max_concurrency(&self) -> u64 {
         self.max_concurrency
     }
@@ -479,7 +534,7 @@ impl TaskExecutionBackend for DockerBackend {
                 .expect("generator should never be exhausted")
         );
         self.manager.send(
-            DockerTaskRequest {
+            CrankshaftTaskRequest {
                 inner: request,
                 shell: self.shell.clone(),
                 backend: self.inner.clone(),

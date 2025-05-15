@@ -10,7 +10,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use tracing::warn;
 
-use crate::DockerBackend;
+use crate::CrankshaftBackend;
 use crate::LocalBackend;
 use crate::TaskExecutionBackend;
 
@@ -46,6 +46,9 @@ pub struct Config {
     /// Storage configuration.
     #[serde(default)]
     pub storage: StorageConfig,
+    /// Crankshaft configuration.
+    #[serde(default)]
+    pub crankshaft: crankshaft::Config,
 }
 
 impl Config {
@@ -56,6 +59,7 @@ impl Config {
         self.task.validate()?;
         self.backend.validate()?;
         self.storage.validate()?;
+        self.crankshaft.validate()?;
         Ok(())
     }
 
@@ -69,9 +73,9 @@ impl Config {
                 );
                 Ok(Arc::new(LocalBackend::new(&self.task, config)?))
             }
-            BackendConfig::Docker(config) => {
-                Ok(Arc::new(DockerBackend::new(&self.task, config).await?))
-            }
+            BackendConfig::Crankshaft(config) => Ok(Arc::new(
+                CrankshaftBackend::new(&self.task, config, &self.crankshaft).await?,
+            )),
         }
     }
 }

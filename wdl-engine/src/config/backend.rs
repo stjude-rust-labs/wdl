@@ -4,10 +4,10 @@ use anyhow::Result;
 use serde::Deserialize;
 use serde::Serialize;
 
-mod docker;
+mod crankshaft;
 mod local;
 
-pub use docker::DockerBackendConfig;
+pub use crankshaft::CrankshaftBackendConfig;
 pub use local::LocalBackendConfig;
 
 /// Represents supported task execution backends.
@@ -16,13 +16,13 @@ pub use local::LocalBackendConfig;
 pub enum BackendConfig {
     /// Use the local task execution backend.
     Local(LocalBackendConfig),
-    /// Use the Docker task execution backend.
-    Docker(DockerBackendConfig),
+    /// Use the Crankshaft task execution backend.
+    Crankshaft(CrankshaftBackendConfig),
 }
 
 impl Default for BackendConfig {
     fn default() -> Self {
-        Self::Docker(Default::default())
+        Self::Crankshaft(Default::default())
     }
 }
 
@@ -31,7 +31,7 @@ impl BackendConfig {
     pub fn validate(&self) -> Result<()> {
         match self {
             Self::Local(config) => config.validate(),
-            Self::Docker(config) => config.validate(),
+            Self::Crankshaft(config) => config.validate(),
         }
     }
 }
