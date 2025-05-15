@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Changed
+
+* Values of `WORKFLOW_HINT_ALLOW_NESTED_INPUTS` and `WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS` were swapped
+    and documentation updated to clarify behavior differences between WDL v1.1 and >v1.2
+    ([#445](https://github.com/stjude-rust-labs/wdl/pull/445)).
+
 ## 0.12.1 - 05-02-2025
 
 _A patch bump was required because an error was made during the release of `wdl` v0.13.0 regarding dependencies._
