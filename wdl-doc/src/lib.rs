@@ -62,6 +62,10 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/search.svg"),
     )?;
     std::fs::write(
+        assets_dir.join("x-mark.svg"),
+        include_bytes!("../theme/assets/x-mark.svg"),
+    )?;
+    std::fs::write(
         assets_dir.join("chevron-down.svg"),
         include_bytes!("../theme/assets/chevron-down.svg"),
     )?;
@@ -155,7 +159,7 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, styleshe
         (DOCTYPE)
         html class="dark" {
             (header(page_title, stylesheet))
-            body class="size-full table-auto border-collapse dark:bg-slate-950 dark:text-white text-base" {
+            body class="size-full table-auto border-collapse text-base" {
                 (body)
             }
         }
