@@ -44,13 +44,13 @@
 
 @layer components {
   .layout__container {
-    @apply flex flex-row items-start;
+    @apply flex flex-row items-start bg-slate-950 text-slate-300;
   }
   .layout__sidebar-left {
     @apply flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky;
   }
   .layout__main-center {
-    @apply flex grow p-4 ml-4 bg-slate-950 text-slate-300;
+    @apply flex grow h-full py-4 px-8;
   }
   .layout__sidebar-right {
     @apply flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky;
