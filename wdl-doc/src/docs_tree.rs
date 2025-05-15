@@ -734,9 +734,37 @@ impl DocsTree {
     /// Render a right sidebar component.
     pub fn render_right_sidebar(&self) -> Markup {
         html! {
-            div class="p-4 h-full w-full bg-red-900 text-white" {
-                h1 class="text-2xl text-center" { "Sidebar" }
-                p class="" { "Right Sidebar" }
+            div class="right-sidebar__container" {
+                div class="right-sidebar__header" {
+                    "ON THIS PAGE"
+                }
+                a class="right-sidebar__section-header" {
+                    "Inputs"
+                }
+                div class="right-sidebar__section-items" {
+                    a class="right-sidebar__section-item right-sidebar__section-item--active" {
+                        "Required Inputs"
+                    }
+                    a class="right-sidebar__section-item" {
+                        "Common Inputs"
+                    }
+                    a class="right-sidebar__section-item" {
+                        "Other Inputs"
+                    }
+                }
+                a class="right-sidebar__section-header right-sidebar__section-header--active" {
+                    "Outputs"
+                }
+                div class="right-sidebar__back-to-top-container" {
+                    a class="right-sidebar__back-to-top" {
+                        span class="right-sidebar__back-to-top-icon" {
+                            "↑"
+                        }
+                        span class="right-sidebar__back-to-top-text" {
+                            "Back to top"
+                        }
+                    }
+                }
             }
         }
     }
