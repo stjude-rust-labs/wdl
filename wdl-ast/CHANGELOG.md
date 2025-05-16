@@ -7,12 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-#### Changed
-
-* Values of `WORKFLOW_HINT_ALLOW_NESTED_INPUTS` and `WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS` were swapped
-    and documentation updated to clarify behavior differences between WDL v1.1 and >=v1.2
-    ([#445](https://github.com/stjude-rust-labs/wdl/pull/445)).
-
 #### Fixed
 
 * If a WDL >=v1.2 workflow has a non-boolean value for the `allow_nested_inputs` hint, the metadata will also be

@@ -22,13 +22,14 @@ use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
 
-/// The name of the `allow_nested_inputs` workflow metadata hint (i.e.
-/// `allowNestedInputs`) for WDL v1.1 and later.
-pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS: &str = "allowNestedInputs";
+/// The name of the `allow_nested_inputs` workflow hint. Note that this
+/// is not a standard WDL v1.1 hint, but is used in WDL >=v1.2.
+pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS: &str = "allow_nested_inputs";
 
-/// The name of the `allow_nested_inputs` workflow hint alias for WDL v1.2 and
-/// later.
-pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS: &str = "allow_nested_inputs";
+/// The alias of the `allow_nested_inputs` workflow hint (e.g.
+/// `allowNestedInputs`). Note that in WDL v1.1, this is the only
+/// form of the hint.
+pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS: &str = "allowNestedInputs";
 
 /// Represents a workflow definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -118,7 +119,7 @@ impl<N: TreeNode> WorkflowDefinition<N> {
         self.metadata()
             .and_then(|s| {
                 s.items().find_map(|i| {
-                    if i.name().text() == WORKFLOW_HINT_ALLOW_NESTED_INPUTS {
+                    if i.name().text() == WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS {
                         match i.value() {
                             MetadataValue::Boolean(v) => Some(v.value()),
                             _ => None,
