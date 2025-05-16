@@ -33,9 +33,10 @@ clap-verbosity-flag = { version = "3.0.2", features = ["tracing"] }
 codespan-reporting = "0.12.0"
 colored = "3.0.0"
 convert_case = "0.8.0"
-crankshaft = "0.2.0"
+crankshaft = { path = "../crankshaft/crankshaft" }
 dirs = "6.0.0"
 faster-hex = "0.10.0"
+figment = "0.10.19"
 ftree = "1.2.0"
 notify = "8.0.0"
 futures = "0.3.31"
@@ -60,7 +61,11 @@ pulldown-cmark = "0.13.0"
 rand = "0.9.1"
 rayon = "1.10.0"
 regex = "1.11.1"
-reqwest = { version = "0.12.15", default-features = false, features = ["rustls-tls", "http2", "charset"] }
+reqwest = { version = "0.12.15", default-features = false, features = [
+    "rustls-tls",
+    "http2",
+    "charset",
+] }
 reqwest-middleware = "0.4.2"
 rowan = "0.16.1"
 serde = { version = "1", features = ["derive"] }
