@@ -1,5 +1,5 @@
 /* FIXME: remove !important, known anti-pattern that leads to CSS specificity wars */
-@import "tailwindcss" important;
+@import "tailwindcss";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -42,18 +42,25 @@
   }
 }
 
+@utility dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1f2937;
+}
+
 @layer components {
   .layout__container {
-    @apply flex flex-row items-start bg-slate-950 text-slate-300;
+    @apply h-screen w-screen flex pl-72;
   }
   .layout__sidebar-left {
-    @apply flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky;
+    @apply fixed left-0 top-0 h-screen w-72 overflow-x-hidden overflow-y-auto dark-scrollbar;
   }
   .layout__main-center {
-    @apply flex grow h-full py-4 px-8;
+    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
   }
+
+  /* should take up w-72 space and NOT grow or shrink */
   .layout__sidebar-right {
-    @apply flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky;
+    @apply w-72 max-xl:hidden;
   }
 
   .workflow__container {
@@ -75,8 +82,18 @@
   .workflow__section-text {
     @apply mt-3 text-slate-300 text-sm;
   }
+  /* We need tables to be scrollable on the X axis */
+  .workflow__table-outer-container {
+    @apply overflow-x-auto dark-scrollbar;
+  }
+  .workflow__table-inner-container {
+    @apply w-3xl md:w-4xl lg:w-auto;
+  }
   .workflow__table {
-    @apply mt-3;
+    @apply mt-3 table-fixed;
+  }
+  .workflow__table details summary + * {
+    @apply mt-2;
   }
   .workflow__table th {
     @apply text-slate-50 text-left py-3.5 border-b border-b-slate-700 pr-5;
@@ -90,4 +107,45 @@
   /* workflow meta-specific, renders <ul> + <li> */
   .workflow__meta-records {}
   .workflow__meta-record {}
+
+  .docs-tree__container {
+    @apply flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
+  }
+
+  .right-sidebar__container {
+    @apply p-4 h-full w-full bg-slate-900 text-white isolate flex flex-col gap-1.5;
+  }
+  .right-sidebar__header {
+    @apply text-xs text-slate-600;
+  }
+  .right-sidebar__section-header {
+    @apply h-7 px-2 flex items-center rounded-sm text-sm text-slate-400 hover:text-slate-300 hover:bg-slate-800 cursor-pointer;
+  }
+  .right-sidebar__section-header--active {
+    @apply bg-slate-700 text-white;
+  }
+
+  .right-sidebar__section-items {
+    @apply flex flex-col gap-1.5 ml-4 border-l border-slate-600;
+  }
+  .right-sidebar__section-item {
+    @apply h-7 px-4 flex items-center rounded-sm text-sm text-slate-400 -ml-2 hover:text-slate-300 hover:bg-slate-400/30 cursor-pointer;
+  }
+  .right-sidebar__section-item--active {
+    @apply bg-slate-400/20 text-white;
+  }
+
+  .right-sidebar__back-to-top-container {
+    @apply mt-4;
+  }
+  .right-sidebar__back-to-top {
+    @apply flex items-center text-slate-400 hover:text-slate-300 cursor-pointer;
+  }
+  .right-sidebar__back-to-top-icon {
+    @apply mr-2 flex items-center justify-center w-6 h-6 rounded-full border border-slate-500;
+  }
+  .right-sidebar__back-to-top-text {
+    @apply text-sm;
+  }
 }
+

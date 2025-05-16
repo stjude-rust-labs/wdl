@@ -672,7 +672,7 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) class="flex flex-col h-screen w-full text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400" {
+            div x-data=(data) class="docs-tree__container" {
                 div class="" {
                     img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none sticky mb-4" alt="Sprocket logo";
                     form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] sticky rounded-md border border-slate-700 mb-4" {
@@ -737,9 +737,37 @@ impl DocsTree {
     /// Render a right sidebar component.
     pub fn render_right_sidebar(&self) -> Markup {
         html! {
-            div class="p-4 h-full w-full bg-red-900 text-white" {
-                h1 class="text-2xl text-center" { "Sidebar" }
-                p class="" { "Right Sidebar" }
+            div class="right-sidebar__container" {
+                div class="right-sidebar__header" {
+                    "ON THIS PAGE"
+                }
+                a class="right-sidebar__section-header" {
+                    "Inputs"
+                }
+                div class="right-sidebar__section-items" {
+                    a class="right-sidebar__section-item right-sidebar__section-item--active" {
+                        "Required Inputs"
+                    }
+                    a class="right-sidebar__section-item" {
+                        "Common Inputs"
+                    }
+                    a class="right-sidebar__section-item" {
+                        "Other Inputs"
+                    }
+                }
+                a class="right-sidebar__section-header right-sidebar__section-header--active" {
+                    "Outputs"
+                }
+                div class="right-sidebar__back-to-top-container" {
+                    a class="right-sidebar__back-to-top" {
+                        span class="right-sidebar__back-to-top-icon" {
+                            "↑"
+                        }
+                        span class="right-sidebar__back-to-top-text" {
+                            "Back to top"
+                        }
+                    }
+                }
             }
         }
     }
