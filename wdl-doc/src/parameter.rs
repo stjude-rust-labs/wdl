@@ -110,9 +110,10 @@ impl Parameter {
     /// This will render any metadata that is not rendered elsewhere if present.
     pub fn render_remaining_meta(&self) -> Option<Markup> {
         if let Some(MetadataValue::Object(o)) = &self.meta {
-            let filtered_items = o.items().filter(|item| {
-                item.name().text() != "description" && item.name().text() != "group"
-            }).collect::<Vec<_>>();
+            let filtered_items = o
+                .items()
+                .filter(|item| item.name().text() != "description" && item.name().text() != "group")
+                .collect::<Vec<_>>();
             if filtered_items.is_empty() {
                 return None;
             }
