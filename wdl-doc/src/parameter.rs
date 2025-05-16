@@ -90,7 +90,7 @@ impl Parameter {
     pub fn description(&self) -> Markup {
         if let Some(meta) = &self.meta {
             if let MetadataValue::String(_) = meta {
-                render_value(meta)
+                return render_value(meta);
             } else if let MetadataValue::Object(o) = meta {
                 for item in o.items() {
                     if item.name().text() == "description" {
@@ -99,13 +99,9 @@ impl Parameter {
                         }
                     }
                 }
-                html! {}
-            } else {
-                html! {}
             }
-        } else {
-            html! {}
         }
+        html! {}
     }
 
     /// Render the remaining metadata as HTML.
@@ -116,8 +112,7 @@ impl Parameter {
             let filtered_items = o.items().filter(|item| {
                 item.name().text() != "description" && item.name().text() != "group"
             });
-
-            html! {
+            return html! {
                 ul {
                     @for item in filtered_items {
                         li {
@@ -125,10 +120,9 @@ impl Parameter {
                         }
                     }
                 }
-            }
-        } else {
-            html! {}
+            };
         }
+        html! {}
     }
 
     /// Render the parameter as HTML.
