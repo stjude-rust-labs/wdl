@@ -347,7 +347,7 @@ impl DocsTree {
                 li class="" {
                     div class="flex items-center gap-x-1 h-6 text-slate-50" {
                         img src=(self.assets_relative_to(base).join("category-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Category icon";
-                        p class="truncate" { (category) }
+                        p class="" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
@@ -375,7 +375,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
-                                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                p class="" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
@@ -693,14 +693,14 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pt-2 pl-2 overflow-x-hidden overflow-y-scroll" {
-                    ul x-cloak x-show="! showWorkflows || search != ''" class="pr-4" {
+                div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-hidden overflow-y-scroll" {
+                    ul x-show="! showWorkflows || search != ''" class="pr-4" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center truncate gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
                                 }
@@ -711,7 +711,7 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 truncate pl-2" {
+                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 pl-2" {
                                 p class="text-xs" x-text="node.path" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
@@ -726,9 +726,10 @@ impl DocsTree {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
-                    ul x-cloak x-show="showWorkflows && search === ''" class="pr-4" {
+                    ul x-show="showWorkflows && search === ''" class="pr-4" {
                         (self.sidebar_workflows_view(path))
                     }
+                    div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-3" {}
                 }
             }
         }
