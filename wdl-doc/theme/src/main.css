@@ -52,7 +52,7 @@
     @apply h-screen w-screen flex pl-72;
   }
   .layout__sidebar-left {
-    @apply fixed left-0 top-0 h-screen w-72 overflow-x-hidden overflow-y-auto dark-scrollbar;
+    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
   }
   .layout__main-center {
     @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;

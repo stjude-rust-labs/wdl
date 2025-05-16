@@ -693,8 +693,8 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-hidden overflow-y-scroll" {
-                    ul x-show="! showWorkflows || search != ''" class="" {
+                div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
+                    ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
@@ -719,14 +719,14 @@ impl DocsTree {
                                 }
                             }
                         }
-                        li class="flex place-content-center pr-8" {
+                        li class="flex place-content-center" {
                             img x-show="search !== '' && searchedNodes.length === 0" src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="size-8" alt="Search icon";
                         }
-                        li class="flex place-content-center pr-8" {
+                        li class="flex place-content-center" {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
-                    ul x-show="showWorkflows && search === ''" class="" {
+                    ul x-show="showWorkflows && search === ''" class="w-max pr-3" {
                         (self.sidebar_workflows_view(path))
                     }
                     div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-3" {}
