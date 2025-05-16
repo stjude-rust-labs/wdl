@@ -9,6 +9,7 @@ use wdl_ast::v1::MetadataValue;
 
 use crate::callable::Group;
 use crate::meta::render_value;
+use crate::DEFAULT_THRESHOLD;
 
 /// Whether a parameter is an input or output.
 #[derive(Debug, Clone, Copy)]
@@ -141,9 +142,35 @@ impl Parameter {
                 tr {
                     td { (self.name()) }
                     td { code { (self.ty()) } }
-                    td { code { (self.expr()) } }
+                    td { (shorten_expr_if_needed(self.expr(), DEFAULT_THRESHOLD)) }
                     td { (self.description()) }
                     td { (self.render_remaining_meta()) }
+                }
+            }
+        }
+    }
+}
+
+/// Render a WDL expression as HTML, with a "Read more" button if it exceeds a certain length.
+fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
+    if expr.len() <= threshold {
+        return html! { code { (expr) } };
+    }
+
+    let clipped_expr = expr[..threshold].trim();
+
+    html! {
+        div x-data="{ expanded: false }" {
+            div x-show="!expanded" {
+                p { code { (clipped_expr) } "..." }
+                button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                    b { "Show full expression" }
+                }
+            }
+            div x-show="expanded" {
+                p { code { (expr) } }
+                button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                    b { "Show less" }
                 }
             }
         }

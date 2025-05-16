@@ -8,9 +8,7 @@ use wdl_ast::v1::MetadataValue;
 
 use crate::Markdown;
 use crate::Render;
-
-/// Default threshold for collapsing long strings.
-const DEFAULT_THRESHOLD: usize = 80;
+use crate::DEFAULT_THRESHOLD;
 
 /// Render a [`MetadataValue`] as HTML.
 pub(crate) fn render_value(value: &MetadataValue) -> Markup {
@@ -19,7 +17,7 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
             MetadataValue::String(s) => {
                 let inner_text = s.text().map(|t| t.text().to_string()).unwrap_or_default();
                 if top_level {
-                    return html! { (wrap_markdown_in_details_if_needed(inner_text, DEFAULT_THRESHOLD)) };
+                    return html! { (summarize_markdown_if_needed(inner_text, DEFAULT_THRESHOLD)) };
                 }
                 html! { (s.text().map(|t| t.text().to_string()).unwrap_or_default()) }
             }
@@ -28,57 +26,63 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
             MetadataValue::Float(f) => html! { code { (f.text().to_string()) } },
             MetadataValue::Null(n) => html! { code { (n.text().to_string()) } },
             MetadataValue::Array(a) => {
-                let full = html! {
-                    div {
-                        code { "[" }
-                        ul {
-                            @for item in a.elements() {
-                                li {
-                                    @match item {
-                                        MetadataValue::Array(_) | MetadataValue::Object(_) => {
-                                            (render_value_inner(&item, false)) ","
-                                        }
-                                        _ => {
-                                            code { (item.text().to_string()) } ","
+                html! {
+                    div x-data="{ expanded: false }" {
+                        div x-show="!expanded" {
+                            p { (format!("Array with {} elements... ", a.elements().collect::<Vec<_>>().len())) }
+                            button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                                b { "Expand" }
+                            }
+                        }
+                        div x-show="expanded" {
+                            code { "[" }
+                            ul {
+                                @for item in a.elements() {
+                                    li {
+                                        @match item {
+                                            MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                                                (render_value_inner(&item, false)) ","
+                                            }
+                                            _ => {
+                                                code { (item.text().to_string()) } ","
+                                            }
                                         }
                                     }
                                 }
                             }
+                            code { "]" }
+                            br;
+                            button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                                b { "Collapse" }
+                            }
                         }
-                        code { "]" }
-                    }
-                };
-                html! {
-                    details {
-                        summary {
-                            (format!("Array with {} elements... ", a.elements().collect::<Vec<_>>().len()))
-                            b { "Expand" }
-                        }
-                        (full)
                     }
                 }
             }
             MetadataValue::Object(o) => {
-                let full = html! {
-                    div {
-                        code { "{" }
-                        ul {
-                            @for item in o.items() {
-                                li {
-                                    b { (item.name().text()) ":" } " " (render_value_inner(&item.value(), false)) ","
-                                }
+                html! {
+                    div x-data="{ expanded: false }" {
+                        div x-show="!expanded" {
+                            p { (format!("Object with {} items... ", o.items().collect::<Vec<_>>().len())) }
+                            button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                                b { "Expand" }
                             }
                         }
-                        code { "}" }
-                    }
-                };
-                html! {
-                    details {
-                        summary {
-                            (format!("Object with {} items... ", o.items().collect::<Vec<_>>().len()))
-                            b { "Expand" }
+                        div x-show="expanded" {
+                            code { "{" }
+                            ul {
+                                @for item in o.items() {
+                                    li {
+                                        b { (item.name().text()) ":" } " " (render_value_inner(&item.value(), false)) ","
+                                    }
+                                }
+                            }
+                            code { "}" }
+                            br;
+                            button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                                b { "Collapse" }
+                            }
                         }
-                        (full)
                     }
                 }
             }
@@ -88,9 +92,8 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     render_value_inner(value, true)
 }
 
-/// Helper function to wrap markdown strings in details element if it exceeds a
-/// length threshold.
-fn wrap_markdown_in_details_if_needed(content: String, threshold: usize) -> Markup {
+/// Summarize a long string if it exceeds the threshold.
+fn summarize_markdown_if_needed(content: String, threshold: usize) -> Markup {
     if content.len() <= threshold {
         return Markdown(content).render();
     }
@@ -100,13 +103,19 @@ fn wrap_markdown_in_details_if_needed(content: String, threshold: usize) -> Mark
     let summary_text = format!("{}... ", &content[..threshold].trim());
 
     html! {
-        details {
-            summary {
-                (summary_text)
-                b { "Read more" }
+        div x-data="{ expanded: false }" {
+            div x-show="!expanded" {
+                p { (summary_text) }
+                button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                    b { "Read more" }
+                }
             }
-            div {
+            div x-show="expanded" {
                 (markup)
+                br;
+                button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                    b { "Read less" }
+                }
             }
         }
     }

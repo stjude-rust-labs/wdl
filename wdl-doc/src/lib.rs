@@ -43,6 +43,9 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
+/// Default threshold for collapsing long strings.
+const DEFAULT_THRESHOLD: usize = 80;
+
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     let dir = dir.as_ref();
