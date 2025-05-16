@@ -18,6 +18,7 @@ use wdl_ast::v1::ParameterMetadataSection;
 use crate::meta::render_value;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
+use crate::parameter::render_parameter_table;
 
 /// A map of metadata key-value pairs, sorted by key.
 pub type MetaMap = BTreeMap<String, MetadataValue>;
@@ -52,31 +53,6 @@ impl Ord for Group {
 
 /// A callable (workflow or task) in a WDL document.
 pub trait Callable {
-    /// Render a table with the given headers and parameters
-    fn render_table<'a, I>(&self, headers: &[&str], params: I) -> Markup
-    where
-        I: Iterator<Item = &'a Parameter>,
-    {
-        html! {
-            div class="workflow__table-outer-container" {
-                div class="workflow__table-inner-container" {
-                    table class="workflow__table" {
-                        thead { tr {
-                            @for header in headers {
-                                th { (header) }
-                            }
-                        }}
-                        tbody {
-                            @for param in params {
-                                (param.render())
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /// Get the name of the callable.
     fn name(&self) -> &str;
 
@@ -148,7 +124,7 @@ pub trait Callable {
         if iter.peek().is_some() {
             return html! {
                 h3 class="workflow__section-subheader" { "Required Inputs" }
-                (self.render_table(&["Name", "Type", "Description", "Additional Meta"], iter))
+                (render_parameter_table(&["Name", "Type", "Description"], iter))
             };
         };
         html! {}
@@ -159,8 +135,8 @@ pub trait Callable {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
                 h3 class="workflow__section-subheader" { (group.0) }
-                (self.render_table(
-                    &["Name", "Type", "Default", "Description", "Additional Meta"],
+                (render_parameter_table(
+                    &["Name", "Type", "Default", "Description"],
                     self.inputs_in_group(&group)
                 ))
             }
@@ -178,8 +154,8 @@ pub trait Callable {
         if iter.peek().is_some() {
             return html! {
                 h3 class="workflow__section-subheader" { "Other Inputs" }
-                (self.render_table(
-                    &["Name", "Type", "Default", "Description", "Additional Meta"],
+                (render_parameter_table(
+                    &["Name", "Type", "Default", "Description"],
                     iter
                 ))
             };
@@ -204,8 +180,8 @@ pub trait Callable {
         html! {
             section class="workflow__section" {
                 h2 class="workflow__section-header" { "Outputs" }
-                (self.render_table(
-                    &["Name", "Type", "Expression", "Description", "Additional Meta"],
+                (render_parameter_table(
+                    &["Name", "Type", "Expression", "Description"],
                     self.outputs().iter()
                 ))
             }
