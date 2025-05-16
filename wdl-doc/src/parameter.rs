@@ -7,9 +7,9 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::DEFAULT_THRESHOLD;
 use crate::callable::Group;
 use crate::meta::render_value;
-use crate::DEFAULT_THRESHOLD;
 
 /// Whether a parameter is an input or output.
 #[derive(Debug, Clone, Copy)]
@@ -151,7 +151,8 @@ impl Parameter {
     }
 }
 
-/// Render a WDL expression as HTML, with a "Read more" button if it exceeds a certain length.
+/// Render a WDL expression as HTML, with a "Read more" button if it exceeds a
+/// certain length.
 fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
     if expr.len() <= threshold {
         return html! { code { (expr) } };

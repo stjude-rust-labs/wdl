@@ -6,9 +6,9 @@ use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::v1::MetadataValue;
 
+use crate::DEFAULT_THRESHOLD;
 use crate::Markdown;
 use crate::Render;
-use crate::DEFAULT_THRESHOLD;
 
 /// Render a [`MetadataValue`] as HTML.
 pub(crate) fn render_value(value: &MetadataValue) -> Markup {
