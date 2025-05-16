@@ -31,6 +31,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
@@ -42,10 +43,87 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
-/// The directory where the generated documentation will be stored.
-///
-/// This directory will be created in the workspace directory.
-const DOCS_DIR: &str = "docs";
+/// Write assets to the given root docs directory.
+fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
+    let dir = dir.as_ref();
+    let assets_dir = dir.join("assets");
+    std::fs::create_dir_all(&assets_dir)?;
+    std::fs::write(
+        dir.join("style.css"),
+        include_str!("../theme/dist/style.css"),
+    )?;
+
+    std::fs::write(
+        assets_dir.join("sprocket-logo.svg"),
+        include_bytes!("../theme/assets/sprocket-logo.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("search.svg"),
+        include_bytes!("../theme/assets/search.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("x-mark.svg"),
+        include_bytes!("../theme/assets/x-mark.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("chevron-down.svg"),
+        include_bytes!("../theme/assets/chevron-down.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("category-selected.svg"),
+        include_bytes!("../theme/assets/category-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("list-bullet-selected.svg"),
+        include_bytes!("../theme/assets/list-bullet-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("list-bullet-unselected.svg"),
+        include_bytes!("../theme/assets/list-bullet-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("folder-selected.svg"),
+        include_bytes!("../theme/assets/folder-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("folder-unselected.svg"),
+        include_bytes!("../theme/assets/folder-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-selected.svg"),
+        include_bytes!("../theme/assets/dir-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-unselected.svg"),
+        include_bytes!("../theme/assets/dir-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("struct-selected.svg"),
+        include_bytes!("../theme/assets/struct-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("struct-unselected.svg"),
+        include_bytes!("../theme/assets/struct-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("task-selected.svg"),
+        include_bytes!("../theme/assets/task-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("task-unselected.svg"),
+        include_bytes!("../theme/assets/task-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("workflow-selected.svg"),
+        include_bytes!("../theme/assets/workflow-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("workflow-unselected.svg"),
+        include_bytes!("../theme/assets/workflow-unselected.svg"),
+    )?;
+
+    Ok(())
+}
 
 /// Links to a CSS stylesheet at the given path.
 struct Css<'a>(&'a str);
@@ -59,7 +137,7 @@ impl Render for Css<'_> {
 }
 
 /// A basic header with a `page_title` and an optional link to the stylesheet.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) -> Markup {
+pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup {
     html! {
         head {
             meta charset="utf-8";
@@ -68,24 +146,20 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) ->
             link rel="preconnect" href="https://fonts.googleapis.com";
             link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
-            @if let Some(ss) = stylesheet {
-                (Css(ss.as_ref().to_str().unwrap()))
-            }
+            script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
+            script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
+            (Css(stylesheet.as_ref().to_str().unwrap()))
         }
     }
 }
 
 /// A full HTML page.
-pub(crate) fn full_page<P: AsRef<Path>>(
-    page_title: &str,
-    body: Markup,
-    stylesheet: Option<P>,
-) -> Markup {
+pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, stylesheet: P) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark size-full" {
+        html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+            body class="size-full table-auto border-collapse text-base" {
                 (body)
             }
         }
@@ -109,14 +183,14 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
         // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
         let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
-            let trimmed = safe_html[3..safe_html.len() - 5].to_string();
+            let trimmed = &safe_html[3..safe_html.len() - 5];
             if trimmed.contains("<p>") {
                 // If the trimmed string contains another `<p>` tag, it means
                 // that the original string was more complicated than a single-line paragraph,
                 // so we should keep the outer `<p>` tag.
                 safe_html
             } else {
-                trimmed
+                trimmed.to_string()
             }
         } else {
             safe_html
@@ -192,11 +266,11 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div {
+            div class="flex flex-col gap-y-6" {
                 h1 { (self.name()) }
                 h3 { "WDL Version: " (self.version()) }
                 div { (self.preamble()) }
-                div class="flex flex-col items-center text-left"  {
+                div class="flex flex-col gap-y-6" {
                     h2 { "Table of Contents" }
                     table class="border" {
                         thead class="border" { tr {
@@ -243,20 +317,17 @@ impl Document {
 /// `docs` directory within the workspace.
 pub async fn document_workspace(
     workspace: impl AsRef<Path>,
+    output_dir: impl AsRef<Path>,
     stylesheet: Option<impl AsRef<Path>>,
-    overwrite: bool,
-) -> Result<PathBuf> {
-    let workspace_abs_path = absolute(workspace)?;
+) -> Result<()> {
+    let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let docs_dir = workspace_abs_path.join(DOCS_DIR);
-    if overwrite && docs_dir.exists() {
-        std::fs::remove_dir_all(&docs_dir)?;
-    }
+    let docs_dir = clean(absolute(output_dir.as_ref())?);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
@@ -266,9 +337,9 @@ pub async fn document_workspace(
     let results = analyzer.analyze(()).await?;
 
     let mut docs_tree = if let Some(ss) = stylesheet {
-        docs_tree::DocsTree::new_with_stylesheet(docs_dir.clone(), ss)?
+        docs_tree::DocsTree::new_with_stylesheet(&docs_dir, ss)?
     } else {
-        docs_tree::DocsTree::new(docs_dir.clone())
+        docs_tree::DocsTree::new(&docs_dir)?
     };
 
     for result in results {
@@ -359,7 +430,7 @@ pub async fn document_workspace(
 
     docs_tree.render_all()?;
 
-    Ok(docs_dir)
+    Ok(())
 }
 
 #[cfg(test)]

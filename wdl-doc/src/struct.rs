@@ -35,7 +35,7 @@ impl Struct {
     /// Render the struct as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div class="table-auto border-collapse" {
+            div class="flex flex-col gap-y-6" {
                 h1 { (self.name()) }
                 h2 { "Members" }
                 ul {

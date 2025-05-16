@@ -52,6 +52,31 @@ impl Ord for Group {
 
 /// A callable (workflow or task) in a WDL document.
 pub trait Callable {
+    /// Render a table with the given headers and parameters
+    fn render_table<'a, I>(&self, headers: &[&str], params: I) -> Markup
+    where
+        I: Iterator<Item = &'a Parameter>,
+    {
+        html! {
+            div class="workflow__table-outer-container" {
+                div class="workflow__table-inner-container" {
+                    table class="workflow__table" {
+                        thead { tr {
+                            @for header in headers {
+                                th { (header) }
+                            }
+                        }}
+                        tbody {
+                            @for param in params {
+                                (param.render())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /// Get the name of the callable.
     fn name(&self) -> &str;
 
@@ -122,20 +147,8 @@ pub trait Callable {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return html! {
-                h3 { "Required Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in iter {
-                            (param.render())
-                        }
-                    }
-                }
+                h3 class="workflow__section-subheader" { "Required Inputs" }
+                (self.render_table(&["Name", "Type", "Description", "Additional Meta"], iter))
             };
         };
         html! {}
@@ -145,21 +158,11 @@ pub trait Callable {
     fn render_group_inputs(&self) -> Markup {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
-                h3 { (group.0) }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Default" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in self.inputs_in_group(&group) {
-                            (param.render())
-                        }
-                    }
-                }
+                h3 class="workflow__section-subheader" { (group.0) }
+                (self.render_table(
+                    &["Name", "Type", "Default", "Description", "Additional Meta"],
+                    self.inputs_in_group(&group)
+                ))
             }
         });
         html! {
@@ -174,21 +177,11 @@ pub trait Callable {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
             return html! {
-                h3 { "Other Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Default" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in iter {
-                            (param.render())
-                        }
-                    }
-                }
+                h3 class="workflow__section-subheader" { "Other Inputs" }
+                (self.render_table(
+                    &["Name", "Type", "Default", "Description", "Additional Meta"],
+                    iter
+                ))
             };
         };
         html! {}
@@ -197,30 +190,24 @@ pub trait Callable {
     /// Render the inputs of the callable.
     fn render_inputs(&self) -> Markup {
         html! {
-            h2 { "Inputs" }
-            (self.render_required_inputs())
-            (self.render_group_inputs())
-            (self.render_other_inputs())
+            section class="workflow__section" {
+                h2 class="workflow__section-header" { "Inputs" }
+                (self.render_required_inputs())
+                (self.render_group_inputs())
+                (self.render_other_inputs())
+            }
         }
     }
 
     /// Render the outputs of the callable.
     fn render_outputs(&self) -> Markup {
         html! {
-            h2 { "Outputs" }
-            table  {
-                thead class="border" { tr {
-                    th { "Name" }
-                    th { "Type" }
-                    th { "Expression" }
-                    th { "Description" }
-                    th { "Additional Meta" }
-                }}
-                tbody class="border" {
-                    @for param in self.outputs() {
-                        (param.render())
-                    }
-                }
+            section class="workflow__section" {
+                h2 class="workflow__section-header" { "Outputs" }
+                (self.render_table(
+                    &["Name", "Type", "Expression", "Description", "Additional Meta"],
+                    self.outputs().iter()
+                ))
             }
         }
     }
