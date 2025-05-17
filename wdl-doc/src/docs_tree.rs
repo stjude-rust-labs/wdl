@@ -803,6 +803,67 @@ impl DocsTree {
         }
     }
 
+    /// Renders a page "breadcrumb" navigation component.
+    pub fn render_breadcrumbs<P: AsRef<Path>>(&self, path: P) -> Markup {
+        let path = path.as_ref();
+        let base = path.parent().expect("path should have a parent");
+
+        let mut current_path = path
+            .strip_prefix(self.root().path())
+            .expect("path should be in the docs directory");
+
+        let mut breadcrumbs = vec![];
+
+        let cur_node = self.get_node(path).unwrap_or(self.get_node(base).unwrap());
+        let cur_page = cur_node.page().expect("node should have a page");
+        breadcrumbs.push((cur_page.name(), None));
+
+        if matches!(cur_page.page_type(), PageType::Index(_)) {
+            // TODO: revisit logic to remove this hack
+            current_path = current_path.parent().expect("path should have a parent");
+        }
+
+        while let Some(parent) = current_path.parent() {
+            let cur_node = self.get_node(parent).expect("path should have a node");
+            breadcrumbs.push((
+                cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
+                if let Some(page) = cur_node.page() {
+                    match page.page_type() {
+                        PageType::Index(_) => {
+                            Some(diff_paths(cur_node.path().join("index.html"), base).unwrap())
+                        }
+                        _ => Some(diff_paths(cur_node.path(), base).unwrap()),
+                    }
+                } else {
+                    None
+                },
+            ));
+            current_path = parent;
+        }
+        breadcrumbs.reverse();
+        let mut breadcrumbs = breadcrumbs.into_iter();
+        let first = breadcrumbs
+            .next()
+            .expect("should have at least one breadcrumb");
+        let first = html! {
+            a href=(self.root_index_relative_to(base).to_string_lossy()) { (first.0) }
+        };
+
+        html! {
+            div class="" {
+                (first)
+                @for crumb in breadcrumbs {
+                    span { " / " }
+                    @if let Some(path) = crumb.1 {
+                        a href=(path.to_string_lossy()) {(crumb.0)}
+                    } @else {
+                        span { (crumb.0) }
+                    }
+                }
+            }
+        }
+    }
+
     /// Render every page in the tree.
     pub fn render_all(&self) -> anyhow::Result<()> {
         let root = self.root();
@@ -887,6 +948,8 @@ impl DocsTree {
             PageType::Workflow(w) => w.render(),
         };
 
+        let breadcrumbs = self.render_breadcrumbs(&path);
+
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
         let left_sidebar = self.render_left_sidebar(&path);
@@ -899,6 +962,7 @@ impl DocsTree {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
+                        (breadcrumbs)
                         (content)
                     }
                     div class="layout__sidebar-right" {
