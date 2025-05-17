@@ -15,6 +15,8 @@ use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
 use crate::meta::render_value;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
@@ -26,6 +28,18 @@ pub type MetaMap = BTreeMap<String, MetadataValue>;
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Group(pub String);
+
+impl Group {
+    /// Get the display name of the group.
+    pub fn display_name(&self) -> String {
+        self.0.clone()
+    }
+
+    /// Get the id of the group.
+    pub fn id(&self) -> String {
+        format!("inputs-{}", self.0.replace(" ", "-"))
+    }
+}
 
 impl PartialOrd for Group {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -118,68 +132,97 @@ pub trait Callable {
         })
     }
 
-    /// Render the required inputs of the callable.
-    fn render_required_inputs(&self) -> Markup {
+    /// Render the required inputs of the callable if present.
+    fn render_required_inputs(&self) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
-            return html! {
-                h3 class="workflow__section-subheader" { "Required Inputs" }
+            return Some(html! {
+                h3 id="inputs-required-inputs" class="workflow__section-subheader" { "Required Inputs" }
                 (render_parameter_table(&["Name", "Type", "Description"], iter))
-            };
+            });
         };
-        html! {}
+        None
     }
 
-    /// Render the inputs with a group of the callable.
-    fn render_group_inputs(&self) -> Markup {
+    /// Render the inputs with a group of the callable if present.
+    fn render_group_inputs(&self) -> Option<Markup> {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
-                h3 class="workflow__section-subheader" { (group.0) }
+                h3 id=(group.id()) class="workflow__section-subheader" { (group.display_name()) }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
                     self.inputs_in_group(&group)
                 ))
             }
-        });
-        html! {
+        }).collect::<Vec<_>>();
+        if group_tables.is_empty() {
+            return None;
+        }
+        Some(html! {
             @for group_table in group_tables {
                 (group_table)
             }
-        }
+        })
     }
 
-    /// Render the inputs that are neither required nor part of a group.
-    fn render_other_inputs(&self) -> Markup {
+    /// Render the inputs that are neither required nor part of a group if
+    /// present.
+    fn render_other_inputs(&self) -> Option<Markup> {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
-            return html! {
-                h3 class="workflow__section-subheader" { "Other Inputs" }
+            return Some(html! {
+                h3 id="inputs-other-inputs" class="workflow__section-subheader" { "Other Inputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
                     iter
                 ))
-            };
+            });
         };
-        html! {}
+        None
     }
 
     /// Render the inputs of the callable.
-    fn render_inputs(&self) -> Markup {
-        html! {
-            section class="workflow__section" {
-                h2 class="workflow__section-header" { "Inputs" }
-                (self.render_required_inputs())
-                (self.render_group_inputs())
-                (self.render_other_inputs())
+    fn render_inputs(&self) -> (Markup, PageHeaders) {
+        let mut inner_markup = Vec::new();
+        let mut headers = PageHeaders::default();
+        headers.push(Header::Header("Inputs".to_string(), "inputs".to_string()));
+        if let Some(req) = self.render_required_inputs() {
+            inner_markup.push(req);
+            headers.push(Header::SubHeader(
+                "Required Inputs".to_string(),
+                "inputs-required-inputs".to_string(),
+            ));
+        }
+        if let Some(group) = self.render_group_inputs() {
+            inner_markup.push(group);
+            for group in self.input_groups() {
+                headers.push(Header::SubHeader(group.display_name(), group.id()));
             }
         }
+        if let Some(other) = self.render_other_inputs() {
+            inner_markup.push(other);
+            headers.push(Header::SubHeader(
+                "Other Inputs".to_string(),
+                "inputs-other-inputs".to_string(),
+            ));
+        }
+        let markup = html! {
+            section class="workflow__section" {
+                h2 id="inputs" class="workflow__section-header" { "Inputs" }
+                @for html in inner_markup {
+                    (html)
+                }
+            }
+        };
+
+        (markup, headers)
     }
 
     /// Render the outputs of the callable.
     fn render_outputs(&self) -> Markup {
         html! {
             section class="workflow__section" {
-                h2 class="workflow__section-header" { "Outputs" }
+                h2 id="outputs" class="workflow__section-header" { "Outputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Expression", "Description"],
                     self.outputs().iter()

@@ -11,6 +11,8 @@ use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -68,22 +70,23 @@ impl Task {
     ///
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
+    pub fn render_meta(&self) -> Option<Markup> {
+        let kv = self
             .meta
             .iter()
             .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                h2 { "Meta" }
-                @for (key, value) in kv {
-                    p {
-                        b { (key) ":" } " " (render_value(value))
-                    }
+            .collect::<Vec<_>>();
+        if kv.is_empty() {
+            return None;
+        }
+        Some(html! {
+            h2 id="meta" { "Meta" }
+            @for (key, value) in kv {
+                p {
+                    b { (key) ":" } " " (render_value(value))
                 }
             }
-        }
+        })
     }
 
     /// Render the runtime section of the task as HTML.
@@ -91,7 +94,7 @@ impl Task {
         match &self.runtime_section {
             Some(runtime_section) => {
                 html! {
-                    h2 { "Default Runtime Attributes" }
+                    h2 id="runtime" { "Default Runtime Attributes" }
                     table class="border" {
                         thead class="border" { tr {
                             th { "Attribute" }
@@ -115,17 +118,32 @@ impl Task {
     }
 
     /// Render the task as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta() {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs();
+        headers.extend(inner_headers);
+
+        let markup = html! {
             div class="flex flex-col gap-y-6" {
-                h1 { (self.name()) }
+                h1 id="title" { (self.name()) }
                 (self.description())
-                (self.render_meta())
-                (self.render_inputs())
+                (meta_markup)
+                (input_markup)
                 (self.render_outputs())
                 (self.render_runtime_section())
             }
-        }
+        };
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+        headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
+
+        (markup, headers)
     }
 }
 

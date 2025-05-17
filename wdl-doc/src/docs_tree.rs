@@ -57,6 +57,52 @@ impl HTMLPage {
     }
 }
 
+/// A page header or page sub header.
+#[derive(Debug)]
+pub enum Header {
+    /// A header in the page.
+    Header(String, String),
+    /// A sub header in the page.
+    SubHeader(String, String),
+}
+
+/// A sorted collection of headers in a page.
+#[derive(Debug, Default)]
+pub struct PageHeaders {
+    /// The headers of the page.
+    pub headers: Vec<Header>,
+}
+
+impl PageHeaders {
+    /// Push a header to the page headers.
+    pub fn push(&mut self, header: Header) {
+        self.headers.push(header);
+    }
+
+    /// Extend the page headers with another collection of headers.
+    pub fn extend(&mut self, headers: Self) {
+        self.headers.extend(headers.headers);
+    }
+
+    /// Consume self and return the headers.
+    pub fn render(self) -> Markup {
+        html!(
+            @for header in self.headers {
+                @match header {
+                    Header::Header(name, id) => {
+                        a href=(format!("#{}", id)) class="right-sidebar__section-header" { (name) }
+                    }
+                    Header::SubHeader(name, id) => {
+                        div class="right-sidebar__section-items" {
+                            a href=(format!("#{}", id)) class="right-sidebar__section-item" { (name) }
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
 /// A node in the docs directory tree.
 #[derive(Debug)]
 struct Node {
@@ -736,31 +782,15 @@ impl DocsTree {
     }
 
     /// Render a right sidebar component.
-    pub fn render_right_sidebar(&self) -> Markup {
+    pub fn render_right_sidebar(&self, headers: PageHeaders) -> Markup {
         html! {
             div class="right-sidebar__container" {
                 div class="right-sidebar__header" {
                     "ON THIS PAGE"
                 }
-                a class="right-sidebar__section-header" {
-                    "Inputs"
-                }
-                div class="right-sidebar__section-items" {
-                    a class="right-sidebar__section-item right-sidebar__section-item--active" {
-                        "Required Inputs"
-                    }
-                    a class="right-sidebar__section-item" {
-                        "Common Inputs"
-                    }
-                    a class="right-sidebar__section-item" {
-                        "Other Inputs"
-                    }
-                }
-                a class="right-sidebar__section-header right-sidebar__section-header--active" {
-                    "Outputs"
-                }
+                (headers.render())
                 div class="right-sidebar__back-to-top-container" {
-                    a class="right-sidebar__back-to-top" {
+                    a href="#title" class="right-sidebar__back-to-top" {
                         span class="right-sidebar__back-to-top-icon" {
                             "↑"
                         }
@@ -833,7 +863,7 @@ impl DocsTree {
                         (content)
                     }
                     div class="layout__sidebar-right" {
-                        (self.render_right_sidebar())
+                        (self.render_right_sidebar(PageHeaders::default()))
                     }
                 }
             },
@@ -847,7 +877,7 @@ impl DocsTree {
     pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
         let mut path = path.into();
 
-        let content = match page.page_type() {
+        let (content, headers) = match page.page_type() {
             PageType::Index(doc) => {
                 path = path.join("index.html");
                 doc.render()
@@ -872,7 +902,7 @@ impl DocsTree {
                         (content)
                     }
                     div class="layout__sidebar-right" {
-                        (self.render_right_sidebar())
+                        (self.render_right_sidebar(headers))
                     }
                 }
             },
