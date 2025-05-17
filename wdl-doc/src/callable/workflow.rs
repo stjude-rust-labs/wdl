@@ -9,6 +9,8 @@ use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
@@ -85,34 +87,47 @@ impl Workflow {
     ///
     /// This will render all metadata key-value pairs except for `name`,
     /// `category`, `description`, and `outputs`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
+    pub fn render_meta(&self) -> Option<Markup> {
+        let kv = self
             .meta
             .iter()
             .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                div class="workflow__section" {
-                    h2 class="workflow__section-header" { "Meta" }
-                    ul class="workflow__meta-records" {
-                        @for (key, value) in kv {
-                            li class="workflow__meta-record" {
-                                b { (key) ":" } " " (render_value(value))
-                            }
+            .collect::<Vec<_>>();
+        if kv.is_empty() {
+            return None;
+        }
+        Some(html! {
+            div class="workflow__section" {
+                h2 id="meta" class="workflow__section-header" { "Meta" }
+                ul class="workflow__meta-records" {
+                    @for (key, value) in kv {
+                        li class="workflow__meta-record" {
+                            b { (key) ":" } " " (render_value(value))
                         }
                     }
                 }
             }
-        }
+        })
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta() {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs();
+
+        headers.extend(inner_headers);
+
+        let markup = html! {
             div class="workflow__container" {
                 section class="workflow__section" {
-                    h1 class="workflow__title" { (self.pretty_name()) }
+                    h1 id="title" class="workflow__title" { (self.pretty_name()) }
                     @if let Some(category) = self.category() {
                         h2 class="workflow__section-subheader" { "Category: " (category) }
                     }
@@ -120,11 +135,15 @@ impl Workflow {
                         (self.description())
                     }
                 }
-                (self.render_meta())
-                (self.render_inputs())
+                (meta_markup)
+                (input_markup)
                 (self.render_outputs())
             }
-        }
+        };
+
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+
+        (markup, headers)
     }
 }
 

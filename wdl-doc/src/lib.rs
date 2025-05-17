@@ -25,6 +25,8 @@ pub use callable::task;
 pub use callable::workflow;
 pub use docs_tree::DocsTree;
 use docs_tree::HTMLPage;
+use docs_tree::Header;
+use docs_tree::PageHeaders;
 use docs_tree::PageType;
 use maud::DOCTYPE;
 use maud::Markup;
@@ -42,6 +44,9 @@ use wdl_ast::AstToken;
 use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
+
+/// Default threshold for collapsing long strings.
+const DEFAULT_THRESHOLD: usize = 80;
 
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
@@ -264,14 +269,14 @@ impl Document {
     }
 
     /// Render the document as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let markup = html! {
             div class="flex flex-col gap-y-6" {
-                h1 { (self.name()) }
+                h1 id="title" { (self.name()) }
                 h3 { "WDL Version: " (self.version()) }
-                div { (self.preamble()) }
+                div id="preamble" { (self.preamble()) }
                 div class="flex flex-col gap-y-6" {
-                    h2 { "Table of Contents" }
+                    h2 id="toc" { "Table of Contents" }
                     table class="border" {
                         thead class="border" { tr {
                             th class="" { "Page" }
@@ -306,7 +311,19 @@ impl Document {
                     }
                 }
             }
-        }
+        };
+
+        let mut headers = PageHeaders::default();
+        headers.push(Header::Header(
+            "Preamble".to_string(),
+            "preamble".to_string(),
+        ));
+        headers.push(Header::Header(
+            "Table of Contents".to_string(),
+            "toc".to_string(),
+        ));
+
+        (markup, headers)
     }
 }
 

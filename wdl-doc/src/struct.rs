@@ -5,6 +5,8 @@ use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
+use crate::docs_tree::PageHeaders;
+
 /// A struct in a WDL document.
 #[derive(Debug)]
 pub struct Struct {
@@ -33,10 +35,10 @@ impl Struct {
     }
 
     /// Render the struct as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let markup = html! {
             div class="flex flex-col gap-y-6" {
-                h1 { (self.name()) }
+                h1 id="title" { (self.name()) }
                 h2 { "Members" }
                 ul {
                     @for (name, ty) in self.members() {
@@ -46,6 +48,7 @@ impl Struct {
                     }
                 }
             }
-        }
+        };
+        (markup, PageHeaders::default())
     }
 }

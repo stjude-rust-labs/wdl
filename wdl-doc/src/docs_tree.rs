@@ -57,6 +57,52 @@ impl HTMLPage {
     }
 }
 
+/// A page header or page sub header.
+#[derive(Debug)]
+pub enum Header {
+    /// A header in the page.
+    Header(String, String),
+    /// A sub header in the page.
+    SubHeader(String, String),
+}
+
+/// A sorted collection of headers in a page.
+#[derive(Debug, Default)]
+pub struct PageHeaders {
+    /// The headers of the page.
+    pub headers: Vec<Header>,
+}
+
+impl PageHeaders {
+    /// Push a header to the page headers.
+    pub fn push(&mut self, header: Header) {
+        self.headers.push(header);
+    }
+
+    /// Extend the page headers with another collection of headers.
+    pub fn extend(&mut self, headers: Self) {
+        self.headers.extend(headers.headers);
+    }
+
+    /// Consume self and return the headers.
+    pub fn render(self) -> Markup {
+        html!(
+            @for header in self.headers {
+                @match header {
+                    Header::Header(name, id) => {
+                        a href=(format!("#{}", id)) class="right-sidebar__section-header" { (name) }
+                    }
+                    Header::SubHeader(name, id) => {
+                        div class="right-sidebar__section-items" {
+                            a href=(format!("#{}", id)) class="right-sidebar__section-item" { (name) }
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
 /// A node in the docs directory tree.
 #[derive(Debug)]
 struct Node {
@@ -347,7 +393,7 @@ impl DocsTree {
                 li class="" {
                     div class="flex items-center gap-x-1 h-6 text-slate-50" {
                         img src=(self.assets_relative_to(base).join("category-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Category icon";
-                        p class="truncate" { (category) }
+                        p class="" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
@@ -375,7 +421,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
-                                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                p class="" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
@@ -693,14 +739,14 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pt-2 pl-2 overflow-x-hidden overflow-y-scroll" {
-                    ul x-cloak x-show="! showWorkflows || search != ''" class="pr-4" {
+                div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
+                    ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center truncate gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
                                 }
@@ -711,7 +757,7 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 truncate pl-2" {
+                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 pl-2" {
                                 p class="text-xs" x-text="node.path" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
@@ -719,53 +765,99 @@ impl DocsTree {
                                 }
                             }
                         }
-                        li class="flex place-content-center pr-8" {
+                        li class="flex place-content-center" {
                             img x-show="search !== '' && searchedNodes.length === 0" src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="size-8" alt="Search icon";
                         }
-                        li class="flex place-content-center pr-8" {
+                        li class="flex place-content-center" {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
-                    ul x-cloak x-show="showWorkflows && search === ''" class="pr-4" {
+                    ul x-show="showWorkflows && search === ''" class="w-max pr-3" {
                         (self.sidebar_workflows_view(path))
                     }
+                    div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-3" {}
                 }
             }
         }
     }
 
     /// Render a right sidebar component.
-    pub fn render_right_sidebar(&self) -> Markup {
+    pub fn render_right_sidebar(&self, headers: PageHeaders) -> Markup {
         html! {
             div class="right-sidebar__container" {
                 div class="right-sidebar__header" {
                     "ON THIS PAGE"
                 }
-                a class="right-sidebar__section-header" {
-                    "Inputs"
-                }
-                div class="right-sidebar__section-items" {
-                    a class="right-sidebar__section-item right-sidebar__section-item--active" {
-                        "Required Inputs"
-                    }
-                    a class="right-sidebar__section-item" {
-                        "Common Inputs"
-                    }
-                    a class="right-sidebar__section-item" {
-                        "Other Inputs"
-                    }
-                }
-                a class="right-sidebar__section-header right-sidebar__section-header--active" {
-                    "Outputs"
-                }
+                (headers.render())
                 div class="right-sidebar__back-to-top-container" {
-                    a class="right-sidebar__back-to-top" {
+                    a href="#title" class="right-sidebar__back-to-top" {
                         span class="right-sidebar__back-to-top-icon" {
                             "↑"
                         }
                         span class="right-sidebar__back-to-top-text" {
                             "Back to top"
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Renders a page "breadcrumb" navigation component.
+    pub fn render_breadcrumbs<P: AsRef<Path>>(&self, path: P) -> Markup {
+        let path = path.as_ref();
+        let base = path.parent().expect("path should have a parent");
+
+        let mut current_path = path
+            .strip_prefix(self.root().path())
+            .expect("path should be in the docs directory");
+
+        let mut breadcrumbs = vec![];
+
+        let cur_node = self.get_node(path).unwrap_or(self.get_node(base).unwrap());
+        let cur_page = cur_node.page().expect("node should have a page");
+        breadcrumbs.push((cur_page.name(), None));
+
+        if matches!(cur_page.page_type(), PageType::Index(_)) {
+            // TODO: revisit logic to remove this hack
+            current_path = current_path.parent().expect("path should have a parent");
+        }
+
+        while let Some(parent) = current_path.parent() {
+            let cur_node = self.get_node(parent).expect("path should have a node");
+            breadcrumbs.push((
+                cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
+                if let Some(page) = cur_node.page() {
+                    match page.page_type() {
+                        PageType::Index(_) => {
+                            Some(diff_paths(cur_node.path().join("index.html"), base).unwrap())
+                        }
+                        _ => Some(diff_paths(cur_node.path(), base).unwrap()),
+                    }
+                } else {
+                    None
+                },
+            ));
+            current_path = parent;
+        }
+        breadcrumbs.reverse();
+        let mut breadcrumbs = breadcrumbs.into_iter();
+        let first = breadcrumbs
+            .next()
+            .expect("should have at least one breadcrumb");
+        let first = html! {
+            a href=(self.root_index_relative_to(base).to_string_lossy()) { (first.0) }
+        };
+
+        html! {
+            div class="" {
+                (first)
+                @for crumb in breadcrumbs {
+                    span { " / " }
+                    @if let Some(path) = crumb.1 {
+                        a href=(path.to_string_lossy()) {(crumb.0)}
+                    } @else {
+                        span { (crumb.0) }
                     }
                 }
             }
@@ -832,7 +924,7 @@ impl DocsTree {
                         (content)
                     }
                     div class="layout__sidebar-right" {
-                        (self.render_right_sidebar())
+                        (self.render_right_sidebar(PageHeaders::default()))
                     }
                 }
             },
@@ -846,7 +938,7 @@ impl DocsTree {
     pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
         let mut path = path.into();
 
-        let content = match page.page_type() {
+        let (content, headers) = match page.page_type() {
             PageType::Index(doc) => {
                 path = path.join("index.html");
                 doc.render()
@@ -855,6 +947,8 @@ impl DocsTree {
             PageType::Task(t) => t.render(),
             PageType::Workflow(w) => w.render(),
         };
+
+        let breadcrumbs = self.render_breadcrumbs(&path);
 
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
@@ -868,10 +962,11 @@ impl DocsTree {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
+                        (breadcrumbs)
                         (content)
                     }
                     div class="layout__sidebar-right" {
-                        (self.render_right_sidebar())
+                        (self.render_right_sidebar(headers))
                     }
                 }
             },

@@ -7,6 +7,7 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::DEFAULT_THRESHOLD;
 use crate::callable::Group;
 use crate::meta::render_value;
 
@@ -104,15 +105,19 @@ impl Parameter {
         html! {}
     }
 
-    /// Render the remaining metadata as HTML.
+    /// Render any remaining metadata as HTML.
     ///
-    /// This will render any metadata that is not rendered elsewhere.
-    pub fn render_remaining_meta(&self) -> Markup {
+    /// This will render any metadata that is not rendered elsewhere if present.
+    pub fn render_remaining_meta(&self) -> Option<Markup> {
         if let Some(MetadataValue::Object(o)) = &self.meta {
-            let filtered_items = o.items().filter(|item| {
-                item.name().text() != "description" && item.name().text() != "group"
-            });
-            return html! {
+            let filtered_items = o
+                .items()
+                .filter(|item| item.name().text() != "description" && item.name().text() != "group")
+                .collect::<Vec<_>>();
+            if filtered_items.is_empty() {
+                return None;
+            }
+            return Some(html! {
                 ul {
                     @for item in filtered_items {
                         li {
@@ -120,30 +125,90 @@ impl Parameter {
                         }
                     }
                 }
-            };
+            });
         }
-        html! {}
+        None
     }
 
     /// Render the parameter as HTML.
-    pub fn render(&self) -> Markup {
-        if self.required() == Some(true) {
-            html! {
-                tr {
-                    td { (self.name()) }
-                    td { code { (self.ty()) } }
-                    td { (self.description()) }
-                    td { (self.render_remaining_meta()) }
+    pub fn render(&self, addl_meta: bool) -> Markup {
+        html! {
+            tr {
+                td { (self.name()) }
+                td { code { (self.ty()) } }
+                @if self.required() != Some(true) {
+                    td { (shorten_expr_if_needed(self.expr(), DEFAULT_THRESHOLD)) }
+                }
+                td { (self.description()) }
+                @if addl_meta {
+                    @if let Some(markup) = self.render_remaining_meta() {
+                        td { (markup) }
+                    } @else {
+                        td { }
+                    }
                 }
             }
-        } else {
-            html! {
-                tr {
-                    td { (self.name()) }
-                    td { code { (self.ty()) } }
-                    td { code { (self.expr()) } }
-                    td { (self.description()) }
-                    td { (self.render_remaining_meta()) }
+        }
+    }
+}
+
+/// Render a WDL expression as HTML, with a "Read more" button if it exceeds a
+/// certain length.
+fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
+    if expr.len() <= threshold {
+        return html! { code { (expr) } };
+    }
+
+    let clipped_expr = expr[..threshold].trim();
+
+    html! {
+        div x-data="{ expanded: false }" {
+            div x-show="!expanded" {
+                p { code { (clipped_expr) } "..." }
+                button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                    b { "Show full expression" }
+                }
+            }
+            div x-show="expanded" {
+                p { code { (expr) } }
+                button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                    b { "Show less" }
+                }
+            }
+        }
+    }
+}
+
+/// Render a table with the given headers and parameters
+///
+/// If any of the parameters return `Some(_)` for `render_remaining_meta()`, an
+/// "Additional Meta" column will be added to the table.
+pub(crate) fn render_parameter_table<'a, I>(headers: &[&str], params: I) -> Markup
+where
+    I: Iterator<Item = &'a Parameter>,
+{
+    let params = params.collect::<Vec<_>>();
+    let addl_meta = params
+        .iter()
+        .any(|param| param.render_remaining_meta().is_some());
+
+    html! {
+        div class="workflow__table-outer-container" {
+            div class="workflow__table-inner-container" {
+                table class="workflow__table" {
+                    thead { tr {
+                        @for header in headers {
+                            th { (header) }
+                        }
+                        @if addl_meta {
+                            th { "Additional Meta" }
+                        }
+                    }}
+                    tbody {
+                        @for param in params {
+                            (param.render(addl_meta))
+                        }
+                    }
                 }
             }
         }
