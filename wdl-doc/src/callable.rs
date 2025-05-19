@@ -458,7 +458,7 @@ mod tests {
         assert_eq!(inputs[0].name(), "a");
         assert_eq!(inputs[0].description().into_string(), "An integer");
         assert_eq!(inputs[1].name(), "b");
-        assert_eq!(inputs[1].description().into_string(), "");
+        assert_eq!(inputs[1].description().into_string(), "No description provided.");
         assert_eq!(inputs[2].name(), "c");
         assert_eq!(inputs[2].description().into_string(), "Another integer");
     }

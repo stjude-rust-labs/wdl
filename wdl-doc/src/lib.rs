@@ -75,6 +75,14 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/chevron-down.svg"),
     )?;
     std::fs::write(
+        assets_dir.join("dir-open.svg"),
+        include_bytes!("../theme/assets/dir-open.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-closed.svg"),
+        include_bytes!("../theme/assets/dir-closed.svg"),
+    )?;
+    std::fs::write(
         assets_dir.join("category-selected.svg"),
         include_bytes!("../theme/assets/category-selected.svg"),
     )?;
@@ -95,12 +103,12 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/folder-unselected.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-selected.svg"),
-        include_bytes!("../theme/assets/dir-selected.svg"),
+        assets_dir.join("wdl-dir-selected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-selected.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-unselected.svg"),
-        include_bytes!("../theme/assets/dir-unselected.svg"),
+        assets_dir.join("wdl-dir-unselected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-unselected.svg"),
     )?;
     std::fs::write(
         assets_dir.join("struct-selected.svg"),

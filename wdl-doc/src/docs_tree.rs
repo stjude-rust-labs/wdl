@@ -423,7 +423,7 @@ impl DocsTree {
                                 hover: false,
                                 node: {{
                                     selected: {},
-                                    img: '{}',
+                                    icon: '{}',
                                 }}
                             }}"#,
                             node.path() == destination,
@@ -439,7 +439,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none" {}
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
-                                                img x-bind:src="node.img" class="w-4 h-4" alt="Workflow icon";
+                                                img x-bind:src="node.icon" class="w-4 h-4" alt="Workflow icon";
                                                 p class="" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
@@ -482,7 +482,7 @@ impl DocsTree {
             /// The search name of the node.
             search_name: String,
             /// The icon for the node.
-            img: String,
+            icon: Option<String>,
             /// The href for the node.
             href: Option<String>,
             /// Whether the node is selected.
@@ -504,7 +504,7 @@ impl DocsTree {
                         display_name: '{}',
                         path: '{}',
                         search_name: '{}',
-                        img: '{}',
+                        icon: {},
                         href: {},
                         selected: {},
                         current: {},
@@ -514,7 +514,11 @@ impl DocsTree {
                     self.display_name,
                     self.path,
                     self.search_name,
-                    self.img,
+                    if let Some(icon) = &self.icon {
+                        format!("'{}'", icon)
+                    } else {
+                        "null".to_string()
+                    },
                     if let Some(href) = &self.href {
                         format!("'{}'", href)
                     } else {
@@ -575,49 +579,42 @@ impl DocsTree {
                 };
                 let selected = path.starts_with(node.path());
                 let current = path == node.path();
-                let img = match node.page() {
+                let icon = match node.page() {
                     Some(page) => match page.page_type() {
-                        PageType::Task(_) => self.get_asset(
+                        PageType::Task(_) => Some(self.get_asset(
                             base,
                             if selected {
                                 "task-selected.svg"
                             } else {
                                 "task-unselected.svg"
                             },
-                        ),
-                        PageType::Struct(_) => self.get_asset(
+                        )),
+                        PageType::Struct(_) => Some(self.get_asset(
                             base,
                             if selected {
                                 "struct-selected.svg"
                             } else {
                                 "struct-unselected.svg"
                             },
-                        ),
-                        PageType::Workflow(_) => self.get_asset(
+                        )),
+                        PageType::Workflow(_) => Some(self.get_asset(
                             base,
                             if selected {
                                 "workflow-selected.svg"
                             } else {
                                 "workflow-unselected.svg"
                             },
-                        ),
-                        PageType::Index(_) => self.get_asset(
+                        )),
+                        PageType::Index(_) => Some(self.get_asset(
                             base,
                             if selected {
-                                "dir-selected.svg"
+                                "wdl-dir-selected.svg"
                             } else {
-                                "dir-unselected.svg"
+                                "wdl-dir-unselected.svg"
                             },
-                        ),
+                        )),
                     },
-                    None => self.get_asset(
-                        base,
-                        if selected {
-                            "dir-selected.svg"
-                        } else {
-                            "dir-unselected.svg"
-                        },
-                    ),
+                    None => None,
                 };
                 let nest_level = node
                     .path()
@@ -635,7 +632,7 @@ impl DocsTree {
                     display_name,
                     path: inner_path,
                     search_name: search_name.clone(),
-                    img,
+                    icon,
                     href,
                     selected,
                     current,
@@ -670,6 +667,8 @@ impl DocsTree {
                 showWorkflows: $persist(true).using(sessionStorage),
                 search: $persist('').using(sessionStorage),
                 chevron: '{}',
+                dirOpen: '{}',
+                dirClosed: '{}',
                 nodes: [{}],
                 get searchedNodes() {{
                     if (this.search === '') {{
@@ -719,6 +718,8 @@ impl DocsTree {
                 }}
             }}"#,
             self.get_asset(base, "chevron-down.svg"),
+            self.get_asset(base, "dir-open.svg"),
+            self.get_asset(base, "dir-closed.svg"),
             all_nodes
                 .iter()
                 .map(|node| node.to_js())
@@ -754,7 +755,7 @@ impl DocsTree {
                 div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
-                            img x-show="search === ''" src=(self.get_asset(base, "dir-selected.svg")) class="w-4 h-4" alt="Directory icon";
+                            img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
@@ -763,7 +764,7 @@ impl DocsTree {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
-                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : node.img" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
+                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
                                     p x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
                                 }
                             }
@@ -772,7 +773,7 @@ impl DocsTree {
                             li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 pl-2" {
                                 p class="text-xs" x-text="node.path" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
-                                    img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
+                                    img x-bind:src="node.icon" class="w-4 h-4" alt="Node icon";
                                     p class="text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
                                 }
                             }
