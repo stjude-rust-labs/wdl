@@ -46,9 +46,8 @@ impl Rule for RedundantNone {
 
     fn explanation(&self) -> &'static str {
         "The specification states that an optional input declaration (e.g., `String? foo`) is \
-         implicitly initialized to `None` if no other value or default is provided. Therefore \
-         explicitly writing `String? foo = None` is equivalent to `String? foo` but adds \
-         unnecessary verbosity."
+         implicitly initialized to `None` if no default is provided. Therefore explicitly writing \
+         `String? foo = None` is equivalent to `String? foo` but adds unnecessary verbosity."
     }
 
     fn tags(&self) -> crate::TagSet {
