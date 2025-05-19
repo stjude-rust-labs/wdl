@@ -10,7 +10,6 @@ use crate::Markdown;
 use crate::Render;
 
 /// Render a [`MetadataValue`] as HTML.
-    fn render_value_inner(value: &MetadataValue, top_level: bool) -> Markup {
 pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
     fn render_value_inner(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
         match value {
