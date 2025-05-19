@@ -224,7 +224,7 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
-/// A WDL document.
+/// A WDL document. This is an index page that links to other HTML pages.
 #[derive(Debug)]
 pub struct Document {
     /// The name of the document.
@@ -291,18 +291,20 @@ impl Document {
                                     }
                                     td class="border" {
                                         @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
                                             PageType::Struct(_) => { "Struct" }
                                             PageType::Task(_) => { "Task" }
                                             PageType::Workflow(_) => { "Workflow" }
+                                            // Index pages should not link to other index pages.
+                                            PageType::Index(_) => { "TODO ERROR" }
                                         }
                                     }
                                     td class="border" {
                                         @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
                                             PageType::Struct(_) => { "N/A" }
                                             PageType::Task(t) => { (t.description()) }
                                             PageType::Workflow(w) => { (w.description()) }
+                                            // Index pages should not link to other index pages.
+                                            PageType::Index(_) => { "TODO ERROR" }
                                         }
                                     }
                                 }
@@ -330,8 +332,9 @@ impl Document {
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
-/// workspace directory. The generated documentation will be stored in a
-/// `docs` directory within the workspace.
+/// workspace directory. This function will overwrite any existing files which
+/// conflict with the generated files, but will not delete any files that
+/// are already present.
 pub async fn document_workspace(
     workspace: impl AsRef<Path>,
     output_dir: impl AsRef<Path>,
@@ -361,6 +364,7 @@ pub async fn document_workspace(
 
     for result in results {
         let uri = result.document().uri();
+        // TODO: revisit these error paths
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
@@ -378,11 +382,11 @@ pub async fn document_workspace(
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
-        let ast_doc = result.document().root();
-        let version = ast_doc
+        let ast = result.document().root();
+        let version = ast
             .version_statement()
             .expect("document should have a version statement");
-        let ast = ast_doc.ast().unwrap_v1();
+        let ast = ast.ast().unwrap_v1();
 
         let mut local_pages = Vec::new();
 
@@ -392,6 +396,7 @@ pub async fn document_workspace(
                     let name = s.name().text().to_owned();
                     let path = cur_dir.join(format!("{}-struct.html", name));
 
+                    // TODO: handle >=v1.2 structs
                     let r#struct = r#struct::Struct::new(s.clone());
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));

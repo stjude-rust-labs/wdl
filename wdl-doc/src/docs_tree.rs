@@ -148,6 +148,9 @@ impl Node {
     }
 
     /// Gather the node and its children in a Depth First Traversal order.
+    ///
+    /// Traversal order is alphabetical by node name, with the exception of the
+    /// "external" node, which is always last.
     pub fn depth_first_traversal(&self) -> Vec<&Node> {
         fn recurse_depth_first<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
             nodes.push(node);
@@ -184,7 +187,7 @@ pub struct DocsTree {
 }
 
 impl DocsTree {
-    /// Create a new docs tree.
+    /// Create a new docs tree with a default stylesheet.
     pub fn new(root: impl AsRef<Path>) -> anyhow::Result<Self> {
         let abs_path = absolute(root.as_ref()).unwrap();
         write_assets(&abs_path)?;
@@ -202,7 +205,7 @@ impl DocsTree {
         })
     }
 
-    /// Create a new docs tree with a stylesheet.
+    /// Create a new docs tree with a custom stylesheet.
     pub fn new_with_stylesheet(
         root: impl AsRef<Path>,
         stylesheet: impl AsRef<Path>,
@@ -235,6 +238,11 @@ impl DocsTree {
         &mut self.root
     }
 
+    /// Get the absolute path to the root directory.
+    pub fn root_path(&self) -> &PathBuf {
+        &self.root.path
+    }
+
     /// Get the absolute path to the stylesheet.
     pub fn stylesheet(&self) -> &PathBuf {
         &self.stylesheet
@@ -260,10 +268,10 @@ impl DocsTree {
     /// Get a relative path to the root index page.
     pub fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(self.root.path().join("index.html"), path).unwrap()
+        diff_paths(self.root_path().join("index.html"), path).unwrap()
     }
 
-    /// Add a page to the tree.
+    /// Add a page to the tree. Path is expected to be absolute.
     pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
         let path = abs_path.into();
@@ -294,6 +302,8 @@ impl DocsTree {
     }
 
     /// Get the Node associated with a path.
+    ///
+    /// Can be an abolute path or a path relative to the root.
     fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
         let root = self.root();
         let path = path.as_ref();
@@ -316,8 +326,10 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Rc<HTMLPage>> {
-        self.get_node(abs_path).and_then(|node| node.page())
+    ///
+    /// Can be an abolute path or a path relative to the root.
+    pub fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {
+        self.get_node(path).and_then(|node| node.page())
     }
 
     /// Get workflows by category.
@@ -331,7 +343,7 @@ impl DocsTree {
                 if let PageType::Workflow(workflow) = page.page_type() {
                     if node
                         .path()
-                        .strip_prefix(self.root().path())
+                        .strip_prefix(self.root_path())
                         .expect("path should be in the docs directory")
                         .iter()
                         .next()
@@ -359,8 +371,8 @@ impl DocsTree {
                     if let PageType::Workflow(workflow) = page {
                         if node
                             .path()
-                            .strip_prefix(self.root().path())
-                            .expect("path should have a next component")
+                            .strip_prefix(self.root_path())
+                            .expect("path should be in the docs directory")
                             .iter()
                             .next()
                             .expect("path should have a next component")
@@ -384,7 +396,8 @@ impl DocsTree {
         workflows_by_category
     }
 
-    /// Render a sidebar component in the "workflows view" mode given a path.
+    /// Render a left sidebar component in the "workflows view" mode given a
+    /// path.
     fn sidebar_workflows_view(&self, destination: &Path) -> Markup {
         let base = destination.parent().unwrap();
         let workflows_by_category = self.get_workflows_by_category();
@@ -443,15 +456,15 @@ impl DocsTree {
         let path = path.as_ref();
         let base = path.parent().unwrap();
 
-        fn make_key(path: &Path, root: &Path) -> String {
-            path.strip_prefix(root)
+        let make_key = |path: &Path| -> String {
+            path.strip_prefix(self.root_path())
                 .expect("path should be in the docs directory")
                 .to_string_lossy()
                 .to_string()
                 .replace("-", "_")
                 .replace(".", "_")
                 .replace(std::path::MAIN_SEPARATOR_STR, "_")
-        }
+        };
 
         struct JsNode {
             /// The key of the node.
@@ -462,9 +475,9 @@ impl DocsTree {
             path: String,
             /// The search name of the node.
             search_name: String,
-            /// The image of the node.
+            /// The icon for the node.
             img: String,
-            /// The href of the node.
+            /// The href for the node.
             href: Option<String>,
             /// Whether the node is selected.
             selected: bool,
@@ -513,30 +526,32 @@ impl DocsTree {
             .iter()
             .skip(1) // Skip the root node
             .map(|node| {
-                let key = make_key(node.path(), root.path());
+                let key = make_key(node.path());
                 let display_name = match node.page() {
                     Some(page) => page.name().to_string(),
                     None => node.name().to_string(),
                 };
                 let inner_path = node
                     .path()
-                    .strip_prefix(root.path())
+                    .strip_prefix(self.root_path())
                     .expect("path should be in the docs directory")
                     .parent()
                     .expect("path should have a parent")
                     .to_string_lossy()
                     .to_string();
                 let search_name = if node.page().is_none() {
+                    // Page-less nodes should not be searchable
                     "".to_string()
                 } else {
                     node.path()
-                        .strip_prefix(root.path())
+                        .strip_prefix(self.root_path())
                         .expect("path should be in the docs directory")
                         .to_string_lossy()
                         .to_string()
                 };
                 let href = match node.page() {
                     Some(page) => match page.page_type() {
+                        // TODO: revisit
                         PageType::Index(_) => Some(
                             diff_paths(node.path().join("index.html"), base)
                                 .unwrap()
@@ -605,14 +620,14 @@ impl DocsTree {
                 };
                 let nest_level = node
                     .path()
-                    .strip_prefix(root.path())
+                    .strip_prefix(self.root_path())
                     .expect("path should be in the docs directory")
                     .components()
                     .count();
                 let children = node
                     .children()
                     .values()
-                    .map(|child| make_key(child.path(), root.path()))
+                    .map(|child| make_key(child.path()))
                     .collect::<Vec<String>>();
                 JsNode {
                     key,
@@ -640,6 +655,12 @@ impl DocsTree {
                     .join(", ");
                 format!("'{}': [{}]", node.key, children)
             })
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        let all_nodes_true = all_nodes
+            .iter()
+            .map(|node| format!("'{}': true", node.key))
             .collect::<Vec<String>>()
             .join(", ");
 
@@ -705,16 +726,8 @@ impl DocsTree {
                 .collect::<Vec<String>>()
                 .join(", "),
             js_dag,
-            all_nodes
-                .iter()
-                .map(|node| format!("'{}': true", node.key))
-                .collect::<Vec<String>>()
-                .join(", "),
-            all_nodes
-                .iter()
-                .map(|node| format!("'{}': true", node.key))
-                .collect::<Vec<String>>()
-                .join(", "),
+            all_nodes_true,
+            all_nodes_true,
         );
 
         html! {
@@ -814,8 +827,7 @@ impl DocsTree {
 
         let mut breadcrumbs = vec![];
 
-        let cur_node = self.get_node(path).unwrap_or(self.get_node(base).unwrap());
-        let cur_page = cur_node.page().expect("node should have a page");
+        let cur_page = self.get_page(path).unwrap_or(self.get_page(base).unwrap());
         breadcrumbs.push((cur_page.name(), None));
 
         if matches!(cur_page.page_type(), PageType::Index(_)) {
@@ -829,6 +841,7 @@ impl DocsTree {
                 cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
                 if let Some(page) = cur_node.page() {
                     match page.page_type() {
+                        // TODO: revisit
                         PageType::Index(_) => {
                             Some(diff_paths(cur_node.path().join("index.html"), base).unwrap())
                         }
@@ -881,7 +894,7 @@ impl DocsTree {
     /// Write the homepage to disk.
     fn write_homepage(&self) -> anyhow::Result<()> {
         let root = self.root();
-        let index_path = root.path().join("index.html");
+        let index_path = self.root_path().join("index.html");
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
@@ -897,6 +910,7 @@ impl DocsTree {
                                 tr class="border" {
                                     td class="border" {
                                         @match node.page().unwrap().page_type() {
+                                            // TODO: revisit
                                             PageType::Index(_) => {
                                                 a href=(diff_paths(node.path().join("index.html"), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
                                             }
@@ -928,7 +942,7 @@ impl DocsTree {
                     }
                 }
             },
-            self.stylesheet_relative_to(root.path()),
+            self.stylesheet_relative_to(self.root_path()),
         );
         std::fs::write(index_path, html.into_string())?;
         Ok(())
@@ -939,6 +953,7 @@ impl DocsTree {
         let mut path = path.into();
 
         let (content, headers) = match page.page_type() {
+            // TODO: revisit
             PageType::Index(doc) => {
                 path = path.join("index.html");
                 doc.render()

@@ -84,7 +84,7 @@ pub trait Callable {
         self.meta()
             .get("description")
             .map(render_value)
-            .unwrap_or_else(|| html! {})
+            .unwrap_or_else(|| html! { "No description provided." })
     }
 
     /// Get the required input parameters of the callable.

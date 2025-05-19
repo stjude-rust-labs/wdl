@@ -88,6 +88,7 @@ impl Parameter {
     }
 
     /// Get the description of the parameter.
+    // TODO: should this return an Option?
     pub fn description(&self) -> Markup {
         if let Some(meta) = &self.meta {
             if let MetadataValue::String(_) = meta {
@@ -102,7 +103,7 @@ impl Parameter {
                 }
             }
         }
-        html! {}
+        html! { "No description provided." }
     }
 
     /// Render any remaining metadata as HTML.

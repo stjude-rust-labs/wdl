@@ -1,4 +1,5 @@
 //! Create HTML documentation for WDL structs.
+// TODO: handle >=v1.2 structs
 
 use maud::Markup;
 use maud::html;
