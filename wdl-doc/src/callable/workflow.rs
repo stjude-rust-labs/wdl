@@ -97,11 +97,11 @@ impl Workflow {
             return None;
         }
         Some(html! {
-            div class="workflow__section" {
-                h2 id="meta" class="workflow__section-header" { "Meta" }
-                ul class="workflow__meta-records" {
+            div class="callable__section" {
+                h2 id="meta" class="callable__section-header" { "Meta" }
+                ul class="callable__meta-records" {
                     @for (key, value) in kv {
-                        li class="workflow__meta-record" {
+                        li class="callable__meta-record" {
                             b { (key) ":" } " " (render_value(value))
                         }
                     }
@@ -125,13 +125,13 @@ impl Workflow {
         headers.extend(inner_headers);
 
         let markup = html! {
-            div class="workflow__container" {
-                section class="workflow__section" {
-                    h1 id="title" class="workflow__title" { (self.pretty_name()) }
+            div class="callable__container" {
+                section class="callable__section" {
+                    h1 id="title" class="callable__title" { (self.pretty_name()) }
                     @if let Some(category) = self.category() {
-                        h2 class="workflow__section-subheader" { "Category: " (category) }
+                        h2 class="callable__section-subheader" { "Category: " (category) }
                     }
-                    p class="workflow__section-text" {
+                    p class="callable__section-text" {
                         (self.description())
                     }
                 }

@@ -84,10 +84,10 @@ impl PageHeaders {
         self.headers.extend(headers.headers);
     }
 
-    /// Consume self and return the headers.
-    pub fn render(self) -> Markup {
+    /// Render the page headers as HTML.
+    pub fn render(&self) -> Markup {
         html!(
-            @for header in self.headers {
+            @for header in &self.headers {
                 @match header {
                     Header::Header(name, id) => {
                         a href=(format!("#{}", id)) class="right-sidebar__section-header" { (name) }

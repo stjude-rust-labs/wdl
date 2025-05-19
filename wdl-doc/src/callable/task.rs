@@ -11,9 +11,11 @@ use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
 
 use super::*;
+use crate::DEFAULT_THRESHOLD;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
 use crate::parameter::Parameter;
+use crate::parameter::shorten_expr_if_needed;
 
 /// A task in a WDL document.
 #[derive(Debug)]
@@ -80,10 +82,14 @@ impl Task {
             return None;
         }
         Some(html! {
-            h2 id="meta" { "Meta" }
-            @for (key, value) in kv {
-                p {
-                    b { (key) ":" } " " (render_value(value))
+            div class="callable__section" {
+                h2 id="meta" class="callable__section-header" { "Meta" }
+                ul class="callable__meta-records" {
+                    @for (key, value) in kv {
+                        li class="callable__meta-record" {
+                            b { (key) ":" } " " (render_value(value))
+                        }
+                    }
                 }
             }
         })
@@ -94,17 +100,23 @@ impl Task {
         match &self.runtime_section {
             Some(runtime_section) => {
                 html! {
-                    h2 id="runtime" { "Default Runtime Attributes" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th { "Attribute" }
-                            th { "Value" }
-                        }}
-                        tbody class="border" {
-                            @for entry in runtime_section.items() {
-                                tr class="border" {
-                                    td class="border" { code { (entry.name().text()) } }
-                                    td class="border" { code { ({let e = entry.expr(); e.text().to_string() }) } }
+                    div class="callable__section" {
+                        h2 id="runtime" class="parameter__section-header" { "Default Runtime Attributes" }
+                        div class="parameter__table-outer-container" {
+                            div class="parameter__table-inner-container" {
+                                table class="parameter__table" {
+                                    thead { tr {
+                                        th { "Attribute" }
+                                        th { "Value" }
+                                    }}
+                                    tbody {
+                                        @for entry in runtime_section.items() {
+                                            tr {
+                                                td { code { (entry.name().text()) } }
+                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string(), DEFAULT_THRESHOLD) }) }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -131,13 +143,17 @@ impl Task {
         headers.extend(inner_headers);
 
         let markup = html! {
-            div class="flex flex-col gap-y-6" {
-                h1 id="title" { (self.name()) }
-                (self.description())
-                (meta_markup)
-                (input_markup)
-                (self.render_outputs())
-                (self.render_runtime_section())
+            div class="callable__container" {
+                section class="callable__section" {
+                    h1 id="title" class="callable__title" { (self.name()) }
+                    p class="callable__section-text" {
+                        (self.description())
+                    }
+                    (meta_markup)
+                    (input_markup)
+                    (self.render_outputs())
+                    (self.render_runtime_section())
+                }
             }
         };
         headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));

@@ -152,9 +152,9 @@ impl Parameter {
     }
 }
 
-/// Render a WDL expression as HTML, with a "Read more" button if it exceeds a
+/// Render a WDL expression as HTML, with a show more button if it exceeds a
 /// certain length.
-fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
+pub fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
     if expr.len() <= threshold {
         return html! { code { (expr) } };
     }
@@ -193,9 +193,9 @@ where
         .any(|param| param.render_remaining_meta().is_some());
 
     html! {
-        div class="workflow__table-outer-container" {
-            div class="workflow__table-inner-container" {
-                table class="workflow__table" {
+        div class="parameter__table-outer-container" {
+            div class="parameter__table-inner-container" {
+                table class="parameter__table" {
                     thead { tr {
                         @for header in headers {
                             th { (header) }
