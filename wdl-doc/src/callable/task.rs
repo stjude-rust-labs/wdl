@@ -144,7 +144,7 @@ impl Task {
         let markup = html! {
             div class="callable__container" {
                 section class="callable__section" {
-                    h1 id="title" class="callable__title" { (self.name()) }
+                    h1 id="title" class="callable__title" { code { (self.name()) } }
                     p class="callable__section-text" {
                         (self.description(false))
                     }
