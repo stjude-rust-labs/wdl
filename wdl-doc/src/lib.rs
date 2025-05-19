@@ -45,9 +45,6 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
-/// Default threshold for collapsing long strings.
-const DEFAULT_THRESHOLD: usize = 80;
-
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     let dir = dir.as_ref();
@@ -309,8 +306,8 @@ impl Document {
                                     td class="border" {
                                         @match page.1.page_type() {
                                             PageType::Struct(_) => { "N/A" }
-                                            PageType::Task(t) => { (t.description()) }
-                                            PageType::Workflow(w) => { (w.description()) }
+                                            PageType::Task(t) => { (t.description(true)) }
+                                            PageType::Workflow(w) => { (w.description(true)) }
                                             // Index pages should not link to other index pages.
                                             PageType::Index(_) => { "TODO ERROR" }
                                         }
@@ -526,7 +523,7 @@ mod tests {
             ast_workflow.output(),
         );
 
-        let description = workflow.description();
+        let description = workflow.description(false);
         assert_eq!(
             description.into_string(),
             "A simple description should not render with p tags"

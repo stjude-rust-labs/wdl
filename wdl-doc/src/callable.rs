@@ -80,10 +80,10 @@ pub trait Callable {
     fn outputs(&self) -> &[Parameter];
 
     /// Get the description of the callable.
-    fn description(&self) -> Markup {
+    fn description(&self, summarize_if_needed: bool) -> Markup {
         self.meta()
             .get("description")
-            .map(render_value)
+            .map(|v| render_value(v, summarize_if_needed))
             .unwrap_or_else(|| html! { "No description provided." })
     }
 
@@ -456,14 +456,17 @@ mod tests {
         );
         assert_eq!(inputs.len(), 3);
         assert_eq!(inputs[0].name(), "a");
-        assert_eq!(inputs[0].description().into_string(), "An integer");
+        assert_eq!(inputs[0].description(false).into_string(), "An integer");
         assert_eq!(inputs[1].name(), "b");
         assert_eq!(
-            inputs[1].description().into_string(),
+            inputs[1].description(false).into_string(),
             "No description provided."
         );
         assert_eq!(inputs[2].name(), "c");
-        assert_eq!(inputs[2].description().into_string(), "Another integer");
+        assert_eq!(
+            inputs[2].description(false).into_string(),
+            "Another integer"
+        );
     }
 
     #[test]
@@ -514,10 +517,16 @@ mod tests {
         );
         assert_eq!(outputs.len(), 3);
         assert_eq!(outputs[0].name(), "a");
-        assert_eq!(outputs[0].description().into_string(), "An integer");
+        assert_eq!(outputs[0].description(false).into_string(), "An integer");
         assert_eq!(outputs[1].name(), "b");
-        assert_eq!(outputs[1].description().into_string(), "A different place!");
+        assert_eq!(
+            outputs[1].description(false).into_string(),
+            "A different place!"
+        );
         assert_eq!(outputs[2].name(), "c");
-        assert_eq!(outputs[2].description().into_string(), "Another integer");
+        assert_eq!(
+            outputs[2].description(false).into_string(),
+            "Another integer"
+        );
     }
 }

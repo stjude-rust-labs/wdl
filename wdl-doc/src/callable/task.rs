@@ -11,7 +11,6 @@ use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
 
 use super::*;
-use crate::DEFAULT_THRESHOLD;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
 use crate::parameter::Parameter;
@@ -87,7 +86,7 @@ impl Task {
                 ul class="callable__meta-records" {
                     @for (key, value) in kv {
                         li class="callable__meta-record" {
-                            b { (key) ":" } " " (render_value(value))
+                            b { (key) ":" } " " (render_value(value, false))
                         }
                     }
                 }
@@ -113,7 +112,7 @@ impl Task {
                                         @for entry in runtime_section.items() {
                                             tr {
                                                 td { code { (entry.name().text()) } }
-                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string(), DEFAULT_THRESHOLD) }) }
+                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) }) }
                                             }
                                         }
                                     }
@@ -147,7 +146,7 @@ impl Task {
                 section class="callable__section" {
                     h1 id="title" class="callable__title" { (self.name()) }
                     p class="callable__section-text" {
-                        (self.description())
+                        (self.description(false))
                     }
                     (meta_markup)
                     (input_markup)

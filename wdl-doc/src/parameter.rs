@@ -7,7 +7,6 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
-use crate::DEFAULT_THRESHOLD;
 use crate::callable::Group;
 use crate::meta::render_value;
 
@@ -89,15 +88,15 @@ impl Parameter {
 
     /// Get the description of the parameter.
     // TODO: should this return an Option?
-    pub fn description(&self) -> Markup {
+    pub fn description(&self, summarize_if_needed: bool) -> Markup {
         if let Some(meta) = &self.meta {
             if let MetadataValue::String(_) = meta {
-                return render_value(meta);
+                return render_value(meta, summarize_if_needed);
             } else if let MetadataValue::Object(o) = meta {
                 for item in o.items() {
                     if item.name().text() == "description" {
                         if let MetadataValue::String(_) = item.value() {
-                            return render_value(&item.value());
+                            return render_value(&item.value(), summarize_if_needed);
                         }
                     }
                 }
@@ -122,7 +121,7 @@ impl Parameter {
                 ul {
                     @for item in filtered_items {
                         li {
-                            b { (item.name().text()) ":" } " " (render_value(&item.value()))
+                            b { (item.name().text()) ":" } " " (render_value(&item.value(), true))
                         }
                     }
                 }
@@ -138,9 +137,9 @@ impl Parameter {
                 td { (self.name()) }
                 td { code { (self.ty()) } }
                 @if self.required() != Some(true) {
-                    td { (shorten_expr_if_needed(self.expr(), DEFAULT_THRESHOLD)) }
+                    td { (shorten_expr_if_needed(self.expr())) }
                 }
-                td { (self.description()) }
+                td { (self.description(true)) }
                 @if addl_meta {
                     @if let Some(markup) = self.render_remaining_meta() {
                         td { (markup) }
@@ -153,14 +152,17 @@ impl Parameter {
     }
 }
 
+/// The maximum length of an expression before it is clipped.
+const MAX_EXPR_LENGTH: usize = 80;
+
 /// Render a WDL expression as HTML, with a show more button if it exceeds a
 /// certain length.
-pub fn shorten_expr_if_needed(expr: String, threshold: usize) -> Markup {
-    if expr.len() <= threshold {
+pub fn shorten_expr_if_needed(expr: String) -> Markup {
+    if expr.len() <= MAX_EXPR_LENGTH {
         return html! { code { (expr) } };
     }
 
-    let clipped_expr = expr[..threshold].trim();
+    let clipped_expr = expr[..MAX_EXPR_LENGTH].trim();
 
     html! {
         div x-data="{ expanded: false }" {

@@ -6,20 +6,20 @@ use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::v1::MetadataValue;
 
-use crate::DEFAULT_THRESHOLD;
 use crate::Markdown;
 use crate::Render;
 
 /// Render a [`MetadataValue`] as HTML.
-pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     fn render_value_inner(value: &MetadataValue, top_level: bool) -> Markup {
+pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
+    fn render_value_inner(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
         match value {
             MetadataValue::String(s) => {
                 let inner_text = s.text().map(|t| t.text().to_string()).unwrap_or_default();
-                if top_level {
-                    return html! { (summarize_markdown_if_needed(inner_text, DEFAULT_THRESHOLD)) };
+                if summarize_if_needed {
+                    return html! { (summarize_markdown_if_needed(inner_text)) };
                 }
-                html! { (s.text().map(|t| t.text().to_string()).unwrap_or_default()) }
+                html! { (inner_text) }
             }
             MetadataValue::Boolean(b) => html! { code { (b.text().to_string()) } },
             MetadataValue::Integer(i) => html! { code { (i.text().to_string()) } },
@@ -89,18 +89,21 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
         }
     }
 
-    render_value_inner(value, true)
+    render_value_inner(value, summarize_if_needed)
 }
 
+/// The default threshold for summarizing a long string.
+const DEFAULT_SUMMARY_THRESHOLD: usize = 140;
+
 /// Summarize a long string if it exceeds the threshold.
-fn summarize_markdown_if_needed(content: String, threshold: usize) -> Markup {
-    if content.len() <= threshold {
+fn summarize_markdown_if_needed(content: String) -> Markup {
+    if content.len() <= DEFAULT_SUMMARY_THRESHOLD {
         return Markdown(content).render();
     }
 
     let markup = Markdown(content.clone()).render();
 
-    let summary_text = format!("{}... ", &content[..threshold].trim());
+    let summary_text = format!("{}... ", &content[..DEFAULT_SUMMARY_THRESHOLD].trim());
 
     html! {
         div x-data="{ expanded: false }" {

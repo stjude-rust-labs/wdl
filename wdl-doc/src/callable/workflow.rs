@@ -63,7 +63,7 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(render_value)
+        self.meta.get("name").map(|v| render_value(v, false))
     }
 
     /// Returns the "pretty" name of the workflow as HTML.
@@ -102,7 +102,7 @@ impl Workflow {
                 ul class="callable__meta-records" {
                     @for (key, value) in kv {
                         li class="callable__meta-record" {
-                            b { (key) ":" } " " (render_value(value))
+                            b { (key) ":" } " " (render_value(value, false))
                         }
                     }
                 }
@@ -132,7 +132,7 @@ impl Workflow {
                         h2 class="callable__section-subheader" { "Category: " (category) }
                     }
                     p class="callable__section-text" {
-                        (self.description())
+                        (self.description(false))
                     }
                 }
                 (meta_markup)
