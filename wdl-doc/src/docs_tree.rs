@@ -260,9 +260,18 @@ impl DocsTree {
     }
 
     /// Get a relative path to the assets directory.
-    pub fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+    fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
         diff_paths(&self.assets, path).unwrap()
+    }
+
+    /// Get a relative path to an asset in the assets directory (converted to a
+    /// string).
+    pub fn get_asset<P: AsRef<Path>>(&self, path: P, asset: &str) -> String {
+        self.assets_relative_to(path)
+            .join(asset)
+            .to_string_lossy()
+            .to_string()
     }
 
     /// Get a relative path to the root index page.
@@ -405,7 +414,7 @@ impl DocsTree {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
                     div class="flex items-center gap-x-1 h-6 text-slate-50" {
-                        img src=(self.assets_relative_to(base).join("category-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Category icon";
+                        img src=(self.get_asset(base, "category-selected.svg")) class="w-4 h-4" alt="Category icon";
                         p class="" { (category) }
                     }
                     ul class="" {
@@ -418,15 +427,12 @@ impl DocsTree {
                                 }}
                             }}"#,
                             node.path() == destination,
-                            self.assets_relative_to(base)
-                                .join(if node.path() == destination {
+                            self.get_asset(base, if node.path() == destination {
                                     "workflow-selected.svg"
                                 } else {
                                     "workflow-unselected.svg"
-                                })
-                                .to_string_lossy()
-                                .to_string(),
-                            )) class="flex flex-row items-center gap-x-1" x-bind:class="node.selected ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                                },
+                            ))) class="flex flex-row items-center gap-x-1" x-bind:class="node.selected ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
@@ -571,52 +577,47 @@ impl DocsTree {
                 let current = path == node.path();
                 let img = match node.page() {
                     Some(page) => match page.page_type() {
-                        PageType::Task(_) => self
-                            .assets_relative_to(base)
-                            .join(if selected {
+                        PageType::Task(_) => self.get_asset(
+                            base,
+                            if selected {
                                 "task-selected.svg"
                             } else {
                                 "task-unselected.svg"
-                            })
-                            .to_string_lossy()
-                            .to_string(),
-                        PageType::Struct(_) => self
-                            .assets_relative_to(base)
-                            .join(if selected {
+                            },
+                        ),
+                        PageType::Struct(_) => self.get_asset(
+                            base,
+                            if selected {
                                 "struct-selected.svg"
                             } else {
                                 "struct-unselected.svg"
-                            })
-                            .to_string_lossy()
-                            .to_string(),
-                        PageType::Workflow(_) => self
-                            .assets_relative_to(base)
-                            .join(if selected {
+                            },
+                        ),
+                        PageType::Workflow(_) => self.get_asset(
+                            base,
+                            if selected {
                                 "workflow-selected.svg"
                             } else {
                                 "workflow-unselected.svg"
-                            })
-                            .to_string_lossy()
-                            .to_string(),
-                        PageType::Index(_) => self
-                            .assets_relative_to(base)
-                            .join(if selected {
+                            },
+                        ),
+                        PageType::Index(_) => self.get_asset(
+                            base,
+                            if selected {
                                 "dir-selected.svg"
                             } else {
                                 "dir-unselected.svg"
-                            })
-                            .to_string_lossy()
-                            .to_string(),
+                            },
+                        ),
                     },
-                    None => self
-                        .assets_relative_to(base)
-                        .join(if selected {
+                    None => self.get_asset(
+                        base,
+                        if selected {
                             "dir-selected.svg"
                         } else {
                             "dir-unselected.svg"
-                        })
-                        .to_string_lossy()
-                        .to_string(),
+                        },
+                    ),
                 };
                 let nest_level = node
                     .path()
@@ -717,9 +718,7 @@ impl DocsTree {
                     }});
                 }}
             }}"#,
-            self.assets_relative_to(base)
-                .join("chevron-down.svg")
-                .to_string_lossy(),
+            self.get_asset(base, "chevron-down.svg"),
             all_nodes
                 .iter()
                 .map(|node| node.to_js())
@@ -733,21 +732,21 @@ impl DocsTree {
         html! {
             div x-data=(data) class="docs-tree__container" {
                 div class="" {
-                    img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none sticky mb-4" alt="Sprocket logo";
+                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-2/3 flex-none sticky mb-4" alt="Sprocket logo";
                     form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] sticky rounded-md border border-slate-700 mb-4" {
                         div class="flex flex-row items-center h-full w-full" {
-                            img src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="flex size-6" alt="Search icon";
+                            img src=(self.get_asset(base, "search.svg")) class="flex size-6" alt="Search icon";
                             input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300 pl-2";
-                            img src=(self.assets_relative_to(base).join("x-mark.svg").to_string_lossy()) class="flex size-6 hover:cursor-pointer ml-2 pr-2" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
+                            img src=(self.get_asset(base, "x-mark.svg")) class="flex size-6 hover:cursor-pointer ml-2 pr-2" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                         }
                     }
                     div class="flex items-center sticky gap-x-1 pr-4" {
                         div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.assets_relative_to(base).join("list-bullet-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            img src=(self.get_asset(base, "list-bullet-selected.svg")) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
                         div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.assets_relative_to(base).join("folder-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            img src=(self.get_asset(base, "folder-selected.svg")) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
                     }
@@ -755,7 +754,7 @@ impl DocsTree {
                 div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
-                            img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                            img x-show="search === ''" src=(self.get_asset(base, "dir-selected.svg")) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
@@ -779,7 +778,7 @@ impl DocsTree {
                             }
                         }
                         li class="flex place-content-center" {
-                            img x-show="search !== '' && searchedNodes.length === 0" src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="size-8" alt="Search icon";
+                            img x-show="search !== '' && searchedNodes.length === 0" src=(self.get_asset(base, "search.svg")) class="size-8" alt="Search icon";
                         }
                         li class="flex place-content-center" {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
