@@ -108,7 +108,7 @@ impl PageHeaders {
 struct Node {
     /// The name of the node.
     name: String,
-    /// The absolute path to the node.
+    /// The path from the root to the node.
     path: PathBuf,
     /// The page associated with the node.
     page: Option<Rc<HTMLPage>>,
@@ -132,9 +132,19 @@ impl Node {
         &self.name
     }
 
-    /// Get the absolute path of the node.
+    /// Get the path from the root to the node.
     pub fn path(&self) -> &PathBuf {
         &self.path
+    }
+
+    /// Determine if the node is part of a path.
+    ///
+    /// Path can be an absolute path or a path relative to the root.
+    pub fn part_of_path<P: AsRef<Path>>(&self, path: P) -> bool {
+        let path = path.as_ref();
+        self.path()
+            .components()
+            .all(|c| path.components().any(|p| p == c))
     }
 
     /// Get the page associated with the node.
@@ -177,9 +187,9 @@ impl Node {
 #[derive(Debug)]
 pub struct DocsTree {
     /// The root of the tree.
-    ///
-    /// `root.path` is the path to the docs directory and is absolute.
     root: Node,
+    /// The absolute path to the root directory.
+    path: PathBuf,
 }
 
 impl DocsTree {
@@ -189,10 +199,13 @@ impl DocsTree {
         write_assets(&abs_path)?;
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
-            abs_path.clone(),
+            PathBuf::from(""),
         );
 
-        Ok(Self { root: node })
+        Ok(Self {
+            root: node,
+            path: abs_path,
+        })
     }
 
     /// Create a new docs tree with a custom stylesheet.
@@ -208,10 +221,13 @@ impl DocsTree {
 
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
-            abs_path.clone(),
+            PathBuf::from(""),
         );
 
-        Ok(Self { root: node })
+        Ok(Self {
+            root: node,
+            path: abs_path,
+        })
     }
 
     /// Get the root of the tree.
@@ -226,7 +242,7 @@ impl DocsTree {
 
     /// Get the absolute path to the root directory.
     fn root_path(&self) -> &PathBuf {
-        &self.root.path
+        &self.path
     }
 
     /// Get the absolute path to the stylesheet.
@@ -266,14 +282,14 @@ impl DocsTree {
         diff_paths(self.root_path().join("index.html"), path).unwrap()
     }
 
-    /// Add a page to the tree. Path is expected to be absolute.
-    pub(crate) fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
-        let root = self.root_mut();
-        let path = abs_path.into();
-        let rel_path = path
-            .strip_prefix(root.path())
-            .expect("path should be in the docs directory");
+    /// Add a page to the tree.
+    ///
+    /// Path can be an absolute path or a path relative to the root.
+    pub(crate) fn add_page<P: Into<PathBuf>>(&mut self, path: P, page: Rc<HTMLPage>) {
+        let path = path.into();
+        let rel_path = path.strip_prefix(self.root_path()).unwrap_or(&path);
 
+        let root = self.root_mut();
         let mut current_node = root;
 
         let mut components = rel_path.components().peekable();
@@ -300,11 +316,11 @@ impl DocsTree {
 
     /// Get the Node associated with a path.
     ///
-    /// Can be an abolute path or a path relative to the root.
+    /// Path can be an absolute path or a path relative to the root.
     fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
         let root = self.root();
         let path = path.as_ref();
-        let rel_path = path.strip_prefix(root.path()).unwrap_or(path);
+        let rel_path = path.strip_prefix(self.root_path()).unwrap_or(path);
 
         let mut current_node = root;
 
@@ -343,8 +359,6 @@ impl DocsTree {
                 if let PageType::Workflow(workflow) = page.page_type() {
                     if node
                         .path()
-                        .strip_prefix(self.root_path())
-                        .expect("path should be in the docs directory")
                         .iter()
                         .next()
                         .expect("path should have a next component")
@@ -371,8 +385,6 @@ impl DocsTree {
                     if let PageType::Workflow(workflow) = page {
                         if node
                             .path()
-                            .strip_prefix(self.root_path())
-                            .expect("path should be in the docs directory")
                             .iter()
                             .next()
                             .expect("path should have a next component")
@@ -398,6 +410,8 @@ impl DocsTree {
 
     /// Render a left sidebar component in the "workflows view" mode given a
     /// path.
+    ///
+    /// Destination is expected to be an absolute path.
     fn sidebar_workflows_view(&self, destination: &Path) -> Markup {
         let base = destination.parent().unwrap();
         let workflows_by_category = self.get_workflows_by_category();
@@ -413,17 +427,17 @@ impl DocsTree {
                             li x-data=(format!(r#"{{
                                 hover: false,
                                 node: {{
-                                    selected: {},
+                                    current: {},
                                     icon: '{}',
                                 }}
                             }}"#,
-                            node.path() == destination,
-                            self.get_asset(base, if node.path() == destination {
+                            self.root_path().join(node.path()) == destination,
+                            self.get_asset(base, if self.root_path().join(node.path()) == destination {
                                     "workflow-selected.svg"
                                 } else {
                                     "workflow-unselected.svg"
                                 },
-                            ))) class="flex flex-row items-center gap-x-1" x-bind:class="node.selected ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            ))) class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
@@ -431,7 +445,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="w-4 h-4" alt="Workflow icon";
-                                                p class="" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                p class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(self.root_path().join(node.path()), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
@@ -448,6 +462,8 @@ impl DocsTree {
     }
 
     /// Render a left sidebar component given a path.
+    ///
+    /// Path is expected to be an absolute path.
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
@@ -461,9 +477,7 @@ impl DocsTree {
             } else {
                 path
             };
-            path.strip_prefix(self.root_path())
-                .expect("path should be in the docs directory")
-                .to_string_lossy()
+            path.to_string_lossy()
                 .to_string()
                 .replace("-", "_")
                 .replace(".", "_")
@@ -543,8 +557,6 @@ impl DocsTree {
                 };
                 let parent = node
                     .path()
-                    .strip_prefix(self.root_path())
-                    .expect("path should be in the docs directory")
                     .parent()
                     .expect("path should have a parent")
                     .to_string_lossy()
@@ -553,15 +565,11 @@ impl DocsTree {
                     // Page-less nodes should not be searchable
                     "".to_string()
                 } else {
-                    node.path()
-                        .strip_prefix(self.root_path())
-                        .expect("path should be in the docs directory")
-                        .to_string_lossy()
-                        .to_string()
+                    node.path().to_string_lossy().to_string()
                 };
                 let href = if node.page().is_some() {
                     Some(
-                        diff_paths(node.path(), base)
+                        diff_paths(self.root_path().join(node.path()), base)
                             .unwrap()
                             .to_string_lossy()
                             .to_string(),
@@ -569,8 +577,8 @@ impl DocsTree {
                 } else {
                     None
                 };
-                let selected = path.starts_with(node.path());
-                let current = path == node.path();
+                let selected = node.part_of_path(path);
+                let current = path == self.root_path().join(node.path());
                 let icon = match node.page() {
                     Some(page) => match page.page_type() {
                         PageType::Task(_) => Some(self.get_asset(
@@ -610,8 +618,6 @@ impl DocsTree {
                 };
                 let nest_level = node
                     .path()
-                    .strip_prefix(self.root_path())
-                    .expect("path should be in the docs directory")
                     .components()
                     .filter(|c| c.as_os_str().to_str().unwrap() != "index.html")
                     .count();
@@ -810,12 +816,14 @@ impl DocsTree {
     }
 
     /// Renders a page "breadcrumb" navigation component.
+    ///
+    /// Path is expected to be an absolute path.
     fn render_breadcrumbs<P: AsRef<Path>>(&self, path: P) -> Markup {
         let path = path.as_ref();
         let base = path.parent().expect("path should have a parent");
 
         let mut current_path = path
-            .strip_prefix(self.root().path())
+            .strip_prefix(self.root_path())
             .expect("path should be in the docs directory");
 
         let mut breadcrumbs = vec![];
@@ -828,7 +836,7 @@ impl DocsTree {
             breadcrumbs.push((
                 cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
                 if cur_node.page().is_some() {
-                    Some(diff_paths(cur_node.path(), base).unwrap())
+                    Some(diff_paths(self.root_path().join(cur_node.path()), base).unwrap())
                 } else {
                     None
                 },
@@ -865,7 +873,7 @@ impl DocsTree {
 
         for node in root.depth_first_traversal() {
             if let Some(page) = node.page() {
-                self.write_page(page.as_ref(), node.path())?;
+                self.write_page(page.as_ref(), self.root_path().join(node.path()))?;
             }
         }
 
@@ -891,7 +899,7 @@ impl DocsTree {
                             @if node.page().is_some() {
                                 tr class="border" {
                                     td class="border" {
-                                        a href=(diff_paths(node.path(), self.root_path()).unwrap().to_string_lossy()) {(node.name()) }
+                                        a href=(node.path().to_string_lossy()) {(node.name()) }
                                     }
                                 }
                             }
@@ -923,6 +931,8 @@ impl DocsTree {
     }
 
     /// Write a page to disk at the designated path.
+    ///
+    /// Path is expected to be an absolute path.
     fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
         let path = path.into();
 
