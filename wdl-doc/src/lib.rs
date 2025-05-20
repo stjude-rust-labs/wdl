@@ -7,11 +7,11 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-pub mod callable;
-pub mod docs_tree;
-pub mod meta;
-pub mod parameter;
-pub mod r#struct;
+mod callable;
+mod docs_tree;
+mod meta;
+mod parameter;
+mod r#struct;
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -20,11 +20,13 @@ use std::rc::Rc;
 
 use anyhow::Result;
 use anyhow::anyhow;
-pub use callable::Callable;
-pub use callable::task;
-pub use callable::workflow;
+use callable::Callable;
+use callable::task;
+use callable::workflow;
 pub use docs_tree::DocsTree;
 use docs_tree::HTMLPage;
+use docs_tree::Header;
+use docs_tree::PageHeaders;
 use docs_tree::PageType;
 use maud::DOCTYPE;
 use maud::Markup;
@@ -70,6 +72,14 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/chevron-down.svg"),
     )?;
     std::fs::write(
+        assets_dir.join("dir-open.svg"),
+        include_bytes!("../theme/assets/dir-open.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-closed.svg"),
+        include_bytes!("../theme/assets/dir-closed.svg"),
+    )?;
+    std::fs::write(
         assets_dir.join("category-selected.svg"),
         include_bytes!("../theme/assets/category-selected.svg"),
     )?;
@@ -90,12 +100,12 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/folder-unselected.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-selected.svg"),
-        include_bytes!("../theme/assets/dir-selected.svg"),
+        assets_dir.join("wdl-dir-selected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-selected.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-unselected.svg"),
-        include_bytes!("../theme/assets/dir-unselected.svg"),
+        assets_dir.join("wdl-dir-unselected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-unselected.svg"),
     )?;
     std::fs::write(
         assets_dir.join("struct-selected.svg"),
@@ -219,9 +229,9 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
-/// A WDL document.
+/// A WDL document. This is an index page that links to other HTML pages.
 #[derive(Debug)]
-pub struct Document {
+pub(crate) struct Document {
     /// The name of the document.
     name: String,
     /// The AST node for the version statement.
@@ -235,7 +245,7 @@ pub struct Document {
 
 impl Document {
     /// Create a new document.
-    pub fn new(
+    pub(crate) fn new(
         name: String,
         version: VersionStatement,
         local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -264,40 +274,47 @@ impl Document {
     }
 
     /// Render the document as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="flex flex-col gap-y-6" {
-                h1 { (self.name()) }
-                h3 { "WDL Version: " (self.version()) }
-                div { (self.preamble()) }
-                div class="flex flex-col gap-y-6" {
-                    h2 { "Table of Contents" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th class="" { "Page" }
-                            th class="" { "Type" }
-                            th class="" { "Description" }
-                        }}
-                        tbody class="border" {
-                            @for page in &self.local_pages {
-                                tr class="border" {
-                                    td class="border" {
-                                        a href=(page.0.to_str().unwrap()) { (page.1.name()) }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
-                                            PageType::Struct(_) => { "Struct" }
-                                            PageType::Task(_) => { "Task" }
-                                            PageType::Workflow(_) => { "Workflow" }
-                                        }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
-                                            PageType::Struct(_) => { "N/A" }
-                                            PageType::Task(t) => { (t.description()) }
-                                            PageType::Workflow(w) => { (w.description()) }
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let markup = html! {
+            div class="callable__container" {
+                h1 id="title" class="callable_title" { (self.name()) }
+                // TODO: does this need better styling?
+                h3 class="callable__section-subheader" { "WDL Version: " (self.version()) }
+                div id="preamble" class="callable__section-text" { (self.preamble()) }
+                div class="callable__section" {
+                    h2 id="toc" class="callable__section-header" { "Table of Contents" }
+                    div class="parameter__table-outer-container" {
+                        div class="parameter__table-inner-container" {
+                            table class="parameter__table" {
+                                thead { tr {
+                                    th { "Page" }
+                                    th { "Type" }
+                                    th { "Description" }
+                                }}
+                                tbody {
+                                    @for page in &self.local_pages {
+                                        tr {
+                                            td class="text-violet-400" {
+                                                a href=(page.0.to_string_lossy()) { (page.1.name()) }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "Struct" }
+                                                    PageType::Task(_) => { "Task" }
+                                                    PageType::Workflow(_) => { "Workflow" }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "N/A" }
+                                                    PageType::Task(t) => { (t.description(true)) }
+                                                    PageType::Workflow(w) => { (w.description(true)) }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -306,15 +323,28 @@ impl Document {
                     }
                 }
             }
-        }
+        };
+
+        let mut headers = PageHeaders::default();
+        headers.push(Header::Header(
+            "Preamble".to_string(),
+            "preamble".to_string(),
+        ));
+        headers.push(Header::Header(
+            "Table of Contents".to_string(),
+            "toc".to_string(),
+        ));
+
+        (markup, headers)
     }
 }
 
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
-/// workspace directory. The generated documentation will be stored in a
-/// `docs` directory within the workspace.
+/// workspace directory. This function will overwrite any existing files which
+/// conflict with the generated files, but will not delete any files that
+/// are already present.
 pub async fn document_workspace(
     workspace: impl AsRef<Path>,
     output_dir: impl AsRef<Path>,
@@ -344,6 +374,7 @@ pub async fn document_workspace(
 
     for result in results {
         let uri = result.document().uri();
+        // TODO: revisit these error paths
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
@@ -361,11 +392,11 @@ pub async fn document_workspace(
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
-        let ast_doc = result.document().root();
-        let version = ast_doc
+        let ast = result.document().root();
+        let version = ast
             .version_statement()
             .expect("document should have a version statement");
-        let ast = ast_doc.ast().unwrap_v1();
+        let ast = ast.ast().unwrap_v1();
 
         let mut local_pages = Vec::new();
 
@@ -375,6 +406,7 @@ pub async fn document_workspace(
                     let name = s.name().text().to_owned();
                     let path = cur_dir.join(format!("{}-struct.html", name));
 
+                    // TODO: handle >=v1.2 structs
                     let r#struct = r#struct::Struct::new(s.clone());
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));
@@ -496,7 +528,7 @@ mod tests {
             ast_workflow.output(),
         );
 
-        let description = workflow.description();
+        let description = workflow.description(false);
         assert_eq!(
             description.into_string(),
             "A simple description should not render with p tags"

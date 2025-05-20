@@ -9,12 +9,14 @@ use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A workflow in a WDL document.
 #[derive(Debug)]
-pub struct Workflow {
+pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
     /// The meta of the workflow.
@@ -61,7 +63,7 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(render_value)
+        self.meta.get("name").map(|v| render_value(v, false))
     }
 
     /// Returns the "pretty" name of the workflow as HTML.
@@ -85,46 +87,63 @@ impl Workflow {
     ///
     /// This will render all metadata key-value pairs except for `name`,
     /// `category`, `description`, and `outputs`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
+    pub fn render_meta(&self) -> Option<Markup> {
+        let kv = self
             .meta
             .iter()
             .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                div class="workflow__section" {
-                    h2 class="workflow__section-header" { "Meta" }
-                    ul class="workflow__meta-records" {
-                        @for (key, value) in kv {
-                            li class="workflow__meta-record" {
-                                b { (key) ":" } " " (render_value(value))
-                            }
+            .collect::<Vec<_>>();
+        if kv.is_empty() {
+            return None;
+        }
+        Some(html! {
+            div class="callable__section" {
+                h2 id="meta" class="callable__section-header" { "Meta" }
+                ul class="callable__meta-records" {
+                    @for (key, value) in kv {
+                        li class="callable__meta-record" {
+                            b { (key) ":" } " " (render_value(value, false))
                         }
                     }
                 }
             }
-        }
+        })
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="workflow__container" {
-                section class="workflow__section" {
-                    h1 class="workflow__title" { (self.pretty_name()) }
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta() {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs();
+
+        headers.extend(inner_headers);
+
+        let markup = html! {
+            div class="callable__container" {
+                section class="callable__section" {
+                    h1 id="title" class="callable__title" { (self.pretty_name()) }
                     @if let Some(category) = self.category() {
-                        h2 class="workflow__section-subheader" { "Category: " (category) }
+                        h2 class="callable__section-subheader" { "Category: " (category) }
                     }
-                    p class="workflow__section-text" {
-                        (self.description())
+                    p class="callable__section-text" {
+                        (self.description(false))
                     }
                 }
-                (self.render_meta())
-                (self.render_inputs())
+                (meta_markup)
+                (input_markup)
                 (self.render_outputs())
             }
-        }
+        };
+
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+
+        (markup, headers)
     }
 }
 
