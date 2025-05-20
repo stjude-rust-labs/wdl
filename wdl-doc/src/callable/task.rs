@@ -11,7 +11,10 @@ use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
 use crate::parameter::Parameter;
+use crate::parameter::shorten_expr_if_needed;
 
 /// A task in a WDL document.
 #[derive(Debug)]
@@ -68,22 +71,27 @@ impl Task {
     ///
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
+    pub fn render_meta(&self) -> Option<Markup> {
+        let kv = self
             .meta
             .iter()
             .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                h2 { "Meta" }
-                @for (key, value) in kv {
-                    p {
-                        b { (key) ":" } " " (render_value(value))
+            .collect::<Vec<_>>();
+        if kv.is_empty() {
+            return None;
+        }
+        Some(html! {
+            div class="callable__section" {
+                h2 id="meta" class="callable__section-header" { "Meta" }
+                ul class="callable__meta-records" {
+                    @for (key, value) in kv {
+                        li class="callable__meta-record" {
+                            b { (key) ":" } " " (render_value(value, false))
+                        }
                     }
                 }
             }
-        }
+        })
     }
 
     /// Render the runtime section of the task as HTML.
@@ -91,17 +99,23 @@ impl Task {
         match &self.runtime_section {
             Some(runtime_section) => {
                 html! {
-                    h2 { "Default Runtime Attributes" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th { "Attribute" }
-                            th { "Value" }
-                        }}
-                        tbody class="border" {
-                            @for entry in runtime_section.items() {
-                                tr class="border" {
-                                    td class="border" { code { (entry.name().text()) } }
-                                    td class="border" { code { ({let e = entry.expr(); e.text().to_string() }) } }
+                    div class="callable__section" {
+                        h2 id="runtime" class="parameter__section-header" { "Default Runtime Attributes" }
+                        div class="parameter__table-outer-container" {
+                            div class="parameter__table-inner-container" {
+                                table class="parameter__table" {
+                                    thead { tr {
+                                        th { "Attribute" }
+                                        th { "Value" }
+                                    }}
+                                    tbody {
+                                        @for entry in runtime_section.items() {
+                                            tr {
+                                                td { code { (entry.name().text()) } }
+                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) }) }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -115,17 +129,36 @@ impl Task {
     }
 
     /// Render the task as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="flex flex-col gap-y-6" {
-                h1 { (self.name()) }
-                (self.description())
-                (self.render_meta())
-                (self.render_inputs())
-                (self.render_outputs())
-                (self.render_runtime_section())
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta() {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs();
+        headers.extend(inner_headers);
+
+        let markup = html! {
+            div class="callable__container" {
+                section class="callable__section" {
+                    h1 id="title" class="callable__title" { code { (self.name()) } }
+                    p class="callable__section-text" {
+                        (self.description(false))
+                    }
+                    (meta_markup)
+                    (input_markup)
+                    (self.render_outputs())
+                    (self.render_runtime_section())
+                }
             }
-        }
+        };
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+        headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
+
+        (markup, headers)
     }
 }
 
