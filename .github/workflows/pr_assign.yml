@@ -39,7 +39,7 @@ jobs:
       - name: Add reviewers
         if: |
           github.event.pull_request.draft == false &&
-          github.base_ref = 'main'
+          github.base_ref == 'main'
         run: |
           # The gh cli silently drops a reviewer if they are the author.
           # So no need to clean the list here.
