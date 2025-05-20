@@ -276,40 +276,45 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
-            div class="flex flex-col gap-y-6" {
-                h1 id="title" { (self.name()) }
-                h3 { "WDL Version: " (self.version()) }
-                div id="preamble" { (self.preamble()) }
-                div class="flex flex-col gap-y-6" {
-                    h2 id="toc" { "Table of Contents" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th class="" { "Page" }
-                            th class="" { "Type" }
-                            th class="" { "Description" }
-                        }}
-                        tbody class="border" {
-                            @for page in &self.local_pages {
-                                tr class="border" {
-                                    td class="border" {
-                                        a href=(page.0.to_str().unwrap()) { (page.1.name()) }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Struct(_) => { "Struct" }
-                                            PageType::Task(_) => { "Task" }
-                                            PageType::Workflow(_) => { "Workflow" }
-                                            // Index pages should not link to other index pages.
-                                            PageType::Index(_) => { "ERROR" }
-                                        }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Struct(_) => { "N/A" }
-                                            PageType::Task(t) => { (t.description(true)) }
-                                            PageType::Workflow(w) => { (w.description(true)) }
-                                            // Index pages should not link to other index pages.
-                                            PageType::Index(_) => { "ERROR" }
+            div class="callable__container" {
+                h1 id="title" class="callable_title" { (self.name()) }
+                // TODO: does this need better styling?
+                h3 class="callable__section-subheader" { "WDL Version: " (self.version()) }
+                div id="preamble" class="callable__section-text" { (self.preamble()) }
+                div class="callable__section" {
+                    h2 id="toc" class="callable__section-header" { "Table of Contents" }
+                    div class="parameter__table-outer-container" {
+                        div class="parameter__table-inner-container" {
+                            table class="parameter__table" {
+                                thead { tr {
+                                    th { "Page" }
+                                    th { "Type" }
+                                    th { "Description" }
+                                }}
+                                tbody {
+                                    @for page in &self.local_pages {
+                                        tr {
+                                            td class="text-violet-400" {
+                                                a href=(page.0.to_string_lossy()) { (page.1.name()) }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "Struct" }
+                                                    PageType::Task(_) => { "Task" }
+                                                    PageType::Workflow(_) => { "Workflow" }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "N/A" }
+                                                    PageType::Task(t) => { (t.description(true)) }
+                                                    PageType::Workflow(w) => { (w.description(true)) }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
                                         }
                                     }
                                 }
