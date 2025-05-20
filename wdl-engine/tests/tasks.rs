@@ -184,7 +184,7 @@ fn configs() -> Vec<config::Config> {
         #[cfg(target_os = "linux")]
         {
             config::Config {
-                backend: BackendConfig::Docker(Default::default()),
+                backend: BackendConfig::Crankshaft(Default::default()),
                 ..Default::default()
             }
         },

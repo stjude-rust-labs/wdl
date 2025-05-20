@@ -17,7 +17,8 @@ wdl-grammar = { version = "0.13.0", path = "../wdl-grammar" }
 
 anyhow = { workspace = true }
 crankshaft = { workspace = true }
-dirs = { workspace =  true }
+dirs = { workspace = true }
+figment = { workspace = true }
 futures = { workspace = true }
 glob = { workspace = true }
 http-cache-stream-reqwest = { workspace = true }

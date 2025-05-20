@@ -27,10 +27,10 @@ use crate::Value;
 use crate::http::HttpDownloader;
 use crate::path::EvaluationPath;
 
-mod docker;
+mod crankshaft;
 mod local;
 
-pub use docker::*;
+pub use crankshaft::*;
 pub use local::*;
 
 /// The default work directory name.
