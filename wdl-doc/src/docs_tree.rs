@@ -824,11 +824,18 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                div class="layout__container" {
+                div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
                     div class="layout__sidebar-left" {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
+                        button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {
+                            svg viewBox="0 0 100 80" width="40" height="40" stroke="none" fill="currentColor" {
+                                rect width="100" height="15" {}
+                                rect y="35" width="100" height="15" {}
+                                rect y="70" width="100" height="15" {}
+                            }
+                        }
                         (content)
                     }
                     div class="layout__sidebar-right" {
@@ -863,11 +870,18 @@ impl DocsTree {
         let html = full_page(
             page.name(),
             html! {
-                div class="layout__container" {
+                div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
                     div class="layout__sidebar-left" {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
+                        button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {
+                            svg viewBox="0 0 100 80" width="40" height="40" stroke="none" fill="currentColor" {
+                                rect width="100" height="15" {}
+                                rect y="35" width="100" height="15" {}
+                                rect y="70" width="100" height="15" {}
+                            }
+                        }
                         (content)
                     }
                     div class="layout__sidebar-right" {
