@@ -66,7 +66,7 @@ impl Ord for Group {
 }
 
 /// A callable (workflow or task) in a WDL document.
-pub trait Callable {
+pub(crate) trait Callable {
     /// Get the name of the callable.
     fn name(&self) -> &str;
 

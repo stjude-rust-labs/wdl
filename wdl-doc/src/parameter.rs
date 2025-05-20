@@ -12,7 +12,7 @@ use crate::meta::render_value;
 
 /// Whether a parameter is an input or output.
 #[derive(Debug, Clone, Copy)]
-pub enum InputOutput {
+pub(crate) enum InputOutput {
     /// An input parameter.
     Input,
     /// An output parameter.
@@ -21,7 +21,7 @@ pub enum InputOutput {
 
 /// A parameter (input or output) in a workflow or task.
 #[derive(Debug)]
-pub struct Parameter {
+pub(crate) struct Parameter {
     /// The declaration of the parameter.
     decl: Decl,
     /// Any meta entries associated with the parameter.
@@ -44,11 +44,6 @@ impl Parameter {
     /// Get the type of the parameter.
     pub fn ty(&self) -> String {
         self.decl.ty().to_string()
-    }
-
-    /// Get whether the parameter is an input or output.
-    pub fn io(&self) -> InputOutput {
-        self.io
     }
 
     /// Get the Expr value of the parameter as a String.
@@ -87,7 +82,6 @@ impl Parameter {
     }
 
     /// Get the description of the parameter.
-    // TODO: should this return an Option?
     pub fn description(&self, summarize_if_needed: bool) -> Markup {
         if let Some(meta) = &self.meta {
             if let MetadataValue::String(_) = meta {
@@ -157,7 +151,7 @@ const MAX_EXPR_LENGTH: usize = 80;
 
 /// Render a WDL expression as HTML, with a show more button if it exceeds a
 /// certain length.
-pub fn shorten_expr_if_needed(expr: String) -> Markup {
+pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
     if expr.len() <= MAX_EXPR_LENGTH {
         return html! { code { (expr) } };
     }

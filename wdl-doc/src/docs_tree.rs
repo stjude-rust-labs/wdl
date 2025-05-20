@@ -20,7 +20,7 @@ use crate::write_assets;
 
 /// The type of a page.
 #[derive(Debug)]
-pub enum PageType {
+pub(crate) enum PageType {
     /// An index page.
     Index(Document),
     /// A struct page.
@@ -33,7 +33,7 @@ pub enum PageType {
 
 /// An HTML page in the docs directory.
 #[derive(Debug)]
-pub struct HTMLPage {
+pub(crate) struct HTMLPage {
     /// The display name of the page.
     name: String,
     /// The type of the page.
@@ -42,7 +42,7 @@ pub struct HTMLPage {
 
 impl HTMLPage {
     /// Create a new HTML page.
-    pub fn new(name: String, page_type: PageType) -> Self {
+    pub(crate) fn new(name: String, page_type: PageType) -> Self {
         Self { name, page_type }
     }
 
@@ -52,7 +52,7 @@ impl HTMLPage {
     }
 
     /// Get the type of the page.
-    pub fn page_type(&self) -> &PageType {
+    pub(crate) fn page_type(&self) -> &PageType {
         &self.page_type
     }
 }
@@ -180,10 +180,6 @@ pub struct DocsTree {
     ///
     /// `root.path` is the path to the docs directory and is absolute.
     root: Node,
-    /// The absolute path to the stylesheet.
-    stylesheet: PathBuf,
-    /// The absolute path to the assets directory.
-    assets: PathBuf,
 }
 
 impl DocsTree {
@@ -196,13 +192,7 @@ impl DocsTree {
             abs_path.clone(),
         );
 
-        let stylesheet = abs_path.join("style.css");
-
-        Ok(Self {
-            root: node,
-            stylesheet,
-            assets: abs_path.join("assets"),
-        })
+        Ok(Self { root: node })
     }
 
     /// Create a new docs tree with a custom stylesheet.
@@ -221,11 +211,7 @@ impl DocsTree {
             abs_path.clone(),
         );
 
-        Ok(Self {
-            root: node,
-            stylesheet: new_stylesheet,
-            assets: abs_path.join("assets"),
-        })
+        Ok(Self { root: node })
     }
 
     /// Get the root of the tree.
@@ -239,35 +225,35 @@ impl DocsTree {
     }
 
     /// Get the absolute path to the root directory.
-    pub fn root_path(&self) -> &PathBuf {
+    fn root_path(&self) -> &PathBuf {
         &self.root.path
     }
 
     /// Get the absolute path to the stylesheet.
-    pub fn stylesheet(&self) -> &PathBuf {
-        &self.stylesheet
+    pub fn stylesheet(&self) -> PathBuf {
+        self.root_path().join("style.css")
     }
 
     /// Get the absolute path to the assets directory.
-    pub fn assets(&self) -> &PathBuf {
-        &self.assets
+    pub fn assets(&self) -> PathBuf {
+        self.root_path().join("assets")
     }
 
     /// Get a relative path to the stylesheet.
-    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+    fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(&self.stylesheet, path).unwrap()
+        diff_paths(self.stylesheet(), path).unwrap()
     }
 
     /// Get a relative path to the assets directory.
     fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(&self.assets, path).unwrap()
+        diff_paths(self.assets(), path).unwrap()
     }
 
     /// Get a relative path to an asset in the assets directory (converted to a
     /// string).
-    pub fn get_asset<P: AsRef<Path>>(&self, path: P, asset: &str) -> String {
+    fn get_asset<P: AsRef<Path>>(&self, path: P, asset: &str) -> String {
         self.assets_relative_to(path)
             .join(asset)
             .to_string_lossy()
@@ -275,17 +261,17 @@ impl DocsTree {
     }
 
     /// Get a relative path to the root index page.
-    pub fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+    fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
         diff_paths(self.root_path().join("index.html"), path).unwrap()
     }
 
     /// Add a page to the tree. Path is expected to be absolute.
-    pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
+    pub(crate) fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
         let path = abs_path.into();
         let rel_path = path
-            .strip_prefix(&root.path)
+            .strip_prefix(root.path())
             .expect("path should be in the docs directory");
 
         let mut current_node = root;
@@ -296,12 +282,14 @@ impl DocsTree {
             if current_node.children.contains_key(cur_name) {
                 current_node = current_node.children.get_mut(cur_name).unwrap();
             } else {
-                let new_node = Node::new(cur_name.to_string(), current_node.path().join(component));
+                let new_path = current_node.path().join(component);
+                let new_node = Node::new(cur_name.to_string(), new_path);
                 current_node.children.insert(cur_name.to_string(), new_node);
                 current_node = current_node.children.get_mut(cur_name).unwrap();
             }
             if let Some(next_component) = components.peek() {
                 if next_component.as_os_str().to_str().unwrap() == "index.html" {
+                    current_node.path = current_node.path().join("index.html");
                     break;
                 }
             }
@@ -316,7 +304,7 @@ impl DocsTree {
     fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
         let root = self.root();
         let path = path.as_ref();
-        let rel_path = path.strip_prefix(&root.path).unwrap_or(path);
+        let rel_path = path.strip_prefix(root.path()).unwrap_or(path);
 
         let mut current_node = root;
 
@@ -324,6 +312,9 @@ impl DocsTree {
             .components()
             .map(|c| c.as_os_str().to_str().unwrap())
         {
+            if component == "index.html" {
+                return Some(current_node);
+            }
             if current_node.children.contains_key(component) {
                 current_node = current_node.children.get(component).unwrap();
             } else {
@@ -337,7 +328,7 @@ impl DocsTree {
     /// Get the page associated with a path.
     ///
     /// Can be an abolute path or a path relative to the root.
-    pub fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {
+    pub(crate) fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(path).and_then(|node| node.page())
     }
 
@@ -457,12 +448,19 @@ impl DocsTree {
     }
 
     /// Render a left sidebar component given a path.
-    pub fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
+    fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
         let base = path.parent().unwrap();
 
         let make_key = |path: &Path| -> String {
+            let path = if path.file_name().unwrap() == "index.html" {
+                // Remove unnecessary index.html from the path.
+                // Not needed for the key.
+                path.parent().unwrap()
+            } else {
+                path
+            };
             path.strip_prefix(self.root_path())
                 .expect("path should be in the docs directory")
                 .to_string_lossy()
@@ -477,8 +475,10 @@ impl DocsTree {
             key: String,
             /// The display name of the node.
             display_name: String,
-            /// The path from the root to the node.
-            path: String,
+            /// The parent directory of the node.
+            ///
+            /// This is used for displaying the path to the node in the sidebar.
+            parent: String,
             /// The search name of the node.
             search_name: String,
             /// The icon for the node.
@@ -502,7 +502,7 @@ impl DocsTree {
                     r#"{{
                         key: '{}',
                         display_name: '{}',
-                        path: '{}',
+                        parent: '{}',
                         search_name: '{}',
                         icon: {},
                         href: {},
@@ -512,7 +512,7 @@ impl DocsTree {
                     }}"#,
                     self.key,
                     self.display_name,
-                    self.path,
+                    self.parent,
                     self.search_name,
                     if let Some(icon) = &self.icon {
                         format!("'{}'", icon)
@@ -541,7 +541,7 @@ impl DocsTree {
                     Some(page) => page.name().to_string(),
                     None => node.name().to_string(),
                 };
-                let inner_path = node
+                let parent = node
                     .path()
                     .strip_prefix(self.root_path())
                     .expect("path should be in the docs directory")
@@ -559,23 +559,15 @@ impl DocsTree {
                         .to_string_lossy()
                         .to_string()
                 };
-                let href = match node.page() {
-                    Some(page) => match page.page_type() {
-                        // TODO: revisit
-                        PageType::Index(_) => Some(
-                            diff_paths(node.path().join("index.html"), base)
-                                .unwrap()
-                                .to_string_lossy()
-                                .to_string(),
-                        ),
-                        _ => Some(
-                            diff_paths(node.path(), base)
-                                .unwrap()
-                                .to_string_lossy()
-                                .to_string(),
-                        ),
-                    },
-                    None => None,
+                let href = if node.page().is_some() {
+                    Some(
+                        diff_paths(node.path(), base)
+                            .unwrap()
+                            .to_string_lossy()
+                            .to_string(),
+                    )
+                } else {
+                    None
                 };
                 let selected = path.starts_with(node.path());
                 let current = path == node.path();
@@ -621,6 +613,7 @@ impl DocsTree {
                     .strip_prefix(self.root_path())
                     .expect("path should be in the docs directory")
                     .components()
+                    .filter(|c| c.as_os_str().to_str().unwrap() != "index.html")
                     .count();
                 let children = node
                     .children()
@@ -630,7 +623,7 @@ impl DocsTree {
                 JsNode {
                     key,
                     display_name,
-                    path: inner_path,
+                    parent,
                     search_name: search_name.clone(),
                     icon,
                     href,
@@ -771,7 +764,7 @@ impl DocsTree {
                         }
                         template x-for="node in searchedNodes" {
                             li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 pl-2" {
-                                p class="text-xs" x-text="node.path" {}
+                                p class="text-xs" x-text="node.parent" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.icon" class="w-4 h-4" alt="Node icon";
                                     p class="text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
@@ -795,7 +788,7 @@ impl DocsTree {
     }
 
     /// Render a right sidebar component.
-    pub fn render_right_sidebar(&self, headers: PageHeaders) -> Markup {
+    fn render_right_sidebar(&self, headers: PageHeaders) -> Markup {
         html! {
             div class="right-sidebar__container" {
                 div class="right-sidebar__header" {
@@ -817,7 +810,7 @@ impl DocsTree {
     }
 
     /// Renders a page "breadcrumb" navigation component.
-    pub fn render_breadcrumbs<P: AsRef<Path>>(&self, path: P) -> Markup {
+    fn render_breadcrumbs<P: AsRef<Path>>(&self, path: P) -> Markup {
         let path = path.as_ref();
         let base = path.parent().expect("path should have a parent");
 
@@ -827,26 +820,15 @@ impl DocsTree {
 
         let mut breadcrumbs = vec![];
 
-        let cur_page = self.get_page(path).unwrap_or(self.get_page(base).unwrap());
+        let cur_page = self.get_page(path).expect("path should have a page");
         breadcrumbs.push((cur_page.name(), None));
-
-        if matches!(cur_page.page_type(), PageType::Index(_)) {
-            // TODO: revisit logic to remove this hack
-            current_path = current_path.parent().expect("path should have a parent");
-        }
 
         while let Some(parent) = current_path.parent() {
             let cur_node = self.get_node(parent).expect("path should have a node");
             breadcrumbs.push((
                 cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
-                if let Some(page) = cur_node.page() {
-                    match page.page_type() {
-                        // TODO: revisit
-                        PageType::Index(_) => {
-                            Some(diff_paths(cur_node.path().join("index.html"), base).unwrap())
-                        }
-                        _ => Some(diff_paths(cur_node.path(), base).unwrap()),
-                    }
+                if cur_node.page().is_some() {
+                    Some(diff_paths(cur_node.path(), base).unwrap())
                 } else {
                     None
                 },
@@ -909,15 +891,7 @@ impl DocsTree {
                             @if node.page().is_some() {
                                 tr class="border" {
                                     td class="border" {
-                                        @match node.page().unwrap().page_type() {
-                                            // TODO: revisit
-                                            PageType::Index(_) => {
-                                                a href=(diff_paths(node.path().join("index.html"), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
-                                            }
-                                            _ => {
-                                                a href=(diff_paths(node.path(), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
-                                            }
-                                        }
+                                        a href=(diff_paths(node.path(), self.root_path()).unwrap().to_string_lossy()) {(node.name()) }
                                     }
                                 }
                             }
@@ -949,15 +923,11 @@ impl DocsTree {
     }
 
     /// Write a page to disk at the designated path.
-    pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
-        let mut path = path.into();
+    fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
+        let path = path.into();
 
         let (content, headers) = match page.page_type() {
-            // TODO: revisit
-            PageType::Index(doc) => {
-                path = path.join("index.html");
-                doc.render()
-            }
+            PageType::Index(doc) => doc.render(),
             PageType::Struct(s) => s.render(),
             PageType::Task(t) => t.render(),
             PageType::Workflow(w) => w.render(),

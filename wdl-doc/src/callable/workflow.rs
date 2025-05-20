@@ -16,7 +16,7 @@ use crate::parameter::Parameter;
 
 /// A workflow in a WDL document.
 #[derive(Debug)]
-pub struct Workflow {
+pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
     /// The meta of the workflow.

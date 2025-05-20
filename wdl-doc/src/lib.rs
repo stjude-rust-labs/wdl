@@ -7,11 +7,11 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-pub mod callable;
-pub mod docs_tree;
-pub mod meta;
-pub mod parameter;
-pub mod r#struct;
+mod callable;
+mod docs_tree;
+mod meta;
+mod parameter;
+mod r#struct;
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -20,9 +20,9 @@ use std::rc::Rc;
 
 use anyhow::Result;
 use anyhow::anyhow;
-pub use callable::Callable;
-pub use callable::task;
-pub use callable::workflow;
+use callable::Callable;
+use callable::task;
+use callable::workflow;
 pub use docs_tree::DocsTree;
 use docs_tree::HTMLPage;
 use docs_tree::Header;
@@ -231,7 +231,7 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
 
 /// A WDL document. This is an index page that links to other HTML pages.
 #[derive(Debug)]
-pub struct Document {
+pub(crate) struct Document {
     /// The name of the document.
     name: String,
     /// The AST node for the version statement.
@@ -245,7 +245,7 @@ pub struct Document {
 
 impl Document {
     /// Create a new document.
-    pub fn new(
+    pub(crate) fn new(
         name: String,
         version: VersionStatement,
         local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -300,7 +300,7 @@ impl Document {
                                             PageType::Task(_) => { "Task" }
                                             PageType::Workflow(_) => { "Workflow" }
                                             // Index pages should not link to other index pages.
-                                            PageType::Index(_) => { "TODO ERROR" }
+                                            PageType::Index(_) => { "ERROR" }
                                         }
                                     }
                                     td class="border" {
@@ -309,7 +309,7 @@ impl Document {
                                             PageType::Task(t) => { (t.description(true)) }
                                             PageType::Workflow(w) => { (w.description(true)) }
                                             // Index pages should not link to other index pages.
-                                            PageType::Index(_) => { "TODO ERROR" }
+                                            PageType::Index(_) => { "ERROR" }
                                         }
                                     }
                                 }
