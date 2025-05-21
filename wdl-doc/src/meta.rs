@@ -91,18 +91,20 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
     render_value_inner(value, summarize_if_needed)
 }
 
-/// The default threshold for summarizing a long string.
-const DEFAULT_SUMMARY_THRESHOLD: usize = 140;
+/// The maximum length of a markdown snippet before it is clipped.
+const MAX_MD_LENGTH: usize = 140;
+/// The amount of characters to show in the clipped markdown.
+const MD_CLIP_LENGTH: usize = 100;
 
 /// Summarize a long string if it exceeds the threshold.
 fn summarize_markdown_if_needed(content: String) -> Markup {
-    if content.len() <= DEFAULT_SUMMARY_THRESHOLD {
+    if content.len() <= MAX_MD_LENGTH {
         return Markdown(content).render();
     }
 
     let markup = Markdown(content.clone()).render();
 
-    let summary_text = format!("{}... ", &content[..DEFAULT_SUMMARY_THRESHOLD].trim());
+    let summary_text = format!("{}... ", &content[..MD_CLIP_LENGTH].trim());
 
     html! {
         div x-data="{ expanded: false }" {
