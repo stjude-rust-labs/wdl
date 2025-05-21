@@ -731,16 +731,16 @@ impl DocsTree {
 
         html! {
             div x-data=(data) class="docs-tree__container" {
-                div class="" {
-                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-2/3 flex-none sticky mb-4" alt="Sprocket logo";
-                    form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] sticky rounded-md border border-slate-700 mb-4" {
+                div class="sticky" {
+                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
+                    form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
                         div class="flex flex-row items-center h-full w-full" {
                             img src=(self.get_asset(base, "search.svg")) class="flex size-6" alt="Search icon";
                             input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300 pl-2";
                             img src=(self.get_asset(base, "x-mark.svg")) class="flex size-6 hover:cursor-pointer ml-2 pr-2" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                         }
                     }
-                    div class="flex items-center sticky gap-x-1 pr-4" {
+                    div class="flex items-center gap-x-1 pr-4" {
                         div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
@@ -751,7 +751,7 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="flex-row w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
+                div x-cloak class="relative w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
@@ -787,7 +787,7 @@ impl DocsTree {
                     ul x-show="showWorkflows && search === ''" class="w-max pr-3" {
                         (self.sidebar_workflows_view(path))
                     }
-                    div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-3" {}
+                    div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-0" {}
                 }
             }
         }
