@@ -16,6 +16,7 @@ wdl-ast = { version = "0.12.1", path = "../wdl-ast" }
 wdl-grammar = { version = "0.13.0", path = "../wdl-grammar" }
 anyhow = { workspace = true }
 crankshaft = { workspace = true }
+codespan-reporting = { workspace = true, optional = true }
 dirs = { workspace =  true }
 futures = { workspace = true }
 glob = { workspace = true }
@@ -48,7 +49,6 @@ chrono = { workspace = true }
 
 [dev-dependencies]
 approx = { workspace = true }
-codespan-reporting = { workspace = true }
 colored = { workspace = true }
 pretty_assertions = { workspace = true }
 rayon = { workspace = true }
@@ -60,18 +60,19 @@ workspace = true
 [features]
 default = []
 codespan = ["wdl-ast/codespan"]
+codespan-reporting = ["codespan", "dep:codespan-reporting"]
 
 [[test]]
 name = "inputs"
-required-features = ["codespan"]
+required-features = ["codespan-reporting"]
 harness = false
 
 [[test]]
 name = "tasks"
-required-features = ["codespan"]
+required-features = ["codespan-reporting"]
 harness = false
 
 [[test]]
 name = "workflows"
-required-features = ["codespan"]
+required-features = ["codespan-reporting"]
 harness = false
