@@ -148,6 +148,8 @@ impl Parameter {
 
 /// The maximum length of an expression before it is clipped.
 const MAX_EXPR_LENGTH: usize = 80;
+/// The amount of characters to show in the clipped expression.
+const EXPR_CLIP_LENGTH: usize = 50;
 
 /// Render a WDL expression as HTML, with a show more button if it exceeds a
 /// certain length.
@@ -156,7 +158,7 @@ pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
         return html! { code { (expr) } };
     }
 
-    let clipped_expr = expr[..MAX_EXPR_LENGTH].trim();
+    let clipped_expr = expr[..EXPR_CLIP_LENGTH].trim();
 
     html! {
         div x-data="{ expanded: false }" {
