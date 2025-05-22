@@ -69,6 +69,7 @@ use crate::EvaluationError;
 use crate::EvaluationResult;
 use crate::Input;
 use crate::InputKind;
+use crate::ONE_GIBIBYTE;
 use crate::Outputs;
 use crate::PrimitiveValue;
 use crate::Scope;
@@ -104,7 +105,7 @@ pub const DEFAULT_TASK_REQUIREMENT_CONTAINER: &str = "ubuntu:latest";
 /// The default value for the `cpu` requirement.
 pub const DEFAULT_TASK_REQUIREMENT_CPU: f64 = 1.0;
 /// The default value for the `memory` requirement.
-pub const DEFAULT_TASK_REQUIREMENT_MEMORY: i64 = 2 * 1024 * 1024 * 1024;
+pub const DEFAULT_TASK_REQUIREMENT_MEMORY: i64 = 2 * (ONE_GIBIBYTE as i64);
 /// The default value for the `max_retries` requirement.
 pub const DEFAULT_TASK_REQUIREMENT_MAX_RETRIES: u64 = 0;
 /// The default value for the `disks` requirement (in GiB).
@@ -333,7 +334,7 @@ pub(crate) fn disks<'a>(
                 // Check for `<size> <unit>`; convert from the specified unit to GiB
                 if let Ok(size) = first.parse() {
                     let unit: StorageUnit = second.parse().ok()?;
-                    let size = unit.bytes(size)? / (1024 * 1024 * 1024);
+                    let size = unit.bytes(size)? / (ONE_GIBIBYTE as u64);
                     return Some((size.try_into().ok()?, None));
                 }
 
@@ -348,7 +349,7 @@ pub(crate) fn disks<'a>(
             (Some(mount_point), Some(size), Some(unit)) => {
                 // Specification is `<mount-point> <size> <units>`
                 let unit: StorageUnit = unit.parse().ok()?;
-                let size = unit.bytes(size.parse().ok()?)? / (1024 * 1024 * 1024);
+                let size = unit.bytes(size.parse().ok()?)? / (ONE_GIBIBYTE as u64);
 
                 // Mount point must be absolute
                 if !mount_point.starts_with('/') {

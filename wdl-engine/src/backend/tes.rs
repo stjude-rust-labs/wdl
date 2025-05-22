@@ -232,6 +232,8 @@ impl TaskManagerRequest for TesTaskRequest {
             );
         }
 
+        // SAFETY: currently `outputs` is required by configuration validation, so it
+        // should always unwrap
         let outputs_url = self
             .config
             .outputs

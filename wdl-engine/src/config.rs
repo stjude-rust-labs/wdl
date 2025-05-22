@@ -455,25 +455,25 @@ impl Default for DockerBackendConfig {
     }
 }
 
-/// Represents information for TES backend basic authentication.
+/// Represents HTTP basic authentication configuration.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
-pub struct TesBackendBasicAuth {
+pub struct BasicAuthConfig {
     /// The TES backend authentication username.
     pub username: Option<String>,
     /// The TES backend authentication password.
     pub password: Option<String>,
 }
 
-impl TesBackendBasicAuth {
-    /// Validates the TES backend configuration.
+impl BasicAuthConfig {
+    /// Validates the HTTP basic auth configuration.
     pub fn validate(&self) -> Result<()> {
         if self.username.is_none() {
-            bail!("TES backend basic auth configuration value `username` is required");
+            bail!("HTTP basic auth configuration value `username` is required");
         }
 
         if self.password.is_none() {
-            bail!("TES backend basic auth configuration value `password` is required");
+            bail!("HTTP basic auth configuration value `password` is required");
         }
 
         Ok(())
@@ -485,7 +485,7 @@ impl TesBackendBasicAuth {
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum TesBackendAuthConfig {
     /// Use basic authentication for the TES backend.
-    Basic(TesBackendBasicAuth),
+    Basic(BasicAuthConfig),
 }
 
 impl TesBackendAuthConfig {
@@ -689,12 +689,12 @@ mod test {
         };
         assert_eq!(
             config.validate().unwrap_err().to_string(),
-            "TES backend basic auth configuration value `username` is required"
+            "HTTP basic auth configuration value `username` is required"
         );
         let config = Config {
             backend: BackendConfig::Tes(Box::new(TesBackendConfig {
                 url: Some(Url::parse("https://example.com").unwrap()),
-                auth: Some(TesBackendAuthConfig::Basic(TesBackendBasicAuth {
+                auth: Some(TesBackendAuthConfig::Basic(BasicAuthConfig {
                     username: Some("Foo".into()),
                     ..Default::default()
                 })),
@@ -704,7 +704,7 @@ mod test {
         };
         assert_eq!(
             config.validate().unwrap_err().to_string(),
-            "TES backend basic auth configuration value `password` is required"
+            "HTTP basic auth configuration value `password` is required"
         );
 
         let mut config = Config::default();
