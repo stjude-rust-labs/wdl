@@ -149,7 +149,7 @@ impl Parameter {
 /// The maximum length of an expression before it is clipped.
 const MAX_EXPR_LENGTH: usize = 80;
 /// The amount of characters to show in the clipped expression.
-const EXPR_CLIP_LENGTH: usize = 50;
+const EXPR_CLIP_LENGTH: usize = 60;
 
 /// Render a WDL expression as HTML, with a show more button if it exceeds a
 /// certain length.
