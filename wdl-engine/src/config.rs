@@ -522,6 +522,12 @@ pub struct TesBackendConfig {
     /// Defaults to 60 second.
     #[serde(default)]
     pub interval: Option<u64>,
+
+    /// The maximum task concurrency for the backend.
+    ///
+    /// Defaults to unlimited.
+    #[serde(default)]
+    pub max_concurrency: Option<u64>,
 }
 
 impl TesBackendConfig {

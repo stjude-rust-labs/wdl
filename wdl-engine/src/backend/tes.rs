@@ -390,8 +390,7 @@ impl TesBackend {
             shell: Arc::new(task.shell.clone()),
             container: task.container.clone(),
             config: Arc::new(config.clone()),
-            // TODO: what should be the maximum amount of concurrency for the TES backend
-            max_concurrency: 100,
+            max_concurrency: config.max_concurrency.unwrap_or(u64::MAX),
             max_cpu,
             max_memory,
             manager,
