@@ -75,17 +75,25 @@ impl Task {
         let kv = self
             .meta
             .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"))
+            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description" | "help"))
             .collect::<Vec<_>>();
-        if kv.is_empty() {
+        let help = self
+            .meta
+            .get("help");
+        if kv.is_empty() && help.is_none() {
             return None;
         }
         Some(html! {
             div class="callable__section" {
                 h2 id="meta" class="callable__section-header" { "Meta" }
-                ul class="callable__meta-records" {
+                @if let Some(help) = help {
+                    p class="" {
+                        (render_value(help, false))
+                    }
+                }
+                div class="callable__meta-records" {
                     @for (key, value) in kv {
-                        li class="callable__meta-record" {
+                        div class="callable__meta-record" {
                             b { (key) ":" } " " (render_value(value, false))
                         }
                     }

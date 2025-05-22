@@ -18,7 +18,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
                 if summarize_if_needed {
                     return html! { (summarize_markdown_if_needed(inner_text)) };
                 }
-                html! { (inner_text) }
+                return Markdown(inner_text).render();
             }
             MetadataValue::Boolean(b) => html! { code { (b.text().to_string()) } },
             MetadataValue::Integer(i) => html! { code { (i.text().to_string()) } },
