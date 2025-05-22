@@ -94,7 +94,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
 /// The maximum length of a markdown snippet before it is clipped.
 const MAX_MD_LENGTH: usize = 140;
 /// The amount of characters to show in the clipped markdown.
-const MD_CLIP_LENGTH: usize = 100;
+const MD_CLIP_LENGTH: usize = 120;
 
 /// Summarize a long string if it exceeds the threshold.
 fn summarize_markdown_if_needed(content: String) -> Markup {
