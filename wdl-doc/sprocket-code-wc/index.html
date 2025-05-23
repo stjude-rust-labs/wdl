@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="dist/bundle.js"></script>
+</head>
+<body>
+    <sprocket-code language="wdl">
+fn main() {
+    println!("Hello, Shiki!");
+    let x = 42;
+    println!("The answer is {}", x);
+}
+        </code-highlight>
+        <code-highlight language="wdl">
+version 1.0
+
+workflow count_lines {
+    input { File input_file }
+    call Count { input: file = input_file }
+    output { Int num_lines = Count.num_lines }
+}
+
+task Count {
+    input { File file }
+    command { wc -l \${file} | awk '{print $1}' }
+    output { Int num_lines = read_int(stdout()) }
+}
+    </sprocket-code>
+</body>
+</html>
