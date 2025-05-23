@@ -7,11 +7,11 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-pub mod callable;
-pub mod docs_tree;
-pub mod meta;
-pub mod parameter;
-pub mod r#struct;
+mod callable;
+mod docs_tree;
+mod meta;
+mod parameter;
+mod r#struct;
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -20,17 +20,21 @@ use std::rc::Rc;
 
 use anyhow::Result;
 use anyhow::anyhow;
-pub use callable::Callable;
-pub use callable::task;
-pub use callable::workflow;
+use callable::Callable;
+use callable::task;
+use callable::workflow;
 pub use docs_tree::DocsTree;
+pub use docs_tree::DocsTreeBuilder;
 use docs_tree::HTMLPage;
+use docs_tree::Header;
+use docs_tree::PageHeaders;
 use docs_tree::PageType;
 use maud::DOCTYPE;
 use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
@@ -42,10 +46,97 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
-/// The directory where the generated documentation will be stored.
-///
-/// This directory will be created in the workspace directory.
-const DOCS_DIR: &str = "docs";
+/// Write assets to the given root docs directory.
+fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
+    let dir = dir.as_ref();
+    let assets_dir = dir.join("assets");
+    std::fs::create_dir_all(&assets_dir)?;
+    if !skip_stylesheet {
+        std::fs::write(
+            dir.join("style.css"),
+            include_str!("../theme/dist/style.css"),
+        )?;
+    }
+
+    std::fs::write(
+        assets_dir.join("sprocket-logo.svg"),
+        include_bytes!("../theme/assets/sprocket-logo.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("search.svg"),
+        include_bytes!("../theme/assets/search.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("x-mark.svg"),
+        include_bytes!("../theme/assets/x-mark.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("chevron-down.svg"),
+        include_bytes!("../theme/assets/chevron-down.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-open.svg"),
+        include_bytes!("../theme/assets/dir-open.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("dir-closed.svg"),
+        include_bytes!("../theme/assets/dir-closed.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("category-selected.svg"),
+        include_bytes!("../theme/assets/category-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("list-bullet-selected.svg"),
+        include_bytes!("../theme/assets/list-bullet-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("list-bullet-unselected.svg"),
+        include_bytes!("../theme/assets/list-bullet-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("folder-selected.svg"),
+        include_bytes!("../theme/assets/folder-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("folder-unselected.svg"),
+        include_bytes!("../theme/assets/folder-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("wdl-dir-selected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("wdl-dir-unselected.svg"),
+        include_bytes!("../theme/assets/wdl-dir-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("struct-selected.svg"),
+        include_bytes!("../theme/assets/struct-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("struct-unselected.svg"),
+        include_bytes!("../theme/assets/struct-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("task-selected.svg"),
+        include_bytes!("../theme/assets/task-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("task-unselected.svg"),
+        include_bytes!("../theme/assets/task-unselected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("workflow-selected.svg"),
+        include_bytes!("../theme/assets/workflow-selected.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("workflow-unselected.svg"),
+        include_bytes!("../theme/assets/workflow-unselected.svg"),
+    )?;
+
+    Ok(())
+}
 
 /// Links to a CSS stylesheet at the given path.
 struct Css<'a>(&'a str);
@@ -59,7 +150,7 @@ impl Render for Css<'_> {
 }
 
 /// A basic header with a `page_title` and an optional link to the stylesheet.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) -> Markup {
+pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup {
     html! {
         head {
             meta charset="utf-8";
@@ -68,24 +159,20 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) ->
             link rel="preconnect" href="https://fonts.googleapis.com";
             link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
-            @if let Some(ss) = stylesheet {
-                (Css(ss.as_ref().to_str().unwrap()))
-            }
+            script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
+            script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
+            (Css(stylesheet.as_ref().to_str().unwrap()))
         }
     }
 }
 
 /// A full HTML page.
-pub(crate) fn full_page<P: AsRef<Path>>(
-    page_title: &str,
-    body: Markup,
-    stylesheet: Option<P>,
-) -> Markup {
+pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, stylesheet: P) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark size-full" {
+        html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+            body class="size-full table-auto border-collapse text-base" {
                 (body)
             }
         }
@@ -109,14 +196,14 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
         // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
         let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
-            let trimmed = safe_html[3..safe_html.len() - 5].to_string();
+            let trimmed = &safe_html[3..safe_html.len() - 5];
             if trimmed.contains("<p>") {
                 // If the trimmed string contains another `<p>` tag, it means
                 // that the original string was more complicated than a single-line paragraph,
                 // so we should keep the outer `<p>` tag.
                 safe_html
             } else {
-                trimmed
+                trimmed.to_string()
             }
         } else {
             safe_html
@@ -145,9 +232,9 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
-/// A WDL document.
+/// A WDL document. This is an index page that links to other HTML pages.
 #[derive(Debug)]
-pub struct Document {
+pub(crate) struct Document {
     /// The name of the document.
     name: String,
     /// The AST node for the version statement.
@@ -161,7 +248,7 @@ pub struct Document {
 
 impl Document {
     /// Create a new document.
-    pub fn new(
+    pub(crate) fn new(
         name: String,
         version: VersionStatement,
         local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -190,40 +277,47 @@ impl Document {
     }
 
     /// Render the document as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div {
-                h1 { (self.name()) }
-                h3 { "WDL Version: " (self.version()) }
-                div { (self.preamble()) }
-                div class="flex flex-col items-center text-left"  {
-                    h2 { "Table of Contents" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th class="" { "Page" }
-                            th class="" { "Type" }
-                            th class="" { "Description" }
-                        }}
-                        tbody class="border" {
-                            @for page in &self.local_pages {
-                                tr class="border" {
-                                    td class="border" {
-                                        a href=(page.0.to_str().unwrap()) { (page.1.name()) }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
-                                            PageType::Struct(_) => { "Struct" }
-                                            PageType::Task(_) => { "Task" }
-                                            PageType::Workflow(_) => { "Workflow" }
-                                        }
-                                    }
-                                    td class="border" {
-                                        @match page.1.page_type() {
-                                            PageType::Index(_) => { "TODO ERROR" }
-                                            PageType::Struct(_) => { "N/A" }
-                                            PageType::Task(t) => { (t.description()) }
-                                            PageType::Workflow(w) => { (w.description()) }
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let markup = html! {
+            div class="callable__container" {
+                h1 id="title" class="callable_title" { (self.name()) }
+                // TODO: does this need better styling?
+                h3 class="callable__section-subheader" { "WDL Version: " (self.version()) }
+                div id="preamble" class="callable__section-text" { (self.preamble()) }
+                div class="callable__section" {
+                    h2 id="toc" class="callable__section-header" { "Table of Contents" }
+                    div class="parameter__table-outer-container" {
+                        div class="parameter__table-inner-container" {
+                            table class="parameter__table" {
+                                thead { tr {
+                                    th { "Page" }
+                                    th { "Type" }
+                                    th { "Description" }
+                                }}
+                                tbody {
+                                    @for page in &self.local_pages {
+                                        tr {
+                                            td class="text-violet-400" {
+                                                a href=(page.0.to_string_lossy()) { (page.1.name()) }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "Struct" }
+                                                    PageType::Task(_) => { "Task" }
+                                                    PageType::Workflow(_) => { "Workflow" }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "N/A" }
+                                                    PageType::Task(t) => { (t.description(true)) }
+                                                    PageType::Workflow(w) => { (w.description(true)) }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -232,31 +326,43 @@ impl Document {
                     }
                 }
             }
-        }
+        };
+
+        let mut headers = PageHeaders::default();
+        headers.push(Header::Header(
+            "Preamble".to_string(),
+            "preamble".to_string(),
+        ));
+        headers.push(Header::Header(
+            "Table of Contents".to_string(),
+            "toc".to_string(),
+        ));
+
+        (markup, headers)
     }
 }
 
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
-/// workspace directory. The generated documentation will be stored in a
-/// `docs` directory within the workspace.
+/// workspace directory. This function will overwrite any existing files which
+/// conflict with the generated files, but will not delete any files that
+/// are already present.
 pub async fn document_workspace(
     workspace: impl AsRef<Path>,
+    output_dir: impl AsRef<Path>,
     stylesheet: Option<impl AsRef<Path>>,
-    overwrite: bool,
-) -> Result<PathBuf> {
-    let workspace_abs_path = absolute(workspace)?;
+    homepage: Option<impl AsRef<Path>>,
+) -> Result<()> {
+    let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
+    let homepage = homepage.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let docs_dir = workspace_abs_path.join(DOCS_DIR);
-    if overwrite && docs_dir.exists() {
-        std::fs::remove_dir_all(&docs_dir)?;
-    }
+    let docs_dir = clean(absolute(output_dir.as_ref())?);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
@@ -265,14 +371,14 @@ pub async fn document_workspace(
     analyzer.add_directory(workspace_abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
-    let mut docs_tree = if let Some(ss) = stylesheet {
-        docs_tree::DocsTree::new_with_stylesheet(docs_dir.clone(), ss)?
-    } else {
-        docs_tree::DocsTree::new(docs_dir.clone())
-    };
+    let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
+        .maybe_stylesheet(stylesheet)
+        .maybe_homepage(homepage)
+        .build()?;
 
     for result in results {
         let uri = result.document().uri();
+        // TODO: revisit these error paths
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
@@ -290,11 +396,11 @@ pub async fn document_workspace(
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
-        let ast_doc = result.document().root();
-        let version = ast_doc
+        let ast = result.document().root();
+        let version = ast
             .version_statement()
             .expect("document should have a version statement");
-        let ast = ast_doc.ast().unwrap_v1();
+        let ast = ast.ast().unwrap_v1();
 
         let mut local_pages = Vec::new();
 
@@ -304,6 +410,7 @@ pub async fn document_workspace(
                     let name = s.name().text().to_owned();
                     let path = cur_dir.join(format!("{}-struct.html", name));
 
+                    // TODO: handle >=v1.2 structs
                     let r#struct = r#struct::Struct::new(s.clone());
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));
@@ -359,7 +466,7 @@ pub async fn document_workspace(
 
     docs_tree.render_all()?;
 
-    Ok(docs_dir)
+    Ok(())
 }
 
 #[cfg(test)]
@@ -425,7 +532,7 @@ mod tests {
             ast_workflow.output(),
         );
 
-        let description = workflow.description();
+        let description = workflow.description(false);
         assert_eq!(
             description.into_string(),
             "A simple description should not render with p tags"
