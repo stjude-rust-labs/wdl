@@ -24,6 +24,7 @@ use callable::Callable;
 use callable::task;
 use callable::workflow;
 pub use docs_tree::DocsTree;
+pub use docs_tree::DocsTreeBuilder;
 use docs_tree::HTMLPage;
 use docs_tree::Header;
 use docs_tree::PageHeaders;
@@ -46,14 +47,16 @@ use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
 /// Write assets to the given root docs directory.
-fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
+fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
     let dir = dir.as_ref();
     let assets_dir = dir.join("assets");
     std::fs::create_dir_all(&assets_dir)?;
-    std::fs::write(
-        dir.join("style.css"),
-        include_str!("../theme/dist/style.css"),
-    )?;
+    if !skip_stylesheet {
+        std::fs::write(
+            dir.join("style.css"),
+            include_str!("../theme/dist/style.css"),
+        )?;
+    }
 
     std::fs::write(
         assets_dir.join("sprocket-logo.svg"),
@@ -349,9 +352,11 @@ pub async fn document_workspace(
     workspace: impl AsRef<Path>,
     output_dir: impl AsRef<Path>,
     stylesheet: Option<impl AsRef<Path>>,
+    homepage: Option<impl AsRef<Path>>,
 ) -> Result<()> {
     let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
+    let homepage = homepage.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
@@ -366,11 +371,10 @@ pub async fn document_workspace(
     analyzer.add_directory(workspace_abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
-    let mut docs_tree = if let Some(ss) = stylesheet {
-        docs_tree::DocsTree::new_with_stylesheet(&docs_dir, ss)?
-    } else {
-        docs_tree::DocsTree::new(&docs_dir)?
-    };
+    let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
+        .maybe_stylesheet(stylesheet)
+        .maybe_homepage(homepage)
+        .build()?;
 
     for result in results {
         let uri = result.document().uri();
