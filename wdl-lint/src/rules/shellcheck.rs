@@ -399,15 +399,36 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                 );
             }
             PrimitiveType::String => {
-                if let Expr::If(i) = placeholder.expr() {
-                    let (_, if_expr, else_expr) = i.exprs();
-                    if let (
-                        Expr::Literal(LiteralExpr::String(_)),
-                        Expr::Literal(LiteralExpr::String(_)),
-                    ) = (if_expr, else_expr)
-                    {
-                        return ("a".repeat(placeholder_len), true);
+                match placeholder.expr() {
+                    Expr::If(i) =>  {
+                        let (_, if_expr, else_expr) = i.exprs();
+                        if let (
+                            Expr::Literal(LiteralExpr::String(_)),
+                            Expr::Literal(LiteralExpr::String(_)),
+                        ) = (if_expr, else_expr)
+                        {
+                            return ("a".repeat(placeholder_len), true);
+                        }
                     }
+                    Expr::Parenthesized(p) => {
+                        if let Expr::If(i) = p.expr() {
+                            let (_, if_expr, else_expr) = i.exprs();
+                            if let (
+                                Expr::Literal(LiteralExpr::String(_)),
+                                Expr::Literal(LiteralExpr::String(_)),
+                            ) = (if_expr, else_expr)
+                            {
+                                return ("a".repeat(placeholder_len), true);
+                            }
+                        }
+                    }
+                    Expr::Call(c) => {
+                        let target = c.target();
+                        if target.text() == "sep" {
+                            return ("a".repeat(placeholder_len), true);
+                        }
+                    }
+                    _ => {}
                 }
             }
             _ => {}
