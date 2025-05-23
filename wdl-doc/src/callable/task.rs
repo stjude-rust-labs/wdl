@@ -77,9 +77,7 @@ impl Task {
             .iter()
             .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description" | "help"))
             .collect::<Vec<_>>();
-        let help = self
-            .meta
-            .get("help");
+        let help = self.meta.get("help");
         if kv.is_empty() && help.is_none() {
             return None;
         }

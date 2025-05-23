@@ -7,11 +7,14 @@ use std::path::PathBuf;
 use std::path::absolute;
 use std::rc::Rc;
 
+use anyhow::Result;
 use maud::Markup;
 use maud::html;
 use pathdiff::diff_paths;
 
 use crate::Document;
+use crate::Markdown;
+use crate::Render;
 use crate::full_page;
 use crate::r#struct::Struct;
 use crate::task::Task;
@@ -183,6 +186,72 @@ impl Node {
     }
 }
 
+/// A builder for a [`DocsTree`] which represents the docs directory.
+#[derive(Debug)]
+pub struct DocsTreeBuilder {
+    /// The root directory for the docs.
+    root: PathBuf,
+    /// The stylesheet for the docs.
+    stylesheet: Option<PathBuf>,
+    /// The path to a Markdown file to embed in the `<root>/index.html` page.
+    homepage: Option<PathBuf>,
+}
+
+impl DocsTreeBuilder {
+    /// Create a new docs tree builder.
+    pub fn new(root: impl AsRef<Path>) -> Self {
+        let root = path_clean::clean(absolute(root.as_ref()).unwrap());
+        Self {
+            root,
+            stylesheet: None,
+            homepage: None,
+        }
+    }
+
+    /// Set the stylesheet for the docs with an option.
+    pub fn maybe_stylesheet(mut self, stylesheet: Option<impl Into<PathBuf>>) -> Self {
+        self.stylesheet = stylesheet.map(|s| s.into());
+        self
+    }
+
+    /// Set the stylesheet for the docs.
+    pub fn stylesheet(self, stylesheet: impl Into<PathBuf>) -> Self {
+        self.maybe_stylesheet(Some(stylesheet))
+    }
+
+    /// Set the homepage for the docs with an option.
+    pub fn maybe_homepage(mut self, homepage: Option<impl Into<PathBuf>>) -> Self {
+        self.homepage = homepage.map(|hp| hp.into());
+        self
+    }
+
+    /// Set the homepage for the docs.
+    pub fn homepage(self, homepage: impl Into<PathBuf>) -> Self {
+        self.maybe_homepage(Some(homepage))
+    }
+
+    /// Build the docs tree.
+    pub fn build(self) -> Result<DocsTree> {
+        write_assets(&self.root, self.stylesheet.is_some())?;
+        if let Some(stylesheet) = self.stylesheet {
+            let new_stylesheet = self.root.join("style.css");
+            std::fs::copy(stylesheet, &new_stylesheet)?;
+        };
+        let node = Node::new(
+            self.root
+                .file_name()
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or("docs".to_string()),
+            PathBuf::from(""),
+        );
+        Ok(DocsTree {
+            root: node,
+            path: self.root,
+            homepage: self.homepage,
+        })
+    }
+}
+
 /// A tree representing the docs directory.
 #[derive(Debug)]
 pub struct DocsTree {
@@ -190,46 +259,12 @@ pub struct DocsTree {
     root: Node,
     /// The absolute path to the root directory.
     path: PathBuf,
+    /// An optional path to a Markdown file to embed in the `<root>/index.html`
+    /// page.
+    homepage: Option<PathBuf>,
 }
 
 impl DocsTree {
-    /// Create a new docs tree with a default stylesheet.
-    pub fn new(root: impl AsRef<Path>) -> anyhow::Result<Self> {
-        let abs_path = absolute(root.as_ref()).unwrap();
-        write_assets(&abs_path)?;
-        let node = Node::new(
-            abs_path.file_name().unwrap().to_str().unwrap().to_string(),
-            PathBuf::from(""),
-        );
-
-        Ok(Self {
-            root: node,
-            path: abs_path,
-        })
-    }
-
-    /// Create a new docs tree with a custom stylesheet.
-    pub fn new_with_stylesheet(
-        root: impl AsRef<Path>,
-        stylesheet: impl AsRef<Path>,
-    ) -> anyhow::Result<Self> {
-        let abs_path = absolute(root.as_ref()).unwrap();
-        write_assets(&abs_path)?;
-        let in_stylesheet = absolute(stylesheet.as_ref())?;
-        let new_stylesheet = abs_path.join("style.css");
-        std::fs::copy(in_stylesheet, &new_stylesheet)?;
-
-        let node = Node::new(
-            abs_path.file_name().unwrap().to_str().unwrap().to_string(),
-            PathBuf::from(""),
-        );
-
-        Ok(Self {
-            root: node,
-            path: abs_path,
-        })
-    }
-
     /// Get the root of the tree.
     fn root(&self) -> &Node {
         &self.root
@@ -868,7 +903,7 @@ impl DocsTree {
     }
 
     /// Render every page in the tree.
-    pub fn render_all(&self) -> anyhow::Result<()> {
+    pub fn render_all(&self) -> Result<()> {
         let root = self.root();
 
         for node in root.depth_first_traversal() {
@@ -882,29 +917,17 @@ impl DocsTree {
     }
 
     /// Write the homepage to disk.
-    fn write_homepage(&self) -> anyhow::Result<()> {
-        let root = self.root();
+    fn write_homepage(&self) -> Result<()> {
         let index_path = self.root_path().join("index.html");
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
             div class="" {
-                h3 class="" { "Home" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th class="" { "Page" }
-                    }}
-                    tbody class="border" {
-                        @for node in root.depth_first_traversal() {
-                            @if node.page().is_some() {
-                                tr class="border" {
-                                    td class="border" {
-                                        a href=(node.path().to_string_lossy()) {(node.name()) }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                h1 class="" { "Home" }
+                @if let Some(homepage) = &self.homepage {
+                    (Markdown(std::fs::read_to_string(homepage)?).render())
+                } @else {
+                    p { "No homepage set." }
                 }
             }
         };
@@ -940,7 +963,7 @@ impl DocsTree {
     /// Write a page to disk at the designated path.
     ///
     /// Path is expected to be an absolute path.
-    fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
+    fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> Result<()> {
         let path = path.into();
 
         let (content, headers) = match page.page_type() {
