@@ -34,6 +34,8 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::StrippedCommandPart;
 
@@ -395,6 +397,18 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                     format!("true{}", " ".repeat(placeholder_len.saturating_sub(4))),
                     true,
                 );
+            }
+            PrimitiveType::String => {
+                if let Expr::If(i) = placeholder.expr() {
+                    let (_, if_expr, else_expr) = i.exprs();
+                    if let (
+                        Expr::Literal(LiteralExpr::String(_)),
+                        Expr::Literal(LiteralExpr::String(_)),
+                    ) = (if_expr, else_expr)
+                    {
+                        return ("a".repeat(placeholder_len), true);
+                    }
+                }
             }
             _ => {}
         }
