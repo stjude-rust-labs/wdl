@@ -1,6 +1,7 @@
 use wdl_analysis::Diagnostics;
 use wdl_analysis::VisitReason;
 use wdl_analysis::Visitor;
+use wdl_analysis::types::Type;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
@@ -73,6 +74,25 @@ impl Visitor for ObjectToStructRule {
             return;
         }
 
+        // match Type::as_struct(&self){
+        //    Some(structnode)=>{
+        //        match decl.expr() {
+        //
+        // wdl_ast::v1::Expr::Literal(wdl_ast::v1::LiteralExpr::Object(token)) => {
+        //                diagnostics.exceptable_add(
+        //                    prefer_struct_over_object(token.span()),
+        //                    SyntaxElement::from(decl.inner().clone()),
+        //                    &self.exceptable_nodes(),
+        //                );
+        //            }
+        //
+        //        _ => {}
+        //        }
+        //
+        //    },
+        //    None=>{}
+        //}
+
         // we check if the expression that is being initialised to the declaration is an
         // object type or not
         match decl.expr() {
@@ -84,26 +104,6 @@ impl Visitor for ObjectToStructRule {
                 );
             }
             _ => {}
-        }
-    }
-
-    // this is redundant because of deprecated object rule !!!
-    fn unbound_decl(
-        &mut self,
-        diagnostics: &mut Diagnostics,
-        reason: VisitReason,
-        decl: &wdl_ast::v1::UnboundDecl,
-    ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
-        if let Type::Object(object_type_token) = decl.ty() {
-            diagnostics.exceptable_add(
-                prefer_struct_over_object(object_type_token.span()),
-                SyntaxElement::from(decl.inner().clone()),
-                &self.exceptable_nodes(),
-            )
         }
     }
 }
