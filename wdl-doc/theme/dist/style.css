@@ -633,6 +633,7 @@
     color: var(--color-slate-200);
   }
   .docs-tree__container {
+    position: relative;
     display: flex;
     height: 100%;
     width: 100%;
