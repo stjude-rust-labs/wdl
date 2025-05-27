@@ -425,7 +425,16 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                     Expr::Call(c) => {
                         let target = c.target();
                         if target.text() == "sep" {
-                            return ("a".repeat(placeholder_len), true);
+                            match c.arguments().nth(1) {
+                                Some(Expr::Call(c)) => {
+                                    if c.target().text() == "quote" || c.target().text() == "squote" {
+                                        // If the second argument is a quoted string, we can replace
+                                        // the placeholder with a literal.
+                                        return ("a".repeat(placeholder_len), true);
+                                    }
+                                }
+                                _ => {}
+                            }
                         }
                     }
                     _ => {}
