@@ -122,7 +122,7 @@
   .callable__meta-record {}
 
   .docs-tree__container {
-    @apply flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
+    @apply relative flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
   }
 
   .right-sidebar__container {
