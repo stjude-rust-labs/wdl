@@ -970,8 +970,12 @@ impl DocsTree {
         let (content, headers) = match page.page_type() {
             PageType::Index(doc) => doc.render(),
             PageType::Struct(s) => s.render(),
-            PageType::Task(t) => t.render(),
-            PageType::Workflow(w) => w.render(),
+            PageType::Task(t) => t.render(
+                &self.assets_relative_to(path.parent().expect("path should have a parent")),
+            ),
+            PageType::Workflow(w) => w.render(
+                &self.assets_relative_to(path.parent().expect("path should have a parent")),
+            ),
         };
 
         let breadcrumbs = self.render_breadcrumbs(&path);
