@@ -24,9 +24,9 @@ fn prefer_struct_over_object(span: Span) -> Diagnostic {
 
 // A rule that discourages object to struct coercion
 #[derive(Default, Debug)]
-pub struct ObjectToStructRule;
+pub struct ObjectToStruct;
 
-impl Rule for ObjectToStructRule {
+impl Rule for ObjectToStruct {
     fn id(&self) -> &'static str {
         ID
     }
@@ -54,7 +54,7 @@ impl Rule for ObjectToStructRule {
     }
 }
 
-impl Visitor for ObjectToStructRule {
+impl Visitor for ObjectToStruct {
     fn reset(&mut self) {
         *self = Self::default();
     }

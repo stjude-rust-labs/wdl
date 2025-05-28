@@ -114,6 +114,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::ExpressionSpacingRule>::default(),
         Box::<rules::InputNameRule>::default(),
         Box::<rules::OutputNameRule>::default(),
+        Box::<rules::ObjectToStruct>::default(),
         Box::<rules::DeclarationNameRule>::default(),
         Box::<rules::RedundantNone>::default(),
         Box::<rules::ContainerUriRule>::default(),
