@@ -400,7 +400,7 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
             }
             PrimitiveType::String => {
                 match placeholder.expr() {
-                    Expr::If(i) =>  {
+                    Expr::If(i) => {
                         let (_, if_expr, else_expr) = i.exprs();
                         if let (
                             Expr::Literal(LiteralExpr::String(_)),
@@ -427,7 +427,8 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                         if target.text() == "sep" {
                             match c.arguments().nth(1) {
                                 Some(Expr::Call(c)) => {
-                                    if c.target().text() == "quote" || c.target().text() == "squote" {
+                                    if c.target().text() == "quote" || c.target().text() == "squote"
+                                    {
                                         // If the second argument is a quoted string, we can replace
                                         // the placeholder with a literal.
                                         return ("a".repeat(placeholder_len), true);
