@@ -13,6 +13,7 @@ use wdl_ast::v1::RuntimeSection;
 use super::*;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
+use crate::meta::render_meta_map;
 use crate::parameter::Parameter;
 use crate::parameter::shorten_expr_if_needed;
 
@@ -71,31 +72,12 @@ impl Task {
     ///
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
-    pub fn render_meta(&self) -> Option<Markup> {
-        let kv = self
-            .meta
-            .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description" | "help"))
-            .collect::<Vec<_>>();
-        let help = self.meta.get("help");
-        if kv.is_empty() && help.is_none() {
-            return None;
-        }
+    pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
+        let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
         Some(html! {
             div class="callable__section" {
                 h2 id="meta" class="callable__section-header" { "Meta" }
-                @if let Some(help) = help {
-                    p class="" {
-                        (render_value(help, false))
-                    }
-                }
-                div class="callable__meta-records" {
-                    @for (key, value) in kv {
-                        div class="callable__meta-record" {
-                            b { (key) ":" } " " (render_value(value, false))
-                        }
-                    }
-                }
+                (content)
             }
         })
     }
@@ -135,16 +117,16 @@ impl Task {
     }
 
     /// Render the task as HTML.
-    pub fn render(&self) -> (Markup, PageHeaders) {
+    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut headers = PageHeaders::default();
-        let meta_markup = if let Some(meta) = self.render_meta() {
+        let meta_markup = if let Some(meta) = self.render_meta(assets) {
             headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
             meta
         } else {
             html! {}
         };
 
-        let (input_markup, inner_headers) = self.render_inputs();
+        let (input_markup, inner_headers) = self.render_inputs(assets);
         headers.extend(inner_headers);
 
         let markup = html! {
@@ -156,7 +138,7 @@ impl Task {
                     }
                     (meta_markup)
                     (input_markup)
-                    (self.render_outputs())
+                    (self.render_outputs(assets))
                     (self.render_runtime_section())
                 }
             }

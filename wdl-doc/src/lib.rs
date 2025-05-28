@@ -138,6 +138,14 @@ fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
         assets_dir.join("missing-home.svg"),
         include_bytes!("../theme/assets/missing-home.svg"),
     )?;
+    std::fs::write(
+        assets_dir.join("link.svg"),
+        include_bytes!("../theme/assets/link.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("information-circle.svg"),
+        include_bytes!("../theme/assets/information-circle.svg"),
+    )?;
 
     Ok(())
 }
