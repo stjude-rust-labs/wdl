@@ -1,5 +1,7 @@
 //! Create HTML documentation for WDL parameters.
 
+use std::path::Path;
+
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
@@ -8,6 +10,8 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
 use crate::callable::Group;
+use crate::meta::MetaMap;
+use crate::meta::render_meta_map;
 use crate::meta::render_value;
 
 /// Whether a parameter is an input or output.
@@ -25,7 +29,7 @@ pub(crate) struct Parameter {
     /// The declaration of the parameter.
     decl: Decl,
     /// Any meta entries associated with the parameter.
-    meta: Option<MetadataValue>,
+    meta: MetaMap,
     /// Whether the parameter is an input or output.
     io: InputOutput,
 }
@@ -33,12 +37,35 @@ pub(crate) struct Parameter {
 impl Parameter {
     /// Create a new parameter.
     pub fn new(decl: Decl, meta: Option<MetadataValue>, io: InputOutput) -> Self {
+        let meta = match meta {
+            Some(ref m) => {
+                match m {
+                    MetadataValue::Object(o) => o
+                        .items()
+                        .map(|item| (item.name().text().to_string(), item.value().clone()))
+                        .collect(),
+                    MetadataValue::String(_s) => {
+                        MetaMap::from([("description".to_string(), m.clone())])
+                    }
+                    _ => {
+                        // If it's not an object or string, we don't know how to handle it.
+                        MetaMap::default()
+                    }
+                }
+            }
+            None => MetaMap::default(),
+        };
         Self { decl, meta, io }
     }
 
     /// Get the name of the parameter.
     pub fn name(&self) -> String {
         self.decl.name().text().to_owned()
+    }
+
+    /// Get the meta of the parameter.
+    pub fn meta(&self) -> &MetaMap {
+        &self.meta
     }
 
     /// Get the type of the parameter.
@@ -69,63 +96,34 @@ impl Parameter {
 
     /// Get the "group" of the parameter.
     pub fn group(&self) -> Option<Group> {
-        if let Some(MetadataValue::Object(o)) = &self.meta {
-            for item in o.items() {
-                if item.name().text() == "group" {
-                    if let MetadataValue::String(s) = item.value() {
-                        return s.text().map(|t| t.text().to_string()).map(Group);
-                    }
-                }
+        self.meta().get("group").and_then(|value| {
+            if let MetadataValue::String(s) = value {
+                Some(Group(
+                    s.text().map(|t| t.text().to_string()).unwrap_or_default(),
+                ))
+            } else {
+                None
             }
-        }
-        None
+        })
     }
 
     /// Get the description of the parameter.
     pub fn description(&self, summarize_if_needed: bool) -> Markup {
-        if let Some(meta) = &self.meta {
-            if let MetadataValue::String(_) = meta {
-                return render_value(meta, summarize_if_needed);
-            } else if let MetadataValue::Object(o) = meta {
-                for item in o.items() {
-                    if item.name().text() == "description" {
-                        if let MetadataValue::String(_) = item.value() {
-                            return render_value(&item.value(), summarize_if_needed);
-                        }
-                    }
-                }
-            }
-        }
-        html! { "No description provided." }
+        self.meta()
+            .get("description")
+            .map(|v| render_value(v, summarize_if_needed))
+            .unwrap_or_else(|| html! { "No description provided." })
     }
 
     /// Render any remaining metadata as HTML.
     ///
     /// This will render any metadata that is not rendered elsewhere if present.
-    pub fn render_remaining_meta(&self) -> Option<Markup> {
-        if let Some(MetadataValue::Object(o)) = &self.meta {
-            let filtered_items = o
-                .items()
-                .filter(|item| item.name().text() != "description" && item.name().text() != "group")
-                .collect::<Vec<_>>();
-            if filtered_items.is_empty() {
-                return None;
-            }
-            return Some(html! {
-                ul {
-                    @for item in filtered_items {
-                        li {
-                            b { (item.name().text()) ":" } " " (render_value(&item.value(), true))
-                        }
-                    }
-                }
-            });
-        }
-        None
+    pub fn render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
+        render_meta_map(self.meta(), &["description", "group"], true, assets)
     }
 
     /// Render the parameter as HTML.
-    pub fn render(&self, addl_meta: bool) -> Markup {
+    pub fn render(&self, addl_meta: bool, assets: &Path) -> Markup {
         html! {
             tr {
                 td { (self.name()) }
@@ -135,7 +133,7 @@ impl Parameter {
                 }
                 td { (self.description(true)) }
                 @if addl_meta {
-                    @if let Some(markup) = self.render_remaining_meta() {
+                    @if let Some(markup) = self.render_remaining_meta(assets) {
                         td { (markup) }
                     } @else {
                         td { }
@@ -182,14 +180,14 @@ pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
 ///
 /// If any of the parameters return `Some(_)` for `render_remaining_meta()`, an
 /// "Additional Meta" column will be added to the table.
-pub(crate) fn render_parameter_table<'a, I>(headers: &[&str], params: I) -> Markup
+pub(crate) fn render_parameter_table<'a, I>(headers: &[&str], params: I, assets: &Path) -> Markup
 where
     I: Iterator<Item = &'a Parameter>,
 {
     let params = params.collect::<Vec<_>>();
     let addl_meta = params
         .iter()
-        .any(|param| param.render_remaining_meta().is_some());
+        .any(|param| param.render_remaining_meta(assets).is_some());
 
     html! {
         div class="parameter__table-outer-container" {
@@ -205,7 +203,7 @@ where
                     }}
                     tbody {
                         @for param in params {
-                            (param.render(addl_meta))
+                            (param.render(addl_meta, assets))
                         }
                     }
                 }

@@ -3,8 +3,8 @@
 pub mod task;
 pub mod workflow;
 
-use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::path::Path;
 
 use maud::Markup;
 use maud::html;
@@ -17,13 +17,11 @@ use wdl_ast::v1::ParameterMetadataSection;
 
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
+use crate::meta::MetaMap;
 use crate::meta::render_value;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
 use crate::parameter::render_parameter_table;
-
-/// A map of metadata key-value pairs, sorted by key.
-pub type MetaMap = BTreeMap<String, MetadataValue>;
 
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
@@ -133,25 +131,26 @@ pub(crate) trait Callable {
     }
 
     /// Render the required inputs of the callable if present.
-    fn render_required_inputs(&self) -> Option<Markup> {
+    fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
                 h3 id="inputs-required-inputs" class="parameter__section-subheader" { "Required Inputs" }
-                (render_parameter_table(&["Name", "Type", "Description"], iter))
+                (render_parameter_table(&["Name", "Type", "Description"], iter, assets))
             });
         };
         None
     }
 
     /// Render the inputs with a group of the callable if present.
-    fn render_group_inputs(&self) -> Option<Markup> {
+    fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
                 h3 id=(group.id()) class="parameter__section-subheader" { (group.display_name()) }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
-                    self.inputs_in_group(&group)
+                    self.inputs_in_group(&group),
+                    assets,
                 ))
             }
         }).collect::<Vec<_>>();
@@ -167,14 +166,15 @@ pub(crate) trait Callable {
 
     /// Render the inputs that are neither required nor part of a group if
     /// present.
-    fn render_other_inputs(&self) -> Option<Markup> {
+    fn render_other_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
                 h3 id="inputs-other-inputs" class="parameter__section-subheader" { "Other Inputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
-                    iter
+                    iter,
+                    assets,
                 ))
             });
         };
@@ -182,24 +182,24 @@ pub(crate) trait Callable {
     }
 
     /// Render the inputs of the callable.
-    fn render_inputs(&self) -> (Markup, PageHeaders) {
+    fn render_inputs(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut inner_markup = Vec::new();
         let mut headers = PageHeaders::default();
         headers.push(Header::Header("Inputs".to_string(), "inputs".to_string()));
-        if let Some(req) = self.render_required_inputs() {
+        if let Some(req) = self.render_required_inputs(assets) {
             inner_markup.push(req);
             headers.push(Header::SubHeader(
                 "Required Inputs".to_string(),
                 "inputs-required-inputs".to_string(),
             ));
         }
-        if let Some(group) = self.render_group_inputs() {
+        if let Some(group) = self.render_group_inputs(assets) {
             inner_markup.push(group);
             for group in self.input_groups() {
                 headers.push(Header::SubHeader(group.display_name(), group.id()));
             }
         }
-        if let Some(other) = self.render_other_inputs() {
+        if let Some(other) = self.render_other_inputs(assets) {
             inner_markup.push(other);
             headers.push(Header::SubHeader(
                 "Other Inputs".to_string(),
@@ -219,13 +219,14 @@ pub(crate) trait Callable {
     }
 
     /// Render the outputs of the callable.
-    fn render_outputs(&self) -> Markup {
+    fn render_outputs(&self, assets: &Path) -> Markup {
         html! {
             section class="parameter__section" {
                 h2 id="outputs" class="parameter__section-header" { "Outputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Expression", "Description"],
-                    self.outputs().iter()
+                    self.outputs().iter(),
+                    assets,
                 ))
             }
         }

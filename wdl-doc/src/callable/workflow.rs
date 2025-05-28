@@ -11,6 +11,7 @@ use wdl_ast::v1::ParameterMetadataSection;
 use super::*;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
+use crate::meta::render_meta_map;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
@@ -87,40 +88,26 @@ impl Workflow {
     ///
     /// This will render all metadata key-value pairs except for `name`,
     /// `category`, `description`, and `outputs`.
-    pub fn render_meta(&self) -> Option<Markup> {
-        let kv = self
-            .meta
-            .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
-            .collect::<Vec<_>>();
-        if kv.is_empty() {
-            return None;
-        }
-        Some(html! {
-            div class="callable__section" {
-                h2 id="meta" class="callable__section-header" { "Meta" }
-                ul class="callable__meta-records" {
-                    @for (key, value) in kv {
-                        li class="callable__meta-record" {
-                            b { (key) ":" } " " (render_value(value, false))
-                        }
-                    }
-                }
-            }
-        })
+    pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
+        render_meta_map(
+            self.meta(),
+            &["name", "category", "outputs", "description"],
+            false,
+            assets,
+        )
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self) -> (Markup, PageHeaders) {
+    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut headers = PageHeaders::default();
-        let meta_markup = if let Some(meta) = self.render_meta() {
+        let meta_markup = if let Some(meta) = self.render_meta(assets) {
             headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
             meta
         } else {
             html! {}
         };
 
-        let (input_markup, inner_headers) = self.render_inputs();
+        let (input_markup, inner_headers) = self.render_inputs(assets);
 
         headers.extend(inner_headers);
 
@@ -137,7 +124,7 @@ impl Workflow {
                 }
                 (meta_markup)
                 (input_markup)
-                (self.render_outputs())
+                (self.render_outputs(assets))
             }
         };
 

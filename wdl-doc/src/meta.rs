@@ -1,5 +1,8 @@
 //! Create HTML documentation for WDL meta sections.
 
+use std::collections::BTreeMap;
+use std::path::Path;
+
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
@@ -8,6 +11,9 @@ use wdl_ast::v1::MetadataValue;
 
 use crate::Markdown;
 use crate::Render;
+
+/// A map of metadata key-value pairs, sorted by key.
+pub type MetaMap = BTreeMap<String, MetadataValue>;
 
 /// Render a [`MetadataValue`] as HTML.
 pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
@@ -89,6 +95,81 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
     }
 
     render_value_inner(value, summarize_if_needed)
+}
+
+/// Help key for custom rendering.
+const HELP_KEY: &str = "help";
+/// External help key for custom rendering.
+const EXTERNAL_HELP_KEY: &str = "external_help";
+/// Warning key for custom rendering.
+const WARNING_KEY: &str = "warning";
+
+/// Render a metadata map as HTML, filtering out certain keys and summarizing
+/// values if needed.
+pub(crate) fn render_meta_map(
+    map: &MetaMap,
+    filter_keys: &[&str],
+    summarize_if_needed: bool,
+    assets: &Path,
+) -> Option<Markup> {
+    let custom_keys = &[HELP_KEY, EXTERNAL_HELP_KEY, WARNING_KEY];
+    let filtered_items = map
+        .iter()
+        .filter(|(k, _v)| !filter_keys.contains(&k.as_str()) && !custom_keys.contains(&k.as_str()))
+        .collect::<Vec<_>>();
+
+    let help_item = map.get(HELP_KEY);
+    let external_help_item = map.get(EXTERNAL_HELP_KEY);
+    let warning_item = map.get(WARNING_KEY);
+
+    let any_filtered_items = !filtered_items.is_empty();
+    let custom_key_present =
+        help_item.is_some() || external_help_item.is_some() || warning_item.is_some();
+    if !any_filtered_items && !custom_key_present {
+        return None;
+    }
+
+    Some(html! {
+        div class="" {
+            @if let Some(help) = help_item {
+                p class="" {
+                    (render_value(help, summarize_if_needed))
+                }
+            }
+            @if let Some(_external_help) = external_help_item {
+                button class="hover:cursor-pointer" {
+                    b { "Go to External Documentation" }
+                    img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-4";
+                }
+            }
+            @if let Some(warning) = warning_item {
+                div class="metadata__warning" {
+                    img src=(assets.join("information-circle.svg").to_string_lossy()) alt="Warning Icon" class="size-4";
+                    p { (render_value(warning, summarize_if_needed)) }
+                }
+            }
+            @if any_filtered_items {
+                div class="parameter__table-outer-container" {
+                    div class="parameter__table-inner-container" {
+                        table class="parameter__table" {
+                            tbody {
+                                @for (k, v) in filtered_items {
+                                    tr {
+                                        td {
+                                            (k)
+                                        }
+                                        td {
+                                            (render_value(v, summarize_if_needed))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
 }
 
 /// The maximum length of a markdown snippet before it is clipped.
