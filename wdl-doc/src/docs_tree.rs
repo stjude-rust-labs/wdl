@@ -786,7 +786,7 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="relative w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
+                div x-cloak class="w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
@@ -822,7 +822,6 @@ impl DocsTree {
                     ul x-show="showWorkflows && search === ''" class="w-max pr-3" {
                         (self.sidebar_workflows_view(path))
                     }
-                    div class="w-6 h-full absolute bg-linear-to-r from-transparent to-slate-900 top-0 right-0" {}
                 }
             }
         }
@@ -927,7 +926,9 @@ impl DocsTree {
                 @if let Some(homepage) = &self.homepage {
                     (Markdown(std::fs::read_to_string(homepage)?).render())
                 } @else {
-                    p { "No homepage set." }
+                    img src=(self.get_asset(self.root_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
+                    h2 { "There's nothing to see on this page" }
+                    p { "The markdown file for this page wasn't supplied." }
                 }
             }
         };
