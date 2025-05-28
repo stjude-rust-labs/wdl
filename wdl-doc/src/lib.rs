@@ -161,6 +161,12 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup 
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
             script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
+            script {
+                (include_str!("../theme/assets/app.js"))
+            }
+            script {
+                (include_str!("../theme/assets/bundle.js"))
+            }
             (Css(stylesheet.as_ref().to_str().unwrap()))
         }
     }
