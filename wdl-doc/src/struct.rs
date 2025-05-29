@@ -3,7 +3,7 @@
 
 use maud::Markup;
 use maud::html;
-use wdl_ast::AstToken;
+use wdl_ast::AstNode;
 use wdl_ast::v1::StructDefinition;
 
 use crate::docs_tree::PageHeaders;
@@ -21,34 +21,24 @@ impl Struct {
         Self { def }
     }
 
-    /// Get the name of the struct.
-    pub fn name(&self) -> String {
-        self.def.name().text().to_string()
-    }
+    // /// Get the name of the struct.
+    // pub fn name(&self) -> String {
+    //     self.def.name().text().to_string()
+    // }
 
-    /// Get the members of the struct.
-    pub fn members(&self) -> impl Iterator<Item = (String, String)> + '_ {
-        self.def.members().map(|decl| {
-            let name = decl.name().text().to_owned();
-            let ty = decl.ty().to_string();
-            (name, ty)
-        })
-    }
+    // /// Get the members of the struct.
+    // pub fn members(&self) -> impl Iterator<Item = (String, String)> + '_ {
+    //     self.def.members().map(|decl| {
+    //         let name = decl.name().text().to_owned();
+    //         let ty = decl.ty().to_string();
+    //         (name, ty)
+    //     })
+    // }
 
     /// Render the struct as HTML.
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
-            div class="flex flex-col gap-y-6" {
-                h1 id="title" { (self.name()) }
-                h2 { "Members" }
-                ul {
-                    @for (name, ty) in self.members() {
-                        li {
-                            b { (name) ":" } " " code { (ty) }
-                        }
-                    }
-                }
-            }
+            sprocket-code language="wdl" { (self.def.inner().to_string()) }
         };
         (markup, PageHeaders::default())
     }
