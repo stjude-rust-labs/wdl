@@ -196,6 +196,8 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, styleshe
         html class="dark" {
             (header(page_title, stylesheet))
             body class="size-full table-auto border-collapse text-base" {
+                hello-world message="Hello World" {}
+                sprocket-code language="wdl" { "version 1.0" }
                 (body)
             }
         }
