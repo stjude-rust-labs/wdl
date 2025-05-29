@@ -35,7 +35,6 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::Expr;
-use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::StrippedCommandPart;
 
@@ -377,6 +376,45 @@ impl<'a> CommandContext<'a> {
     }
 }
 
+/// Evaluate an expression to determine if it can be simplified to a literal.
+fn evaluate_expr(expr: &Expr) -> bool {
+    match expr {
+        Expr::Literal(_) => {
+            return true;
+        }
+        Expr::Call(c)  => {
+            match c.target().text() {
+                "sep" => {
+                    return evaluate_expr(&c.arguments().nth(1).unwrap_or_else(|| {
+                        panic!("`sep` call should have two arguments")
+                    }));
+                }
+                "quote" | "squote" => {
+                    return true;
+                }
+                _ =>  return false,
+            }
+        }
+        Expr::Parenthesized(p) => {
+            return evaluate_expr(&p.expr());
+        }
+        Expr::If(i) => {
+            let (_, if_expr, else_expr) = i.exprs();
+            return evaluate_expr(&if_expr) && evaluate_expr(&else_expr);
+        }
+        Expr::NameRef(n) => {
+            return false;
+        }
+        Expr::Addition(a) => {
+            let (left, right) = a.operands();
+            return evaluate_expr(&left) && evaluate_expr(&right);
+        }
+        _ => {
+            return false;
+        }
+    }
+}
+
 /// Convert a WDL placeholder to a bash variable or literal.
 ///
 /// The boolean returned indicates whether the placeholder was replaced with a
@@ -399,46 +437,8 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                 );
             }
             PrimitiveType::String => {
-                match placeholder.expr() {
-                    Expr::If(i) => {
-                        let (_, if_expr, else_expr) = i.exprs();
-                        if let (
-                            Expr::Literal(LiteralExpr::String(_)),
-                            Expr::Literal(LiteralExpr::String(_)),
-                        ) = (if_expr, else_expr)
-                        {
-                            return ("a".repeat(placeholder_len), true);
-                        }
-                    }
-                    Expr::Parenthesized(p) => {
-                        if let Expr::If(i) = p.expr() {
-                            let (_, if_expr, else_expr) = i.exprs();
-                            if let (
-                                Expr::Literal(LiteralExpr::String(_)),
-                                Expr::Literal(LiteralExpr::String(_)),
-                            ) = (if_expr, else_expr)
-                            {
-                                return ("a".repeat(placeholder_len), true);
-                            }
-                        }
-                    }
-                    Expr::Call(c) => {
-                        let target = c.target();
-                        if target.text() == "sep" {
-                            match c.arguments().nth(1) {
-                                Some(Expr::Call(c)) => {
-                                    if c.target().text() == "quote" || c.target().text() == "squote"
-                                    {
-                                        // If the second argument is a quoted string, we can replace
-                                        // the placeholder with a literal.
-                                        return ("a".repeat(placeholder_len), true);
-                                    }
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                    _ => {}
+                if evaluate_expr(&placeholder.expr()) {
+                    return ("a".repeat(placeholder_len), true);
                 }
             }
             _ => {}
