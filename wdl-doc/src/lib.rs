@@ -59,6 +59,15 @@ fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
     }
 
     std::fs::write(
+        assets_dir.join("app.js"),
+        include_str!("../theme/assets/app.js"),
+    )?;
+    std::fs::write(
+        assets_dir.join("bundle.js"),
+        include_str!("../theme/assets/bundle.js"),
+    )?;
+
+    std::fs::write(
         assets_dir.join("sprocket-logo.svg"),
         include_bytes!("../theme/assets/sprocket-logo.svg"),
     )?;
@@ -161,13 +170,9 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup 
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
             script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
-            script {
-                (include_str!("../theme/assets/app.js"))
-            }
-            script {
-                (include_str!("../theme/assets/bundle.js"))
-            }
-            (Css(stylesheet.as_ref().to_str().unwrap()))
+            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("app.js").to_string_lossy()) {}
+            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("bundle.js").to_string_lossy()) {}
+            (Css(&stylesheet.as_ref().to_string_lossy()))
         }
     }
 }
