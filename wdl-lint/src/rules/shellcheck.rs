@@ -34,6 +34,7 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::Expr;
 use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::StrippedCommandPart;
 
@@ -375,6 +376,69 @@ impl<'a> CommandContext<'a> {
     }
 }
 
+/// Detect embedded quotes surrounding an expression in a string.
+fn is_quoted(expr: &Expr) -> bool {
+    let mut opened = false;
+    let mut name = false;
+    for c in expr.descendants::<Expr>() {
+        let k = c.kind();
+        println!("checking expression: {}", c.text());
+        println!("expression kind: {:?}", k);
+        match c.kind() {
+            SyntaxKind::LiteralStringNode => {
+                let t = c.text().to_string();
+                t.match_indices("\"").for_each(|(..)| {
+                    if opened && name {
+                        name = false;
+                    }
+                    opened = !opened;
+                });
+            }
+            SyntaxKind::NameRefExprNode => {
+                if !opened {
+                    return false;
+                }
+                name = true;
+            }
+            _ => {}
+        }
+    }
+    !name
+}
+
+/// Evaluate an expression to determine if it can be simplified to a literal.
+fn evaluate_expr(expr: &Expr) -> bool {
+    match expr {
+        Expr::Literal(_) => {
+            true
+        }
+        Expr::Call(c) => {
+            match c.target().text() {
+                "sep" => evaluate_expr(
+                    &c.arguments()
+                        .nth(1)
+                        .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
+                ),
+                "quote" | "squote" => true,
+                _ => false,
+            }
+        }
+        Expr::Parenthesized(p) => {
+            evaluate_expr(&p.expr())
+        }
+        Expr::If(i) => {
+            let (_, if_expr, else_expr) = i.exprs();
+            evaluate_expr(&if_expr) && evaluate_expr(&else_expr)
+        }
+        Expr::Addition(a) => {
+            let balanced = is_quoted(expr);
+            let (left, right) = a.operands();
+            (evaluate_expr(&left) && evaluate_expr(&right)) || balanced
+        }
+        _ => false,
+    }
+}
+
 /// Convert a WDL placeholder to a bash variable or literal.
 ///
 /// The boolean returned indicates whether the placeholder was replaced with a
@@ -395,6 +459,11 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                     format!("true{}", " ".repeat(placeholder_len.saturating_sub(4))),
                     true,
                 );
+            }
+            PrimitiveType::String => {
+                if evaluate_expr(&placeholder.expr()) {
+                    return ("a".repeat(placeholder_len), true);
+                }
             }
             _ => {}
         }
