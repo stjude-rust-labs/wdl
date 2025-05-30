@@ -376,6 +376,41 @@ impl<'a> CommandContext<'a> {
     }
 }
 
+// Detect embedded quotes surrounding an expression in a string.
+fn is_quoted(expr: &Expr) -> bool {
+    let mut opened = false;
+    let mut name = false;
+    for c in expr.descendants::<Expr>() {
+        let k = c.kind();
+        println!("checking expression: {}", c.text());
+        println!("expression kind: {:?}", k);
+        match c.kind() {
+            SyntaxKind::LiteralStringNode => {
+                let t = c.text().to_string();
+                t.match_indices("\"").for_each(|(_,_)| {
+                    if opened && name {
+                        name = false;
+                    }
+                    opened = !opened;
+                });
+            }
+            SyntaxKind::NameRefExprNode => {
+                if !opened {
+                    return false;
+                }
+                name = true;
+            }
+            _ => {}
+        }
+    }
+    if name {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 /// Evaluate an expression to determine if it can be simplified to a literal.
 fn evaluate_expr(expr: &Expr) -> bool {
     match expr {
@@ -406,8 +441,9 @@ fn evaluate_expr(expr: &Expr) -> bool {
             return false;
         }
         Expr::Addition(a) => {
+            let balanced = is_quoted(&expr);
             let (left, right) = a.operands();
-            return evaluate_expr(&left) && evaluate_expr(&right);
+            return (evaluate_expr(&left) && evaluate_expr(&right)) || balanced;
         }
         _ => {
             return false;
