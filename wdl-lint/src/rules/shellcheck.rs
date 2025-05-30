@@ -376,7 +376,7 @@ impl<'a> CommandContext<'a> {
     }
 }
 
-// Detect embedded quotes surrounding an expression in a string.
+/// Detect embedded quotes surrounding an expression in a string.
 fn is_quoted(expr: &Expr) -> bool {
     let mut opened = false;
     let mut name = false;
@@ -387,7 +387,7 @@ fn is_quoted(expr: &Expr) -> bool {
         match c.kind() {
             SyntaxKind::LiteralStringNode => {
                 let t = c.text().to_string();
-                t.match_indices("\"").for_each(|(_,_)| {
+                t.match_indices("\"").for_each(|(..)| {
                     if opened && name {
                         name = false;
                     }
@@ -403,51 +403,39 @@ fn is_quoted(expr: &Expr) -> bool {
             _ => {}
         }
     }
-    if name {
-        return false;
-    }
-    else {
-        return true;
-    }
+    !name
 }
 
 /// Evaluate an expression to determine if it can be simplified to a literal.
 fn evaluate_expr(expr: &Expr) -> bool {
     match expr {
         Expr::Literal(_) => {
-            return true;
+            true
         }
-        Expr::Call(c)  => {
+        Expr::Call(c) => {
             match c.target().text() {
-                "sep" => {
-                    return evaluate_expr(&c.arguments().nth(1).unwrap_or_else(|| {
-                        panic!("`sep` call should have two arguments")
-                    }));
-                }
-                "quote" | "squote" => {
-                    return true;
-                }
-                _ =>  return false,
+                "sep" => evaluate_expr(
+                    &c.arguments()
+                        .nth(1)
+                        .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
+                ),
+                "quote" | "squote" => true,
+                _ => false,
             }
         }
         Expr::Parenthesized(p) => {
-            return evaluate_expr(&p.expr());
+            evaluate_expr(&p.expr())
         }
         Expr::If(i) => {
             let (_, if_expr, else_expr) = i.exprs();
-            return evaluate_expr(&if_expr) && evaluate_expr(&else_expr);
-        }
-        Expr::NameRef(n) => {
-            return false;
+            evaluate_expr(&if_expr) && evaluate_expr(&else_expr)
         }
         Expr::Addition(a) => {
-            let balanced = is_quoted(&expr);
+            let balanced = is_quoted(expr);
             let (left, right) = a.operands();
-            return (evaluate_expr(&left) && evaluate_expr(&right)) || balanced;
+            (evaluate_expr(&left) && evaluate_expr(&right)) || balanced
         }
-        _ => {
-            return false;
-        }
+        _ => false,
     }
 }
 
