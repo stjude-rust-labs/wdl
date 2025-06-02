@@ -191,8 +191,6 @@ impl Node {
 pub struct DocsTreeBuilder {
     /// The root directory for the docs.
     root: PathBuf,
-    /// The stylesheet for the docs.
-    stylesheet: Option<PathBuf>,
     /// The path to a Markdown file to embed in the `<root>/index.html` page.
     homepage: Option<PathBuf>,
 }
@@ -203,20 +201,8 @@ impl DocsTreeBuilder {
         let root = path_clean::clean(absolute(root.as_ref()).unwrap());
         Self {
             root,
-            stylesheet: None,
             homepage: None,
         }
-    }
-
-    /// Set the stylesheet for the docs with an option.
-    pub fn maybe_stylesheet(mut self, stylesheet: Option<impl Into<PathBuf>>) -> Self {
-        self.stylesheet = stylesheet.map(|s| s.into());
-        self
-    }
-
-    /// Set the stylesheet for the docs.
-    pub fn stylesheet(self, stylesheet: impl Into<PathBuf>) -> Self {
-        self.maybe_stylesheet(Some(stylesheet))
     }
 
     /// Set the homepage for the docs with an option.
@@ -232,11 +218,7 @@ impl DocsTreeBuilder {
 
     /// Build the docs tree.
     pub fn build(self) -> Result<DocsTree> {
-        write_assets(&self.root, self.stylesheet.is_some())?;
-        if let Some(stylesheet) = self.stylesheet {
-            let new_stylesheet = self.root.join("style.css");
-            std::fs::copy(stylesheet, &new_stylesheet)?;
-        };
+        write_assets(&self.root)?;
         let node = Node::new(
             self.root
                 .file_name()

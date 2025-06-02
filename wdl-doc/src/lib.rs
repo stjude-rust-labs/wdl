@@ -85,7 +85,7 @@ pub fn build_web_components(theme_dir: &Path) -> Result<()> {
 
 /// Build a stylesheet for the documentation, given a path to the theme
 /// directory.
-pub fn build_stylesheet(theme_dir: &Path) -> Result<PathBuf> {
+pub fn build_stylesheet(theme_dir: &Path) -> Result<()> {
     let theme_dir = absolute(theme_dir)?;
     let output = std::process::Command::new("npx")
         .arg("@tailwindcss/cli")
@@ -106,21 +106,19 @@ pub fn build_stylesheet(theme_dir: &Path) -> Result<PathBuf> {
         bail!("failed to build stylesheet: no output file found");
     }
 
-    Ok(css_path)
+    Ok(())
 }
 
 /// Write assets to the given root docs directory.
-fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
+fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     let dir = dir.as_ref();
     let assets_dir = dir.join("assets");
     std::fs::create_dir_all(&assets_dir)?;
-    if !skip_stylesheet {
-        std::fs::write(
-            dir.join("style.css"),
-            include_str!("../theme/dist/style.css"),
-        )?;
-    }
 
+    std::fs::write(
+        dir.join("style.css"),
+        include_str!("../theme/dist/style.css"),
+    )?;
     std::fs::write(dir.join("index.js"), include_str!("../theme/dist/index.js"))?;
 
     std::fs::write(
@@ -269,6 +267,7 @@ impl<T: AsRef<str>> Render for Markdown<T> {
         let mut options = Options::empty();
         options.insert(Options::ENABLE_TABLES);
         options.insert(Options::ENABLE_STRIKETHROUGH);
+        options.insert(Options::ENABLE_GFM);
         let parser = Parser::new_ext(self.0.as_ref(), options);
         pulldown_cmark::html::push_html(&mut unsafe_html, parser);
         // Sanitize it with ammonia
@@ -431,11 +430,9 @@ impl Document {
 pub async fn document_workspace(
     workspace: impl AsRef<Path>,
     output_dir: impl AsRef<Path>,
-    stylesheet: Option<impl AsRef<Path>>,
     homepage: Option<impl AsRef<Path>>,
 ) -> Result<()> {
     let workspace_abs_path = clean(absolute(workspace.as_ref())?);
-    let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
     let homepage = homepage.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
@@ -452,7 +449,6 @@ pub async fn document_workspace(
     let results = analyzer.analyze(()).await?;
 
     let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
-        .maybe_stylesheet(stylesheet)
         .maybe_homepage(homepage)
         .build()?;
 

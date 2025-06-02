@@ -69,4 +69,4 @@ var DE=Object.defineProperty;var h=(B,A)=>()=>(B&&(A=B(B=0)),A);var VB=(B,A)=>{f
       <style>${this._getStyles()}</style>
       <div class="tooltip" data-position="${A}">${Q}</div>
       <slot></slot>
-    `;let g=this.shadowRoot.querySelector(".tooltip");this.addEventListener("mouseenter",()=>{debugger;g.classList.add("visible")}),this.addEventListener("mouseleave",()=>{g.classList.remove("visible")})}};customElements.define("sprocket-tooltip",WB);
+    `;let g=this.shadowRoot.querySelector(".tooltip");this.addEventListener("mouseenter",()=>{g.classList.add("visible")}),this.addEventListener("mouseleave",()=>{g.classList.remove("visible")})}};customElements.define("sprocket-tooltip",WB);
