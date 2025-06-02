@@ -63,8 +63,8 @@ fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
         include_str!("../theme/assets/app.js"),
     )?;
     std::fs::write(
-        assets_dir.join("bundle.js"),
-        include_str!("../theme/assets/bundle.js"),
+        assets_dir.join("index.js"),
+        include_str!("../theme/assets/index.js"),
     )?;
 
     std::fs::write(
@@ -183,7 +183,7 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup 
             script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
             script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("app.js").to_string_lossy()) {}
-            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("bundle.js").to_string_lossy()) {}
+            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("index.js").to_string_lossy()) {}
             (Css(&stylesheet.as_ref().to_string_lossy()))
         }
     }
@@ -196,8 +196,8 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, styleshe
         html class="dark" {
             (header(page_title, stylesheet))
             body class="size-full table-auto border-collapse text-base" {
-                hello-world message="Hello World" {}
                 sprocket-code language="wdl" { "version 1.0" }
+                sprocket-code language="rust" { "fn main() { println!(\"Hello, world!\") }" }
                 (body)
             }
         }
