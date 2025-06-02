@@ -276,24 +276,24 @@ impl DocsTree {
     }
 
     /// Get the absolute path to the root directory.
-    fn root_path(&self) -> &PathBuf {
+    fn root_abs_path(&self) -> &PathBuf {
         &self.path
+    }
+
+    /// Get the path to the root directory relative to a given path.
+    pub fn root_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(self.root_abs_path(), path).unwrap()
     }
 
     /// Get the absolute path to the stylesheet.
     pub fn stylesheet(&self) -> PathBuf {
-        self.root_path().join("style.css")
+        self.root_abs_path().join("style.css")
     }
 
     /// Get the absolute path to the assets directory.
     pub fn assets(&self) -> PathBuf {
-        self.root_path().join("assets")
-    }
-
-    /// Get a relative path to the stylesheet.
-    fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        let path = path.as_ref();
-        diff_paths(self.stylesheet(), path).unwrap()
+        self.root_abs_path().join("assets")
     }
 
     /// Get a relative path to the assets directory.
@@ -314,7 +314,7 @@ impl DocsTree {
     /// Get a relative path to the root index page.
     fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(self.root_path().join("index.html"), path).unwrap()
+        diff_paths(self.root_abs_path().join("index.html"), path).unwrap()
     }
 
     /// Add a page to the tree.
@@ -322,7 +322,7 @@ impl DocsTree {
     /// Path can be an absolute path or a path relative to the root.
     pub(crate) fn add_page<P: Into<PathBuf>>(&mut self, path: P, page: Rc<HTMLPage>) {
         let path = path.into();
-        let rel_path = path.strip_prefix(self.root_path()).unwrap_or(&path);
+        let rel_path = path.strip_prefix(self.root_abs_path()).unwrap_or(&path);
 
         let root = self.root_mut();
         let mut current_node = root;
@@ -355,7 +355,7 @@ impl DocsTree {
     fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
         let root = self.root();
         let path = path.as_ref();
-        let rel_path = path.strip_prefix(self.root_path()).unwrap_or(path);
+        let rel_path = path.strip_prefix(self.root_abs_path()).unwrap_or(path);
 
         let mut current_node = root;
 
@@ -466,8 +466,8 @@ impl DocsTree {
                                     icon: '{}',
                                 }}
                             }}"#,
-                            self.root_path().join(node.path()) == destination,
-                            self.get_asset(base, if self.root_path().join(node.path()) == destination {
+                            self.root_abs_path().join(node.path()) == destination,
+                            self.get_asset(base, if self.root_abs_path().join(node.path()) == destination {
                                     "workflow-selected.svg"
                                 } else {
                                     "workflow-unselected.svg"
@@ -480,7 +480,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="w-4 h-4" alt="Workflow icon";
-                                                p class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(self.root_path().join(node.path()), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                p class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
@@ -604,7 +604,7 @@ impl DocsTree {
                 };
                 let href = if node.page().is_some() {
                     Some(
-                        diff_paths(self.root_path().join(node.path()), base)
+                        diff_paths(self.root_abs_path().join(node.path()), base)
                             .unwrap()
                             .to_string_lossy()
                             .to_string(),
@@ -613,7 +613,7 @@ impl DocsTree {
                     None
                 };
                 let selected = node.part_of_path(path);
-                let current = path == self.root_path().join(node.path());
+                let current = path == self.root_abs_path().join(node.path());
                 let icon = match node.page() {
                     Some(page) => match page.page_type() {
                         PageType::Task(_) => Some(self.get_asset(
@@ -790,7 +790,9 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
-                            p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
+                            sprocket-tooltip position="bottom" content=(root.name()) x-show="search === ''" {
+                                a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) }
+                            }
                         }
                         template x-for="node in shownNodes" {
                             li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
@@ -799,16 +801,20 @@ impl DocsTree {
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
                                     img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
-                                    p x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                    sprocket-tooltip position="bottom" x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
+                                        a x-bind:href="node.href" x-text="node.display_name" {}
+                                    }
                                 }
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 pl-2" {
+                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 text-slate-50 pl-2" {
                                 p class="text-xs" x-text="node.parent" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.icon" class="w-4 h-4" alt="Node icon";
-                                    p class="text-slate-50" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                    sprocket-tooltip position="bottom" x-bind:content="node.display_name" {
+                                        a x-bind:href="node.href" x-text="node.display_name" {}
+                                    }
                                 }
                             }
                         }
@@ -857,7 +863,7 @@ impl DocsTree {
         let base = path.parent().expect("path should have a parent");
 
         let mut current_path = path
-            .strip_prefix(self.root_path())
+            .strip_prefix(self.root_abs_path())
             .expect("path should be in the docs directory");
 
         let mut breadcrumbs = vec![];
@@ -870,7 +876,7 @@ impl DocsTree {
             breadcrumbs.push((
                 cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
                 if cur_node.page().is_some() {
-                    Some(diff_paths(self.root_path().join(cur_node.path()), base).unwrap())
+                    Some(diff_paths(self.root_abs_path().join(cur_node.path()), base).unwrap())
                 } else {
                     None
                 },
@@ -907,7 +913,7 @@ impl DocsTree {
 
         for node in root.depth_first_traversal() {
             if let Some(page) = node.page() {
-                self.write_page(page.as_ref(), self.root_path().join(node.path()))?;
+                self.write_page(page.as_ref(), self.root_abs_path().join(node.path()))?;
             }
         }
 
@@ -917,7 +923,7 @@ impl DocsTree {
 
     /// Write the homepage to disk.
     fn write_homepage(&self) -> Result<()> {
-        let index_path = self.root_path().join("index.html");
+        let index_path = self.root_abs_path().join("index.html");
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
@@ -955,7 +961,7 @@ impl DocsTree {
                     }
                 }
             },
-            self.stylesheet_relative_to(self.root_path()),
+            PathBuf::from(""),
         );
         std::fs::write(index_path, html.into_string())?;
         Ok(())
@@ -980,8 +986,6 @@ impl DocsTree {
 
         let breadcrumbs = self.render_breadcrumbs(&path);
 
-        let stylesheet =
-            self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
         let left_sidebar = self.render_left_sidebar(&path);
 
         let html = full_page(
@@ -1007,7 +1011,7 @@ impl DocsTree {
                     }
                 }
             },
-            stylesheet,
+            self.root_relative_to(path.parent().expect("path should have a parent")),
         );
         std::fs::write(path, html.into_string())?;
         Ok(())

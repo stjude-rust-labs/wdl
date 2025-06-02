@@ -59,7 +59,6 @@ class SprocketTooltip extends HTMLElement {
     const tooltipElement = this.shadowRoot.querySelector('.tooltip');
 
     this.addEventListener('mouseenter', () => {
-      debugger;
       tooltipElement.classList.add('visible');
     });
 

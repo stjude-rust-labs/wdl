@@ -20,6 +20,7 @@ use std::rc::Rc;
 
 use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::bail;
 use callable::Callable;
 use callable::task;
 use callable::workflow;
@@ -46,6 +47,68 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
+/// Install the theme dependencies using npm.
+pub fn install_theme(theme_dir: &Path) -> Result<()> {
+    let theme_dir = absolute(theme_dir)?;
+    if !theme_dir.exists() {
+        bail!("Theme directory does not exist: {}", theme_dir.display());
+    }
+    let output = std::process::Command::new("npm")
+        .arg("install")
+        .current_dir(&theme_dir)
+        .output()?;
+    if !output.status.success() {
+        bail!(
+            "failed to install theme dependencies: {stderr}",
+            stderr = String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    Ok(())
+}
+
+/// Build the web components for the theme.
+pub fn build_web_components(theme_dir: &Path) -> Result<()> {
+    let theme_dir = absolute(theme_dir)?;
+    let output = std::process::Command::new("npm")
+        .arg("run")
+        .arg("build")
+        .current_dir(&theme_dir)
+        .output()?;
+    if !output.status.success() {
+        bail!(
+            "failed to build web components: {stderr}",
+            stderr = String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    Ok(())
+}
+
+/// Build a stylesheet for the documentation, given a path to the theme
+/// directory.
+pub fn build_stylesheet(theme_dir: &Path) -> Result<PathBuf> {
+    let theme_dir = absolute(theme_dir)?;
+    let output = std::process::Command::new("npx")
+        .arg("@tailwindcss/cli")
+        .arg("-i")
+        .arg("src/main.css")
+        .arg("-o")
+        .arg("dist/style.css")
+        .current_dir(&theme_dir)
+        .output()?;
+    if !output.status.success() {
+        bail!(
+            "failed to build stylesheet: {stderr}",
+            stderr = String::from_utf8_lossy(&output.stderr)
+        );
+    }
+    let css_path = theme_dir.join("dist/style.css");
+    if !css_path.exists() {
+        bail!("failed to build stylesheet: no output file found");
+    }
+
+    Ok(css_path)
+}
+
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
     let dir = dir.as_ref();
@@ -58,14 +121,7 @@ fn write_assets<P: AsRef<Path>>(dir: P, skip_stylesheet: bool) -> Result<()> {
         )?;
     }
 
-    std::fs::write(
-        assets_dir.join("app.js"),
-        include_str!("../theme/assets/app.js"),
-    )?;
-    std::fs::write(
-        assets_dir.join("index.js"),
-        include_str!("../theme/assets/index.js"),
-    )?;
+    std::fs::write(dir.join("index.js"), include_str!("../theme/dist/index.js"))?;
 
     std::fs::write(
         assets_dir.join("sprocket-logo.svg"),
@@ -170,8 +226,10 @@ impl Render for Css<'_> {
     }
 }
 
-/// A basic header with a `page_title` and an optional link to the stylesheet.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup {
+/// A basic header with a `page_title` and a relative path to the root (where
+/// `style.css` and `index.js` files are expected).
+pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P) -> Markup {
+    let root = root.as_ref();
     html! {
         head {
             meta charset="utf-8";
@@ -182,22 +240,19 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup 
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
             script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
-            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("app.js").to_string_lossy()) {}
-            script src=(stylesheet.as_ref().parent().unwrap().join("assets").join("index.js").to_string_lossy()) {}
-            (Css(&stylesheet.as_ref().to_string_lossy()))
+            script defer src=(root.join("index.js").to_string_lossy()) {}
+            (Css(&root.join("style.css").to_string_lossy()))
         }
     }
 }
 
 /// A full HTML page.
-pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, stylesheet: P) -> Markup {
+pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, root: P) -> Markup {
     html! {
         (DOCTYPE)
         html class="dark" {
-            (header(page_title, stylesheet))
+            (header(page_title, root))
             body class="size-full table-auto border-collapse text-base" {
-                sprocket-code language="wdl" { "version 1.0" }
-                sprocket-code language="rust" { "fn main() { println!(\"Hello, world!\") }" }
                 (body)
             }
         }
