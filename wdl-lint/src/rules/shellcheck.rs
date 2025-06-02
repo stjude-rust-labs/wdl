@@ -409,23 +409,17 @@ fn is_quoted(expr: &Expr) -> bool {
 /// Evaluate an expression to determine if it can be simplified to a literal.
 fn evaluate_expr(expr: &Expr) -> bool {
     match expr {
-        Expr::Literal(_) => {
-            true
-        }
-        Expr::Call(c) => {
-            match c.target().text() {
-                "sep" => evaluate_expr(
-                    &c.arguments()
-                        .nth(1)
-                        .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
-                ),
-                "quote" | "squote" => true,
-                _ => false,
-            }
-        }
-        Expr::Parenthesized(p) => {
-            evaluate_expr(&p.expr())
-        }
+        Expr::Literal(_) => true,
+        Expr::Call(c) => match c.target().text() {
+            "sep" => evaluate_expr(
+                &c.arguments()
+                    .nth(1)
+                    .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
+            ),
+            "quote" | "squote" => true,
+            _ => false,
+        },
+        Expr::Parenthesized(p) => evaluate_expr(&p.expr()),
         Expr::If(i) => {
             let (_, if_expr, else_expr) = i.exprs();
             evaluate_expr(&if_expr) && evaluate_expr(&else_expr)
