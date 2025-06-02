@@ -381,9 +381,6 @@ fn is_quoted(expr: &Expr) -> bool {
     let mut opened = false;
     let mut name = false;
     for c in expr.descendants::<Expr>() {
-        let k = c.kind();
-        println!("checking expression: {}", c.text());
-        println!("expression kind: {:?}", k);
         match c.kind() {
             SyntaxKind::LiteralStringNode => {
                 let t = c.text().to_string();
