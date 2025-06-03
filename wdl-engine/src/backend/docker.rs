@@ -269,7 +269,7 @@ impl TaskManagerRequest for DockerTaskRequest {
 
 /// Represents the Docker backend.
 pub struct DockerBackend {
-    /// The engine configuration
+    /// The engine configuration.
     config: Arc<Config>,
     /// The underlying Crankshaft backend.
     inner: Arc<docker::Backend>,
