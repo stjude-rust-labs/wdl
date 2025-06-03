@@ -1,5 +1,6 @@
 /* FIXME: remove !important, known anti-pattern that leads to CSS specificity wars */
 @import "tailwindcss";
+@import "./markdown.css";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -161,4 +162,3 @@
     @apply text-sm;
   }
 }
-
