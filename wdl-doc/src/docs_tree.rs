@@ -912,7 +912,9 @@ impl DocsTree {
             div class="" {
                 h1 class="" { "Home" }
                 @if let Some(homepage) = &self.homepage {
-                    (Markdown(std::fs::read_to_string(homepage)?).render())
+                    div class="markdown__container" {
+                        (Markdown(std::fs::read_to_string(homepage)?).render())
+                    }
                 } @else {
                     img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
                     h2 { "There's nothing to see on this page" }
