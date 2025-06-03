@@ -1,0 +1,1262 @@
+{
+  "inputs": {
+    "node_modules/@shikijs/types/dist/index.mjs": {
+      "bytes": 138,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-oniguruma/dist/index.mjs": {
+      "bytes": 16099,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/core/dist/shared/core.Bn_XU0Iv.mjs": {
+      "bytes": 579,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/vscode-textmate/dist/index.js": {
+      "bytes": 100008,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/html-void-elements/index.js": {
+      "bytes": 316,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/schema.js": {
+      "bytes": 587,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/merge.js": {
+      "bytes": 607,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/schema.js",
+          "kind": "import-statement",
+          "original": "./schema.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/normalize.js": {
+      "bytes": 326,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/info.js": {
+      "bytes": 769,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/types.js": {
+      "bytes": 350,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/defined-info.js": {
+      "bytes": 1198,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/info.js",
+          "kind": "import-statement",
+          "original": "./info.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/types.js",
+          "kind": "import-statement",
+          "original": "./types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/create.js": {
+      "bytes": 1710,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/normalize.js",
+          "kind": "import-statement",
+          "original": "../normalize.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/defined-info.js",
+          "kind": "import-statement",
+          "original": "./defined-info.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/schema.js",
+          "kind": "import-statement",
+          "original": "./schema.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/aria.js": {
+      "bytes": 1644,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/types.js",
+          "kind": "import-statement",
+          "original": "./util/types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/case-sensitive-transform.js": {
+      "bytes": 300,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/util/case-insensitive-transform.js": {
+      "bytes": 367,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/case-sensitive-transform.js",
+          "kind": "import-statement",
+          "original": "./case-sensitive-transform.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/html.js": {
+      "bytes": 8649,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/case-insensitive-transform.js",
+          "kind": "import-statement",
+          "original": "./util/case-insensitive-transform.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/types.js",
+          "kind": "import-statement",
+          "original": "./util/types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/svg.js": {
+      "bytes": 14350,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/case-sensitive-transform.js",
+          "kind": "import-statement",
+          "original": "./util/case-sensitive-transform.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/types.js",
+          "kind": "import-statement",
+          "original": "./util/types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/xlink.js": {
+      "bytes": 351,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/xmlns.js": {
+      "bytes": 298,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/case-insensitive-transform.js",
+          "kind": "import-statement",
+          "original": "./util/case-insensitive-transform.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/xml.js": {
+      "bytes": 233,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/create.js",
+          "kind": "import-statement",
+          "original": "./util/create.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/hast-to-react.js": {
+      "bytes": 859,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/property-information/lib/find.js": {
+      "bytes": 2344,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/defined-info.js",
+          "kind": "import-statement",
+          "original": "./util/defined-info.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/util/info.js",
+          "kind": "import-statement",
+          "original": "./util/info.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/normalize.js",
+          "kind": "import-statement",
+          "original": "./normalize.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/property-information/index.js": {
+      "bytes": 591,
+      "imports": [
+        {
+          "path": "node_modules/property-information/lib/util/merge.js",
+          "kind": "import-statement",
+          "original": "./lib/util/merge.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/aria.js",
+          "kind": "import-statement",
+          "original": "./lib/aria.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/html.js",
+          "kind": "import-statement",
+          "original": "./lib/html.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/svg.js",
+          "kind": "import-statement",
+          "original": "./lib/svg.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/xlink.js",
+          "kind": "import-statement",
+          "original": "./lib/xlink.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/xmlns.js",
+          "kind": "import-statement",
+          "original": "./lib/xmlns.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/xml.js",
+          "kind": "import-statement",
+          "original": "./lib/xml.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/hast-to-react.js",
+          "kind": "import-statement",
+          "original": "./lib/hast-to-react.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/find.js",
+          "kind": "import-statement",
+          "original": "./lib/find.js"
+        },
+        {
+          "path": "node_modules/property-information/lib/normalize.js",
+          "kind": "import-statement",
+          "original": "./lib/normalize.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/zwitch/index.js": {
+      "bytes": 3787,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/core.js": {
+      "bytes": 3040,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/util/to-hexadecimal.js": {
+      "bytes": 436,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/util/to-decimal.js": {
+      "bytes": 392,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/character-entities-legacy/index.js": {
+      "bytes": 1316,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/character-entities-html4/index.js": {
+      "bytes": 3908,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/constant/dangerous.js": {
+      "bytes": 290,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/util/to-named.js": {
+      "bytes": 1290,
+      "imports": [
+        {
+          "path": "node_modules/character-entities-legacy/index.js",
+          "kind": "import-statement",
+          "original": "character-entities-legacy"
+        },
+        {
+          "path": "node_modules/character-entities-html4/index.js",
+          "kind": "import-statement",
+          "original": "character-entities-html4"
+        },
+        {
+          "path": "node_modules/stringify-entities/lib/constant/dangerous.js",
+          "kind": "import-statement",
+          "original": "../constant/dangerous.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/util/format-smart.js": {
+      "bytes": 2478,
+      "imports": [
+        {
+          "path": "node_modules/stringify-entities/lib/util/to-hexadecimal.js",
+          "kind": "import-statement",
+          "original": "./to-hexadecimal.js"
+        },
+        {
+          "path": "node_modules/stringify-entities/lib/util/to-decimal.js",
+          "kind": "import-statement",
+          "original": "./to-decimal.js"
+        },
+        {
+          "path": "node_modules/stringify-entities/lib/util/to-named.js",
+          "kind": "import-statement",
+          "original": "./to-named.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/util/format-basic.js": {
+      "bytes": 192,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/lib/index.js": {
+      "bytes": 961,
+      "imports": [
+        {
+          "path": "node_modules/stringify-entities/lib/core.js",
+          "kind": "import-statement",
+          "original": "./core.js"
+        },
+        {
+          "path": "node_modules/stringify-entities/lib/util/format-smart.js",
+          "kind": "import-statement",
+          "original": "./util/format-smart.js"
+        },
+        {
+          "path": "node_modules/stringify-entities/lib/util/format-basic.js",
+          "kind": "import-statement",
+          "original": "./util/format-basic.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/stringify-entities/index.js": {
+      "bytes": 160,
+      "imports": [
+        {
+          "path": "node_modules/stringify-entities/lib/index.js",
+          "kind": "import-statement",
+          "original": "./lib/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/comment.js": {
+      "bytes": 1328,
+      "imports": [
+        {
+          "path": "node_modules/stringify-entities/index.js",
+          "kind": "import-statement",
+          "original": "stringify-entities"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/doctype.js": {
+      "bytes": 601,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/ccount/index.js": {
+      "bytes": 619,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/comma-separated-tokens/index.js": {
+      "bytes": 1592,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/space-separated-tokens/index.js": {
+      "bytes": 551,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/hast-util-whitespace/lib/index.js": {
+      "bytes": 885,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/hast-util-whitespace/index.js": {
+      "bytes": 42,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-whitespace/lib/index.js",
+          "kind": "import-statement",
+          "original": "./lib/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
+      "bytes": 1265,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-whitespace/index.js",
+          "kind": "import-statement",
+          "original": "hast-util-whitespace"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/omission/omission.js": {
+      "bytes": 978,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/omission/closing.js": {
+      "bytes": 8737,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-whitespace/index.js",
+          "kind": "import-statement",
+          "original": "hast-util-whitespace"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
+          "kind": "import-statement",
+          "original": "./util/siblings.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/omission.js",
+          "kind": "import-statement",
+          "original": "./omission.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/omission/opening.js": {
+      "bytes": 3606,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-whitespace/index.js",
+          "kind": "import-statement",
+          "original": "hast-util-whitespace"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/util/siblings.js",
+          "kind": "import-statement",
+          "original": "./util/siblings.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/closing.js",
+          "kind": "import-statement",
+          "original": "./closing.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/omission.js",
+          "kind": "import-statement",
+          "original": "./omission.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/element.js": {
+      "bytes": 7564,
+      "imports": [
+        {
+          "path": "node_modules/ccount/index.js",
+          "kind": "import-statement",
+          "original": "ccount"
+        },
+        {
+          "path": "node_modules/comma-separated-tokens/index.js",
+          "kind": "import-statement",
+          "original": "comma-separated-tokens"
+        },
+        {
+          "path": "node_modules/property-information/index.js",
+          "kind": "import-statement",
+          "original": "property-information"
+        },
+        {
+          "path": "node_modules/space-separated-tokens/index.js",
+          "kind": "import-statement",
+          "original": "space-separated-tokens"
+        },
+        {
+          "path": "node_modules/stringify-entities/index.js",
+          "kind": "import-statement",
+          "original": "stringify-entities"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/closing.js",
+          "kind": "import-statement",
+          "original": "../omission/closing.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/omission/opening.js",
+          "kind": "import-statement",
+          "original": "../omission/opening.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/text.js": {
+      "bytes": 1018,
+      "imports": [
+        {
+          "path": "node_modules/stringify-entities/index.js",
+          "kind": "import-statement",
+          "original": "stringify-entities"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/raw.js": {
+      "bytes": 632,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/text.js",
+          "kind": "import-statement",
+          "original": "./text.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/root.js": {
+      "bytes": 473,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/handle/index.js": {
+      "bytes": 1104,
+      "imports": [
+        {
+          "path": "node_modules/zwitch/index.js",
+          "kind": "import-statement",
+          "original": "zwitch"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/comment.js",
+          "kind": "import-statement",
+          "original": "./comment.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/doctype.js",
+          "kind": "import-statement",
+          "original": "./doctype.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/element.js",
+          "kind": "import-statement",
+          "original": "./element.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/raw.js",
+          "kind": "import-statement",
+          "original": "./raw.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/root.js",
+          "kind": "import-statement",
+          "original": "./root.js"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/text.js",
+          "kind": "import-statement",
+          "original": "./text.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/lib/index.js": {
+      "bytes": 9724,
+      "imports": [
+        {
+          "path": "node_modules/html-void-elements/index.js",
+          "kind": "import-statement",
+          "original": "html-void-elements"
+        },
+        {
+          "path": "node_modules/property-information/index.js",
+          "kind": "import-statement",
+          "original": "property-information"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/lib/handle/index.js",
+          "kind": "import-statement",
+          "original": "./handle/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/hast-util-to-html/index.js": {
+      "bytes": 283,
+      "imports": [
+        {
+          "path": "node_modules/hast-util-to-html/lib/index.js",
+          "kind": "import-statement",
+          "original": "./lib/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/emoji-regex-xs/index.mjs": {
+      "bytes": 327,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/regex-utilities/src/index.js": {
+      "bytes": 6094,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/regex/src/subclass.js": {
+      "bytes": 4753,
+      "imports": [
+        {
+          "path": "node_modules/regex-utilities/src/index.js",
+          "kind": "import-statement",
+          "original": "regex-utilities"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/regex/src/utils-internals.js": {
+      "bytes": 449,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/regex/src/atomic.js": {
+      "bytes": 6634,
+      "imports": [
+        {
+          "path": "node_modules/regex/src/subclass.js",
+          "kind": "import-statement",
+          "original": "./subclass.js"
+        },
+        {
+          "path": "node_modules/regex/src/utils-internals.js",
+          "kind": "import-statement",
+          "original": "./utils-internals.js"
+        },
+        {
+          "path": "node_modules/regex-utilities/src/index.js",
+          "kind": "import-statement",
+          "original": "regex-utilities"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/regex/src/internals.js": {
+      "bytes": 116,
+      "imports": [
+        {
+          "path": "node_modules/regex/src/atomic.js",
+          "kind": "import-statement",
+          "original": "./atomic.js"
+        },
+        {
+          "path": "node_modules/regex/src/subclass.js",
+          "kind": "import-statement",
+          "original": "./subclass.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/regex-recursion/src/index.js": {
+      "bytes": 8822,
+      "imports": [
+        {
+          "path": "node_modules/regex-utilities/src/index.js",
+          "kind": "import-statement",
+          "original": "regex-utilities"
+        },
+        {
+          "path": "node_modules/regex/src/internals.js",
+          "kind": "import-statement",
+          "original": "regex/internals"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/oniguruma-to-es/dist/esm/index.js": {
+      "bytes": 97517,
+      "imports": [
+        {
+          "path": "node_modules/emoji-regex-xs/index.mjs",
+          "kind": "import-statement",
+          "original": "emoji-regex-xs"
+        },
+        {
+          "path": "node_modules/regex/src/internals.js",
+          "kind": "import-statement",
+          "original": "regex/internals"
+        },
+        {
+          "path": "node_modules/regex/src/internals.js",
+          "kind": "import-statement",
+          "original": "regex/internals"
+        },
+        {
+          "path": "node_modules/regex/src/internals.js",
+          "kind": "import-statement",
+          "original": "regex/internals"
+        },
+        {
+          "path": "node_modules/regex-recursion/src/index.js",
+          "kind": "import-statement",
+          "original": "regex-recursion"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-javascript/dist/shared/engine-javascript.hzpS1_41.mjs": {
+      "bytes": 2324,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-javascript/dist/engine-compile.mjs": {
+      "bytes": 1586,
+      "imports": [
+        {
+          "path": "node_modules/oniguruma-to-es/dist/esm/index.js",
+          "kind": "import-statement",
+          "original": "oniguruma-to-es"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/shared/engine-javascript.hzpS1_41.mjs",
+          "kind": "import-statement",
+          "original": "./shared/engine-javascript.hzpS1_41.mjs"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-javascript/dist/engine-raw.mjs": {
+      "bytes": 521,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/shared/engine-javascript.hzpS1_41.mjs",
+          "kind": "import-statement",
+          "original": "./shared/engine-javascript.hzpS1_41.mjs"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-javascript/dist/index.mjs": {
+      "bytes": 273,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/engine-compile.mjs",
+          "kind": "import-statement",
+          "original": "./engine-compile.mjs"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/engine-raw.mjs",
+          "kind": "import-statement",
+          "original": "./engine-raw.mjs"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/shared/engine-javascript.hzpS1_41.mjs",
+          "kind": "import-statement",
+          "original": "./shared/engine-javascript.hzpS1_41.mjs"
+        },
+        {
+          "path": "node_modules/oniguruma-to-es/dist/esm/index.js",
+          "kind": "import-statement",
+          "original": "oniguruma-to-es"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/core/dist/index.mjs": {
+      "bytes": 72833,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/types/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/types"
+        },
+        {
+          "path": "node_modules/@shikijs/types/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/types"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-oniguruma/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/engine-oniguruma"
+        },
+        {
+          "path": "node_modules/@shikijs/core/dist/shared/core.Bn_XU0Iv.mjs",
+          "kind": "import-statement",
+          "original": "./shared/core.Bn_XU0Iv.mjs"
+        },
+        {
+          "path": "node_modules/@shikijs/core/dist/shared/core.Bn_XU0Iv.mjs",
+          "kind": "import-statement",
+          "original": "./shared/core.Bn_XU0Iv.mjs"
+        },
+        {
+          "path": "node_modules/@shikijs/vscode-textmate/dist/index.js",
+          "kind": "import-statement",
+          "original": "@shikijs/vscode-textmate"
+        },
+        {
+          "path": "node_modules/@shikijs/vscode-textmate/dist/index.js",
+          "kind": "import-statement",
+          "original": "@shikijs/vscode-textmate"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/index.js",
+          "kind": "import-statement",
+          "original": "hast-util-to-html"
+        },
+        {
+          "path": "node_modules/hast-util-to-html/index.js",
+          "kind": "import-statement",
+          "original": "hast-util-to-html"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-javascript/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/engine-javascript"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/shiki/dist/core.mjs": {
+      "bytes": 31,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/core/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/core"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/themes/dist/catppuccin-mocha.mjs": {
+      "bytes": 50272,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/langs/dist/rust.mjs": {
+      "bytes": 19766,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/shiki/dist/engine-oniguruma.mjs": {
+      "bytes": 43,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/engine-oniguruma/dist/index.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/engine-oniguruma"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@shikijs/engine-oniguruma/dist/wasm-inlined.mjs": {
+      "bytes": 622442,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/shiki/dist/wasm.mjs": {
+      "bytes": 122,
+      "imports": [
+        {
+          "path": "node_modules/@shikijs/engine-oniguruma/dist/wasm-inlined.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/engine-oniguruma/wasm-inlined"
+        },
+        {
+          "path": "node_modules/@shikijs/engine-oniguruma/dist/wasm-inlined.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/engine-oniguruma/wasm-inlined"
+        }
+      ],
+      "format": "esm"
+    },
+    "web-components/sprocket-code.utils.js": {
+      "bytes": 2226,
+      "imports": [
+        {
+          "path": "node_modules/shiki/dist/core.mjs",
+          "kind": "import-statement",
+          "original": "shiki/core"
+        },
+        {
+          "path": "node_modules/@shikijs/themes/dist/catppuccin-mocha.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/themes/catppuccin-mocha"
+        },
+        {
+          "path": "node_modules/@shikijs/langs/dist/rust.mjs",
+          "kind": "import-statement",
+          "original": "@shikijs/langs/rust"
+        },
+        {
+          "path": "node_modules/shiki/dist/engine-oniguruma.mjs",
+          "kind": "import-statement",
+          "original": "shiki/engine/oniguruma"
+        },
+        {
+          "path": "node_modules/shiki/dist/wasm.mjs",
+          "kind": "import-statement",
+          "original": "shiki/wasm"
+        }
+      ],
+      "format": "esm"
+    },
+    "web-components/sprocket-code.js": {
+      "bytes": 1114,
+      "imports": [
+        {
+          "path": "web-components/sprocket-code.utils.js",
+          "kind": "dynamic-import",
+          "original": "./sprocket-code.utils.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs": {
+      "bytes": 4071,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/core/dist/floating-ui.core.mjs": {
+      "bytes": 36119,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs": {
+      "bytes": 5830,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs": {
+      "bytes": 26403,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/core"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils/dom"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils/dom"
+        }
+      ],
+      "format": "esm"
+    },
+    "web-components/sprocket-tooltip.js": {
+      "bytes": 2591,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/dom"
+        }
+      ],
+      "format": "esm"
+    },
+    "web-components/index.js": {
+      "bytes": 61,
+      "imports": [
+        {
+          "path": "web-components/sprocket-code.js",
+          "kind": "import-statement",
+          "original": "./sprocket-code.js"
+        },
+        {
+          "path": "web-components/sprocket-tooltip.js",
+          "kind": "import-statement",
+          "original": "./sprocket-tooltip.js"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "dist/index.js": {
+      "imports": [],
+      "exports": [],
+      "entryPoint": "web-components/index.js",
+      "inputs": {
+        "node_modules/@shikijs/types/dist/index.mjs": {
+          "bytesInOutput": 89
+        },
+        "node_modules/@shikijs/engine-oniguruma/dist/index.mjs": {
+          "bytesInOutput": 6710
+        },
+        "node_modules/@shikijs/core/dist/shared/core.Bn_XU0Iv.mjs": {
+          "bytesInOutput": 181
+        },
+        "node_modules/@shikijs/vscode-textmate/dist/index.js": {
+          "bytesInOutput": 42677
+        },
+        "node_modules/html-void-elements/index.js": {
+          "bytesInOutput": 177
+        },
+        "node_modules/property-information/lib/util/schema.js": {
+          "bytesInOutput": 166
+        },
+        "node_modules/property-information/lib/util/merge.js": {
+          "bytesInOutput": 141
+        },
+        "node_modules/property-information/lib/normalize.js": {
+          "bytesInOutput": 55
+        },
+        "node_modules/property-information/lib/util/info.js": {
+          "bytesInOutput": 407
+        },
+        "node_modules/property-information/lib/util/types.js": {
+          "bytesInOutput": 279
+        },
+        "node_modules/property-information/lib/util/defined-info.js": {
+          "bytesInOutput": 276
+        },
+        "node_modules/property-information/lib/util/create.js": {
+          "bytesInOutput": 300
+        },
+        "node_modules/property-information/lib/aria.js": {
+          "bytesInOutput": 903
+        },
+        "node_modules/property-information/lib/util/case-sensitive-transform.js": {
+          "bytesInOutput": 55
+        },
+        "node_modules/property-information/lib/util/case-insensitive-transform.js": {
+          "bytesInOutput": 67
+        },
+        "node_modules/property-information/lib/html.js": {
+          "bytesInOutput": 4190
+        },
+        "node_modules/property-information/lib/svg.js": {
+          "bytesInOutput": 10095
+        },
+        "node_modules/property-information/lib/xlink.js": {
+          "bytesInOutput": 227
+        },
+        "node_modules/property-information/lib/xmlns.js": {
+          "bytesInOutput": 142
+        },
+        "node_modules/property-information/lib/xml.js": {
+          "bytesInOutput": 151
+        },
+        "node_modules/property-information/lib/find.js": {
+          "bytesInOutput": 535
+        },
+        "node_modules/property-information/index.js": {
+          "bytesInOutput": 123
+        },
+        "node_modules/zwitch/index.js": {
+          "bytesInOutput": 293
+        },
+        "node_modules/stringify-entities/lib/core.js": {
+          "bytesInOutput": 690
+        },
+        "node_modules/stringify-entities/lib/util/to-hexadecimal.js": {
+          "bytesInOutput": 149
+        },
+        "node_modules/stringify-entities/lib/util/to-decimal.js": {
+          "bytesInOutput": 121
+        },
+        "node_modules/character-entities-legacy/index.js": {
+          "bytesInOutput": 854
+        },
+        "node_modules/character-entities-html4/index.js": {
+          "bytesInOutput": 3496
+        },
+        "node_modules/stringify-entities/lib/constant/dangerous.js": {
+          "bytesInOutput": 78
+        },
+        "node_modules/stringify-entities/lib/util/to-named.js": {
+          "bytesInOutput": 329
+        },
+        "node_modules/stringify-entities/lib/util/format-smart.js": {
+          "bytesInOutput": 372
+        },
+        "node_modules/stringify-entities/lib/index.js": {
+          "bytesInOutput": 84
+        },
+        "node_modules/stringify-entities/index.js": {
+          "bytesInOutput": 21
+        },
+        "node_modules/hast-util-to-html/lib/handle/comment.js": {
+          "bytesInOutput": 341
+        },
+        "node_modules/hast-util-to-html/lib/handle/doctype.js": {
+          "bytesInOutput": 136
+        },
+        "node_modules/ccount/index.js": {
+          "bytesInOutput": 189
+        },
+        "node_modules/comma-separated-tokens/index.js": {
+          "bytesInOutput": 146
+        },
+        "node_modules/space-separated-tokens/index.js": {
+          "bytesInOutput": 58
+        },
+        "node_modules/hast-util-whitespace/lib/index.js": {
+          "bytesInOutput": 159
+        },
+        "node_modules/hast-util-whitespace/index.js": {
+          "bytesInOutput": 21
+        },
+        "node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
+          "bytesInOutput": 178
+        },
+        "node_modules/hast-util-to-html/lib/omission/omission.js": {
+          "bytesInOutput": 132
+        },
+        "node_modules/hast-util-to-html/lib/omission/closing.js": {
+          "bytesInOutput": 2260
+        },
+        "node_modules/hast-util-to-html/lib/omission/opening.js": {
+          "bytesInOutput": 979
+        },
+        "node_modules/hast-util-to-html/lib/handle/element.js": {
+          "bytesInOutput": 2348
+        },
+        "node_modules/hast-util-to-html/lib/handle/text.js": {
+          "bytesInOutput": 212
+        },
+        "node_modules/hast-util-to-html/lib/handle/raw.js": {
+          "bytesInOutput": 99
+        },
+        "node_modules/hast-util-to-html/lib/handle/root.js": {
+          "bytesInOutput": 54
+        },
+        "node_modules/hast-util-to-html/lib/handle/index.js": {
+          "bytesInOutput": 303
+        },
+        "node_modules/hast-util-to-html/lib/index.js": {
+          "bytesInOutput": 1179
+        },
+        "node_modules/hast-util-to-html/index.js": {
+          "bytesInOutput": 21
+        },
+        "node_modules/@shikijs/core/dist/index.mjs": {
+          "bytesInOutput": 27039
+        },
+        "node_modules/shiki/dist/core.mjs": {
+          "bytesInOutput": 21
+        },
+        "node_modules/@shikijs/themes/dist/catppuccin-mocha.mjs": {
+          "bytesInOutput": 45605
+        },
+        "node_modules/@shikijs/langs/dist/rust.mjs": {
+          "bytesInOutput": 17600
+        },
+        "node_modules/shiki/dist/engine-oniguruma.mjs": {
+          "bytesInOutput": 21
+        },
+        "node_modules/@shikijs/engine-oniguruma/dist/wasm-inlined.mjs": {
+          "bytesInOutput": 622297
+        },
+        "node_modules/shiki/dist/wasm.mjs": {
+          "bytesInOutput": 26
+        },
+        "web-components/sprocket-code.utils.js": {
+          "bytesInOutput": 1158
+        },
+        "web-components/sprocket-code.js": {
+          "bytesInOutput": 878
+        },
+        "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs": {
+          "bytesInOutput": 1442
+        },
+        "node_modules/@floating-ui/core/dist/floating-ui.core.mjs": {
+          "bytesInOutput": 5006
+        },
+        "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs": {
+          "bytesInOutput": 2413
+        },
+        "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs": {
+          "bytesInOutput": 5195
+        },
+        "web-components/sprocket-tooltip.js": {
+          "bytesInOutput": 1718
+        },
+        "web-components/index.js": {
+          "bytesInOutput": 0
+        }
+      },
+      "bytes": 813796
+    }
+  }
+}

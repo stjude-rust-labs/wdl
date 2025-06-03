@@ -1,0 +1,57 @@
+import { createHighlighterCore } from 'shiki/core';
+import catppuccinMocha from '@shikijs/themes/catppuccin-mocha';
+import rust from '@shikijs/langs/rust';
+import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
+import wasm from 'shiki/wasm';
+
+// WDL Grammar fetching logic
+let wdlGrammarCache = null;
+const WDL_GRAMMAR_URL = 'https://raw.githubusercontent.com/stjude-rust-labs/sprocket-vscode/refs/heads/main/syntaxes/wdl.tmGrammar.json';
+
+async function getWdlGrammar() {
+  if (wdlGrammarCache) {
+    console.log('sprocket-code-utils: Using cached WDL grammar');
+    return wdlGrammarCache;
+  }
+  try {
+    console.log('sprocket-code-utils: Fetching WDL grammar from', WDL_GRAMMAR_URL);
+    const response = await fetch(WDL_GRAMMAR_URL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch WDL grammar: ${response.status} ${response.statusText}`);
+    }
+    const grammar = await response.json();
+    wdlGrammarCache = grammar;
+    console.log('sprocket-code-utils: WDL grammar fetched and cached');
+    return wdlGrammarCache;
+  } catch (error) {
+    console.error('sprocket-code-utils: Failed to fetch or parse WDL grammar:', error);
+    return null; // Gracefully degrade; WDL highlighting won't work for WDL
+  }
+}
+
+// Highlighter initialization logic
+export async function initializeHighlighter() {
+  console.log('sprocket-code-utils: Initializing highlighter');
+  try {
+    const wdlLangDefinition = await getWdlGrammar();
+    const languagesToLoad = [rust]; // Always load Rust
+
+    if (wdlLangDefinition) {
+      languagesToLoad.push(wdlLangDefinition);
+    } else {
+      // Log a warning if WDL grammar couldn't be loaded
+      console.warn('sprocket-code-utils: WDL grammar could not be loaded. WDL syntax highlighting will be unavailable.');
+    }
+
+    const highlighter = await createHighlighterCore({
+      themes: [catppuccinMocha],
+      langs: languagesToLoad,
+      engine: createOnigurumaEngine(wasm)
+    });
+    console.log('sprocket-code-utils: Highlighter initialized successfully');
+    return highlighter;
+  } catch (error) {
+    console.error('sprocket-code-utils: Failed to initialize highlighter core:', error);
+    return null; // Return null if core initialization fails
+  }
+}
