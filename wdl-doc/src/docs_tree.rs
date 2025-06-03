@@ -912,7 +912,7 @@ impl DocsTree {
             div class="" {
                 h1 class="" { "Home" }
                 @if let Some(homepage) = &self.homepage {
-                    div class="markdown__container" {
+                    div class="markdown-body" data-theme="dark" {
                         (Markdown(std::fs::read_to_string(homepage)?).render())
                     }
                 } @else {
