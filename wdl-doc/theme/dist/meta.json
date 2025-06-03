@@ -971,9 +971,67 @@
       ],
       "format": "esm"
     },
-    "web-components/sprocket-tooltip.js": {
-      "bytes": 1824,
+    "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs": {
+      "bytes": 4071,
       "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/core/dist/floating-ui.core.mjs": {
+      "bytes": 36119,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs": {
+      "bytes": 5830,
+      "imports": [],
+      "format": "esm"
+    },
+    "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs": {
+      "bytes": 26403,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/core/dist/floating-ui.core.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/core"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils/dom"
+        },
+        {
+          "path": "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/utils/dom"
+        }
+      ],
+      "format": "esm"
+    },
+    "web-components/sprocket-tooltip.js": {
+      "bytes": 2591,
+      "imports": [
+        {
+          "path": "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs",
+          "kind": "import-statement",
+          "original": "@floating-ui/dom"
+        }
+      ],
       "format": "esm"
     },
     "web-components/index.js": {
@@ -1009,7 +1067,7 @@
           "bytesInOutput": 181
         },
         "node_modules/@shikijs/vscode-textmate/dist/index.js": {
-          "bytesInOutput": 42664
+          "bytesInOutput": 42677
         },
         "node_modules/html-void-elements/index.js": {
           "bytesInOutput": 177
@@ -1027,16 +1085,16 @@
           "bytesInOutput": 407
         },
         "node_modules/property-information/lib/util/types.js": {
-          "bytesInOutput": 268
+          "bytesInOutput": 279
         },
         "node_modules/property-information/lib/util/defined-info.js": {
-          "bytesInOutput": 273
+          "bytesInOutput": 276
         },
         "node_modules/property-information/lib/util/create.js": {
-          "bytesInOutput": 298
+          "bytesInOutput": 300
         },
         "node_modules/property-information/lib/aria.js": {
-          "bytesInOutput": 902
+          "bytesInOutput": 903
         },
         "node_modules/property-information/lib/util/case-sensitive-transform.js": {
           "bytesInOutput": 55
@@ -1045,22 +1103,22 @@
           "bytesInOutput": 67
         },
         "node_modules/property-information/lib/html.js": {
-          "bytesInOutput": 4187
+          "bytesInOutput": 4190
         },
         "node_modules/property-information/lib/svg.js": {
-          "bytesInOutput": 10091
+          "bytesInOutput": 10095
         },
         "node_modules/property-information/lib/xlink.js": {
-          "bytesInOutput": 226
+          "bytesInOutput": 227
         },
         "node_modules/property-information/lib/xmlns.js": {
-          "bytesInOutput": 141
+          "bytesInOutput": 142
         },
         "node_modules/property-information/lib/xml.js": {
-          "bytesInOutput": 150
+          "bytesInOutput": 151
         },
         "node_modules/property-information/lib/find.js": {
-          "bytesInOutput": 534
+          "bytesInOutput": 535
         },
         "node_modules/property-information/index.js": {
           "bytesInOutput": 123
@@ -1114,22 +1172,22 @@
           "bytesInOutput": 58
         },
         "node_modules/hast-util-whitespace/lib/index.js": {
-          "bytesInOutput": 158
+          "bytesInOutput": 159
         },
         "node_modules/hast-util-whitespace/index.js": {
           "bytesInOutput": 21
         },
         "node_modules/hast-util-to-html/lib/omission/util/siblings.js": {
-          "bytesInOutput": 177
+          "bytesInOutput": 178
         },
         "node_modules/hast-util-to-html/lib/omission/omission.js": {
           "bytesInOutput": 132
         },
         "node_modules/hast-util-to-html/lib/omission/closing.js": {
-          "bytesInOutput": 2259
+          "bytesInOutput": 2260
         },
         "node_modules/hast-util-to-html/lib/omission/opening.js": {
-          "bytesInOutput": 978
+          "bytesInOutput": 979
         },
         "node_modules/hast-util-to-html/lib/handle/element.js": {
           "bytesInOutput": 2348
@@ -1153,7 +1211,7 @@
           "bytesInOutput": 21
         },
         "node_modules/@shikijs/core/dist/index.mjs": {
-          "bytesInOutput": 27031
+          "bytesInOutput": 27039
         },
         "node_modules/shiki/dist/core.mjs": {
           "bytesInOutput": 21
@@ -1179,14 +1237,26 @@
         "web-components/sprocket-code.js": {
           "bytesInOutput": 878
         },
+        "node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs": {
+          "bytesInOutput": 1442
+        },
+        "node_modules/@floating-ui/core/dist/floating-ui.core.mjs": {
+          "bytesInOutput": 5006
+        },
+        "node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs": {
+          "bytesInOutput": 2413
+        },
+        "node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs": {
+          "bytesInOutput": 5195
+        },
         "web-components/sprocket-tooltip.js": {
-          "bytesInOutput": 1600
+          "bytesInOutput": 1718
         },
         "web-components/index.js": {
           "bytesInOutput": 0
         }
       },
-      "bytes": 799569
+      "bytes": 813796
     }
   }
 }

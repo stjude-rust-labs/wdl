@@ -1,12 +1,15 @@
+import { computePosition, flip, shift, offset } from '@floating-ui/dom';
+
 class SprocketTooltip extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this._cleanup = null;
   }
 
   _getStyles() {
     return `
-      :host { display: inline-block; position: relative; }
+      :host { display: inline-block; }
       .tooltip {
         position: absolute;
         background: #333;
@@ -18,53 +21,83 @@ class SprocketTooltip extends HTMLElement {
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.2s;
+        z-index: 100;
+        top: 0;
+        left: 0;
       }
       .tooltip.visible {
         opacity: 1;
       }
-      /* Position variants */
-      .tooltip[data-position='top'] {
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-8px);
-      }
-      .tooltip[data-position='bottom'] {
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(8px);
-      }
-      .tooltip[data-position='left'] {
-        right: 100%;
-        top: 50%;
-        transform: translateX(-8px) translateY(-50%);
-      }
-      .tooltip[data-position='right'] {
-        left: 100%;
-        top: 50%;
-        transform: translateX(8px) translateY(-50%);
-      }
     `;
+  }
+
+  _updatePosition() {
+    const tooltipElement = this.shadowRoot.querySelector('.tooltip');
+    const position = this.getAttribute('position') || 'top';
+
+    computePosition(this, tooltipElement, {
+      placement: position,
+      middleware: [
+        offset(8),
+        flip(),
+        shift({ padding: 5 })
+      ]
+    }).then(({ x, y }) => {
+      Object.assign(tooltipElement.style, {
+        left: `${x}px`,
+        top: `${y}px`
+      });
+    });
   }
 
   connectedCallback() {
     const position = this.getAttribute('position') || 'top';
-    const tooltip = this.getAttribute('tooltip') || '';
+    const tooltip = this.getAttribute('content') || '';
 
     this.shadowRoot.innerHTML = `
       <style>${this._getStyles()}</style>
-      <div class="tooltip" data-position="${position}">${tooltip}</div>
+      <div class="tooltip">${tooltip}</div>
       <slot></slot>
     `;
 
     const tooltipElement = this.shadowRoot.querySelector('.tooltip');
 
-    this.addEventListener('mouseenter', () => {
+    const showTooltip = () => {
       tooltipElement.classList.add('visible');
-    });
+      this._updatePosition();
+    };
 
-    this.addEventListener('mouseleave', () => {
+    const hideTooltip = () => {
       tooltipElement.classList.remove('visible');
-    });
+    };
+
+    this.addEventListener('mouseenter', showTooltip);
+    this.addEventListener('mouseleave', hideTooltip);
+
+    // Update position on scroll and resize
+    const update = () => {
+      if (tooltipElement.classList.contains('visible')) {
+        this._updatePosition();
+      }
+    };
+
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+
+    // Store cleanup function
+    this._cleanup = () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+      this.removeEventListener('mouseenter', showTooltip);
+      this.removeEventListener('mouseleave', hideTooltip);
+    };
+  }
+
+  disconnectedCallback() {
+    if (this._cleanup) {
+      this._cleanup();
+      this._cleanup = null;
+    }
   }
 }
 
