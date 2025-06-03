@@ -62,19 +62,17 @@ impl Config {
     }
 
     /// Creates a new task execution backend based on this configuration.
-    pub async fn create_backend(&self) -> Result<Arc<dyn TaskExecutionBackend>> {
+    pub async fn create_backend(self: &Arc<Self>) -> Result<Arc<dyn TaskExecutionBackend>> {
         match &self.backend {
-            BackendConfig::Local(config) => {
+            BackendConfig::Local(_) => {
                 warn!(
                     "the engine is configured to use the local backend: tasks will not be run \
                      inside of a container"
                 );
-                Ok(Arc::new(LocalBackend::new(&self.task, config)?))
+                Ok(Arc::new(LocalBackend::new(self.clone())?))
             }
-            BackendConfig::Docker(config) => {
-                Ok(Arc::new(DockerBackend::new(&self.task, config).await?))
-            }
-            BackendConfig::Tes(config) => Ok(Arc::new(TesBackend::new(&self.task, config).await?)),
+            BackendConfig::Docker(_) => Ok(Arc::new(DockerBackend::new(self.clone()).await?)),
+            BackendConfig::Tes(_) => Ok(Arc::new(TesBackend::new(self.clone()).await?)),
         }
     }
 }
@@ -356,6 +354,36 @@ impl BackendConfig {
             Self::Local(config) => config.validate(),
             Self::Docker(config) => config.validate(),
             Self::Tes(config) => config.validate(),
+        }
+    }
+
+    /// Converts the backend configuration into a local backend configuration
+    ///
+    /// Returns `None` if the backend configuration is not local.
+    pub fn as_local(&self) -> Option<&LocalBackendConfig> {
+        match self {
+            Self::Local(config) => Some(config),
+            _ => None,
+        }
+    }
+
+    /// Converts the backend configuration into a Docker backend configuration
+    ///
+    /// Returns `None` if the backend configuration is not Docker.
+    pub fn as_docker(&self) -> Option<&DockerBackendConfig> {
+        match self {
+            Self::Docker(config) => Some(config),
+            _ => None,
+        }
+    }
+
+    /// Converts the backend configuration into a TES backend configuration
+    ///
+    /// Returns `None` if the backend configuration is not TES.
+    pub fn as_tes(&self) -> Option<&TesBackendConfig> {
+        match self {
+            Self::Tes(config) => Some(config),
+            _ => None,
         }
     }
 }
