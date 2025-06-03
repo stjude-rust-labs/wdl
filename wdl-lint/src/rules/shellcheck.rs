@@ -377,6 +377,10 @@ impl<'a> CommandContext<'a> {
 }
 
 /// Detect embedded quotes surrounding an expression in a string.
+/// For a given expression, it checks through all descendants to see if there
+/// are any name references (variables) that are surrounded by escaped quotes.
+/// In WDL, the parent expressions is an addition (concatenation) operations.
+/// So the escaped quotes are not in a single string literal.
 fn is_quoted(expr: &Expr) -> bool {
     let mut opened = false;
     let mut name = false;
@@ -404,11 +408,11 @@ fn is_quoted(expr: &Expr) -> bool {
 }
 
 /// Evaluate an expression to determine if it can be simplified to a literal.
-fn evaluate_expr(expr: &Expr) -> bool {
+fn evaluates_to_literal(expr: &Expr) -> bool {
     match expr {
         Expr::Literal(_) => true,
         Expr::Call(c) => match c.target().text() {
-            "sep" => evaluate_expr(
+            "sep" => evaluates_to_literal(
                 &c.arguments()
                     .nth(1)
                     .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
@@ -416,15 +420,15 @@ fn evaluate_expr(expr: &Expr) -> bool {
             "quote" | "squote" => true,
             _ => false,
         },
-        Expr::Parenthesized(p) => evaluate_expr(&p.expr()),
+        Expr::Parenthesized(p) => evaluates_to_literal(&p.expr()),
         Expr::If(i) => {
             let (_, if_expr, else_expr) = i.exprs();
-            evaluate_expr(&if_expr) && evaluate_expr(&else_expr)
+            evaluates_to_literal(&if_expr) && evaluates_to_literal(&else_expr)
         }
         Expr::Addition(a) => {
             let balanced = is_quoted(expr);
             let (left, right) = a.operands();
-            (evaluate_expr(&left) && evaluate_expr(&right)) || balanced
+            (evaluates_to_literal(&left) && evaluates_to_literal(&right)) || balanced
         }
         _ => false,
     }
@@ -452,7 +456,7 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                 );
             }
             PrimitiveType::String => {
-                if evaluate_expr(&placeholder.expr()) {
+                if evaluates_to_literal(&placeholder.expr()) {
                     return ("a".repeat(placeholder_len), true);
                 }
             }
