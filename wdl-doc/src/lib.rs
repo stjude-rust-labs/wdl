@@ -362,7 +362,7 @@ impl Document {
                 h1 id="title" class="callable_title" { (self.name()) }
                 // TODO: does this need better styling?
                 h3 class="callable__section-subheader" { "WDL Version: " (self.version()) }
-                div id="preamble" class="callable__section-text" { (self.preamble()) }
+                div id="preamble" class="markdown-body" data-theme="dark" { (self.preamble()) }
                 div class="callable__section" {
                     h2 id="toc" class="callable__section-header" { "Table of Contents" }
                     div class="parameter__table-outer-container" {
