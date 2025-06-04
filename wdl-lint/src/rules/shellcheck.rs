@@ -25,6 +25,8 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::v1::EvaluationContext;
 use wdl_analysis::types::v1::ExprTypeEvaluator;
+use wdl_ast::v1::LiteralExpr;
+use wdl_ast::v1::StringPart;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -388,7 +390,7 @@ fn is_quoted(expr: &Expr) -> bool {
         match c.kind() {
             SyntaxKind::LiteralStringNode => {
                 let t = c.text().to_string();
-                t.match_indices("\"").for_each(|(..)| {
+                t.match_indices(&['\'', '"']).for_each(|(..)| {
                     if opened && name {
                         name = false;
                     }
@@ -410,6 +412,35 @@ fn is_quoted(expr: &Expr) -> bool {
 /// Evaluate an expression to determine if it can be simplified to a literal.
 fn evaluates_to_literal(expr: &Expr) -> bool {
     match expr {
+        Expr::Literal(LiteralExpr::String(s)) => {
+            if let Some(_) = s.text() {
+                return true;
+            }
+            let mut opened = false;
+            let mut name = false;
+            for p in s.parts() {
+                match p {
+                    StringPart::Text(t) => {
+                        let mut buffer = String::new();
+                        t.unescape_to(&mut buffer);
+                        buffer.match_indices(&['\'', '"']).for_each(|(..)| {
+                            if opened && name {
+                                name = false;
+                            }
+                            opened = !opened;
+                        });
+
+                    }
+                    StringPart::Placeholder(_placeholder) => {
+                        if !opened {
+                            return false;
+                        }
+                        name = true;
+                    }
+                }
+            }
+            !name
+        }
         Expr::Literal(_) => true,
         Expr::Call(c) => match c.target().text() {
             "sep" => evaluates_to_literal(
