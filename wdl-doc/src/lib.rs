@@ -239,6 +239,11 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P) -> Markup {
             script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js" {}
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
             script defer src=(root.join("index.js").to_string_lossy()) {}
+            script {
+                (PreEscaped(r#"document.addEventListener('alpine:initialized', () => {
+                    document.querySelector('.is-scrolled-to')?.scrollIntoView();
+                });"#))
+            }
             (Css(&root.join("style.css").to_string_lossy()))
         }
     }
