@@ -4,11 +4,14 @@ use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
+use wdl_ast::v1::CommandPart;
+use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::StrippedCommandPart;
 
 use super::*;
 use crate::docs_tree::Header;
@@ -30,6 +33,8 @@ pub struct Task {
     outputs: Vec<Parameter>,
     /// The runtime section of the task.
     runtime_section: Option<RuntimeSection>,
+    /// The command section/Bash script of the task.
+    command_section: Option<CommandSection>,
 }
 
 impl Task {
@@ -41,6 +46,7 @@ impl Task {
         input_section: Option<InputSection>,
         output_section: Option<OutputSection>,
         runtime_section: Option<RuntimeSection>,
+        command_section: Option<CommandSection>,
     ) -> Self {
         let meta = match meta_section {
             Some(mds) => parse_meta(&mds),
@@ -65,6 +71,7 @@ impl Task {
             inputs,
             outputs,
             runtime_section,
+            command_section,
         }
     }
 
@@ -116,6 +123,49 @@ impl Task {
         }
     }
 
+    /// Render the command section (Bash script) of the task as HTML.
+    pub fn render_command_section(&self) -> Markup {
+        match &self.command_section {
+            Some(command_section) => {
+                let script = match command_section.strip_whitespace() {
+                    Some(v) => v
+                        .into_iter()
+                        .map(|s| match s {
+                            StrippedCommandPart::Text(text) => text,
+                            StrippedCommandPart::Placeholder(placeholder) => {
+                                placeholder.text().to_string()
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(""),
+                    None => command_section
+                        .parts()
+                        .map(|p| match p {
+                            CommandPart::Text(text) => {
+                                let mut buffer = String::new();
+                                text.unescape_to(command_section.is_heredoc(), &mut buffer);
+                                buffer
+                            }
+                            CommandPart::Placeholder(placehoder) => placehoder.text().to_string(),
+                        })
+                        .collect::<Vec<_>>()
+                        .join(""),
+                };
+                html! {
+                    div class="callable__section" {
+                        h2 id="command" class="callable__section-header" { "Command Script" }
+                        sprocket-code language="bash" {
+                            (script)
+                        }
+                    }
+                }
+            }
+            _ => {
+                html! {}
+            }
+        }
+    }
+
     /// Render the task as HTML.
     pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut headers = PageHeaders::default();
@@ -140,11 +190,16 @@ impl Task {
                     (input_markup)
                     (self.render_outputs(assets))
                     (self.render_runtime_section())
+                    (self.render_command_section())
                 }
             }
         };
         headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
         headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
+        headers.push(Header::Header(
+            "Command Script".to_string(),
+            "command".to_string(),
+        ));
 
         (markup, headers)
     }
@@ -207,6 +262,7 @@ mod tests {
             ast_task.input(),
             ast_task.output(),
             ast_task.runtime(),
+            ast_task.command(),
         );
 
         assert_eq!(task.name(), "my_task");
