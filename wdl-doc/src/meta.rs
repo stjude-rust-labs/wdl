@@ -129,6 +129,23 @@ pub(crate) fn render_meta_map(
         return None;
     }
 
+    let external_link = external_help_item.map(|v| {
+        match v {
+            MetadataValue::String(s) => {
+                let text = s.text().expect("meta string should not be interpolated");
+                let mut buffer = String::new();
+                text.unescape_to(&mut buffer);
+                Some(buffer)
+            },
+            _ => None,
+        }
+    });
+    let external_link_on_click = if let Some(Some(link)) = external_link {
+        Some(format!("window.open('{}', '_blank')", link))
+    } else {
+        None
+    };
+
     Some(html! {
         div class="" {
             @if let Some(help) = help_item {
@@ -136,8 +153,8 @@ pub(crate) fn render_meta_map(
                     (render_value(help, summarize_if_needed))
                 }
             }
-            @if let Some(_external_help) = external_help_item {
-                button class="hover:cursor-pointer" {
+            @if let Some(on_click) = external_link_on_click {
+                button class="hover:cursor-pointer" x-on:click=(on_click) {
                     b { "Go to External Documentation" }
                     img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-4";
                 }
