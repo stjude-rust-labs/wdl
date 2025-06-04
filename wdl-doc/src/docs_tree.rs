@@ -462,7 +462,11 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="w-4 h-4" alt="Workflow icon";
-                                                p class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" { a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                sprocket-tooltip content=(wf.pretty_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
+                                                    a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) {
+                                                        (wf.pretty_name())
+                                                    }
+                                                }
                                             }
                                         }
                                         _ => {
@@ -772,7 +776,7 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
-                            sprocket-tooltip position="bottom" content=(root.name()) x-show="search === ''" {
+                            sprocket-tooltip content=(root.name()) x-show="search === ''" {
                                 a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) }
                             }
                         }
@@ -783,7 +787,7 @@ impl DocsTree {
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
                                     img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="w-4 h-4" alt="Node icon";
-                                    sprocket-tooltip position="bottom" x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
+                                    sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
                                 }
@@ -794,7 +798,7 @@ impl DocsTree {
                                 p class="text-xs" x-text="node.parent" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
                                     img x-bind:src="node.icon" class="w-4 h-4" alt="Node icon";
-                                    sprocket-tooltip position="bottom" x-bind:content="node.display_name" {
+                                    sprocket-tooltip x-bind:content="node.display_name" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
                                 }
