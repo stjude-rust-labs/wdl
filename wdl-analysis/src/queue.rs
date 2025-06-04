@@ -15,10 +15,13 @@ use futures::Future;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
 use indexmap::IndexSet;
+use line_index::LineIndex;
+use line_index::WideEncoding;
 use parking_lot::RwLock;
 use petgraph::Direction;
 use petgraph::graph::NodeIndex;
 use reqwest::Client;
+use rowan::TextSize;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::oneshot;
@@ -27,16 +30,23 @@ use tracing::error;
 use tracing::info;
 use url::Url;
 use wdl_ast::Ast;
+use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Node;
 use wdl_ast::Severity;
+use wdl_ast::Span;
+use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNode;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
 use crate::AnalysisResult;
 use crate::DiagnosticsConfig;
+use crate::GotoDefinitionLocation;
 use crate::IncrementalChange;
 use crate::ProgressKind;
+use crate::SourcePosition;
+use crate::SourcePositionEncoding;
 use crate::document::Document;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
@@ -60,6 +70,8 @@ pub enum Request<Context> {
     NotifyChange(NotifyChangeRequest),
     /// A request to format a document.
     Format(FormatRequest),
+    /// A request to goto definition of a symbol.
+    GotoDefinition(GotoDefinitionRequest),
 }
 
 /// Represents a request to add documents to the graph.
@@ -118,6 +130,18 @@ pub struct FormatRequest {
     /// * The column of the last character in the document, and
     /// * The formatted document to replace the entire file with.
     pub completed: oneshot::Sender<Option<(u32, u32, String)>>,
+}
+
+/// Represents a request to find the definition of a symbol at a given position.
+pub struct GotoDefinitionRequest {
+    /// The document to search for the symbol definition.
+    pub document: Url,
+    /// The position of the symbol in the document.
+    pub position: SourcePosition,
+    /// The encoding used for the position.
+    pub encoding: SourcePositionEncoding,
+    /// The sender for completing the request.
+    pub completed: oneshot::Sender<Option<GotoDefinitionLocation>>,
 }
 
 /// A simple enumeration to signal a cancellation to the caller.
@@ -313,6 +337,33 @@ where
                         });
 
                     completed.send(result).ok();
+                }
+                Request::GotoDefinition(GotoDefinitionRequest {
+                    document,
+                    position,
+                    encoding,
+                    completed,
+                }) => {
+                    let start = Instant::now();
+                    debug!(
+                        "received request for goto definition at {document}: {line}{char}",
+                        line = position.line,
+                        char = position.character
+                    );
+
+                    match self.goto_definition(document, position, encoding) {
+                        Ok(result) => {
+                            debug!(
+                                "goto definition request completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+
+                            completed.send(result).ok();
+                        }
+                        Err(err) => {
+                            debug!("error occurred while completing the request: {err:?}")
+                        }
+                    }
                 }
             }
         }
@@ -723,6 +774,106 @@ where
 
         (index, document)
     }
+
+    /// Finds the definition location for an identifier at the given position.
+    ///
+    /// Searches the document and its imports (doesn't work now) for the
+    /// definition of the identifier at the specified position, returning
+    /// the location if found.
+    fn goto_definition(
+        &self,
+        document: Url,
+        position: SourcePosition,
+        encoding: SourcePositionEncoding,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        let graph = self.graph.read();
+
+        let index = graph
+            .get_index(&document)
+            .ok_or_else(|| anyhow!("document not found in graph"))?;
+
+        let lines = match graph.get(index).parse_state() {
+            ParseState::Parsed { lines, .. } => lines,
+            _ => return Ok(None),
+        };
+
+        let line_col = match encoding {
+            SourcePositionEncoding::UTF8 => line_index::LineCol {
+                line: position.line,
+                col: position.character,
+            },
+            SourcePositionEncoding::UTF16 => lines
+                .to_utf8(
+                    line_index::WideEncoding::Utf16,
+                    line_index::WideLineCol {
+                        line: position.line,
+                        col: position.character,
+                    },
+                )
+                .ok_or_else(|| anyhow!("invalid uth-16 position"))?,
+        };
+
+        let root = graph
+            .get(index)
+            .root()
+            .ok_or_else(|| anyhow!("document root not available for {}", document))?;
+
+        let ast = root.ast().unwrap_v1();
+
+        let offset = lines
+            .offset(line_col)
+            .ok_or_else(|| anyhow!("line_col is invalid"))?;
+
+        let ident = match find_identifier_at_offset(ast.inner(), offset.into())? {
+            Some(id) => id,
+            None => return Ok(None),
+        };
+
+        if let Some(location) = find_definition_in_ast(&ast, &ident, &document, lines)? {
+            return Ok(Some(location));
+        }
+
+        // TODO: imports doesn't works or if it does, i am getting squiggly lines for
+        // them
+        for import in ast.imports() {
+            let text = match import.uri().text() {
+                Some(text) => text,
+                None => continue,
+            };
+
+            let uri = match graph.get(index).uri().join(text.text()) {
+                Ok(uri) => uri,
+                Err(_) => continue,
+            };
+
+            let index = match graph.get_index(&uri) {
+                Some(index) => index,
+                None => continue,
+            };
+
+            let node = graph.get(index);
+            let document = match node.document() {
+                Some(doc) => doc,
+                None => continue,
+            };
+
+            let lines = match node.parse_state() {
+                ParseState::Parsed { lines, .. } => lines,
+                _ => continue,
+            };
+
+            let ast = match document.root().ast().into_v1() {
+                Some(ast) => ast,
+                None => continue,
+            };
+
+            if let Some(location) = find_definition_in_ast(&ast, &ident, &uri, lines)? {
+                return Ok(Some(location));
+            }
+        }
+
+        Ok(None)
+    }
 }
 
 /// Formats the panic payload for display.
@@ -734,4 +885,92 @@ pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> S
     } else {
         "unknown panic payload".to_string()
     }
+}
+
+/// Finds an identifier token at the specified byte offset in the CST.
+fn find_identifier_at_offset(node: &SyntaxNode, offset: usize) -> Result<Option<String>> {
+    let text_size_offset = TextSize::try_from(offset)
+        .map_err(|_| anyhow!("offset {} out of bounds for TextSize", offset))?;
+
+    if let Some(token) = node
+        .token_at_offset(text_size_offset)
+        .find(|t| t.kind() == SyntaxKind::Ident)
+    {
+        let token_range = token.text_range();
+        if token_range.contains_inclusive(text_size_offset)
+            && token_range.start() != token_range.end()
+        {
+            return Ok(Some(token.text().to_string()));
+        }
+    }
+
+    Ok(None)
+}
+
+/// Searches for a definition of the given identifier in the AST.
+///
+/// order:  workflows -> tasks -> structs
+fn find_definition_in_ast(
+    ast: &wdl_ast::v1::Ast,
+    ident: &str,
+    document_uri: &Url,
+    lines: &Arc<line_index::LineIndex>,
+) -> Result<Option<GotoDefinitionLocation>> {
+    for workflow in ast.workflows() {
+        if workflow.name().text() == ident {
+            let range = range_from_span(workflow.name().span(), lines)?;
+            return Ok(Some(GotoDefinitionLocation {
+                uri: document_uri.clone(),
+                range,
+            }));
+        }
+    }
+
+    for task in ast.tasks() {
+        if task.name().text() == ident {
+            let range = range_from_span(task.name().span(), lines)?;
+            return Ok(Some(GotoDefinitionLocation {
+                uri: document_uri.clone(),
+                range,
+            }));
+        }
+    }
+
+    for struct_def in ast.structs() {
+        if struct_def.name().text() == ident {
+            let range = range_from_span(struct_def.name().span(), lines)?;
+            return Ok(Some(GotoDefinitionLocation {
+                uri: document_uri.clone(),
+                range,
+            }));
+        }
+    }
+    Ok(None)
+}
+
+/// Converts a text size offset to source position.
+fn source_position(index: &LineIndex, offset: TextSize) -> Result<SourcePosition> {
+    let line_col = index.line_col(offset);
+    let line_col = index
+        .to_wide(WideEncoding::Utf16, line_col)
+        .with_context(|| {
+            format!(
+                "invalid line column: {line}:{column}",
+                line = line_col.line,
+                column = line_col.col
+            )
+        })?;
+
+    Ok(SourcePosition::new(line_col.line, line_col.col))
+}
+
+/// Converts a AST `Span` to LSP source position range.
+fn range_from_span(span: Span, index: &Arc<LineIndex>) -> Result<Range<SourcePosition>> {
+    let start_offset = TextSize::from(span.start() as u32);
+    let end_offset = TextSize::from(span.end() as u32);
+
+    Ok(Range {
+        start: source_position(index, start_offset)?,
+        end: source_position(index, end_offset)?,
+    })
 }
