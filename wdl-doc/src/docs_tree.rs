@@ -777,7 +777,7 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
                                 }
