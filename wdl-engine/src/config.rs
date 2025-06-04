@@ -49,12 +49,16 @@ pub struct Config {
     pub task: TaskConfig,
     /// The name of the backend to use.
     ///
-    /// Defaults to a backend named `default`.
+    /// If not specified and `backends` has multiple entries, it will use a name
+    /// of `default`.
     pub backend: Option<String>,
     /// Task execution backends configuration.
     ///
     /// If the collection is empty and `backend` is not specified, the engine
     /// default backend is used.
+    ///
+    /// If the collection has exactly one entry and `backend` is not specified,
+    /// the singular entry will be used.
     #[serde(default)]
     pub backends: HashMap<String, BackendConfig>,
     /// Storage configuration.
@@ -69,8 +73,11 @@ impl Config {
         self.workflow.validate()?;
         self.task.validate()?;
 
-        // If the backend is specified or if there are backends, check the backends map
-        if self.backend.is_some() || !self.backends.is_empty() {
+        if self.backend.is_none() && self.backends.len() < 2 {
+            // This is OK, we'll use either the singular backends entry (1) or
+            // the default (0)
+        } else {
+            // Check the backends map for the backend name (or "default")
             let backend = self.backend.as_deref().unwrap_or(DEFAULT_BACKEND_NAME);
             if !self.backends.contains_key(backend) {
                 bail!("a backend named `{backend}` is not present in the configuration");
@@ -87,10 +94,16 @@ impl Config {
 
     /// Creates a new task execution backend based on this configuration.
     pub async fn create_backend(self: &Arc<Self>) -> Result<Arc<dyn TaskExecutionBackend>> {
-        let config = if self.backend.is_none() && self.backends.is_empty() {
-            // Use the default
-            Cow::Owned(BackendConfig::default())
+        let config = if self.backend.is_none() && self.backends.len() < 2 {
+            if self.backends.len() == 1 {
+                // Use the singular entry
+                Cow::Borrowed(self.backends.values().next().unwrap())
+            } else {
+                // Use the default
+                Cow::Owned(BackendConfig::default())
+            }
         } else {
+            // Lookup the backend to use
             let backend = self.backend.as_deref().unwrap_or(DEFAULT_BACKEND_NAME);
             Cow::Borrowed(self.backends.get(backend).ok_or_else(|| {
                 anyhow!("a backend named `{backend}` is not present in the configuration")
@@ -710,14 +723,6 @@ mod test {
 
         // Test invalid backend name
         let config = Config {
-            backends: [("not-default".to_string(), BackendConfig::default())].into(),
-            ..Default::default()
-        };
-        assert_eq!(
-            config.validate().unwrap_err().to_string(),
-            "a backend named `default` is not present in the configuration"
-        );
-        let config = Config {
             backend: Some("foo".into()),
             ..Default::default()
         };
@@ -734,6 +739,13 @@ mod test {
             config.validate().unwrap_err().to_string(),
             "a backend named `bar` is not present in the configuration"
         );
+
+        // Test a singular backend
+        let config = Config {
+            backends: [("foo".to_string(), BackendConfig::default())].into(),
+            ..Default::default()
+        };
+        config.validate().expect("config should validate");
 
         // Test invalid local backend cpu config
         let config = Config {
