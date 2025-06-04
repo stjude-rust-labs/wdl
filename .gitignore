@@ -11,3 +11,4 @@ rustc-ice*
 **/docs/
 
 **/node_modules/
+**/dist/meta.json

@@ -1,6 +1,6 @@
 import { createHighlighterCore } from 'shiki/core';
 import catppuccinMocha from '@shikijs/themes/catppuccin-mocha';
-import rust from '@shikijs/langs/rust';
+import bash from '@shikijs/langs/bash';
 import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import wasm from 'shiki/wasm';
 
@@ -34,7 +34,7 @@ export async function initializeHighlighter() {
   console.log('sprocket-code-utils: Initializing highlighter');
   try {
     const wdlLangDefinition = await getWdlGrammar();
-    const languagesToLoad = [rust]; // Always load Rust
+    const languagesToLoad = [bash];
 
     if (wdlLangDefinition) {
       languagesToLoad.push(wdlLangDefinition);

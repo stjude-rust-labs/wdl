@@ -504,6 +504,7 @@ pub async fn document_workspace(
                         t.input(),
                         t.output(),
                         t.runtime(),
+                        t.command(),
                     );
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
