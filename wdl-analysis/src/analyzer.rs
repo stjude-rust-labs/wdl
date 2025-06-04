@@ -44,6 +44,7 @@ use crate::queue::AddRequest;
 use crate::queue::AnalysisQueue;
 use crate::queue::AnalyzeRequest;
 use crate::queue::FormatRequest;
+use crate::queue::GotoDefinitionRequest;
 use crate::queue::NotifyChangeRequest;
 use crate::queue::NotifyIncrementalChangeRequest;
 use crate::queue::RemoveRequest;
@@ -58,6 +59,15 @@ pub enum ProgressKind {
     Parsing,
     /// The progress is for analyzing documents.
     Analyzing,
+}
+
+/// Represents a location for goto definition results.
+#[derive(Debug, Clone)]
+pub struct GotoDefinitionLocation {
+    /// The URI of the document containing the definition.
+    pub uri: Url,
+    /// The range of the definition in the document.
+    pub range: Range<SourcePosition>,
 }
 
 impl fmt::Display for ProgressKind {
@@ -716,6 +726,36 @@ where
 
         rx.await.map_err(|_| {
             anyhow!("failed to send format request to the queue because the channel has closed")
+        })
+    }
+
+    /// Performs a `goto definition` for a symbol at the current position.
+    pub async fn goto_definition(
+        &self,
+        document: Url,
+        position: SourcePosition,
+        encoding: SourcePositionEncoding,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        let (tx, rx) = oneshot::channel();
+        self.sender
+            .send(Request::GotoDefinition(GotoDefinitionRequest {
+                document,
+                position,
+                encoding,
+                completed: tx,
+            }))
+            .map_err(|_| {
+                anyhow!(
+                    "failed to send goto definition request to analysis queue because the channel \
+                     has closed"
+                )
+            })?;
+
+        rx.await.map_err(|_| {
+            anyhow!(
+                "failed to receive goto definition response from analysis queue because the \
+                 channel has closed"
+            )
         })
     }
 }

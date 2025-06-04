@@ -383,6 +383,7 @@ impl LanguageServer for Server {
                     },
                 )),
                 document_formatting_provider: Some(OneOf::Left(true)),
+                definition_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -709,5 +710,49 @@ impl LanguageServer for Server {
             });
 
         Ok(result)
+    }
+
+    async fn goto_definition(
+        &self,
+        mut params: GotoDefinitionParams,
+    ) -> RpcResult<Option<GotoDefinitionResponse>> {
+        normalize_uri_path(&mut params.text_document_position_params.text_document.uri);
+
+        debug!("received `textDocument/gotoDefinition` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position_params.position.line,
+            params.text_document_position_params.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .goto_definition(
+                params.text_document_position_params.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result.map(|location| {
+            GotoDefinitionResponse::Scalar(Location {
+                uri: location.uri,
+                range: Range {
+                    start: Position {
+                        line: location.range.start.line,
+                        character: location.range.start.character,
+                    },
+                    end: Position {
+                        line: location.range.end.line,
+                        character: location.range.end.character,
+                    },
+                },
+            })
+        }))
     }
 }
