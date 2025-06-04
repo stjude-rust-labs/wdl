@@ -75,10 +75,10 @@ const GUEST_WORK_DIR: &str = "/mnt/work";
 const GUEST_COMMAND_PATH: &str = "/mnt/command";
 
 /// The path to the container's stdout.
-const GUEST_STDOUT_PATH: &str = "/stdout";
+const GUEST_STDOUT_PATH: &str = "/var/log/stdout";
 
 /// The path to the container's stderr.
-const GUEST_STDERR_PATH: &str = "/stderr";
+const GUEST_STDERR_PATH: &str = "/var/log/stderr";
 
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
