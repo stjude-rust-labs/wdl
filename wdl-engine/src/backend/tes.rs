@@ -11,9 +11,8 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
-use base64::Engine as _;
-use base64::engine::general_purpose::STANDARD;
 use crankshaft::config::backend;
+use crankshaft::config::backend::tes::http::HttpAuthConfig;
 use crankshaft::engine::Task;
 use crankshaft::engine::service::name::GeneratorIterator;
 use crankshaft::engine::service::name::UniqueAlphanumeric;
@@ -393,12 +392,28 @@ impl TesBackend {
         let manager = TaskManager::new_unlimited(max_cpu, max_memory);
 
         let mut http = backend::tes::http::Config::default();
-        if let Some(TesBackendAuthConfig::Basic(auth)) = &backend_config.auth {
-            http.basic_auth_token = Some(STANDARD.encode(format!(
-                "{user}:{pass}",
-                user = auth.username.as_ref().expect("should have user name"),
-                pass = auth.password.as_ref().expect("should have password")
-            )));
+        match &backend_config.auth {
+            Some(TesBackendAuthConfig::Basic(config)) => {
+                http.auth = Some(HttpAuthConfig::Basic {
+                    username: config
+                        .username
+                        .clone()
+                        .ok_or_else(|| anyhow!("missing `username` in basic auth"))?,
+                    password: config
+                        .password
+                        .clone()
+                        .ok_or_else(|| anyhow!("missing `password` in basic auth"))?,
+                });
+            }
+            Some(TesBackendAuthConfig::Bearer(config)) => {
+                http.auth = Some(HttpAuthConfig::Bearer {
+                    token: config
+                        .token
+                        .clone()
+                        .ok_or_else(|| anyhow!("missing `token` in bearer auth"))?,
+                });
+            }
+            None => {}
         }
 
         let backend = tes::Backend::initialize(

@@ -487,9 +487,9 @@ impl Default for DockerBackendConfig {
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct BasicAuthConfig {
-    /// The TES backend authentication username.
+    /// The HTTP basic authentication username.
     pub username: Option<String>,
-    /// The TES backend authentication password.
+    /// The HTTP basic authentication password.
     pub password: Option<String>,
 }
 
@@ -508,19 +508,41 @@ impl BasicAuthConfig {
     }
 }
 
+/// Represents HTTP bearer token authentication configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub struct BearerAuthConfig {
+    /// The HTTP bearer authentication token.
+    pub token: Option<String>,
+}
+
+impl BearerAuthConfig {
+    /// Validates the HTTP basic auth configuration.
+    pub fn validate(&self) -> Result<()> {
+        if self.token.is_none() {
+            bail!("HTTP bearer auth configuration value `token` is required");
+        }
+
+        Ok(())
+    }
+}
+
 /// Represents the kind of authentication for a TES backend.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum TesBackendAuthConfig {
     /// Use basic authentication for the TES backend.
     Basic(BasicAuthConfig),
+    /// Use bearer token authentication for the TES backend.
+    Bearer(BearerAuthConfig),
 }
 
 impl TesBackendAuthConfig {
     /// Validates the TES backend authentication configuration.
     pub fn validate(&self) -> Result<()> {
         match self {
-            Self::Basic(auth) => auth.validate(),
+            Self::Basic(config) => config.validate(),
+            Self::Bearer(config) => config.validate(),
         }
     }
 }
@@ -779,6 +801,20 @@ mod test {
         assert_eq!(
             config.validate().unwrap_err().to_string(),
             "HTTP basic auth configuration value `password` is required"
+        );
+
+        // Test invalid TES bearer auth
+        let config = Config {
+            backend: BackendConfig::Tes(Box::new(TesBackendConfig {
+                url: Some(Url::parse("https://example.com").unwrap()),
+                auth: Some(TesBackendAuthConfig::Bearer(Default::default())),
+                ..Default::default()
+            })),
+            ..Default::default()
+        };
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "HTTP bearer auth configuration value `token` is required"
         );
 
         let mut config = Config::default();
