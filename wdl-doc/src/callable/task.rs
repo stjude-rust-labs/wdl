@@ -196,10 +196,7 @@ impl Task {
         };
         headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
         headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
-        headers.push(Header::Header(
-            "Command".to_string(),
-            "command".to_string(),
-        ));
+        headers.push(Header::Header("Command".to_string(), "command".to_string()));
 
         (markup, headers)
     }
