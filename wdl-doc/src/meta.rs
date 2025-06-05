@@ -164,15 +164,15 @@ pub(crate) fn render_meta_map(
                 }
             }
             @if any_filtered_items {
-                div class="parameter__table-outer-container" {
-                    div class="parameter__table-inner-container" {
-                        table class="parameter__table" {
+                div class="main__table-outer-container" {
+                    div class="main__table-inner-container" {
+                        table class="main__table" {
                             tbody {
                                 @for (k, v) in filtered_items {
                                     tr {
-                                        td class="text-mono" {
+                                        td { code {
                                             (k)
-                                        }
+                                        } }
                                         td {
                                             (render_value(v, summarize_if_needed))
                                         }

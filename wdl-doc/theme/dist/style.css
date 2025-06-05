@@ -755,8 +755,8 @@
   .gap-y-2 {
     row-gap: calc(var(--spacing) * 2);
   }
-  .overflow-x-auto {
-    overflow-x: auto;
+  .overflow-x-clip {
+    overflow-x: clip;
   }
   .overflow-y-scroll {
     overflow-y: scroll;
@@ -1808,43 +1808,48 @@
       display: none;
     }
   }
-  .callable__container {
+  .main__container {
     display: flex;
     flex-direction: column;
     row-gap: calc(var(--spacing) * 6);
   }
-  .callable__title {
+  .main__title {
+    margin-top: calc(var(--spacing) * 8);
+    margin-bottom: calc(var(--spacing) * 4);
     font-size: var(--text-5xl);
     line-height: var(--tw-leading, var(--text-5xl--line-height));
     color: var(--color-slate-50);
   }
-  .callable__section {
+  .main__section {
     display: flex;
     flex-direction: column;
   }
-  .callable__section-header {
+  .main__section-header {
+    margin-top: calc(var(--spacing) * 8);
+    margin-bottom: calc(var(--spacing) * 4);
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
     color: var(--color-slate-50);
   }
-  .callable__section-subheader {
+  .main__section-subheader {
     margin-top: calc(var(--spacing) * 8);
+    margin-bottom: calc(var(--spacing) * 4);
     font-size: var(--text-lg);
     line-height: var(--tw-leading, var(--text-lg--line-height));
     color: var(--color-slate-50);
   }
-  .callable__section-text {
+  .main__section-text {
     margin-top: calc(var(--spacing) * 3);
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
     color: var(--color-slate-300);
   }
-  .parameter__table-outer-container {
+  .main__table-outer-container {
     overflow-x: auto;
     scrollbar-width: thin;
     scrollbar-color: #4b5563 #1f2937;
   }
-  .parameter__table-inner-container {
+  .main__table-inner-container {
     width: var(--container-3xl);
     @media (width >= 48rem) {
       width: var(--container-4xl);
@@ -1853,14 +1858,11 @@
       width: auto;
     }
   }
-  .parameter__table {
+  .main__table {
     margin-top: calc(var(--spacing) * 3);
     table-layout: fixed;
   }
-  .parameter__table details summary + * {
-    margin-top: calc(var(--spacing) * 2);
-  }
-  .parameter__table th {
+  .main__table th {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
     border-bottom-color: var(--color-slate-700);
@@ -1869,7 +1871,7 @@
     text-align: left;
     color: var(--color-slate-50);
   }
-  .parameter__table td {
+  .main__table td {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
     border-bottom-color: var(--color-slate-800);
@@ -1878,7 +1880,7 @@
     text-align: left;
     color: var(--color-slate-400);
   }
-  .parameter__table td code {
+  .main__table td code {
     display: inline;
     border-radius: var(--radius-md);
     border-style: var(--tw-border-style);

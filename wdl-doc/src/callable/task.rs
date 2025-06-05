@@ -82,8 +82,8 @@ impl Task {
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
         let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
         Some(html! {
-            div class="callable__section" {
-                h2 id="meta" class="callable__section-header" { "Meta" }
+            div class="main__section" {
+                h2 id="meta" class="main__section-header" { "Meta" }
                 (content)
             }
         })
@@ -94,11 +94,11 @@ impl Task {
         match &self.runtime_section {
             Some(runtime_section) => {
                 html! {
-                    div class="callable__section" {
-                        h2 id="runtime" class="parameter__section-header" { "Default Runtime Attributes" }
-                        div class="parameter__table-outer-container" {
-                            div class="parameter__table-inner-container" {
-                                table class="parameter__table" {
+                    div class="main__section" {
+                        h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
+                        div class="main__table-outer-container" {
+                            div class="main__table-inner-container" {
+                                table class="main__table" {
                                     thead { tr {
                                         th { "Attribute" }
                                         th { "Value" }
@@ -152,8 +152,8 @@ impl Task {
                         .join(""),
                 };
                 html! {
-                    div class="callable__section" {
-                        h2 id="command" class="callable__section-header" { "Command" }
+                    div class="main__section" {
+                        h2 id="command" class="main__section-header" { "Command" }
                         sprocket-code language="bash" {
                             (script)
                         }
@@ -180,10 +180,10 @@ impl Task {
         headers.extend(inner_headers);
 
         let markup = html! {
-            div class="callable__container" {
-                section class="callable__section" {
-                    h1 id="title" class="callable__title" { code { (self.name()) } }
-                    p class="callable__section-text" {
+            div class="main__container" {
+                section class="main__section" {
+                    h1 id="title" class="main__title" { code { (self.name()) } }
+                    article class="mardown-body prose" {
                         (self.description(false))
                     }
                     (meta_markup)
@@ -197,7 +197,7 @@ impl Task {
         headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
         headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
         headers.push(Header::Header(
-            "Command Script".to_string(),
+            "Command".to_string(),
             "command".to_string(),
         ));
 
