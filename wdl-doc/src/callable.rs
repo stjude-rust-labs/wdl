@@ -144,16 +144,20 @@ pub(crate) trait Callable {
 
     /// Render the inputs with a group of the callable if present.
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
-        let group_tables = self.input_groups().into_iter().map(|group| {
-            html! {
-                h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
-                (render_parameter_table(
-                    &["Name", "Type", "Default", "Description"],
-                    self.inputs_in_group(&group),
-                    assets,
-                ))
-            }
-        }).collect::<Vec<_>>();
+        let group_tables = self
+            .input_groups()
+            .into_iter()
+            .map(|group| {
+                html! {
+                    h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
+                    (render_parameter_table(
+                        &["Name", "Type", "Default", "Description"],
+                        self.inputs_in_group(&group),
+                        assets,
+                    ))
+                }
+            })
+            .collect::<Vec<_>>();
         if group_tables.is_empty() {
             return None;
         }
