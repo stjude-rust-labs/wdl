@@ -161,4 +161,9 @@
   .right-sidebar__back-to-top-text {
     @apply text-sm;
   }
+
+  .metadata__warning {
+    /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
+    @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm;
+  }
 }
