@@ -147,21 +147,21 @@ pub(crate) fn render_meta_map(
     };
 
     Some(html! {
-        div class="" {
+        div class="metadata__container" {
             @if let Some(help) = help_item {
                 article class="prose" {
                     (render_value(help, summarize_if_needed))
                 }
             }
             @if let Some(on_click) = external_link_on_click {
-                button class="hover:cursor-pointer" x-on:click=(on_click) {
+                button class="hover:cursor-pointer flex items-center gap-2" x-on:click=(on_click) {
                     b { "Go to External Documentation" }
-                    img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-4";
+                    img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-5";
                 }
             }
             @if let Some(warning) = warning_item {
                 div class="metadata__warning" {
-                    img src=(assets.join("information-circle.svg").to_string_lossy()) alt="Warning Icon" class="size-4";
+                    img src=(assets.join("information-circle.svg").to_string_lossy()) alt="Warning Icon" class="size-5";
                     p { (render_value(warning, summarize_if_needed)) }
                 }
             }
@@ -172,7 +172,7 @@ pub(crate) fn render_meta_map(
                             tbody {
                                 @for (k, v) in filtered_items {
                                     tr {
-                                        td {
+                                        td class="text-mono" {
                                             (k)
                                         }
                                         td {
