@@ -147,9 +147,7 @@ pub(crate) fn render_meta_map(
     Some(html! {
         div class="metadata__container" {
             @if let Some(help) = help_item {
-                article class="prose" {
-                    (render_value(help, summarize_if_needed))
-                }
+                (render_value(help, summarize_if_needed))
             }
             @if let Some(on_click) = external_link_on_click {
                 button class="hover:cursor-pointer flex items-center gap-2" x-on:click=(on_click) {

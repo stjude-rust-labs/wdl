@@ -181,16 +181,16 @@ impl Task {
 
         let markup = html! {
             div class="main__container" {
-                section class="main__section" {
-                    h1 id="title" class="main__title" { code { (self.name()) } }
-                    article class="mardown-body prose" {
+                div class="main__section" {
+                    article class="prose prose-slate prose-invert" {
+                        h1 id="title" class="main__title" { code { (self.name()) } }
                         (self.description(false))
+                        (meta_markup)
+                        (input_markup)
+                        (self.render_outputs(assets))
+                        (self.render_runtime_section())
+                        (self.render_command_section())
                     }
-                    (meta_markup)
-                    (input_markup)
-                    (self.render_outputs(assets))
-                    (self.render_runtime_section())
-                    (self.render_command_section())
                 }
             }
         };
