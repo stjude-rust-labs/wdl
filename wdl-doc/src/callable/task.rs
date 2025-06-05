@@ -33,7 +33,7 @@ pub struct Task {
     outputs: Vec<Parameter>,
     /// The runtime section of the task.
     runtime_section: Option<RuntimeSection>,
-    /// The command section/Bash script of the task.
+    /// The command section of the task.
     command_section: Option<CommandSection>,
 }
 
@@ -153,7 +153,7 @@ impl Task {
                 };
                 html! {
                     div class="callable__section" {
-                        h2 id="command" class="callable__section-header" { "Command Script" }
+                        h2 id="command" class="callable__section-header" { "Command" }
                         sprocket-code language="bash" {
                             (script)
                         }
