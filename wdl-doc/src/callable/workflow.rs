@@ -113,19 +113,19 @@ impl Workflow {
 
         let markup = html! {
             div class="main__container" {
-                section class="main__section" {
-                    h1 id="title" class="main__title" { (self.pretty_name()) }
-                    @if let Some(category) = self.category() {
-                        // TODO style this better
-                        h3 class="main__section-subheader" { "Category: " (category) }
-                    }
-                    article class="markdown-body prose" {
+                div class="main__section" {
+                    article class="prose prose-slate prose-invert" {
+                        h1 id="title" class="main__title" { (self.pretty_name()) }
+                        @if let Some(category) = self.category() {
+                            // TODO style this better
+                            h3 class="main__section-subheader" { "Category: " (category) }
+                        }
                         (self.description(false))
+                        (meta_markup)
+                        (input_markup)
+                        (self.render_outputs(assets))
                     }
                 }
-                (meta_markup)
-                (input_markup)
-                (self.render_outputs(assets))
             }
         };
 

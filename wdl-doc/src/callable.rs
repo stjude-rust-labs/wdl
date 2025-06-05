@@ -207,7 +207,7 @@ pub(crate) trait Callable {
             ));
         }
         let markup = html! {
-            section class="parameter__section" {
+            div class="parameter__section" {
                 h2 id="inputs" class="main__section-header" { "Inputs" }
                 @for html in inner_markup {
                     (html)
@@ -221,7 +221,7 @@ pub(crate) trait Callable {
     /// Render the outputs of the callable.
     fn render_outputs(&self, assets: &Path) -> Markup {
         html! {
-            section class="main__section" {
+            div class="main__section" {
                 h2 id="outputs" class="main__section-header" { "Outputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Expression", "Description"],

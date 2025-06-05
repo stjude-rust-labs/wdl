@@ -359,42 +359,44 @@ impl Document {
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
             div class="main__container" {
-                h1 id="title" class="main__title" { (self.name()) }
-                // TODO: does this need better styling?
-                h3 class="main__section-subheader" { "WDL Version: " (self.version()) }
-                article id="preamble" class="markdown-body prose" data-theme="dark" { (self.preamble()) }
-                div class="main__section" {
-                    h2 id="toc" class="main__section-header" { "Table of Contents" }
-                    div class="main__table-outer-container" {
-                        div class="main__table-inner-container" {
-                            table class="main__table" {
-                                thead { tr {
-                                    th { "Page" }
-                                    th { "Type" }
-                                    th { "Description" }
-                                }}
-                                tbody {
-                                    @for page in &self.local_pages {
-                                        tr {
-                                            td class="text-violet-400" {
-                                                a href=(page.0.to_string_lossy()) { (page.1.name()) }
-                                            }
-                                            td { code {
-                                                @match page.1.page_type() {
-                                                    PageType::Struct(_) => { "struct" }
-                                                    PageType::Task(_) => { "task" }
-                                                    PageType::Workflow(_) => { "workflow" }
-                                                    // Index pages should not link to other index pages.
-                                                    PageType::Index(_) => { "ERROR" }
+                article id="preamble" class="prose prose-slate prose-invert" {
+                    h1 id="title" class="main__title" { (self.name()) }
+                    // TODO: does this need better styling?
+                    h3 class="main__section-subheader" { "WDL Version: " (self.version()) }
+                    (self.preamble())
+                    div class="main__section" {
+                        h2 id="toc" class="main__section-header" { "Table of Contents" }
+                        div class="main__table-outer-container" {
+                            div class="main__table-inner-container" {
+                                table class="main__table" {
+                                    thead { tr {
+                                        th { "Page" }
+                                        th { "Type" }
+                                        th { "Description" }
+                                    }}
+                                    tbody {
+                                        @for page in &self.local_pages {
+                                            tr {
+                                                td class="text-violet-400" {
+                                                    a href=(page.0.to_string_lossy()) { (page.1.name()) }
                                                 }
-                                            } }
-                                            td {
-                                                @match page.1.page_type() {
-                                                    PageType::Struct(_) => { "N/A" }
-                                                    PageType::Task(t) => { (t.description(true)) }
-                                                    PageType::Workflow(w) => { (w.description(true)) }
-                                                    // Index pages should not link to other index pages.
-                                                    PageType::Index(_) => { "ERROR" }
+                                                td { code {
+                                                    @match page.1.page_type() {
+                                                        PageType::Struct(_) => { "struct" }
+                                                        PageType::Task(_) => { "task" }
+                                                        PageType::Workflow(_) => { "workflow" }
+                                                        // Index pages should not link to other index pages.
+                                                        PageType::Index(_) => { "ERROR" }
+                                                    }
+                                                } }
+                                                td {
+                                                    @match page.1.page_type() {
+                                                        PageType::Struct(_) => { "N/A" }
+                                                        PageType::Task(t) => { (t.description(true)) }
+                                                        PageType::Workflow(w) => { (w.description(true)) }
+                                                        // Index pages should not link to other index pages.
+                                                        PageType::Index(_) => { "ERROR" }
+                                                    }
                                                 }
                                             }
                                         }

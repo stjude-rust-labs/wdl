@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@import "./markdown.css";
+/* @import "./markdown.css"; */
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -69,7 +69,7 @@
     @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
   }
   .layout__main-center {
-    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
+    @apply flex-grow bg-slate-950 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
   }
 
   /* should take up w-72 space and NOT grow or shrink */
@@ -88,13 +88,13 @@
     @apply flex flex-col;
   }
   .main__section-header {
-    @apply text-2xl text-slate-50 mt-8 mb-4;
+    @apply text-2xl mt-8 mb-4;
   }
   .main__section-subheader {
-    @apply text-lg text-slate-50 mt-8 mb-4;
+    @apply text-lg mt-8 mb-4;
   }
   .main__section-text {
-    @apply mt-3 text-slate-300 text-sm;
+    @apply mt-3 text-sm;
   }
   /* We need tables to be scrollable on the X axis */
   .main__table-outer-container {
@@ -107,13 +107,13 @@
     @apply mt-3 table-fixed;
   }
   .main__table th {
-    @apply text-slate-50 text-left py-3.5 border-b border-b-slate-700 pr-5;
+    @apply text-left py-3.5 border-b border-b-slate-700 pr-5;
   }
   .main__table td {
-    @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
+    @apply text-left pr-5 py-4 border-b border-b-slate-800;
   }
   .main__table td code {
-    @apply inline text-slate-200 border border-slate-700 bg-slate-800 rounded-md font-mono text-[0.8em] p-[0.2em];
+    @apply inline border border-slate-700 bg-slate-800 rounded-md font-mono text-[0.8em] p-[0.2em];
   }
 
   .docs-tree__container {
