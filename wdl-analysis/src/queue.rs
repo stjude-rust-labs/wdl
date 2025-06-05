@@ -898,17 +898,13 @@ pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> S
 
 /// Finds an identifier token at the specified `TextSize` offset in the CST.
 fn find_identifier_at_offset(node: &SyntaxNode, offset: TextSize) -> Result<Option<String>> {
-    if let Some(token) = node
+    match node
         .token_at_offset(offset)
         .find(|t| t.kind() == SyntaxKind::Ident)
     {
-        let range = token.text_range();
-        if !range.is_empty() && range.contains_inclusive(offset) {
-            return Ok(Some(token.text().to_string()));
-        }
+        None => Ok(None),
+        Some(token) => Ok(Some(token.text().to_string())),
     }
-
-    Ok(None)
 }
 
 /// Searches for a definition of the given identifier in the AST.
@@ -968,7 +964,7 @@ fn source_position(index: &LineIndex, offset: TextSize) -> Result<SourcePosition
     Ok(SourcePosition::new(line_col.line, line_col.col))
 }
 
-/// Converts a AST `Span` to LSP source position range.
+/// Converts an AST `Span` to LSP source position range.
 fn range_from_span(span: Span, index: &Arc<LineIndex>) -> Result<Range<SourcePosition>> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
