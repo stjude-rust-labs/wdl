@@ -129,16 +129,14 @@ pub(crate) fn render_meta_map(
         return None;
     }
 
-    let external_link = external_help_item.map(|v| {
-        match v {
-            MetadataValue::String(s) => {
-                let text = s.text().expect("meta string should not be interpolated");
-                let mut buffer = String::new();
-                text.unescape_to(&mut buffer);
-                Some(buffer)
-            },
-            _ => None,
+    let external_link = external_help_item.map(|v| match v {
+        MetadataValue::String(s) => {
+            let text = s.text().expect("meta string should not be interpolated");
+            let mut buffer = String::new();
+            text.unescape_to(&mut buffer);
+            Some(buffer)
         }
+        _ => None,
     });
     let external_link_on_click = if let Some(Some(link)) = external_link {
         Some(format!("window.open('{}', '_blank')", link))
