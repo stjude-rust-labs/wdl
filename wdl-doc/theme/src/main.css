@@ -1,5 +1,5 @@
-/* FIXME: remove !important, known anti-pattern that leads to CSS specificity wars */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "./markdown.css";
 
 /* Dark mode enabled with the `dark` class */

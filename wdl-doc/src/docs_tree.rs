@@ -913,18 +913,16 @@ impl DocsTree {
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
-            div class="" {
-                h1 class="" { "Home" }
-                @if let Some(homepage) = &self.homepage {
-                    div class="markdown-body" data-theme="dark" {
-                        (Markdown(std::fs::read_to_string(homepage)?).render())
-                    }
-                } @else {
-                    div class="flex flex-col flex-grow items-center justify-center h-full w-full gap-y-2 pt-8" {
-                        img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
-                        h2 { "There's nothing to see on this page" }
-                        p { "The markdown file for this page wasn't supplied." }
-                    }
+            h1 class="" { "Home" }
+            @if let Some(homepage) = &self.homepage {
+                article class="markdown-body prose" data-theme="dark" {
+                    (Markdown(std::fs::read_to_string(homepage)?).render())
+                }
+            } @else {
+                div class="flex flex-col flex-grow items-center justify-center h-full w-full gap-y-2 pt-8" {
+                    img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
+                    h2 { "There's nothing to see on this page" }
+                    p { "The markdown file for this page wasn't supplied." }
                 }
             }
         };

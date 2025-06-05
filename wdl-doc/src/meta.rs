@@ -149,7 +149,7 @@ pub(crate) fn render_meta_map(
     Some(html! {
         div class="" {
             @if let Some(help) = help_item {
-                p class="" {
+                article class="prose" {
                     (render_value(help, summarize_if_needed))
                 }
             }
