@@ -361,7 +361,10 @@ where
                             completed.send(result).ok();
                         }
                         Err(err) => {
-                            debug!("error occurred while completing the request: {err:?}")
+                            debug!(
+                                "error occurred while completing the goto definition request: \
+                                 {err:?}"
+                            )
                         }
                     }
                 }
@@ -777,9 +780,14 @@ where
 
     /// Finds the definition location for an identifier at the given position.
     ///
-    /// Searches the document and its imports (doesn't work now) for the
-    /// definition of the identifier at the specified position, returning
-    /// the location if found.
+    /// Searches the document and its imports for the definition of the
+    /// identifier at the specified position, returning the location if
+    /// found.
+    ///
+    /// * If a definition is found for the identifier then a
+    ///   [`GotoDefinitionLocation`] contanining the URI and range is returned
+    ///   wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
     fn goto_definition(
         &self,
         document: Url,
@@ -792,9 +800,11 @@ where
             .get_index(&document)
             .ok_or_else(|| anyhow!("document not found in graph"))?;
 
-        let lines = match graph.get(index).parse_state() {
+        let node = graph.get(index);
+
+        let lines = match node.parse_state() {
             ParseState::Parsed { lines, .. } => lines,
-            _ => return Ok(None),
+            _ => return Err(anyhow!("failed to parse document `{uri}`", uri = document)),
         };
 
         let line_col = match encoding {
@@ -810,11 +820,10 @@ where
                         col: position.character,
                     },
                 )
-                .ok_or_else(|| anyhow!("invalid uth-16 position"))?,
+                .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?,
         };
 
-        let root = graph
-            .get(index)
+        let root = node
             .root()
             .ok_or_else(|| anyhow!("document root not available for {}", document))?;
 
@@ -824,7 +833,7 @@ where
             .offset(line_col)
             .ok_or_else(|| anyhow!("line_col is invalid"))?;
 
-        let ident = match find_identifier_at_offset(ast.inner(), offset.into())? {
+        let ident = match find_identifier_at_offset(ast.inner(), offset)? {
             Some(id) => id,
             None => return Ok(None),
         };
@@ -841,7 +850,7 @@ where
                 None => continue,
             };
 
-            let uri = match graph.get(index).uri().join(text.text()) {
+            let uri = match node.uri().join(text.text()) {
                 Ok(uri) => uri,
                 Err(_) => continue,
             };
@@ -887,19 +896,14 @@ pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> S
     }
 }
 
-/// Finds an identifier token at the specified byte offset in the CST.
-fn find_identifier_at_offset(node: &SyntaxNode, offset: usize) -> Result<Option<String>> {
-    let text_size_offset = TextSize::try_from(offset)
-        .map_err(|_| anyhow!("offset {} out of bounds for TextSize", offset))?;
-
+/// Finds an identifier token at the specified `TextSize` offset in the CST.
+fn find_identifier_at_offset(node: &SyntaxNode, offset: TextSize) -> Result<Option<String>> {
     if let Some(token) = node
-        .token_at_offset(text_size_offset)
+        .token_at_offset(offset)
         .find(|t| t.kind() == SyntaxKind::Ident)
     {
-        let token_range = token.text_range();
-        if token_range.contains_inclusive(text_size_offset)
-            && token_range.start() != token_range.end()
-        {
+        let range = token.text_range();
+        if !range.is_empty() && range.contains_inclusive(offset) {
             return Ok(Some(token.text().to_string()));
         }
     }

@@ -61,15 +61,6 @@ pub enum ProgressKind {
     Analyzing,
 }
 
-/// Represents a location for goto definition results.
-#[derive(Debug, Clone)]
-pub struct GotoDefinitionLocation {
-    /// The URI of the document containing the definition.
-    pub uri: Url,
-    /// The range of the definition in the document.
-    pub range: Range<SourcePosition>,
-}
-
 impl fmt::Display for ProgressKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -432,6 +423,15 @@ impl DiagnosticsConfig {
             unnecessary_function_call: None,
         }
     }
+}
+
+/// Represents a location for goto definition results.
+#[derive(Debug, Clone)]
+pub struct GotoDefinitionLocation {
+    /// The URI of the document containing the definition.
+    pub uri: Url,
+    /// The range of the definition in the document.
+    pub range: Range<SourcePosition>,
 }
 
 /// Represents a Workflow Description Language (WDL) document analyzer.
