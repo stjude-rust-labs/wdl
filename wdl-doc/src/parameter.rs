@@ -190,9 +190,9 @@ where
         .any(|param| param.render_remaining_meta(assets).is_some());
 
     html! {
-        div class="parameter__table-outer-container" {
-            div class="parameter__table-inner-container" {
-                table class="parameter__table" {
+        div class="main__table-outer-container" {
+            div class="main__table-inner-container" {
+                table class="main__table" {
                     thead { tr {
                         @for header in headers {
                             th { (header) }

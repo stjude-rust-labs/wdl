@@ -112,13 +112,14 @@ impl Workflow {
         headers.extend(inner_headers);
 
         let markup = html! {
-            div class="callable__container" {
-                section class="callable__section" {
-                    h1 id="title" class="callable__title" { (self.pretty_name()) }
+            div class="main__container" {
+                section class="main__section" {
+                    h1 id="title" class="main__title" { (self.pretty_name()) }
                     @if let Some(category) = self.category() {
-                        h2 class="callable__section-subheader" { "Category: " (category) }
+                        // TODO style this better
+                        h3 class="main__section-subheader" { "Category: " (category) }
                     }
-                    p class="callable__section-text" {
+                    article class="markdown-body prose" {
                         (self.description(false))
                     }
                 }
