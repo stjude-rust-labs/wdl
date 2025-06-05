@@ -77,50 +77,44 @@
     @apply w-72 max-xl:hidden;
   }
 
-  .callable__container {
+  .main__container {
     @apply flex flex-col gap-y-6;
   }
 
-  .callable__title {
-    @apply text-5xl text-slate-50;
+  .main__title {
+    @apply text-5xl text-slate-50 mt-8 mb-4;
   }
-  .callable__section {
+  .main__section {
     @apply flex flex-col;
   }
-  .callable__section-header {
-    @apply text-2xl text-slate-50;
+  .main__section-header {
+    @apply text-2xl text-slate-50 mt-8 mb-4;
   }
-  .callable__section-subheader {
-    @apply mt-8 text-lg text-slate-50;
+  .main__section-subheader {
+    @apply text-lg text-slate-50 mt-8 mb-4;
   }
-  .callable__section-text {
+  .main__section-text {
     @apply mt-3 text-slate-300 text-sm;
   }
   /* We need tables to be scrollable on the X axis */
-  .parameter__table-outer-container {
+  .main__table-outer-container {
     @apply overflow-x-auto dark-scrollbar;
   }
-  .parameter__table-inner-container {
+  .main__table-inner-container {
     @apply w-3xl md:w-4xl lg:w-auto;
   }
-  .parameter__table {
+  .main__table {
     @apply mt-3 table-fixed;
   }
-  .parameter__table details summary + * {
-    @apply mt-2;
-  }
-  .parameter__table th {
+  .main__table th {
     @apply text-slate-50 text-left py-3.5 border-b border-b-slate-700 pr-5;
   }
-  .parameter__table td {
+  .main__table td {
     @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
   }
-  .parameter__table td code {
+  .main__table td code {
     @apply inline text-slate-200 border border-slate-700 bg-slate-800 rounded-md font-mono text-[0.8em] p-[0.2em];
   }
-  /* workflow meta-specific, renders <ul> + <li> */
-  .callable__meta-records {}
-  .callable__meta-record {}
 
   .docs-tree__container {
     @apply flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;

@@ -772,7 +772,7 @@ impl DocsTree {
                         }
                     }
                 }
-                div x-cloak class="w-full h-full rounded-md pt-2 pl-2 overflow-x-auto overflow-y-scroll" {
+                div x-cloak class="w-full h-full rounded-md pt-2 pl-2 overflow-x-clip overflow-y-scroll" {
                     ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="w-4 h-4" alt="Directory icon";
@@ -913,7 +913,7 @@ impl DocsTree {
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
-            h1 class="" { "Home" }
+            h1 class="main__title" { "Home" }
             @if let Some(homepage) = &self.homepage {
                 article class="markdown-body prose" data-theme="dark" {
                     (Markdown(std::fs::read_to_string(homepage)?).render())
@@ -921,7 +921,7 @@ impl DocsTree {
             } @else {
                 div class="flex flex-col flex-grow items-center justify-center h-full w-full gap-y-2 pt-8" {
                     img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
-                    h2 { "There's nothing to see on this page" }
+                    h2 class="main__section-header" { "There's nothing to see on this page" }
                     p { "The markdown file for this page wasn't supplied." }
                 }
             }

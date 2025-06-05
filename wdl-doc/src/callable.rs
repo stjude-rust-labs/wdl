@@ -135,7 +135,7 @@ pub(crate) trait Callable {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
-                h3 id="inputs-required-inputs" class="parameter__section-subheader" { "Required Inputs" }
+                h3 id="inputs-required-inputs" class="main__section-subheader" { "Required Inputs" }
                 (render_parameter_table(&["Name", "Type", "Description"], iter, assets))
             });
         };
@@ -146,7 +146,7 @@ pub(crate) trait Callable {
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
         let group_tables = self.input_groups().into_iter().map(|group| {
             html! {
-                h3 id=(group.id()) class="parameter__section-subheader" { (group.display_name()) }
+                h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
                     self.inputs_in_group(&group),
@@ -170,7 +170,7 @@ pub(crate) trait Callable {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
-                h3 id="inputs-other-inputs" class="parameter__section-subheader" { "Other Inputs" }
+                h3 id="inputs-other-inputs" class="main__section-subheader" { "Other Inputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Default", "Description"],
                     iter,
@@ -208,7 +208,7 @@ pub(crate) trait Callable {
         }
         let markup = html! {
             section class="parameter__section" {
-                h2 id="inputs" class="parameter__section-header" { "Inputs" }
+                h2 id="inputs" class="main__section-header" { "Inputs" }
                 @for html in inner_markup {
                     (html)
                 }
@@ -221,8 +221,8 @@ pub(crate) trait Callable {
     /// Render the outputs of the callable.
     fn render_outputs(&self, assets: &Path) -> Markup {
         html! {
-            section class="parameter__section" {
-                h2 id="outputs" class="parameter__section-header" { "Outputs" }
+            section class="main__section" {
+                h2 id="outputs" class="main__section-header" { "Outputs" }
                 (render_parameter_table(
                     &["Name", "Type", "Expression", "Description"],
                     self.outputs().iter(),
