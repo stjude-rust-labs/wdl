@@ -386,18 +386,32 @@ impl<'a> CommandContext<'a> {
 fn is_quoted(expr: &Expr) -> bool {
     let mut opened = false;
     let mut name = false;
+
     for c in expr.descendants::<Expr>() {
-        match c.kind() {
-            SyntaxKind::LiteralStringNode => {
-                let t = c.text().to_string();
-                t.match_indices(&['\'', '"']).for_each(|(..)| {
-                    if opened && name {
-                        name = false;
+        match c {
+            Expr::Literal(LiteralExpr::String(ref s)) => {
+                for p in s.parts() {
+                    match p {
+                        StringPart::Text(t) => {
+                            let mut buffer = String::new();
+                            t.unescape_to(&mut buffer);
+                            buffer.match_indices(&['\'', '"']).for_each(|(..)| {
+                                if opened && name {
+                                    name = false;
+                                }
+                                opened = !opened;
+                            });
+                        }
+                        StringPart::Placeholder(_placeholder) => {
+                            if !opened {
+                                return false;
+                            }
+                            name = true;
+                        }
                     }
-                    opened = !opened;
-                });
+                }
             }
-            SyntaxKind::NameRefExprNode => {
+            Expr::NameRef(_) => {
                 if !opened {
                     return false;
                 }
@@ -416,36 +430,14 @@ fn evaluates_to_literal(expr: &Expr) -> bool {
             if s.text().is_some() {
                 return true;
             }
-            let mut opened = false;
-            let mut name = false;
-            for p in s.parts() {
-                match p {
-                    StringPart::Text(t) => {
-                        let mut buffer = String::new();
-                        t.unescape_to(&mut buffer);
-                        buffer.match_indices(&['\'', '"']).for_each(|(..)| {
-                            if opened && name {
-                                name = false;
-                            }
-                            opened = !opened;
-                        });
-                    }
-                    StringPart::Placeholder(_placeholder) => {
-                        if !opened {
-                            return false;
-                        }
-                        name = true;
-                    }
-                }
-            }
-            !name
+            is_quoted(expr)
         }
         Expr::Literal(_) => true,
         Expr::Call(c) => match c.target().text() {
             "sep" => evaluates_to_literal(
                 &c.arguments()
                     .nth(1)
-                    .expect("`sep` call should have two arguments")),
+                    .expect("`sep` call should have two arguments"),
             ),
             "quote" | "squote" => true,
             _ => false,
@@ -734,6 +726,7 @@ impl Visitor for ShellCheckRule {
 mod tests {
     use ftree::FenwickTree;
     use pretty_assertions::assert_eq;
+    use wdl_ast::Document;
 
     use super::ShellCheckReplacement;
     use super::normalize_replacements;
@@ -796,5 +789,115 @@ mod tests {
         let mut fixer = Fixer::new(ref_str);
         fixer.apply_replacement(rep);
         assert_eq!(fixer.value(), expected);
+    }
+
+    #[test]
+    fn test_is_quoted() {
+        let (document, _diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    input {
+        String foo = "bar"
+        Int baz = 42
+        Array[File] arr = ["a", "b", "c"]
+    }
+    command {
+        # Both sides of the addition are literals
+        echo ~{"hello" + " world"}
+        # This contains an unquoted variable.
+        echo ~{"hello " + foo + " world"}
+        # This contains a quoted variable.
+        echo ~{"hello '" + foo + "' world"}
+    }
+}
+"#,
+        );
+
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        let command = tasks[0].command().expect("should have a command section");
+        let parts = command.parts().collect::<Vec<_>>();
+
+        assert!(super::is_quoted(
+            &parts[1].clone().unwrap_placeholder().expr()
+        ));
+        assert_eq!(
+            super::is_quoted(&parts[3].clone().unwrap_placeholder().expr()),
+            false
+        );
+        assert!(super::is_quoted(
+            &parts[5].clone().unwrap_placeholder().expr()
+        ));
+    }
+
+    #[test]
+    fn test_evaluates_to_literal() {
+        let (document, _diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    input {
+        String foo = "bar"
+        Int baz = 42
+        Array[File] arr = ["a", "b", "c"]
+    }
+    command {
+        # Both sides of the addition are literals
+        echo ~{"hello" + " world"}
+        # Non-string literals are handled upstream
+        echo ~{baz}
+        # This is not a literal because of the unquoted
+        # placeholder substitution.
+        echo ~{"hello " + foo + " world"}
+        # This is a literal because of the quoted
+        # placeholder substitution.
+        echo ~{"hello '" + foo + "' world"}
+        # This is a literal because all array elements are literals.
+        echo ~{sep(" ", ["a", "b", "c"])}
+        # This is not a literal because the array is not
+        # guaranteed to be all literals.
+        echo ~{sep(" ", arr)}
+        # Surrounding with quotes makes it a literal.
+        echo ~{sep(" ", quote(arr))}
+    }
+}
+"#,
+        );
+
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        let command = tasks[0].command().expect("should have a command section");
+        let parts = command.parts().collect::<Vec<_>>();
+
+        assert!(super::evaluates_to_literal(
+            &parts[1].clone().unwrap_placeholder().expr()
+        ));
+
+        assert_eq!(
+            super::evaluates_to_literal(&parts[5].clone().unwrap_placeholder().expr()),
+            false
+        );
+
+        assert!(super::evaluates_to_literal(
+            &parts[7].clone().unwrap_placeholder().expr()
+        ));
+
+        assert!(super::evaluates_to_literal(
+            &parts[9].clone().unwrap_placeholder().expr()
+        ));
+
+        assert_eq!(
+            super::evaluates_to_literal(&parts[11].clone().unwrap_placeholder().expr()),
+            false
+        );
+
+        assert!(super::evaluates_to_literal(
+            &parts[13].clone().unwrap_placeholder().expr()
+        ));
     }
 }
