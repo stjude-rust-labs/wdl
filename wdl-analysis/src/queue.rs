@@ -37,6 +37,8 @@ use wdl_ast::Severity;
 use wdl_ast::Span;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
+use wdl_ast::SyntaxToken;
+use wdl_ast::TreeToken;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
@@ -790,94 +792,342 @@ where
     /// * Else, [`None`] is returned.
     fn goto_definition(
         &self,
-        document: Url,
+        document_uri: Url,
         position: SourcePosition,
         encoding: SourcePositionEncoding,
     ) -> Result<Option<GotoDefinitionLocation>> {
         let graph = self.graph.read();
-
         let index = graph
-            .get_index(&document)
+            .get_index(&document_uri)
             .ok_or_else(|| anyhow!("document not found in graph"))?;
 
-        let node = graph.get(index);
+        let (root, lines, analysis_doc) = {
+            let node = graph.get(index);
 
-        let lines = match node.parse_state() {
-            ParseState::Parsed { lines, .. } => lines,
-            _ => return Err(anyhow!("failed to parse document `{uri}`", uri = document)),
+            let (root, lines) = match node.parse_state() {
+                ParseState::Parsed { lines, root, .. } => {
+                    (SyntaxNode::new_root(root.clone()), lines.clone())
+                }
+                _ => {
+                    debug!("document not yet parsed: {}", document_uri);
+                    return Ok(None);
+                }
+            };
+
+            let analysis_doc = match node.document() {
+                Some(doc) => doc.clone(),
+                None => {
+                    debug!("document analysis data not available for {}", document_uri);
+                    if graph.is_rooted(index) {
+                        debug!("marking document for reanalysis: {}", document_uri);
+                        drop(graph);
+                        let mut write_graph = self.graph.write();
+                        write_graph.get_mut(index).reanalyze();
+                    }
+                    return Ok(None);
+                }
+            };
+
+            (root, lines, analysis_doc)
         };
 
-        let line_col = match encoding {
-            SourcePositionEncoding::UTF8 => line_index::LineCol {
-                line: position.line,
-                col: position.character,
-            },
-            SourcePositionEncoding::UTF16 => lines
-                .to_utf8(
-                    line_index::WideEncoding::Utf16,
-                    line_index::WideLineCol {
-                        line: position.line,
-                        col: position.character,
-                    },
-                )
-                .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?,
+        let offset = position_to_offset(&lines, position, encoding)?;
+        let token = match find_identifier_token_at_offset(&root, offset) {
+            Some(tok) => tok,
+            None => {
+                // TODO: if we throw an error the lsp crashes on other editors
+                // vscode extension kicks in and restarts the lsp automatically
+                //
+                // anyhow!("no identifier found at position")
+                debug!("no identifier found at position");
+                return Ok(None);
+            }
         };
 
-        let root = node
-            .root()
-            .ok_or_else(|| anyhow!("document root not available for {}", document))?;
+        let ident_text = token.text();
+        let parent_node = token
+            .parent()
+            .ok_or_else(|| anyhow!("identifier token has no parent"))?;
 
-        let ast = root.ast().unwrap_v1();
+        debug!("resolving location for {token:?}");
 
-        let offset = lines
-            .offset(line_col)
-            .ok_or_else(|| anyhow!("line_col is invalid"))?;
-
-        let ident = match find_identifier_at_offset(ast.inner(), offset)? {
-            Some(id) => id,
-            None => return Ok(None),
-        };
-
-        if let Some(location) = find_definition_in_ast(&ast, &ident, &document, lines)? {
+        // TODO: context
+        if let Some(location) = self.resolve_by_context(
+            &parent_node,
+            &token,
+            &analysis_doc,
+            &document_uri,
+            &lines,
+            &graph,
+        )? {
             return Ok(Some(location));
         }
 
-        // TODO: imports doesn't works or if it does, i am getting squiggly lines for
-        // them
-        for import in ast.imports() {
-            let text = match import.uri().text() {
-                Some(text) => text,
-                None => continue,
-            };
+        // TODO: scope
+        if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
+            if let Some(name_def) = scope_ref.lookup(ident_text) {
+                return Ok(Some(location(
+                    &Arc::new(document_uri),
+                    name_def.span(),
+                    &lines,
+                )?));
+            }
+        }
 
-            let uri = match node.uri().join(text.text()) {
-                Ok(uri) => uri,
-                Err(_) => continue,
-            };
+        self.resolve_global_identifier(&analysis_doc, ident_text, &document_uri, &lines, &graph)
+    }
 
-            let index = match graph.get_index(&uri) {
-                Some(index) => index,
-                None => continue,
-            };
+    /// Resolves identifier definition based on their parent node's syntax kind
+    fn resolve_by_context(
+        &self,
+        parent_node: &SyntaxNode,
+        token: &SyntaxToken,
+        analysis_doc: &Document,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+        graph: &DocumentGraph,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        match parent_node.kind() {
+            SyntaxKind::TypeRefNode => {
+                self.resolve_type_reference(analysis_doc, token.text(), document_uri, lines, graph)
+            }
 
-            let node = graph.get(index);
-            let document = match node.document() {
-                Some(doc) => doc,
-                None => continue,
-            };
+            SyntaxKind::CallTargetNode => self.resolve_call_target(
+                parent_node,
+                token,
+                analysis_doc,
+                document_uri,
+                lines,
+                graph,
+            ),
+            SyntaxKind::ImportStatementNode => {
+                self.resolve_import_namespace(parent_node, token, document_uri, lines)
+            }
 
-            let lines = match node.parse_state() {
-                ParseState::Parsed { lines, .. } => lines,
-                _ => continue,
-            };
+            // TODO:
+            SyntaxKind::AccessExprNode
+            | SyntaxKind::BoundDeclNode
+            | SyntaxKind::UnboundDeclNode
+            | SyntaxKind::ScatterStatementNode
+            | SyntaxKind::ImportAliasNode
+            | SyntaxKind::StructDefinitionNode
+            | SyntaxKind::TaskDefinitionNode
+            | SyntaxKind::WorkflowDefinitionNode => {
+                debug!("NOT YET IMPLEMENTED: {kind:?}", kind = parent_node.kind());
+                Ok(None)
+            }
 
-            let ast = match document.root().ast().into_v1() {
-                Some(ast) => ast,
-                None => continue,
-            };
+            // handled by scope resolution
+            SyntaxKind::NameRefExprNode => Ok(None),
+            _ => Ok(None),
+        }
+    }
 
-            if let Some(location) = find_definition_in_ast(&ast, &ident, &uri, lines)? {
-                return Ok(Some(location));
+    /// Resolves type references to their definition locations.
+    ///
+    /// Searches for struct definitions in the current document and imported
+    /// namespaces
+    fn resolve_type_reference(
+        &self,
+        analysis_doc: &Document,
+        ident_text: &str,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+        graph: &DocumentGraph,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        // NOTE: local structs
+        if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
+            let (uri, def_lines) = if let Some(ns_name) = struct_info.namespace() {
+                let ns = analysis_doc.namespace(ns_name).unwrap();
+                let imported_lines = graph
+                    .get(graph.get_index(ns.source()).unwrap())
+                    .parse_state()
+                    .lines()
+                    .unwrap()
+                    .clone();
+
+                (ns.source(), imported_lines)
+            } else {
+                (&Arc::new(document_uri.clone()), lines.clone())
+            };
+            return Ok(Some(location(uri, struct_info.name_span(), &def_lines)?));
+        };
+
+        // NOTE: imported structs
+        for (_ns_name_str, ns_info) in analysis_doc.namespaces() {
+            if let Some(imported_doc) = graph
+                .get(graph.get_index(ns_info.source()).unwrap())
+                .document()
+            {
+                if let Some(struct_info) = imported_doc.struct_by_name(ident_text) {
+                    let imported_lines = graph
+                        .get(graph.get_index(ns_info.source()).unwrap())
+                        .parse_state()
+                        .lines()
+                        .unwrap()
+                        .clone();
+
+                    return Ok(Some(location(
+                        ns_info.source(),
+                        struct_info.name_span(),
+                        &imported_lines,
+                    )?));
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    /// Resolves call targets to their definition locations.
+    ///
+    /// Handles both local and namespaced function calls, resolving them to task
+    /// and workflow definition in the current document or imported
+    /// namespaces.
+    fn resolve_call_target(
+        &self,
+        parent_node: &SyntaxNode,
+        token: &SyntaxToken,
+        analysis_doc: &Document,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+        graph: &DocumentGraph,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        let ident_text = token.text();
+        let target = wdl_ast::v1::CallTarget::cast(parent_node.clone()).unwrap();
+        let target_names: Vec<_> = target.names().collect();
+        let is_callee_name_clicked = target_names.last().is_some_and(|n| n.text() == ident_text);
+
+        if is_callee_name_clicked {
+            let callee_name_str = token.text();
+
+            // NOTE: namespaced (foo.bar)
+            if target_names.len() > 1 {
+                let namespaced_name_str = target_names.first().unwrap().text();
+                if let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) {
+                    if let Some(imported_doc) = graph
+                        .get(graph.get_index(ns_info.source()).unwrap())
+                        .document()
+                    {
+                        let imported_lines = graph
+                            .get(graph.get_index(ns_info.source()).unwrap())
+                            .parse_state()
+                            .lines()
+                            .unwrap()
+                            .clone();
+
+                        if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
+                            return Ok(Some(location(
+                                ns_info.source(),
+                                task_def.name_span(),
+                                &imported_lines,
+                            )?));
+                        }
+
+                        if let Some(wf_def) = imported_doc
+                            .workflow()
+                            .filter(|w| w.name() == callee_name_str)
+                        {
+                            return Ok(Some(location(
+                                ns_info.source(),
+                                wf_def.name_span(),
+                                &imported_lines,
+                            )?));
+                        }
+                    }
+                }
+            } else {
+                // NOTE: local calls
+                if let Some(task_def) = analysis_doc.task_by_name(callee_name_str) {
+                    return Ok(Some(location(
+                        &Arc::new(document_uri.clone()),
+                        task_def.name_span(),
+                        lines,
+                    )?));
+                }
+
+                if let Some(wf_def) = analysis_doc
+                    .workflow()
+                    .filter(|w| w.name() == callee_name_str)
+                {
+                    return Ok(Some(location(
+                        &Arc::new(document_uri.clone()),
+                        wf_def.name_span(),
+                        lines,
+                    )?));
+                }
+            }
+        } else if let Some(ns_info) = analysis_doc.namespace(token.text()) {
+            return Ok(Some(location(
+                &Arc::new(document_uri.clone()),
+                ns_info.span(),
+                lines,
+            )?));
+        }
+
+        Ok(None)
+    }
+
+    /// Resolves import namespace identifier to their definition locations.
+    fn resolve_import_namespace(
+        &self,
+        parent_node: &SyntaxNode,
+        token: &SyntaxToken,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        let import_stmt = wdl_ast::v1::ImportStatement::cast(parent_node.clone()).unwrap();
+        let ident_text = token.text();
+
+        if import_stmt
+            .explicit_namespace()
+            .is_some_and(|ns_ident| ns_ident.text() == ident_text)
+        {
+            return Ok(Some(location(
+                &Arc::new(document_uri.clone()),
+                token.span(),
+                lines,
+            )?));
+        }
+
+        Ok(None)
+    }
+
+    /// Searches for global definitions(structs, tasks, workflows) in the
+    /// current document and all imported namespaces
+    fn resolve_global_identifier(
+        &self,
+        analysis_doc: &Document,
+        ident_text: &str,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+        graph: &DocumentGraph,
+    ) -> Result<Option<GotoDefinitionLocation>> {
+        if let Some(location) =
+            find_global_definition_in_doc(analysis_doc, ident_text, document_uri, lines)?
+        {
+            return Ok(Some(location));
+        }
+
+        for (_, ns_info) in analysis_doc.namespaces() {
+            if let Some(imported_doc) = graph
+                .get(graph.get_index(ns_info.source()).unwrap())
+                .document()
+            {
+                let imported_lines = graph
+                    .get(graph.get_index(ns_info.source()).unwrap())
+                    .parse_state()
+                    .lines()
+                    .unwrap()
+                    .clone();
+
+                if let Some(location) = find_global_definition_in_doc(
+                    imported_doc,
+                    ident_text,
+                    ns_info.source().as_ref(),
+                    &imported_lines,
+                )? {
+                    return Ok(Some(location));
+                }
             }
         }
 
@@ -896,56 +1146,11 @@ pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> S
     }
 }
 
-/// Finds an identifier token at the specified `TextSize` offset in the CST.
-fn find_identifier_at_offset(node: &SyntaxNode, offset: TextSize) -> Result<Option<String>> {
-    match node
-        .token_at_offset(offset)
+/// Finds an identifier token at the specified `TextSize` offset in the concrete
+/// syntax tree.
+fn find_identifier_token_at_offset(node: &SyntaxNode, offset: TextSize) -> Option<SyntaxToken> {
+    node.token_at_offset(offset)
         .find(|t| t.kind() == SyntaxKind::Ident)
-    {
-        None => Ok(None),
-        Some(token) => Ok(Some(token.text().to_string())),
-    }
-}
-
-/// Searches for a definition of the given identifier in the AST.
-///
-/// order:  workflows -> tasks -> structs
-fn find_definition_in_ast(
-    ast: &wdl_ast::v1::Ast,
-    ident: &str,
-    document_uri: &Url,
-    lines: &Arc<line_index::LineIndex>,
-) -> Result<Option<GotoDefinitionLocation>> {
-    for workflow in ast.workflows() {
-        if workflow.name().text() == ident {
-            let range = range_from_span(workflow.name().span(), lines)?;
-            return Ok(Some(GotoDefinitionLocation {
-                uri: document_uri.clone(),
-                range,
-            }));
-        }
-    }
-
-    for task in ast.tasks() {
-        if task.name().text() == ident {
-            let range = range_from_span(task.name().span(), lines)?;
-            return Ok(Some(GotoDefinitionLocation {
-                uri: document_uri.clone(),
-                range,
-            }));
-        }
-    }
-
-    for struct_def in ast.structs() {
-        if struct_def.name().text() == ident {
-            let range = range_from_span(struct_def.name().span(), lines)?;
-            return Ok(Some(GotoDefinitionLocation {
-                uri: document_uri.clone(),
-                range,
-            }));
-        }
-    }
-    Ok(None)
 }
 
 /// Converts a text size offset to source position.
@@ -964,13 +1169,79 @@ fn source_position(index: &LineIndex, offset: TextSize) -> Result<SourcePosition
     Ok(SourcePosition::new(line_col.line, line_col.col))
 }
 
-/// Converts an AST `Span` to LSP source position range.
-fn range_from_span(span: Span, index: &Arc<LineIndex>) -> Result<Range<SourcePosition>> {
+/// TODO: rename
+fn location(uri: &Arc<Url>, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionLocation> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
+    let range = Range {
+        start: source_position(lines, start_offset)?,
+        end: source_position(lines, end_offset)?,
+    };
 
-    Ok(Range {
-        start: source_position(index, start_offset)?,
-        end: source_position(index, end_offset)?,
+    Ok(GotoDefinitionLocation {
+        uri: uri.as_ref().clone(),
+        range,
     })
+}
+
+/// Finds global structs, tasks and workflow definition in a document
+fn find_global_definition_in_doc(
+    analysis_doc: &Document,
+    ident_text: &str,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+) -> Result<Option<GotoDefinitionLocation>> {
+    if let Some(s) = analysis_doc.struct_by_name(ident_text) {
+        return Ok(Some(location(
+            &Arc::new(document_uri.clone()),
+            s.name_span(),
+            lines,
+        )?));
+    }
+    if let Some(t) = analysis_doc.task_by_name(ident_text) {
+        return Ok(Some(location(
+            &Arc::new(document_uri.clone()),
+            t.name_span(),
+            lines,
+        )?));
+    }
+    if let Some(w) = analysis_doc
+        .workflow()
+        .filter(|w_def| w_def.name() == ident_text)
+    {
+        return Ok(Some(location(
+            &Arc::new(document_uri.clone()),
+            w.name_span(),
+            lines,
+        )?));
+    }
+
+    Ok(None)
+}
+
+/// Converts a source postion to a text offset based on the specified encoding.
+fn position_to_offset(
+    lines: &Arc<LineIndex>,
+    position: SourcePosition,
+    encoding: SourcePositionEncoding,
+) -> Result<TextSize> {
+    let line_col = match encoding {
+        SourcePositionEncoding::UTF8 => line_index::LineCol {
+            line: position.line,
+            col: position.character,
+        },
+        SourcePositionEncoding::UTF16 => lines
+            .to_utf8(
+                line_index::WideEncoding::Utf16,
+                line_index::WideLineCol {
+                    line: position.line,
+                    col: position.character,
+                },
+            )
+            .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?,
+    };
+
+    lines
+        .offset(line_col)
+        .ok_or_else(|| anyhow!("line_col is invalid"))
 }
