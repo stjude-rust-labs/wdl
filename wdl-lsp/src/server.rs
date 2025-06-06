@@ -739,20 +739,6 @@ impl LanguageServer for Server {
                 data: None,
             })?;
 
-        Ok(result.map(|location| {
-            GotoDefinitionResponse::Scalar(Location {
-                uri: location.uri,
-                range: Range {
-                    start: Position {
-                        line: location.range.start.line,
-                        character: location.range.start.character,
-                    },
-                    end: Position {
-                        line: location.range.end.line,
-                        character: location.range.end.character,
-                    },
-                },
-            })
-        }))
+        Ok(result)
     }
 }
