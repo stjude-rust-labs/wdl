@@ -5,6 +5,7 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::panic;
 use std::panic::AssertUnwindSafe;
+use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -17,6 +18,10 @@ use futures::stream::FuturesUnordered;
 use indexmap::IndexSet;
 use line_index::LineIndex;
 use line_index::WideEncoding;
+use lsp_types::GotoDefinitionResponse;
+use lsp_types::Location;
+use lsp_types::Position;
+use lsp_types::Uri;
 use parking_lot::RwLock;
 use petgraph::Direction;
 use petgraph::graph::NodeIndex;
@@ -44,7 +49,6 @@ use wdl_format::element::node::AstNodeFormatExt as _;
 
 use crate::AnalysisResult;
 use crate::DiagnosticsConfig;
-use crate::GotoDefinitionLocation;
 use crate::IncrementalChange;
 use crate::ProgressKind;
 use crate::SourcePosition;
@@ -143,7 +147,7 @@ pub struct GotoDefinitionRequest {
     /// The encoding used for the position.
     pub encoding: SourcePositionEncoding,
     /// The sender for completing the request.
-    pub completed: oneshot::Sender<Option<GotoDefinitionLocation>>,
+    pub completed: oneshot::Sender<Option<GotoDefinitionResponse>>,
 }
 
 /// A simple enumeration to signal a cancellation to the caller.
@@ -795,7 +799,7 @@ where
         document_uri: Url,
         position: SourcePosition,
         encoding: SourcePositionEncoding,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         let graph = self.graph.read();
         let index = graph
             .get_index(&document_uri)
@@ -886,7 +890,7 @@ where
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         match parent_node.kind() {
             SyntaxKind::TypeRefNode => {
                 self.resolve_type_reference(analysis_doc, token.text(), document_uri, lines, graph)
@@ -934,7 +938,7 @@ where
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         // NOTE: local structs
         if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
             let (uri, def_lines) = if let Some(ns_name) = struct_info.namespace() {
@@ -991,7 +995,7 @@ where
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         let ident_text = token.text();
         let target = wdl_ast::v1::CallTarget::cast(parent_node.clone()).unwrap();
         let target_names: Vec<_> = target.names().collect();
@@ -1074,7 +1078,7 @@ where
         token: &SyntaxToken,
         document_uri: &Url,
         lines: &Arc<LineIndex>,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         let import_stmt = wdl_ast::v1::ImportStatement::cast(parent_node.clone()).unwrap();
         let ident_text = token.text();
 
@@ -1101,7 +1105,7 @@ where
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         if let Some(location) =
             find_global_definition_in_doc(analysis_doc, ident_text, document_uri, lines)?
         {
@@ -1153,8 +1157,8 @@ fn find_identifier_token_at_offset(node: &SyntaxNode, offset: TextSize) -> Optio
         .find(|t| t.kind() == SyntaxKind::Ident)
 }
 
-/// Converts a text size offset to source position.
-fn source_position(index: &LineIndex, offset: TextSize) -> Result<SourcePosition> {
+/// Converts a text size offset to LSP position.
+fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
     let line_col = index.line_col(offset);
     let line_col = index
         .to_wide(WideEncoding::Utf16, line_col)
@@ -1166,22 +1170,22 @@ fn source_position(index: &LineIndex, offset: TextSize) -> Result<SourcePosition
             )
         })?;
 
-    Ok(SourcePosition::new(line_col.line, line_col.col))
+    Ok(Position::new(line_col.line, line_col.col))
 }
 
-/// TODO: rename
-fn location(uri: &Arc<Url>, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionLocation> {
+/// Converts a `Span` to an LSP location
+fn location(uri: &Arc<Url>, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionResponse> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
-    let range = Range {
-        start: source_position(lines, start_offset)?,
-        end: source_position(lines, end_offset)?,
+    let range = lsp_types::Range {
+        start: position(lines, start_offset)?,
+        end: position(lines, end_offset)?,
     };
 
-    Ok(GotoDefinitionLocation {
-        uri: uri.as_ref().clone(),
+    Ok(GotoDefinitionResponse::Scalar(Location::new(
+        Uri::from_str(uri.as_str())?,
         range,
-    })
+    )))
 }
 
 /// Finds global structs, tasks and workflow definition in a document
@@ -1190,7 +1194,7 @@ fn find_global_definition_in_doc(
     ident_text: &str,
     document_uri: &Url,
     lines: &Arc<LineIndex>,
-) -> Result<Option<GotoDefinitionLocation>> {
+) -> Result<Option<GotoDefinitionResponse>> {
     if let Some(s) = analysis_doc.struct_by_name(ident_text) {
         return Ok(Some(location(
             &Arc::new(document_uri.clone()),

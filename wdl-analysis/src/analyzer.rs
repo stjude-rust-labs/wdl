@@ -21,6 +21,7 @@ use line_index::LineCol;
 use line_index::LineIndex;
 use line_index::WideEncoding;
 use line_index::WideLineCol;
+use lsp_types::GotoDefinitionResponse;
 use path_clean::clean;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc;
@@ -425,15 +426,6 @@ impl DiagnosticsConfig {
     }
 }
 
-/// Represents a location for goto definition results.
-#[derive(Debug, Clone)]
-pub struct GotoDefinitionLocation {
-    /// The URI of the document containing the definition.
-    pub uri: Url,
-    /// The range of the definition in the document.
-    pub range: Range<SourcePosition>,
-}
-
 /// Represents a Workflow Description Language (WDL) document analyzer.
 ///
 /// By default, analysis parses documents, performs validation checks, resolves
@@ -735,7 +727,7 @@ where
         document: Url,
         position: SourcePosition,
         encoding: SourcePositionEncoding,
-    ) -> Result<Option<GotoDefinitionLocation>> {
+    ) -> Result<Option<GotoDefinitionResponse>> {
         let (tx, rx) = oneshot::channel();
         self.sender
             .send(Request::GotoDefinition(GotoDefinitionRequest {
