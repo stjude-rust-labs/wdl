@@ -810,6 +810,8 @@ task test {
         echo ~{"hello " + foo + " world"}
         # This contains a quoted variable.
         echo ~{"hello '" + foo + "' world"}
+        # This contains a hanging quote.
+        echo ~{"hello '" + foo + " world"}
     }
 }
 "#,
@@ -831,6 +833,10 @@ task test {
         assert!(super::is_quoted(
             &parts[5].clone().unwrap_placeholder().expr()
         ));
+        assert_eq!(
+            super::is_quoted(&parts[7].clone().unwrap_placeholder().expr()),
+            false
+        );
     }
 
     #[test]
