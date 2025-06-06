@@ -5,7 +5,6 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::panic;
 use std::panic::AssertUnwindSafe;
-use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -21,7 +20,6 @@ use line_index::WideEncoding;
 use lsp_types::GotoDefinitionResponse;
 use lsp_types::Location;
 use lsp_types::Position;
-use lsp_types::Uri;
 use parking_lot::RwLock;
 use petgraph::Direction;
 use petgraph::graph::NodeIndex;
@@ -870,11 +868,7 @@ where
         // TODO: scope
         if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
             if let Some(name_def) = scope_ref.lookup(ident_text) {
-                return Ok(Some(location(
-                    &Arc::new(document_uri),
-                    name_def.span(),
-                    &lines,
-                )?));
+                return Ok(Some(location(&document_uri, name_def.span(), &lines)?));
             }
         }
 
@@ -950,9 +944,9 @@ where
                     .unwrap()
                     .clone();
 
-                (ns.source(), imported_lines)
+                (ns.source().as_ref(), imported_lines)
             } else {
-                (&Arc::new(document_uri.clone()), lines.clone())
+                (document_uri, lines.clone())
             };
             return Ok(Some(location(uri, struct_info.name_span(), &def_lines)?));
         };
@@ -1174,7 +1168,7 @@ fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
 }
 
 /// Converts a `Span` to an LSP location
-fn location(uri: &Arc<Url>, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionResponse> {
+fn location(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionResponse> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
     let range = lsp_types::Range {
@@ -1183,7 +1177,7 @@ fn location(uri: &Arc<Url>, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDe
     };
 
     Ok(GotoDefinitionResponse::Scalar(Location::new(
-        Uri::from_str(uri.as_str())?,
+        uri.clone(),
         range,
     )))
 }
@@ -1196,28 +1190,16 @@ fn find_global_definition_in_doc(
     lines: &Arc<LineIndex>,
 ) -> Result<Option<GotoDefinitionResponse>> {
     if let Some(s) = analysis_doc.struct_by_name(ident_text) {
-        return Ok(Some(location(
-            &Arc::new(document_uri.clone()),
-            s.name_span(),
-            lines,
-        )?));
+        return Ok(Some(location(document_uri, s.name_span(), lines)?));
     }
     if let Some(t) = analysis_doc.task_by_name(ident_text) {
-        return Ok(Some(location(
-            &Arc::new(document_uri.clone()),
-            t.name_span(),
-            lines,
-        )?));
+        return Ok(Some(location(document_uri, t.name_span(), lines)?));
     }
     if let Some(w) = analysis_doc
         .workflow()
         .filter(|w_def| w_def.name() == ident_text)
     {
-        return Ok(Some(location(
-            &Arc::new(document_uri.clone()),
-            w.name_span(),
-            lines,
-        )?));
+        return Ok(Some(location(document_uri, w.name_span(), lines)?));
     }
 
     Ok(None)
