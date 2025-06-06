@@ -49,6 +49,7 @@ use crate::Value;
 use crate::WORK_DIR_NAME;
 use crate::config::Config;
 use crate::config::DEFAULT_TASK_SHELL;
+use crate::config::DockerBackendConfig;
 use crate::http::Downloader;
 use crate::http::HttpDownloader;
 use crate::http::Location;
@@ -66,19 +67,19 @@ use crate::v1::memory;
 const INITIAL_EXPECTED_NAMES: usize = 1000;
 
 /// The root guest path for inputs.
-const GUEST_INPUTS_DIR: &str = "/mnt/inputs";
+const GUEST_INPUTS_DIR: &str = "/mnt/task/inputs";
 
 /// The guest working directory.
-const GUEST_WORK_DIR: &str = "/mnt/work";
+const GUEST_WORK_DIR: &str = "/mnt/task/work";
 
 /// The guest path for the command file.
-const GUEST_COMMAND_PATH: &str = "/mnt/command";
+const GUEST_COMMAND_PATH: &str = "/mnt/task/command";
 
 /// The path to the container's stdout.
-const GUEST_STDOUT_PATH: &str = "/stdout";
+const GUEST_STDOUT_PATH: &str = "/mnt/task/stdout";
 
 /// The path to the container's stderr.
-const GUEST_STDERR_PATH: &str = "/stderr";
+const GUEST_STDERR_PATH: &str = "/mnt/task/stderr";
 
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
@@ -290,15 +291,8 @@ impl DockerBackend {
     /// configuration.
     ///
     /// The provided configuration is expected to have already been validated.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the given configuration is not configured to use the docker
-    /// backend.
-    pub async fn new(config: Arc<Config>) -> Result<Self> {
+    pub async fn new(config: Arc<Config>, backend_config: &DockerBackendConfig) -> Result<Self> {
         info!("initializing Docker backend");
-
-        let backend_config = config.backend.as_docker().expect("expected docker backend");
 
         let backend = docker::Backend::initialize_default_with(
             backend::docker::Config::builder()

@@ -57,7 +57,7 @@ use wdl_engine::v1::TaskEvaluator;
 
 /// Regex used to remove both host and guest path prefixes.
 static PATH_PREFIX_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"(attempts[\/\\]\d+[\/\\]|\/mnt\/inputs\/\d+\/)"#).expect("invalid regex")
+    Regex::new(r#"(attempts[\/\\]\d+[\/\\]|\/mnt\/task\/inputs\/\d+\/)"#).expect("invalid regex")
 });
 
 /// Regex used to replace temporary file names in task command files with
@@ -166,7 +166,11 @@ fn configs() -> Vec<config::Config> {
     vec![
         {
             config::Config {
-                backend: BackendConfig::Local(Default::default()),
+                backends: [(
+                    "default".to_string(),
+                    BackendConfig::Local(Default::default()),
+                )]
+                .into(),
                 ..Default::default()
             }
         },
@@ -176,7 +180,11 @@ fn configs() -> Vec<config::Config> {
         #[cfg(target_os = "linux")]
         {
             config::Config {
-                backend: BackendConfig::Docker(Default::default()),
+                backends: [(
+                    "default".to_string(),
+                    BackendConfig::Docker(Default::default()),
+                )]
+                .into(),
                 ..Default::default()
             }
         },
