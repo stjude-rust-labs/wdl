@@ -359,7 +359,7 @@ impl Document {
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
             div class="main__container" {
-                article id="preamble" class="prose prose-slate prose-invert" {
+                article id="preamble" class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
                     h1 id="title" class="main__title" { (self.name()) }
                     // TODO: does this need better styling?
                     h3 class="main__section-subheader" { "WDL Version: " (self.version()) }

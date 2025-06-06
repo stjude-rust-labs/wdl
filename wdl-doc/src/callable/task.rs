@@ -182,7 +182,7 @@ impl Task {
         let markup = html! {
             div class="main__container" {
                 div class="main__section" {
-                    article class="prose prose-slate prose-invert" {
+                    article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
                         h1 id="title" class="main__title" { code { (self.name()) } }
                         (self.description(false))
                         (meta_markup)
