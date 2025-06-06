@@ -332,14 +332,14 @@ fn add_namespace(
                     if prev.namespace.is_none() {
                         document.diagnostics.push(struct_conflicts_with_import(
                             aliased_name,
-                            prev.span,
+                            prev.name_span,
                             span,
                         ));
                     } else {
                         document.diagnostics.push(imported_struct_conflict(
                             aliased_name,
                             span,
-                            prev.span,
+                            prev.name_span,
                             !aliased,
                         ));
                     }
@@ -350,7 +350,8 @@ fn add_namespace(
                 document.structs.insert(
                     aliased_name.to_string(),
                     Struct {
-                        span,
+                        name_span: span,
+                        name: aliased_name.to_string(),
                         offset: s.offset,
                         node: s.node.clone(),
                         namespace: Some(ns.clone()),
@@ -388,14 +389,14 @@ fn add_struct(document: &mut DocumentData, definition: &StructDefinition) {
                 document.diagnostics.push(struct_conflicts_with_import(
                     name.text(),
                     name.span(),
-                    prev.span,
+                    prev.name_span,
                 ))
             }
         } else {
             document.diagnostics.push(name_conflict(
                 name.text(),
                 Context::Struct(name.span()),
-                Context::Struct(prev.span),
+                Context::Struct(prev.name_span),
             ));
         }
         return;
@@ -422,7 +423,8 @@ fn add_struct(document: &mut DocumentData, definition: &StructDefinition) {
     document.structs.insert(
         name.text().to_string(),
         Struct {
-            span: name.span(),
+            name_span: name.span(),
+            name: name.text().to_string(),
             namespace: None,
             offset: definition.span().start(),
             node: definition.inner().green().into(),
