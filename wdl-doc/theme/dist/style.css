@@ -938,6 +938,22 @@
       }
     }
   }
+  .prose-code\:before\:hidden {
+    & :is(:where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))) {
+      &::before {
+        content: var(--tw-content);
+        display: none;
+      }
+    }
+  }
+  .prose-code\:after\:hidden {
+    & :is(:where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))) {
+      &::after {
+        content: var(--tw-content);
+        display: none;
+      }
+    }
+  }
 }
 [x-cloak] {
   display: none !important;
@@ -1431,6 +1447,11 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-content {
+  syntax: "*";
+  initial-value: "";
+  inherits: false;
+}
 @property --tw-leading {
   syntax: "*";
   inherits: false;
@@ -1491,6 +1512,7 @@
       --tw-drop-shadow-color: initial;
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
+      --tw-content: "";
       --tw-leading: initial;
       --tw-duration: initial;
       --tw-translate-x: 0;
