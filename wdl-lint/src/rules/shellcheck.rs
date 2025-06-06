@@ -445,7 +445,7 @@ fn evaluates_to_literal(expr: &Expr) -> bool {
             "sep" => evaluates_to_literal(
                 &c.arguments()
                     .nth(1)
-                    .unwrap_or_else(|| panic!("`sep` call should have two arguments")),
+                    .expect("`sep` call should have two arguments")),
             ),
             "quote" | "squote" => true,
             _ => false,
