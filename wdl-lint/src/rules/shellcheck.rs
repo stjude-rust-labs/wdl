@@ -25,8 +25,6 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::v1::EvaluationContext;
 use wdl_analysis::types::v1::ExprTypeEvaluator;
-use wdl_ast::v1::LiteralExpr;
-use wdl_ast::v1::StringPart;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -37,7 +35,9 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::Placeholder;
+use wdl_ast::v1::StringPart;
 use wdl_ast::v1::StrippedCommandPart;
 
 use crate::Rule;
@@ -413,7 +413,7 @@ fn is_quoted(expr: &Expr) -> bool {
 fn evaluates_to_literal(expr: &Expr) -> bool {
     match expr {
         Expr::Literal(LiteralExpr::String(s)) => {
-            if let Some(_) = s.text() {
+            if s.text().is_some() {
                 return true;
             }
             let mut opened = false;
@@ -429,7 +429,6 @@ fn evaluates_to_literal(expr: &Expr) -> bool {
                             }
                             opened = !opened;
                         });
-
                     }
                     StringPart::Placeholder(_placeholder) => {
                         if !opened {
