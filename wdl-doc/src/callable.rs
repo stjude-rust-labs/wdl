@@ -3,8 +3,8 @@
 pub mod task;
 pub mod workflow;
 
-use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::path::Path;
 
 use maud::Markup;
 use maud::html;
@@ -15,16 +15,29 @@ use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
+use crate::meta::MetaMap;
 use crate::meta::render_value;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
-
-/// A map of metadata key-value pairs, sorted by key.
-pub type MetaMap = BTreeMap<String, MetadataValue>;
+use crate::parameter::render_parameter_table;
 
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Group(pub String);
+
+impl Group {
+    /// Get the display name of the group.
+    pub fn display_name(&self) -> String {
+        self.0.clone()
+    }
+
+    /// Get the id of the group.
+    pub fn id(&self) -> String {
+        format!("inputs-{}", self.0.replace(" ", "-"))
+    }
+}
 
 impl PartialOrd for Group {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -51,7 +64,7 @@ impl Ord for Group {
 }
 
 /// A callable (workflow or task) in a WDL document.
-pub trait Callable {
+pub(crate) trait Callable {
     /// Get the name of the callable.
     fn name(&self) -> &str;
 
@@ -65,11 +78,11 @@ pub trait Callable {
     fn outputs(&self) -> &[Parameter];
 
     /// Get the description of the callable.
-    fn description(&self) -> Markup {
+    fn description(&self, summarize_if_needed: bool) -> Markup {
         self.meta()
             .get("description")
-            .map(render_value)
-            .unwrap_or_else(|| html! {})
+            .map(|v| render_value(v, summarize_if_needed))
+            .unwrap_or_else(|| html! { "No description provided." })
     }
 
     /// Get the required input parameters of the callable.
@@ -117,110 +130,108 @@ pub trait Callable {
         })
     }
 
-    /// Render the required inputs of the callable.
-    fn render_required_inputs(&self) -> Markup {
+    /// Render the required inputs of the callable if present.
+    fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
-            return html! {
-                h3 { "Required Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in iter {
-                            (param.render())
-                        }
-                    }
-                }
-            };
+            return Some(html! {
+                h3 id="inputs-required-inputs" class="main__section-subheader" { "Required Inputs" }
+                (render_parameter_table(&["Name", "Type", "Description"], iter, assets))
+            });
         };
-        html! {}
+        None
     }
 
-    /// Render the inputs with a group of the callable.
-    fn render_group_inputs(&self) -> Markup {
-        let group_tables = self.input_groups().into_iter().map(|group| {
-            html! {
-                h3 { (group.0) }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Default" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in self.inputs_in_group(&group) {
-                            (param.render())
-                        }
-                    }
+    /// Render the inputs with a group of the callable if present.
+    fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
+        let group_tables = self
+            .input_groups()
+            .into_iter()
+            .map(|group| {
+                html! {
+                    h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
+                    (render_parameter_table(
+                        &["Name", "Type", "Default", "Description"],
+                        self.inputs_in_group(&group),
+                        assets,
+                    ))
                 }
-            }
-        });
-        html! {
+            })
+            .collect::<Vec<_>>();
+        if group_tables.is_empty() {
+            return None;
+        }
+        Some(html! {
             @for group_table in group_tables {
                 (group_table)
             }
-        }
+        })
     }
 
-    /// Render the inputs that are neither required nor part of a group.
-    fn render_other_inputs(&self) -> Markup {
+    /// Render the inputs that are neither required nor part of a group if
+    /// present.
+    fn render_other_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
-            return html! {
-                h3 { "Other Inputs" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Default" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in iter {
-                            (param.render())
-                        }
-                    }
-                }
-            };
+            return Some(html! {
+                h3 id="inputs-other-inputs" class="main__section-subheader" { "Other Inputs" }
+                (render_parameter_table(
+                    &["Name", "Type", "Default", "Description"],
+                    iter,
+                    assets,
+                ))
+            });
         };
-        html! {}
+        None
     }
 
     /// Render the inputs of the callable.
-    fn render_inputs(&self) -> Markup {
-        html! {
-            h2 { "Inputs" }
-            (self.render_required_inputs())
-            (self.render_group_inputs())
-            (self.render_other_inputs())
+    fn render_inputs(&self, assets: &Path) -> (Markup, PageHeaders) {
+        let mut inner_markup = Vec::new();
+        let mut headers = PageHeaders::default();
+        headers.push(Header::Header("Inputs".to_string(), "inputs".to_string()));
+        if let Some(req) = self.render_required_inputs(assets) {
+            inner_markup.push(req);
+            headers.push(Header::SubHeader(
+                "Required Inputs".to_string(),
+                "inputs-required-inputs".to_string(),
+            ));
         }
+        if let Some(group) = self.render_group_inputs(assets) {
+            inner_markup.push(group);
+            for group in self.input_groups() {
+                headers.push(Header::SubHeader(group.display_name(), group.id()));
+            }
+        }
+        if let Some(other) = self.render_other_inputs(assets) {
+            inner_markup.push(other);
+            headers.push(Header::SubHeader(
+                "Other Inputs".to_string(),
+                "inputs-other-inputs".to_string(),
+            ));
+        }
+        let markup = html! {
+            div class="parameter__section" {
+                h2 id="inputs" class="main__section-header" { "Inputs" }
+                @for html in inner_markup {
+                    (html)
+                }
+            }
+        };
+
+        (markup, headers)
     }
 
     /// Render the outputs of the callable.
-    fn render_outputs(&self) -> Markup {
+    fn render_outputs(&self, assets: &Path) -> Markup {
         html! {
-            h2 { "Outputs" }
-            table  {
-                thead class="border" { tr {
-                    th { "Name" }
-                    th { "Type" }
-                    th { "Expression" }
-                    th { "Description" }
-                    th { "Additional Meta" }
-                }}
-                tbody class="border" {
-                    @for param in self.outputs() {
-                        (param.render())
-                    }
-                }
+            div class="main__section" {
+                h2 id="outputs" class="main__section-header" { "Outputs" }
+                (render_parameter_table(
+                    &["Name", "Type", "Expression", "Description"],
+                    self.outputs().iter(),
+                    assets,
+                ))
             }
         }
     }
@@ -450,11 +461,17 @@ mod tests {
         );
         assert_eq!(inputs.len(), 3);
         assert_eq!(inputs[0].name(), "a");
-        assert_eq!(inputs[0].description().into_string(), "An integer");
+        assert_eq!(inputs[0].description(false).into_string(), "An integer");
         assert_eq!(inputs[1].name(), "b");
-        assert_eq!(inputs[1].description().into_string(), "");
+        assert_eq!(
+            inputs[1].description(false).into_string(),
+            "No description provided."
+        );
         assert_eq!(inputs[2].name(), "c");
-        assert_eq!(inputs[2].description().into_string(), "Another integer");
+        assert_eq!(
+            inputs[2].description(false).into_string(),
+            "Another integer"
+        );
     }
 
     #[test]
@@ -505,10 +522,16 @@ mod tests {
         );
         assert_eq!(outputs.len(), 3);
         assert_eq!(outputs[0].name(), "a");
-        assert_eq!(outputs[0].description().into_string(), "An integer");
+        assert_eq!(outputs[0].description(false).into_string(), "An integer");
         assert_eq!(outputs[1].name(), "b");
-        assert_eq!(outputs[1].description().into_string(), "A different place!");
+        assert_eq!(
+            outputs[1].description(false).into_string(),
+            "A different place!"
+        );
         assert_eq!(outputs[2].name(), "c");
-        assert_eq!(outputs[2].description().into_string(), "Another integer");
+        assert_eq!(
+            outputs[2].description(false).into_string(),
+            "Another integer"
+        );
     }
 }

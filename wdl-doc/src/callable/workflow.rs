@@ -9,12 +9,15 @@ use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
+use crate::meta::render_meta_map;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A workflow in a WDL document.
 #[derive(Debug)]
-pub struct Workflow {
+pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
     /// The meta of the workflow.
@@ -61,7 +64,16 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(render_value)
+        self.meta.get("name").map(|v| render_value(v, false))
+    }
+
+    /// Returns the "pretty" name of the workflow as HTML.
+    pub fn pretty_name(&self) -> Markup {
+        if let Some(name) = self.name_override() {
+            name
+        } else {
+            html! { (self.name) }
+        }
     }
 
     /// Returns the `category` entry from the meta section, if it exists.
@@ -76,40 +88,50 @@ impl Workflow {
     ///
     /// This will render all metadata key-value pairs except for `name`,
     /// `category`, `description`, and `outputs`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
-            .meta
-            .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                div {
-                    h2 { "Meta" }
-                    @for (key, value) in kv {
-                        p {
-                            b { (key) ":" } " " (render_value(value))
-                        }
-                    }
-                }
-            }
-        }
+    pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
+        render_meta_map(
+            self.meta(),
+            &["name", "category", "outputs", "description"],
+            false,
+            assets,
+        )
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="table-auto border-collapse" {
-                h1 { @if let Some(name) = self.name_override() { (name) } @else { (self.name) } }
-                @if let Some(category) = self.category() {
-                    h2 { "Category: " (category) }
+    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta(assets) {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs(assets);
+
+        headers.extend(inner_headers);
+
+        let markup = html! {
+            div class="main__container" {
+                div class="main__section" {
+                    article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                        h1 id="title" class="main__title" { (self.pretty_name()) }
+                        @if let Some(category) = self.category() {
+                            // TODO style this better
+                            h3 class="main__section-subheader" { "Category: " (category) }
+                        }
+                        (self.description(false))
+                        (meta_markup)
+                        (input_markup)
+                        (self.render_outputs(assets))
+                    }
                 }
-                (self.description())
-                (self.render_meta())
-                (self.render_inputs())
-                (self.render_outputs())
             }
-        }
+        };
+
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+
+        (markup, headers)
     }
 }
 

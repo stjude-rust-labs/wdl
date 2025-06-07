@@ -1,9 +1,12 @@
 //! Create HTML documentation for WDL structs.
+// TODO: handle >=v1.2 structs
 
 use maud::Markup;
 use maud::html;
-use wdl_ast::AstToken;
+use wdl_ast::AstNode;
 use wdl_ast::v1::StructDefinition;
+
+use crate::docs_tree::PageHeaders;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -18,34 +21,11 @@ impl Struct {
         Self { def }
     }
 
-    /// Get the name of the struct.
-    pub fn name(&self) -> String {
-        self.def.name().text().to_string()
-    }
-
-    /// Get the members of the struct.
-    pub fn members(&self) -> impl Iterator<Item = (String, String)> + '_ {
-        self.def.members().map(|decl| {
-            let name = decl.name().text().to_owned();
-            let ty = decl.ty().to_string();
-            (name, ty)
-        })
-    }
-
     /// Render the struct as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="table-auto border-collapse" {
-                h1 { (self.name()) }
-                h2 { "Members" }
-                ul {
-                    @for (name, ty) in self.members() {
-                        li {
-                            b { (name) ":" } " " code { (ty) }
-                        }
-                    }
-                }
-            }
-        }
+    pub fn render(&self) -> (Markup, PageHeaders) {
+        let markup = html! {
+            sprocket-code language="wdl" { (self.def.inner().to_string()) }
+        };
+        (markup, PageHeaders::default())
     }
 }

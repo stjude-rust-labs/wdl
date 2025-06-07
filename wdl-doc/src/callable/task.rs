@@ -4,14 +4,21 @@ use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
+use wdl_ast::v1::CommandPart;
+use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::StrippedCommandPart;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageHeaders;
+use crate::meta::render_meta_map;
 use crate::parameter::Parameter;
+use crate::parameter::shorten_expr_if_needed;
 
 /// A task in a WDL document.
 #[derive(Debug)]
@@ -26,6 +33,8 @@ pub struct Task {
     outputs: Vec<Parameter>,
     /// The runtime section of the task.
     runtime_section: Option<RuntimeSection>,
+    /// The command section of the task.
+    command_section: Option<CommandSection>,
 }
 
 impl Task {
@@ -37,6 +46,7 @@ impl Task {
         input_section: Option<InputSection>,
         output_section: Option<OutputSection>,
         runtime_section: Option<RuntimeSection>,
+        command_section: Option<CommandSection>,
     ) -> Self {
         let meta = match meta_section {
             Some(mds) => parse_meta(&mds),
@@ -61,6 +71,7 @@ impl Task {
             inputs,
             outputs,
             runtime_section,
+            command_section,
         }
     }
 
@@ -68,22 +79,14 @@ impl Task {
     ///
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
-            .meta
-            .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                h2 { "Meta" }
-                @for (key, value) in kv {
-                    p {
-                        b { (key) ":" } " " (render_value(value))
-                    }
-                }
+    pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
+        let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
+        Some(html! {
+            div class="main__section" {
+                h2 id="meta" class="main__section-header" { "Meta" }
+                (content)
             }
-        }
+        })
     }
 
     /// Render the runtime section of the task as HTML.
@@ -91,17 +94,23 @@ impl Task {
         match &self.runtime_section {
             Some(runtime_section) => {
                 html! {
-                    h2 { "Default Runtime Attributes" }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th { "Attribute" }
-                            th { "Value" }
-                        }}
-                        tbody class="border" {
-                            @for entry in runtime_section.items() {
-                                tr class="border" {
-                                    td class="border" { code { (entry.name().text()) } }
-                                    td class="border" { code { ({let e = entry.expr(); e.text().to_string() }) } }
+                    div class="main__section" {
+                        h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
+                        div class="main__table-outer-container" {
+                            div class="main__table-inner-container" {
+                                table class="main__table" {
+                                    thead { tr {
+                                        th { "Attribute" }
+                                        th { "Value" }
+                                    }}
+                                    tbody {
+                                        @for entry in runtime_section.items() {
+                                            tr {
+                                                td { code { (entry.name().text()) } }
+                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) }) }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -114,18 +123,82 @@ impl Task {
         }
     }
 
-    /// Render the task as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="table-auto border-collapse" {
-                h1 { (self.name()) }
-                (self.description())
-                (self.render_meta())
-                (self.render_inputs())
-                (self.render_outputs())
-                (self.render_runtime_section())
+    /// Render the command section (Bash script) of the task as HTML.
+    pub fn render_command_section(&self) -> Markup {
+        match &self.command_section {
+            Some(command_section) => {
+                let script = match command_section.strip_whitespace() {
+                    Some(v) => v
+                        .into_iter()
+                        .map(|s| match s {
+                            StrippedCommandPart::Text(text) => text,
+                            StrippedCommandPart::Placeholder(placeholder) => {
+                                placeholder.text().to_string()
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(""),
+                    None => command_section
+                        .parts()
+                        .map(|p| match p {
+                            CommandPart::Text(text) => {
+                                let mut buffer = String::new();
+                                text.unescape_to(command_section.is_heredoc(), &mut buffer);
+                                buffer
+                            }
+                            CommandPart::Placeholder(placehoder) => placehoder.text().to_string(),
+                        })
+                        .collect::<Vec<_>>()
+                        .join(""),
+                };
+                html! {
+                    div class="main__section" {
+                        h2 id="command" class="main__section-header" { "Command" }
+                        sprocket-code language="wdl" {
+                            (script)
+                        }
+                    }
+                }
+            }
+            _ => {
+                html! {}
             }
         }
+    }
+
+    /// Render the task as HTML.
+    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
+        let mut headers = PageHeaders::default();
+        let meta_markup = if let Some(meta) = self.render_meta(assets) {
+            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs(assets);
+        headers.extend(inner_headers);
+
+        let markup = html! {
+            div class="main__container" {
+                div class="main__section" {
+                    article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                        h1 id="title" class="main__title" { code { (self.name()) } }
+                        (self.description(false))
+                        (meta_markup)
+                        (input_markup)
+                        (self.render_outputs(assets))
+                        (self.render_runtime_section())
+                        (self.render_command_section())
+                    }
+                }
+            }
+        };
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+        headers.push(Header::Header("Runtime".to_string(), "runtime".to_string()));
+        headers.push(Header::Header("Command".to_string(), "command".to_string()));
+
+        (markup, headers)
     }
 }
 
@@ -186,6 +259,7 @@ mod tests {
             ast_task.input(),
             ast_task.output(),
             ast_task.runtime(),
+            ast_task.command(),
         );
 
         assert_eq!(task.name(), "my_task");
