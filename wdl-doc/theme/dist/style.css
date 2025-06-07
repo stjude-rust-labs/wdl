@@ -656,6 +656,10 @@
   .table {
     display: table;
   }
+  .size-4 {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
   .size-5 {
     width: calc(var(--spacing) * 5);
     height: calc(var(--spacing) * 5);
@@ -676,29 +680,17 @@
     width: 100%;
     height: 100%;
   }
-  .h-4 {
-    height: calc(var(--spacing) * 4);
-  }
   .h-6 {
     height: calc(var(--spacing) * 6);
   }
   .h-\[40px\] {
     height: 40px;
   }
-  .h-full {
-    height: 100%;
-  }
   .w-2\/3 {
     width: calc(2/3 * 100%);
   }
-  .w-4 {
-    width: calc(var(--spacing) * 4);
-  }
   .w-9\/10 {
     width: calc(9/10 * 100%);
-  }
-  .w-full {
-    width: 100%;
   }
   .w-max {
     width: max-content;
@@ -1161,8 +1153,8 @@
   }
   .docs-tree__container {
     display: flex;
-    height: 100%;
     width: 100%;
+    height: 100%;
     flex-direction: column;
     row-gap: calc(var(--spacing) * 3);
     background-color: var(--color-slate-900);
@@ -1174,8 +1166,8 @@
   .right-sidebar__container {
     isolation: isolate;
     display: flex;
-    height: 100%;
     width: 100%;
+    height: 100%;
     flex-direction: column;
     gap: calc(var(--spacing) * 1.5);
     background-color: var(--color-slate-900);
