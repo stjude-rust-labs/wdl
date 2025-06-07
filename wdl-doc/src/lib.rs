@@ -83,8 +83,7 @@ pub fn build_web_components(theme_dir: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Build a stylesheet for the documentation, given a path to the theme
-/// directory.
+/// Build a stylesheet for the documentation, using Tailwind CSS.
 pub fn build_stylesheet(theme_dir: &Path) -> Result<()> {
     let theme_dir = absolute(theme_dir)?;
     let output = std::process::Command::new("npx")
