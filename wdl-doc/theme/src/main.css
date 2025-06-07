@@ -117,11 +117,11 @@
   }
 
   .docs-tree__container {
-    @apply flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
+    @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
   }
 
   .right-sidebar__container {
-    @apply p-4 h-full w-full bg-slate-900 text-white isolate flex flex-col gap-1.5;
+    @apply p-4 size-full bg-slate-900 text-white isolate flex flex-col gap-1.5;
   }
   .right-sidebar__header {
     @apply text-xs text-slate-600;

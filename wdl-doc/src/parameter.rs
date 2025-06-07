@@ -126,7 +126,7 @@ impl Parameter {
     pub fn render(&self, addl_meta: bool, assets: &Path) -> Markup {
         html! {
             tr {
-                td { (self.name()) }
+                td { code { (self.name()) } }
                 td { code { (self.ty()) } }
                 @if self.required() != Some(true) {
                     td { (shorten_expr_if_needed(self.expr())) }
