@@ -4,16 +4,15 @@ use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
-use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
-use wdl_ast::v1::StrippedCommandPart;
 
 use super::*;
+use crate::command_section::CommandSectionExt;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
 use crate::meta::render_meta_map;
@@ -127,35 +126,11 @@ impl Task {
     pub fn render_command_section(&self) -> Markup {
         match &self.command_section {
             Some(command_section) => {
-                let script = match command_section.strip_whitespace() {
-                    Some(v) => v
-                        .into_iter()
-                        .map(|s| match s {
-                            StrippedCommandPart::Text(text) => text,
-                            StrippedCommandPart::Placeholder(placeholder) => {
-                                placeholder.text().to_string()
-                            }
-                        })
-                        .collect::<Vec<_>>()
-                        .join(""),
-                    None => command_section
-                        .parts()
-                        .map(|p| match p {
-                            CommandPart::Text(text) => {
-                                let mut buffer = String::new();
-                                text.unescape_to(command_section.is_heredoc(), &mut buffer);
-                                buffer
-                            }
-                            CommandPart::Placeholder(placehoder) => placehoder.text().to_string(),
-                        })
-                        .collect::<Vec<_>>()
-                        .join(""),
-                };
                 html! {
                     div class="main__section" {
                         h2 id="command" class="main__section-header" { "Command" }
                         sprocket-code language="wdl" {
-                            (script)
+                            (command_section.script())
                         }
                     }
                 }
