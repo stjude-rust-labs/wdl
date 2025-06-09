@@ -8,6 +8,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod callable;
+mod command_section;
 mod docs_tree;
 mod meta;
 mod parameter;
@@ -24,6 +25,7 @@ use anyhow::bail;
 use callable::Callable;
 use callable::task;
 use callable::workflow;
+pub use command_section::CommandSectionExt;
 pub use docs_tree::DocsTree;
 pub use docs_tree::DocsTreeBuilder;
 use docs_tree::HTMLPage;
