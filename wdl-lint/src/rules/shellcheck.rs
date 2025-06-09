@@ -381,8 +381,11 @@ impl<'a> CommandContext<'a> {
 /// Detect embedded quotes surrounding an expression in a string.
 /// For a given expression, it checks through all descendants to see if there
 /// are any name references (variables) that are surrounded by escaped quotes.
-/// In WDL, the parent expressions is an addition (concatenation) operations.
-/// So the escaped quotes are not in a single string literal.
+/// In WDL, the parent expression is either an addition (concatenation, e.g.
+/// `~{"foo " + bar + " baz"}`) operation or a string with an embedded
+/// placeholder (e.g. `~{"foo ~{bar} baz"`). So the escaped quotes are not in a
+/// single string literal. The descendant expressions must be traversed to check
+/// for quoting.
 fn is_quoted(expr: &Expr) -> bool {
     let mut opened = false;
     let mut name = false;
