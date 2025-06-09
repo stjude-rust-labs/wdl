@@ -465,7 +465,8 @@ fn evaluates_to_literal(expr: &Expr) -> bool {
 /// literal (true) or a bash variable (false).
 /// If the placeholder is an integer, float, or boolean,
 /// it is replaced with a literal value.
-/// Otherwise, it is replaced with a bash variable.
+/// If it is a string, then the string is checked to see if it evaluates to a
+/// literal. Otherwise, it is replaced with a bash variable.
 fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     let placeholder_len: usize = placeholder.inner().text_range().len().into();
 
