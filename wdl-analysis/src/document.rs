@@ -130,7 +130,6 @@ impl Struct {
     /// Gets the offset of the struct
     pub fn offset(&self) -> usize {
         self.offset
-
     }
 }
 
