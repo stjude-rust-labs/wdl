@@ -506,7 +506,7 @@ fn create_output_type_map(
         }
 
         let ty = convert_ast_type(document, &decl.ty());
-        map.insert(name.text().to_string(), Output { ty });
+        map.insert(name.text().to_string(), Output::new(ty, name.span()));
     }
 
     map.into()

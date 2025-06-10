@@ -41,7 +41,9 @@ use wdl_ast::Span;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxToken;
+use wdl_ast::TreeNode;
 use wdl_ast::TreeToken;
+use wdl_ast::v1;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
@@ -51,11 +53,15 @@ use crate::IncrementalChange;
 use crate::ProgressKind;
 use crate::SourcePosition;
 use crate::SourcePositionEncoding;
+use crate::diagnostics;
 use crate::document::Document;
+use crate::document::ScopeRef;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
 use crate::rayon::RayonHandle;
+use crate::types::v1::EvaluationContext;
+use crate::types::v1::ExprTypeEvaluator;
 
 /// The minimum number of milliseconds between analysis progress reports.
 const MINIMUM_PROGRESS_MILLIS: u128 = 50;
@@ -902,9 +908,17 @@ where
                 self.resolve_import_namespace(parent_node, token, document_uri, lines)
             }
 
+            SyntaxKind::AccessExprNode => self.resolve_access_expression(
+                parent_node,
+                token,
+                analysis_doc,
+                document_uri,
+                lines,
+                graph,
+            ),
+
             // TODO:
-            SyntaxKind::AccessExprNode
-            | SyntaxKind::BoundDeclNode
+            SyntaxKind::BoundDeclNode
             | SyntaxKind::UnboundDeclNode
             | SyntaxKind::ScatterStatementNode
             | SyntaxKind::ImportAliasNode
@@ -1131,6 +1145,90 @@ where
 
         Ok(None)
     }
+
+    /// Resolves access expressions to their member definition locations.
+    ///
+    /// Evaluates the target expression's type and resolves member access to the
+    /// appropriate def. location.
+    ///
+    /// # Supports:
+    /// - Struct member access (`person.name`)
+    /// - Call output access (`call_result.output`)
+    /// - TODO: Arrays
+    fn resolve_access_expression(
+        &self,
+        parent_node: &SyntaxNode,
+        token: &SyntaxToken,
+        analysis_doc: &Document,
+        document_uri: &Url,
+        lines: &Arc<LineIndex>,
+        graph: &DocumentGraph,
+    ) -> Result<Option<GotoDefinitionResponse>> {
+        let access_expr = wdl_ast::v1::AccessExpr::cast(parent_node.clone()).unwrap();
+        let (target_expr, member_ident) = access_expr.operands();
+
+        if member_ident.span() != token.span() {
+            return Ok(None);
+        }
+
+        let scope = analysis_doc
+            .find_scope_by_position(parent_node.span().start())
+            .ok_or_else(|| anyhow!("could not find scope for access expression"))?;
+
+        let mut ctx = GotoDefEvalContext {
+            scope,
+            document: analysis_doc,
+        };
+        let mut evaluator = ExprTypeEvaluator::new(&mut ctx);
+        let target_type = evaluator
+            .evaluate_expr(&target_expr)
+            .unwrap_or(crate::types::Type::Union);
+
+        if let Some(struct_ty) = target_type.as_struct() {
+            let struct_def = analysis_doc
+                .struct_by_name(struct_ty.name())
+                .ok_or_else(|| anyhow!("struct definition not found for {}", struct_ty.name()))?;
+
+            let (uri, def_lines) = if let Some(ns_name) = struct_def.namespace() {
+                let ns = analysis_doc.namespace(ns_name).unwrap();
+                let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+                let lines = imported_node.parse_state().lines().unwrap().clone();
+                (ns.source().as_ref(), lines)
+            } else {
+                (document_uri, lines.clone())
+            };
+
+            let struct_node =
+                v1::StructDefinition::cast(SyntaxNode::new_root(struct_def.node().clone()))
+                    .expect("should cast to struct definition");
+
+            if let Some(member) = struct_node
+                .members()
+                .find(|m| m.name().text() == member_ident.text())
+            {
+                let member_span = member.name().span();
+                let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
+                return Ok(Some(location(uri, span, &def_lines)?));
+            }
+        }
+
+        if let Some(call_ty) = target_type.as_call() {
+            if let Some(output) = call_ty.outputs().get(member_ident.text()) {
+                let (uri, callee_lines) = if let Some(ns_name) = call_ty.namespace() {
+                    let ns = analysis_doc.namespace(ns_name).unwrap();
+                    let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+                    let lines = imported_node.parse_state().lines().unwrap().clone();
+                    (ns.source().as_ref(), lines.clone())
+                } else {
+                    (document_uri, lines.clone())
+                };
+
+                return Ok(Some(location(uri, output.name_span(), &callee_lines)?));
+            }
+        }
+
+        Ok(None)
+    }
 }
 
 /// Formats the panic payload for display.
@@ -1230,4 +1328,49 @@ fn position_to_offset(
     lines
         .offset(line_col)
         .ok_or_else(|| anyhow!("line_col is invalid"))
+}
+
+/// Context for evaluating expressions during goto definition resolution.
+struct GotoDefEvalContext<'a> {
+    /// The scope reference containing the variable and name bindings at the
+    /// current position
+    scope: ScopeRef<'a>,
+
+    /// The document being analyzed.
+    document: &'a Document,
+}
+
+impl EvaluationContext for GotoDefEvalContext<'_> {
+    fn version(&self) -> wdl_ast::SupportedVersion {
+        self.document
+            .version()
+            .expect("document should have a version")
+    }
+
+    fn resolve_name(&self, name: &str, _span: Span) -> Option<crate::types::Type> {
+        self.scope.lookup(name).map(|n| n.ty().clone())
+    }
+
+    fn resolve_type_name(
+        &mut self,
+        name: &str,
+        span: Span,
+    ) -> std::result::Result<crate::types::Type, wdl_ast::Diagnostic> {
+        if let Some(s) = self.document.struct_by_name(name) {
+            if let Some(ty) = s.ty() {
+                return Ok(ty.clone());
+            }
+        }
+        Err(diagnostics::unknown_type(name, span))
+    }
+
+    fn task(&self) -> Option<&crate::document::Task> {
+        None
+    }
+
+    fn diagnostics_config(&self) -> DiagnosticsConfig {
+        DiagnosticsConfig::default()
+    }
+
+    fn add_diagnostic(&mut self, _: wdl_ast::Diagnostic) {}
 }
