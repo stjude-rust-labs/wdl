@@ -1461,6 +1461,7 @@ pub(crate) mod test {
     use wdl_analysis::diagnostics::unknown_type;
     use wdl_analysis::types::StructType;
     use wdl_ast::NewRoot;
+    use wdl_grammar::ParserConfig;
     use wdl_grammar::construct_tree;
     use wdl_grammar::grammar::v1;
     use wdl_grammar::lexer::Lexer;
@@ -1680,7 +1681,7 @@ pub(crate) mod test {
         source: &str,
     ) -> Result<Value, Diagnostic> {
         let source = source.trim();
-        let mut parser = v1::Parser::new(Lexer::new(source));
+        let mut parser = v1::Parser::new(ParserConfig::default(), Lexer::new(source));
         let marker = parser.start();
         match v1::expr(&mut parser, marker) {
             Ok(()) => {

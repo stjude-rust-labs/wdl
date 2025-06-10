@@ -15,13 +15,17 @@ codespan-reporting = { workspace = true, optional = true }
 itertools = { workspace = true }
 logos = { workspace = true }
 rowan = { workspace = true }
+serde = { workspace = true }
+serde_with = { workspace = true }
 strum = { version = "0.27", features = ["derive"] }
 
 [dev-dependencies]
+anyhow = { workspace = true }
 codespan-reporting = { workspace = true }
 colored = { workspace = true }
 pretty_assertions = { workspace = true }
 rayon = { workspace = true }
+toml = { workspace = true }
 
 [features]
 codespan = ["dep:codespan-reporting"]
