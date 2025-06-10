@@ -79,17 +79,16 @@ impl GotoDefinitionHandler {
                 ParseState::Parsed { lines, root, .. } => {
                     (SyntaxNode::new_root(root.clone()), lines.clone())
                 }
-                _ => {
-                    debug!("document not yet parsed: {}", document_uri);
-                    return Ok(None);
-                }
+                _ => return Err(anyhow!("document not yet parsed: {}", document_uri)),
             };
 
             let analysis_doc = match node.document() {
                 Some(doc) => doc.clone(),
                 None => {
-                    debug!("document analysis data not available for {}", document_uri);
-                    return Ok(None);
+                    return Err(anyhow!(
+                        "document analysis data not available for {}",
+                        document_uri
+                    ));
                 }
             };
 
@@ -99,13 +98,7 @@ impl GotoDefinitionHandler {
         let offset = position_to_offset(&lines, position, encoding)?;
         let token = match find_identifier_token_at_offset(&root, offset) {
             Some(tok) => tok,
-            None => {
-                // WARN: if we throw an error the lsp crashes on other editors
-                // vscode extension kicks in and restarts the lsp automatically
-                //
-                debug!("no identifier found at position");
-                return Ok(None);
-            }
+            None => return Err(anyhow!("no identifier found at position")),
         };
 
         let ident_text = token.text();
@@ -113,9 +106,7 @@ impl GotoDefinitionHandler {
             .parent()
             .ok_or_else(|| anyhow!("identifier token has no parent"))?;
 
-        debug!("resolving location for {token:?}");
-
-        // context based resolution
+        // Context based resolution
         if let Some(location) = self.resolve_by_context(
             &parent_node,
             &token,
@@ -127,14 +118,14 @@ impl GotoDefinitionHandler {
             return Ok(Some(location));
         }
 
-        // scope based resolution
+        // Scope based resolution
         if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
             if let Some(name_def) = scope_ref.lookup(ident_text) {
                 return Ok(Some(location(&document_uri, name_def.span(), &lines)?));
             }
         }
 
-        // global resolution
+        // Global resolution
         self.resolve_global_identifier(&analysis_doc, ident_text, &document_uri, &lines, graph)
     }
 
@@ -204,7 +195,7 @@ impl GotoDefinitionHandler {
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
     ) -> Result<Option<GotoDefinitionResponse>> {
-        // NOTE: local structs
+        // NOTE: Local structs
         if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
             let (uri, def_lines) = if let Some(ns_name) = struct_info.namespace() {
                 let ns = analysis_doc.namespace(ns_name).unwrap();
@@ -222,7 +213,7 @@ impl GotoDefinitionHandler {
             return Ok(Some(location(uri, struct_info.name_span(), &def_lines)?));
         };
 
-        // NOTE: imported structs
+        // NOTE: Imported structs
         for (_ns_name_str, ns_info) in analysis_doc.namespaces() {
             if let Some(imported_doc) = graph
                 .get(graph.get_index(ns_info.source()).unwrap())
@@ -244,7 +235,10 @@ impl GotoDefinitionHandler {
                 }
             }
         }
-        Ok(None)
+        Err(anyhow!(
+            "could not resolve type reference for: {}",
+            ident_text
+        ))
     }
 
     /// Resolves call targets to their definition locations.
@@ -269,7 +263,7 @@ impl GotoDefinitionHandler {
         if is_callee_name_clicked {
             let callee_name_str = token.text();
 
-            // NOTE: namespaced (foo.bar)
+            // NOTE: Namespaced (foo.bar)
             if target_names.len() > 1 {
                 let namespaced_name_str = target_names.first().unwrap().text();
                 if let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) {
@@ -305,7 +299,7 @@ impl GotoDefinitionHandler {
                     }
                 }
             } else {
-                // NOTE: local calls
+                // NOTE: Local calls
                 if let Some(task_def) = analysis_doc.task_by_name(callee_name_str) {
                     return Ok(Some(location(document_uri, task_def.name_span(), lines)?));
                 }
