@@ -121,6 +121,17 @@ impl Struct {
     pub fn ty(&self) -> Option<&Type> {
         self.ty.as_ref()
     }
+
+    /// Gets the node of the struct.
+    pub fn node(&self) -> &rowan::GreenNode {
+        &self.node
+    }
+
+    /// Gets the offset of the struct
+    pub fn offset(&self) -> usize {
+        self.offset
+
+    }
 }
 
 /// Represents information about a name in a scope.
@@ -314,17 +325,24 @@ impl Input {
 pub struct Output {
     /// The type of the output.
     ty: Type,
+    /// The span of the output.
+    name_span: Span,
 }
 
 impl Output {
     /// Creates a new output with the given type.
-    pub(crate) fn new(ty: Type) -> Self {
-        Self { ty }
+    pub(crate) fn new(ty: Type, name_span: Span) -> Self {
+        Self { ty, name_span }
     }
 
     /// Gets the type of the output.
     pub fn ty(&self) -> &Type {
         &self.ty
+    }
+
+    /// Gets the span of output's name.
+    pub fn name_span(&self) -> Span {
+        self.name_span
     }
 }
 
