@@ -72,33 +72,24 @@ impl GotoDefinitionHandler {
             .get_index(&document_uri)
             .ok_or_else(|| anyhow!("document not found in graph"))?;
 
-        let (root, lines, analysis_doc) = {
-            let node = graph.get(index);
+        let node = graph.get(index);
+        let (root, lines) = match node.parse_state() {
+            ParseState::Parsed { lines, root, .. } => {
+                (SyntaxNode::new_root(root.clone()), lines.clone())
+            }
+            _ => return Err(anyhow!("document not yet parsed: {}", document_uri)),
+        };
 
-            let (root, lines) = match node.parse_state() {
-                ParseState::Parsed { lines, root, .. } => {
-                    (SyntaxNode::new_root(root.clone()), lines.clone())
-                }
-                _ => return Err(anyhow!("document not yet parsed: {}", document_uri)),
-            };
-
-            let analysis_doc = match node.document() {
-                Some(doc) => doc.clone(),
-                None => {
-                    return Err(anyhow!(
-                        "document analysis data not available for {}",
-                        document_uri
-                    ));
-                }
-            };
-
-            (root, lines, analysis_doc)
+        let Some(analysis_doc) = node.document() else {
+            return Err(anyhow!(
+                "document analysis data not available for {}",
+                document_uri
+            ));
         };
 
         let offset = position_to_offset(&lines, position, encoding)?;
-        let token = match find_identifier_token_at_offset(&root, offset) {
-            Some(tok) => tok,
-            None => return Err(anyhow!("no identifier found at position")),
+        let Some(token) = find_identifier_token_at_offset(&root, offset) else {
+            return Err(anyhow!("no identifier found at position"));
         };
 
         let ident_text = token.text();
@@ -110,7 +101,7 @@ impl GotoDefinitionHandler {
         if let Some(location) = self.resolve_by_context(
             &parent_node,
             &token,
-            &analysis_doc,
+            analysis_doc,
             &document_uri,
             &lines,
             graph,
@@ -126,7 +117,7 @@ impl GotoDefinitionHandler {
         }
 
         // Global resolution
-        self.resolve_global_identifier(&analysis_doc, ident_text, &document_uri, &lines, graph)
+        self.resolve_global_identifier(analysis_doc, ident_text, &document_uri, &lines, graph)
     }
 
     /// Resolves identifier definition based on their parent node's syntax kind
@@ -195,46 +186,67 @@ impl GotoDefinitionHandler {
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
     ) -> Result<Option<GotoDefinitionResponse>> {
-        // NOTE: Local structs
         if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
-            let (uri, def_lines) = if let Some(ns_name) = struct_info.namespace() {
-                let ns = analysis_doc.namespace(ns_name).unwrap();
-                let imported_lines = graph
-                    .get(graph.get_index(ns.source()).unwrap())
-                    .parse_state()
-                    .lines()
-                    .unwrap()
-                    .clone();
-
-                (ns.source().as_ref(), imported_lines)
-            } else {
-                (document_uri, lines.clone())
+            let Some(ns_name) = struct_info.namespace() else {
+                return Ok(Some(location(
+                    document_uri,
+                    struct_info.name_span(),
+                    lines,
+                )?));
             };
-            return Ok(Some(location(uri, struct_info.name_span(), &def_lines)?));
-        };
 
-        // NOTE: Imported structs
-        for (_ns_name_str, ns_info) in analysis_doc.namespaces() {
-            if let Some(imported_doc) = graph
-                .get(graph.get_index(ns_info.source()).unwrap())
-                .document()
-            {
-                if let Some(struct_info) = imported_doc.struct_by_name(ident_text) {
-                    let imported_lines = graph
-                        .get(graph.get_index(ns_info.source()).unwrap())
-                        .parse_state()
-                        .lines()
-                        .unwrap()
-                        .clone();
+            let ns = analysis_doc
+                .namespace(ns_name)
+                .expect("namespace should be present");
+            let node = graph.get(graph.get_index(ns.source()).unwrap());
+            let imported_lines = node.parse_state().lines().unwrap().clone();
 
-                    return Ok(Some(location(
-                        ns_info.source(),
-                        struct_info.name_span(),
-                        &imported_lines,
-                    )?));
+            if let Some(struct_ty) = struct_info.ty() {
+                if let Some(s_struct_ty) = struct_ty.as_struct() {
+                    let original_name = s_struct_ty.name();
+                    // aliased struct
+                    if struct_info.name() != original_name.as_str() {
+                        return Ok(Some(location(
+                            document_uri,
+                            struct_info.name_span(),
+                            lines,
+                        )?));
+                    }
+                    // original struct
+                    let imported_doc = node.document().expect("document should exist");
+                    if let Some(original_struct) = imported_doc.struct_by_name(original_name) {
+                        return Ok(Some(location(
+                            ns.source(),
+                            original_struct.name_span(),
+                            &imported_lines,
+                        )?));
+                    }
                 }
             }
+
+            return Ok(Some(location(
+                ns.source(),
+                struct_info.name_span(),
+                &imported_lines,
+            )?));
         }
+
+        for (_, ns) in analysis_doc.namespaces() {
+            let node = graph.get(graph.get_index(ns.source()).unwrap());
+            let Some(imported_doc) = node.document() else {
+                continue;
+            };
+            let Some(struct_info) = imported_doc.struct_by_name(ident_text) else {
+                continue;
+            };
+            let imported_lines = node.parse_state().lines().unwrap().clone();
+            return Ok(Some(location(
+                ns.source(),
+                struct_info.name_span(),
+                &imported_lines,
+            )?));
+        }
+
         Err(anyhow!(
             "could not resolve type reference for: {}",
             ident_text
@@ -266,37 +278,33 @@ impl GotoDefinitionHandler {
             // NOTE: Namespaced (foo.bar)
             if target_names.len() > 1 {
                 let namespaced_name_str = target_names.first().unwrap().text();
-                if let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) {
-                    if let Some(imported_doc) = graph
-                        .get(graph.get_index(ns_info.source()).unwrap())
-                        .document()
-                    {
-                        let imported_lines = graph
-                            .get(graph.get_index(ns_info.source()).unwrap())
-                            .parse_state()
-                            .lines()
-                            .unwrap()
-                            .clone();
+                let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) else {
+                    return Ok(None);
+                };
 
-                        if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
-                            return Ok(Some(location(
-                                ns_info.source(),
-                                task_def.name_span(),
-                                &imported_lines,
-                            )?));
-                        }
+                let node = graph.get(graph.get_index(ns_info.source()).unwrap());
+                let Some(imported_doc) = node.document() else {
+                    return Ok(None);
+                };
+                let imported_lines = node.parse_state().lines().unwrap().clone();
 
-                        if let Some(wf_def) = imported_doc
-                            .workflow()
-                            .filter(|w| w.name() == callee_name_str)
-                        {
-                            return Ok(Some(location(
-                                ns_info.source(),
-                                wf_def.name_span(),
-                                &imported_lines,
-                            )?));
-                        }
-                    }
+                if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
+                    return Ok(Some(location(
+                        ns_info.source(),
+                        task_def.name_span(),
+                        &imported_lines,
+                    )?));
+                }
+
+                if let Some(wf_def) = imported_doc
+                    .workflow()
+                    .filter(|w| w.name() == callee_name_str)
+                {
+                    return Ok(Some(location(
+                        ns_info.source(),
+                        wf_def.name_span(),
+                        &imported_lines,
+                    )?));
                 }
             } else {
                 // NOTE: Local calls
@@ -355,26 +363,21 @@ impl GotoDefinitionHandler {
             return Ok(Some(location));
         }
 
-        for (_, ns_info) in analysis_doc.namespaces() {
-            if let Some(imported_doc) = graph
-                .get(graph.get_index(ns_info.source()).unwrap())
-                .document()
-            {
-                let imported_lines = graph
-                    .get(graph.get_index(ns_info.source()).unwrap())
-                    .parse_state()
-                    .lines()
-                    .unwrap()
-                    .clone();
+        for (_, ns) in analysis_doc.namespaces() {
+            let node = graph.get(graph.get_index(ns.source()).unwrap());
+            let Some(imported_doc) = node.document() else {
+                continue;
+            };
 
-                if let Some(location) = find_global_definition_in_doc(
-                    imported_doc,
-                    ident_text,
-                    ns_info.source().as_ref(),
-                    &imported_lines,
-                )? {
-                    return Ok(Some(location));
-                }
+            let imported_lines = node.parse_state().lines().unwrap().clone();
+
+            if let Some(location) = find_global_definition_in_doc(
+                imported_doc,
+                ident_text,
+                ns.source().as_ref(),
+                &imported_lines,
+            )? {
+                return Ok(Some(location));
             }
         }
 
@@ -433,13 +436,14 @@ impl GotoDefinitionHandler {
                 .map(|(_, s)| s)
                 .ok_or_else(|| anyhow!("struct definition not found for {}", struct_ty.name()))?;
 
-            let (uri, def_lines) = if let Some(ns_name) = struct_def.namespace() {
-                let ns = analysis_doc.namespace(ns_name).unwrap();
-                let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
-                let lines = imported_node.parse_state().lines().unwrap().clone();
-                (ns.source().as_ref(), lines)
-            } else {
-                (document_uri, lines.clone())
+            let (uri, def_lines) = match struct_def.namespace() {
+                Some(ns_name) => {
+                    let ns = analysis_doc.namespace(ns_name).unwrap();
+                    let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+                    let lines = imported_node.parse_state().lines().unwrap().clone();
+                    (ns.source().as_ref(), lines)
+                }
+                None => (document_uri, lines.clone()),
             };
 
             let struct_node =
@@ -457,18 +461,21 @@ impl GotoDefinitionHandler {
         }
 
         if let Some(call_ty) = target_type.as_call() {
-            if let Some(output) = call_ty.outputs().get(member_ident.text()) {
-                let (uri, callee_lines) = if let Some(ns_name) = call_ty.namespace() {
+            let Some(output) = call_ty.outputs().get(member_ident.text()) else {
+                return Ok(None);
+            };
+
+            let (uri, callee_lines) = match call_ty.namespace() {
+                Some(ns_name) => {
                     let ns = analysis_doc.namespace(ns_name).unwrap();
                     let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
                     let lines = imported_node.parse_state().lines().unwrap().clone();
                     (ns.source().as_ref(), lines.clone())
-                } else {
-                    (document_uri, lines.clone())
-                };
+                }
+                None => (document_uri, lines.clone()),
+            };
 
-                return Ok(Some(location(uri, output.name_span(), &callee_lines)?));
-            }
+            return Ok(Some(location(uri, output.name_span(), &callee_lines)?));
         }
 
         Ok(None)
@@ -547,15 +554,15 @@ fn position_to_offset(
             line: position.line,
             col: position.character,
         },
-        SourcePositionEncoding::UTF16 => lines
-            .to_utf8(
-                line_index::WideEncoding::Utf16,
-                line_index::WideLineCol {
-                    line: position.line,
-                    col: position.character,
-                },
-            )
-            .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?,
+        SourcePositionEncoding::UTF16 => {
+            let wide_col = line_index::WideLineCol {
+                line: position.line,
+                col: position.character,
+            };
+            lines
+                .to_utf8(line_index::WideEncoding::Utf16, wide_col)
+                .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?
+        }
     };
 
     lines
