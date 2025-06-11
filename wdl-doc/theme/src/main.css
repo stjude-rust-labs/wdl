@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import "tailwindcss";
 /* @import "./markdown.css"; */
 
 /* Dark mode enabled with the `dark` class */
