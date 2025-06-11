@@ -420,8 +420,40 @@ impl GotoDefinitionHandler {
             .unwrap_or(crate::types::Type::Union);
 
         if let Some(struct_ty) = target_type.as_struct() {
+            debug!("found a struct type: {}", struct_ty);
             let struct_def = analysis_doc
-                .struct_by_name(struct_ty.name())
+                .structs()
+                .find(|(_, s)| {
+                    // When structs imported and aliased to a different name,they are checked
+                    // using their Type
+                    //
+                    // Eg:
+                    // `person.wdl`:
+                    //
+                    // sturct Person {
+                    //  Sting name
+                    // }
+                    //
+                    // `main.wdl`:
+                    //
+                    // import "person.wdl" as lib alias Person as person
+                    //
+                    // workflow main {
+                    //  peson a = person {
+                    //      name = "wdl"
+                    //  }
+                    //
+                    //  a.name
+                    //    ^^^^ this has a struct name as person but Type is `Person`
+                    // }
+                    if let Some(s_ty) = s.ty() {
+                        if let Some(s_struct_ty) = s_ty.as_struct() {
+                            return s_struct_ty.name() == struct_ty.name();
+                        }
+                    }
+                    s.name() == struct_ty.name().as_str()
+                })
+                .map(|(_, s)| s)
                 .ok_or_else(|| anyhow!("struct definition not found for {}", struct_ty.name()))?;
 
             let (uri, def_lines) = if let Some(ns_name) = struct_def.namespace() {
