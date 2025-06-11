@@ -35,7 +35,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
                     div x-data="{ expanded: false }" {
                         div x-show="!expanded" {
                             p { (format!("Array with {} elements... ", a.elements().collect::<Vec<_>>().len())) }
-                            button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                            button type="button" class="main__button" x-on:click="expanded = true" {
                                 b { "Expand" }
                             }
                         }
@@ -57,7 +57,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
                             }
                             code { "]" }
                             br;
-                            button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                            button type="button" class="main__button" x-on:click="expanded = false" {
                                 b { "Collapse" }
                             }
                         }
@@ -69,7 +69,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
                     div x-data="{ expanded: false }" {
                         div x-show="!expanded" {
                             p { (format!("Object with {} items... ", o.items().collect::<Vec<_>>().len())) }
-                            button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                            button type="button" class="main__button" x-on:click="expanded = true" {
                                 b { "Expand" }
                             }
                         }
@@ -84,7 +84,7 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
                             }
                             code { "}" }
                             br;
-                            button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                            button type="button" class="main__button" x-on:click="expanded = false" {
                                 b { "Collapse" }
                             }
                         }
@@ -150,7 +150,7 @@ pub(crate) fn render_meta_map(
                 (render_value(help, summarize_if_needed))
             }
             @if let Some(on_click) = external_link_on_click {
-                button class="hover:cursor-pointer flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-slate-100/10" x-on:click=(on_click) {
+                button type="button" class="main__button flex items-center gap-2" x-on:click=(on_click) {
                     b { "Go to External Documentation" }
                     img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-5";
                 }
@@ -204,14 +204,14 @@ fn summarize_markdown_if_needed(content: String) -> Markup {
         div x-data="{ expanded: false }" {
             div x-show="!expanded" {
                 p { (summary_text) }
-                button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                button type="button" class="main__button" x-on:click="expanded = true" {
                     b { "Read more" }
                 }
             }
             div x-show="expanded" {
                 (markup)
                 br;
-                button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                button type="button" class="main__button" x-on:click="expanded = false" {
                     b { "Read less" }
                 }
             }

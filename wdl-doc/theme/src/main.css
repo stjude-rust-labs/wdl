@@ -1,6 +1,5 @@
 @plugin "@tailwindcss/typography";
 @import "tailwindcss";
-/* @import "./markdown.css"; */
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -159,5 +158,9 @@
   .metadata__warning {
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
     @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm;
+  }
+
+  .main__button {
+    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
   }
 }
