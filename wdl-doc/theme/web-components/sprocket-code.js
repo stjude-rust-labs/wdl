@@ -31,8 +31,8 @@ class SprocketCode extends HTMLElement {
       this.textContent = '';
       
       const html = highlighter.codeToHtml(code, {
-        lang: this.getAttribute('language') || 'rust',
-        theme: 'catppuccin-mocha'
+        lang: this.getAttribute('language') || 'wdl',
+        theme: 'material-theme-ocean'
       });
 
       this.shadowRoot.innerHTML = `

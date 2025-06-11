@@ -1,5 +1,5 @@
 import { createHighlighterCore } from 'shiki/core';
-import catppuccinMocha from '@shikijs/themes/catppuccin-mocha';
+import materialThemeOcean from '@shikijs/themes/material-theme-ocean';
 import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import wasm from 'shiki/wasm';
 
@@ -43,7 +43,7 @@ export async function initializeHighlighter() {
     }
 
     const highlighter = await createHighlighterCore({
-      themes: [catppuccinMocha],
+      themes: [materialThemeOcean],
       langs: languagesToLoad,
       engine: createOnigurumaEngine(wasm)
     });

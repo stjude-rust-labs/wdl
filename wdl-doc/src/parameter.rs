@@ -9,10 +9,49 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
-use crate::callable::Group;
 use crate::meta::MetaMap;
 use crate::meta::render_meta_map;
 use crate::meta::render_value;
+
+/// A group of inputs.
+#[derive(Debug, Eq, PartialEq)]
+pub(crate) struct Group(pub String);
+
+impl Group {
+    /// Get the display name of the group.
+    pub fn display_name(&self) -> String {
+        self.0.clone()
+    }
+
+    /// Get the id of the group.
+    pub fn id(&self) -> String {
+        format!("inputs-{}", self.0.replace(" ", "-"))
+    }
+}
+
+impl PartialOrd for Group {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Group {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.0 == "Common" {
+            return std::cmp::Ordering::Less;
+        }
+        if other.0 == "Common" {
+            return std::cmp::Ordering::Greater;
+        }
+        if self.0 == "Resources" {
+            return std::cmp::Ordering::Greater;
+        }
+        if other.0 == "Resources" {
+            return std::cmp::Ordering::Less;
+        }
+        self.0.cmp(&other.0)
+    }
+}
 
 /// Whether a parameter is an input or output.
 #[derive(Debug, Clone, Copy)]

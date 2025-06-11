@@ -166,4 +166,16 @@
   .main__prose {
     @apply prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden
   }
+  .main__badge {
+    @apply flex flex-row max-w-fit items-center border border-slate-700 px-2 py-1 rounded-md bg-slate-800 my-2;
+  }
+  .main__badge-text {
+    @apply text-xs text-slate-100;
+  }
+  .main__badge-inner {
+    @apply flex items-center gap-1 bg-slate-700 px-2 py-1 rounded-md mx-2 my-1;
+  }
+  .main__badge-inner-text {
+    @apply text-xs text-slate-100;
+  }
 }
