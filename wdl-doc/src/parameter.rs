@@ -190,7 +190,7 @@ where
         .any(|param| param.render_remaining_meta(assets).is_some());
 
     html! {
-        div class="main__table-outer-container" {
+        div class="main__table-outer-container not-prose" {
             div class="main__table-inner-container" {
                 table class="main__table" {
                     thead { tr {

@@ -5,6 +5,7 @@ use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::v1::StructDefinition;
+use wdl_ast::AstToken;
 
 use crate::docs_tree::PageHeaders;
 
@@ -23,8 +24,18 @@ impl Struct {
 
     /// Render the struct as HTML.
     pub fn render(&self) -> (Markup, PageHeaders) {
+        let name = self.def.name();
+        let name = name.text();
         let markup = html! {
-            sprocket-code language="wdl" { (self.def.inner().to_string()) }
+            div class="main__container" {
+                div class="main__section" {
+                    article class="main__prose" {
+                        p class="text-pink-400 not-prose" { "Struct" }
+                        h1 id="title" class="main__title" { code { (name) } }
+                        sprocket-code language="wdl" { (self.def.inner().to_string()) }
+                    }
+                }
+            }
         };
         (markup, PageHeaders::default())
     }
