@@ -77,20 +77,20 @@
   }
 
   .main__container {
-    @apply flex flex-col gap-y-6;
+    @apply flex flex-col;
   }
 
   .main__title {
-    @apply text-5xl text-slate-50 mt-8 mb-4;
+    @apply text-5xl;
   }
   .main__section {
     @apply flex flex-col;
   }
   .main__section-header {
-    @apply text-2xl mt-8 mb-4;
+    @apply text-2xl;
   }
   .main__section-subheader {
-    @apply text-lg mt-8 mb-4;
+    @apply text-lg;
   }
   .main__section-text {
     @apply mt-3 text-sm;
@@ -162,5 +162,8 @@
 
   .main__button {
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
+  }
+  .main__prose {
+    @apply prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden
   }
 }

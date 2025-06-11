@@ -114,7 +114,7 @@ impl Workflow {
         let markup = html! {
             div class="main__container" {
                 div class="main__section" {
-                    article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                    article class="main__prose" {
                         h1 id="title" class="main__title" { (self.pretty_name()) }
                         @if let Some(category) = self.category() {
                             // TODO style this better
