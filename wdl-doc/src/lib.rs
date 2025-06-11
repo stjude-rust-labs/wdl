@@ -45,9 +45,11 @@ use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
 use wdl_ast::AstToken;
+use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
+use wdl_ast::version::V1;
 
 /// Install the theme dependencies using npm.
 pub fn install_theme(theme_dir: &Path) -> Result<()> {
@@ -321,7 +323,7 @@ pub(crate) struct Document {
     ///
     /// This is used both to display the WDL version number and to fetch the
     /// preamble comments.
-    version: VersionStatement,
+    version_statement: VersionStatement,
     /// The pages that this document should link to.
     local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
 }
@@ -335,7 +337,7 @@ impl Document {
     ) -> Self {
         Self {
             name,
-            version,
+            version_statement: version,
             local_pages,
         }
     }
@@ -347,12 +349,12 @@ impl Document {
 
     /// Get the version of the document as text.
     pub fn version(&self) -> String {
-        self.version.version().text().to_string()
+        self.version_statement.version().text().to_string()
     }
 
     /// Get the preamble comments of the document.
     pub fn preamble(&self) -> Markup {
-        let preamble = parse_preamble_comments(self.version.clone());
+        let preamble = parse_preamble_comments(self.version_statement.clone());
         Markdown(&preamble).render()
     }
 
@@ -426,6 +428,49 @@ impl Document {
     }
 }
 
+/// A version badge for the WDL document. This is used to display the WDL
+/// version in the header of the documentation.
+#[derive(Debug, Clone)]
+pub(crate) struct VersionBadge {
+    /// The WDL version of the document.
+    version: SupportedVersion,
+}
+
+impl VersionBadge {
+    /// Create a new version badge.
+    pub(crate) fn new(version: SupportedVersion) -> Self {
+        Self { version }
+    }
+
+    /// Render the version badge as HTML.
+    pub(crate) fn render(&self) -> Markup {
+        let latest = match &self.version {
+            SupportedVersion::V1(v) => matches!(v, V1::Two),
+            _ => unreachable!("Only V1 is supported"),
+        };
+        let text = self.version.to_string();
+        html! {
+            div class="main__badge not-prose" {
+                span class="main__badge-text" {
+                    "WDL Version"
+                }
+                div class="main__badge-inner" {
+                    span class="main__badge-inner-text" {
+                        (text)
+                    }
+                }
+                @if latest {
+                    div class="main__badge-inner" {
+                        span class="main__badge-inner-text" {
+                            "Latest"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
@@ -477,8 +522,12 @@ pub async fn document_workspace(
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
+        let version = result
+            .document()
+            .version()
+            .expect("document should have a supported version");
         let ast = result.document().root();
-        let version = ast
+        let version_statement = ast
             .version_statement()
             .expect("document should have a version statement");
         let ast = ast.ast().unwrap_v1();
@@ -492,7 +541,7 @@ pub async fn document_workspace(
                     let path = cur_dir.join(format!("{}-struct.html", name));
 
                     // TODO: handle >=v1.2 structs
-                    let r#struct = r#struct::Struct::new(s.clone());
+                    let r#struct = r#struct::Struct::new(s.clone(), version);
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));
                     docs_tree.add_page(path.clone(), page.clone());
@@ -502,15 +551,7 @@ pub async fn document_workspace(
                     let name = t.name().text().to_owned();
                     let path = cur_dir.join(format!("{}-task.html", name));
 
-                    let task = task::Task::new(
-                        name.clone(),
-                        t.metadata(),
-                        t.parameter_metadata(),
-                        t.input(),
-                        t.output(),
-                        t.runtime(),
-                        t.command(),
-                    );
+                    let task = task::Task::new(name.clone(), version, t);
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
                     docs_tree.add_page(path.clone(), page.clone());
@@ -520,13 +561,7 @@ pub async fn document_workspace(
                     let name = w.name().text().to_owned();
                     let path = cur_dir.join(format!("{}-workflow.html", name));
 
-                    let workflow = workflow::Workflow::new(
-                        name.clone(),
-                        w.metadata(),
-                        w.parameter_metadata(),
-                        w.input(),
-                        w.output(),
-                    );
+                    let workflow = workflow::Workflow::new(name.clone(), version, w);
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Workflow(workflow)));
                     docs_tree.add_page(path.clone(), page.clone());
@@ -536,7 +571,7 @@ pub async fn document_workspace(
             }
         }
         let name = rel_wdl_path.file_stem().unwrap().to_str().unwrap();
-        let document = Document::new(name.to_string(), version, local_pages);
+        let document = Document::new(name.to_string(), version_statement, local_pages);
 
         let index_path = cur_dir.join("index.html");
 
@@ -608,10 +643,8 @@ mod tests {
         let ast_workflow = doc_item.into_workflow_definition().unwrap();
         let workflow = workflow::Workflow::new(
             ast_workflow.name().text().to_string(),
-            ast_workflow.metadata(),
-            ast_workflow.parameter_metadata(),
-            ast_workflow.input(),
-            ast_workflow.output(),
+            SupportedVersion::V1(V1::Zero),
+            ast_workflow,
         );
 
         let description = workflow.description(false);

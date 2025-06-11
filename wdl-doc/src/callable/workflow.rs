@@ -2,11 +2,9 @@
 
 use maud::Markup;
 use wdl_ast::AstToken;
-use wdl_ast::v1::InputSection;
-use wdl_ast::v1::MetadataSection;
+use wdl_ast::SupportedVersion;
 use wdl_ast::v1::MetadataValue;
-use wdl_ast::v1::OutputSection;
-use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::WorkflowDefinition;
 
 use super::*;
 use crate::docs_tree::Header;
@@ -20,6 +18,8 @@ use crate::parameter::Parameter;
 pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
+    /// The version of WDL this workflow is defined in.
+    version: VersionBadge,
     /// The meta of the workflow.
     meta: MetaMap,
     /// The inputs of the workflow.
@@ -30,32 +30,27 @@ pub(crate) struct Workflow {
 
 impl Workflow {
     /// Create a new workflow.
-    pub fn new(
-        name: String,
-        meta_section: Option<MetadataSection>,
-        parameter_meta: Option<ParameterMetadataSection>,
-        input_section: Option<InputSection>,
-        output_section: Option<OutputSection>,
-    ) -> Self {
-        let meta = match meta_section {
+    pub fn new(name: String, version: SupportedVersion, definition: WorkflowDefinition) -> Self {
+        let meta = match definition.metadata() {
             Some(mds) => parse_meta(&mds),
             _ => MetaMap::default(),
         };
-        let parameter_meta = match parameter_meta {
+        let parameter_meta = match definition.parameter_metadata() {
             Some(pmds) => parse_parameter_meta(&pmds),
             _ => MetaMap::default(),
         };
-        let inputs = match input_section {
+        let inputs = match definition.input() {
             Some(is) => parse_inputs(&is, &parameter_meta),
             _ => Vec::new(),
         };
-        let outputs = match output_section {
+        let outputs = match definition.output() {
             Some(os) => parse_outputs(&os, &meta, &parameter_meta),
             _ => Vec::new(),
         };
 
         Self {
             name,
+            version: VersionBadge::new(version),
             meta,
             inputs,
             outputs,
@@ -115,10 +110,22 @@ impl Workflow {
             div class="main__container" {
                 div class="main__section" {
                     article class="main__prose" {
+                        span class="text-emerald-400 not-prose" { "Workflow" }
                         h1 id="title" class="main__title" { (self.pretty_name()) }
-                        @if let Some(category) = self.category() {
-                            // TODO style this better
-                            h3 class="main__section-subheader" { "Category: " (category) }
+                        div class="flex flex-row not-prose items-center gap-2" {
+                            (self.version().render())
+                            @if let Some(category) = self.category() {
+                                div class="main__badge" {
+                                    span class="main__badge-text" {
+                                        "Category"
+                                    }
+                                    div class="main__badge-inner" {
+                                        span class="main__badge-inner-text" {
+                                            (category)
+                                        }
+                                    }
+                                }
+                            }
                         }
                         (self.description(false))
                         (meta_markup)
@@ -140,6 +147,10 @@ impl Callable for Workflow {
         &self.name
     }
 
+    fn version(&self) -> &VersionBadge {
+        &self.version
+    }
+
     fn meta(&self) -> &MetaMap {
         &self.meta
     }
@@ -156,6 +167,7 @@ impl Callable for Workflow {
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document;
+    use wdl_ast::version::V1;
 
     use super::*;
 
@@ -180,10 +192,8 @@ mod tests {
 
         let workflow = Workflow::new(
             ast_workflow.name().text().to_string(),
-            ast_workflow.metadata(),
-            ast_workflow.parameter_metadata(),
-            ast_workflow.input(),
-            ast_workflow.output(),
+            SupportedVersion::V1(V1::Zero),
+            ast_workflow,
         );
 
         assert_eq!(workflow.name(), "test");

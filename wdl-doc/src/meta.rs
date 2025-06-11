@@ -122,10 +122,10 @@ pub(crate) fn render_meta_map(
     let external_help_item = map.get(EXTERNAL_HELP_KEY);
     let warning_item = map.get(WARNING_KEY);
 
-    let any_filtered_items = !filtered_items.is_empty();
+    let any_additional_items = !filtered_items.is_empty();
     let custom_key_present =
         help_item.is_some() || external_help_item.is_some() || warning_item.is_some();
-    if !any_filtered_items && !custom_key_present {
+    if !any_additional_items && !custom_key_present {
         return None;
     }
 
@@ -161,8 +161,8 @@ pub(crate) fn render_meta_map(
                     p { (render_value(warning, summarize_if_needed)) }
                 }
             }
-            @if any_filtered_items {
-                div class="main__table-outer-container not-prose" {
+            @if any_additional_items {
+                div class="main__table-outer-container" {
                     div class="main__table-inner-container" {
                         table class="main__table" {
                             tbody {
