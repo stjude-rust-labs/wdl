@@ -423,28 +423,6 @@ impl GotoDefinitionHandler {
             let struct_def = analysis_doc
                 .structs()
                 .find(|(_, s)| {
-                    // When structs imported and aliased to a different name,they are checked
-                    // using their Type
-                    //
-                    // Eg:
-                    // `person.wdl`:
-                    //
-                    // sturct Person {
-                    //  Sting name
-                    // }
-                    //
-                    // `main.wdl`:
-                    //
-                    // import "person.wdl" as lib alias Person as person
-                    //
-                    // workflow main {
-                    //  peson a = person {
-                    //      name = "wdl"
-                    //  }
-                    //
-                    //  a.name
-                    //    ^^^^ this has a struct name as person but Type is `Person`
-                    // }
                     if let Some(s_ty) = s.ty() {
                         if let Some(s_struct_ty) = s_ty.as_struct() {
                             return s_struct_ty.name() == struct_ty.name();
