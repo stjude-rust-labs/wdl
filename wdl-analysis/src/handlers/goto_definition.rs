@@ -420,7 +420,6 @@ impl GotoDefinitionHandler {
             .unwrap_or(crate::types::Type::Union);
 
         if let Some(struct_ty) = target_type.as_struct() {
-            debug!("found a struct type: {}", struct_ty);
             let struct_def = analysis_doc
                 .structs()
                 .find(|(_, s)| {
