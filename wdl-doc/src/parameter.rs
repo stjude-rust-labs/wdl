@@ -162,13 +162,13 @@ pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
         div x-data="{ expanded: false }" {
             div x-show="!expanded" {
                 p { code { (clipped_expr) } "..." }
-                button class="hover:cursor-pointer" x-on:click="expanded = true" {
+                button type="button" class="main__button" x-on:click="expanded = true" {
                     b { "Show full expression" }
                 }
             }
             div x-show="expanded" {
                 p { code { (expr) } }
-                button class="hover:cursor-pointer" x-on:click="expanded = false" {
+                button type="button" class="main__button" x-on:click="expanded = false" {
                     b { "Show less" }
                 }
             }
