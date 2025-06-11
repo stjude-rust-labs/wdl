@@ -940,7 +940,7 @@ impl DocsTree {
                                 rect y="70" width="100" height="15" {}
                             }
                         }
-                        article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                        article class="main__prose" {
                             (content)
                         }
                     }
@@ -981,7 +981,7 @@ impl DocsTree {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
-                        article class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                        article class="main__prose" {
                             (breadcrumbs)
                         }
                         button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {

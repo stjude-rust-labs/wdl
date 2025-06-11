@@ -162,7 +162,7 @@ pub(crate) fn render_meta_map(
                 }
             }
             @if any_filtered_items {
-                div class="main__table-outer-container" {
+                div class="main__table-outer-container not-prose" {
                     div class="main__table-inner-container" {
                         table class="main__table" {
                             tbody {

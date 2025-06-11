@@ -360,14 +360,14 @@ impl Document {
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
             div class="main__container" {
-                article id="preamble" class="prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden" {
+                article id="preamble" class="main__prose" {
                     h1 id="title" class="main__title" { (self.name()) }
                     // TODO: does this need better styling?
                     h3 class="main__section-subheader" { "WDL Version: " (self.version()) }
                     (self.preamble())
                     div class="main__section" {
                         h2 id="toc" class="main__section-header" { "Table of Contents" }
-                        div class="main__table-outer-container" {
+                        div class="main__table-outer-container not-prose" {
                             div class="main__table-inner-container" {
                                 table class="main__table" {
                                     thead { tr {
@@ -378,8 +378,10 @@ impl Document {
                                     tbody {
                                         @for page in &self.local_pages {
                                             tr {
-                                                td class="text-violet-400" {
-                                                    a href=(page.0.to_string_lossy()) { (page.1.name()) }
+                                                td {
+                                                    a class="text-violet-400" href=(page.0.to_string_lossy()) {
+                                                        (page.1.name())
+                                                    }
                                                 }
                                                 td { code {
                                                     @match page.1.page_type() {
