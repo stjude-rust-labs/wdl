@@ -6,7 +6,7 @@ class SprocketCode extends HTMLElement {
 
   _getStyles() {
     return `
-      :host { display: block }
+      :host { display: block; font-size: 14px; }
       .code-block {
         margin: 0;
         border-radius: 6px;
