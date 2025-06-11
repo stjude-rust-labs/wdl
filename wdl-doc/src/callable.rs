@@ -15,53 +15,15 @@ use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
+use crate::VersionBadge;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageHeaders;
 use crate::meta::MetaMap;
 use crate::meta::render_value;
+use crate::parameter::Group;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
 use crate::parameter::render_parameter_table;
-
-/// A group of inputs.
-#[derive(Debug, Eq, PartialEq)]
-pub struct Group(pub String);
-
-impl Group {
-    /// Get the display name of the group.
-    pub fn display_name(&self) -> String {
-        self.0.clone()
-    }
-
-    /// Get the id of the group.
-    pub fn id(&self) -> String {
-        format!("inputs-{}", self.0.replace(" ", "-"))
-    }
-}
-
-impl PartialOrd for Group {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Group {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.0 == "Common" {
-            return std::cmp::Ordering::Less;
-        }
-        if other.0 == "Common" {
-            return std::cmp::Ordering::Greater;
-        }
-        if self.0 == "Resources" {
-            return std::cmp::Ordering::Greater;
-        }
-        if other.0 == "Resources" {
-            return std::cmp::Ordering::Less;
-        }
-        self.0.cmp(&other.0)
-    }
-}
 
 /// A callable (workflow or task) in a WDL document.
 pub(crate) trait Callable {
@@ -76,6 +38,9 @@ pub(crate) trait Callable {
 
     /// Get the outputs of the callable.
     fn outputs(&self) -> &[Parameter];
+
+    /// Get the WDL version of the callable.
+    fn version(&self) -> &VersionBadge;
 
     /// Get the description of the callable.
     fn description(&self, summarize_if_needed: bool) -> Markup {
@@ -310,6 +275,7 @@ mod tests {
     use wdl_ast::Document;
 
     use super::*;
+    use crate::parameter::Group;
 
     #[test]
     fn test_group_cmp() {
