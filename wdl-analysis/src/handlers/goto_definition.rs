@@ -392,7 +392,8 @@ impl GotoDefinitionHandler {
     /// # Supports:
     /// - Struct member access (`person.name`)
     /// - Call output access (`call_result.output`)
-    /// - TODO: Arrays
+    /// - Arrays (persons[0].name)
+    /// - Chained Access Expressions (documents.persons[0].address.street)
     fn resolve_access_expression(
         &self,
         parent_node: &SyntaxNode,

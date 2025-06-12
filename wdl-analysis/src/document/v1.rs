@@ -1442,6 +1442,27 @@ fn set_struct_types(document: &mut DocumentData) {
         return;
     }
 
+    fn find_deps_in_ty(ty: &wdl_ast::v1::Type, deps: &mut Vec<String>) {
+        match ty {
+            wdl_ast::v1::Type::Ref(r) => {
+                deps.push(r.name().text().to_string());
+            }
+            wdl_ast::v1::Type::Array(a) => {
+                find_deps_in_ty(&a.element_type(), deps);
+            }
+            wdl_ast::v1::Type::Map(m) => {
+                let (_, v) = m.types();
+                find_deps_in_ty(&v, deps);
+            }
+            wdl_ast::v1::Type::Pair(p) => {
+                let (left, right) = p.types();
+                find_deps_in_ty(&left, deps);
+                find_deps_in_ty(&right, deps);
+            }
+            wdl_ast::v1::Type::Object(_) | wdl_ast::v1::Type::Primitive(_) => {}
+        }
+    }
+
     // Populate a type dependency graph; any edges that would form cycles are turned
     // into diagnostics.
     let mut graph: DiGraphMap<_, _, RandomState> = DiGraphMap::new();
@@ -1456,9 +1477,12 @@ fn set_struct_types(document: &mut DocumentData) {
         let definition: StructDefinition =
             StructDefinition::cast(SyntaxNode::new_root(s.node.clone())).expect("node should cast");
         for member in definition.members() {
-            if let wdl_ast::v1::Type::Ref(r) = member.ty() {
+            let mut deps = Vec::new();
+            find_deps_in_ty(&member.ty(), &mut deps);
+
+            for dep in deps {
                 // Add an edge to the referenced struct
-                if let Some(to) = document.structs.get_index_of(r.name().text()) {
+                if let Some(to) = document.structs.get_index_of(&dep) {
                     // Only add an edge to another local struct definition
                     if document.structs[to].namespace.is_some() {
                         continue;
