@@ -130,7 +130,7 @@ impl GotoDefinitionHandler {
         graph: &DocumentGraph,
     ) -> Result<Option<GotoDefinitionResponse>> {
         match parent_node.kind() {
-            SyntaxKind::TypeRefNode => {
+            SyntaxKind::TypeRefNode | SyntaxKind::LiteralStructNode => {
                 self.resolve_type_reference(analysis_doc, token, document_uri, lines, graph)
             }
 
