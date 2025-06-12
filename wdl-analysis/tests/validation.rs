@@ -25,6 +25,7 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
+use tracing_subscriber::EnvFilter;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_ast::AstNode;
@@ -121,6 +122,10 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), Strin
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
+
     let tests = find_tests();
     println!("\nrunning {} tests\n", tests.len());
 
