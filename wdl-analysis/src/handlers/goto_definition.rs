@@ -11,7 +11,6 @@ use lsp_types::GotoDefinitionResponse;
 use lsp_types::Location;
 use lsp_types::Position;
 use rowan::TextSize;
-use tracing::debug;
 use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -155,18 +154,6 @@ impl GotoDefinitionHandler {
                 lines,
                 graph,
             ),
-
-            // TODO:
-            SyntaxKind::BoundDeclNode
-            | SyntaxKind::UnboundDeclNode
-            | SyntaxKind::ScatterStatementNode
-            | SyntaxKind::ImportAliasNode
-            | SyntaxKind::StructDefinitionNode
-            | SyntaxKind::TaskDefinitionNode
-            | SyntaxKind::WorkflowDefinitionNode => {
-                debug!("NOT YET IMPLEMENTED: {kind:?}", kind = parent_node.kind());
-                Ok(None)
-            }
 
             // handled by scope resolution
             SyntaxKind::NameRefExprNode => Ok(None),
