@@ -88,7 +88,7 @@ impl std::str::FromStr for Source {
 impl Default for Source {
     fn default() -> Self {
         // Default to the current directory.
-        Source::Directory(std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")))
+        Source::Directory(std::env::current_dir().unwrap_or_else(|_| PathBuf::from(std::path::Component::CurDir.as_os_str()))
     }
 }
 
