@@ -131,7 +131,7 @@ impl GotoDefinitionHandler {
     ) -> Result<Option<GotoDefinitionResponse>> {
         match parent_node.kind() {
             SyntaxKind::TypeRefNode => {
-                self.resolve_type_reference(analysis_doc, token.text(), document_uri, lines, graph)
+                self.resolve_type_reference(analysis_doc, token, document_uri, lines, graph)
             }
 
             SyntaxKind::CallTargetNode => self.resolve_call_target(
@@ -155,7 +155,7 @@ impl GotoDefinitionHandler {
                 graph,
             ),
 
-            // handled by scope resolution
+            // This case is handled by scope resolution.
             SyntaxKind::NameRefExprNode => Ok(None),
             _ => Ok(None),
         }
@@ -168,64 +168,71 @@ impl GotoDefinitionHandler {
     fn resolve_type_reference(
         &self,
         analysis_doc: &Document,
-        ident_text: &str,
+        token: &SyntaxToken,
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
     ) -> Result<Option<GotoDefinitionResponse>> {
+        let ident_text = token.text();
         if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
-            let Some(ns_name) = struct_info.namespace() else {
+            if struct_info.namespace().is_none() {
+                // Handle struct defined in local document.
                 return Ok(Some(location(
                     document_uri,
                     struct_info.name_span(),
                     lines,
                 )?));
-            };
-
-            let ns = analysis_doc
-                .namespace(ns_name)
-                .expect("namespace should be present");
-            let node = graph.get(graph.get_index(ns.source()).unwrap());
-            let imported_lines = node.parse_state().lines().unwrap().clone();
-
-            if let Some(struct_ty) = struct_info.ty() {
-                if let Some(s_struct_ty) = struct_ty.as_struct() {
-                    let original_name = s_struct_ty.name();
-                    // aliased struct
-                    if struct_info.name() != original_name.as_str() {
-                        return Ok(Some(location(
-                            document_uri,
-                            struct_info.name_span(),
-                            lines,
-                        )?));
-                    }
-                    // original struct
-                    let imported_doc = node.document().expect("document should exist");
-                    if let Some(original_struct) = imported_doc.struct_by_name(original_name) {
-                        return Ok(Some(location(
-                            ns.source(),
-                            original_struct.name_span(),
-                            &imported_lines,
-                        )?));
-                    }
-                }
             }
 
-            return Ok(Some(location(
-                ns.source(),
-                struct_info.name_span(),
-                &imported_lines,
-            )?));
+            let is_aliased_import = struct_info
+                .ty()
+                .and_then(|t| t.as_struct())
+                .map(|st| st.name().as_str() != ident_text)
+                .unwrap_or(false);
+
+            if is_aliased_import {
+                // Returns the location where alias import was defined.
+                return Ok(Some(location(
+                    document_uri,
+                    struct_info.name_span(),
+                    lines,
+                )?));
+            } else {
+                // Return the location in the imported file.
+                let ns_name = struct_info.namespace().unwrap();
+
+                // SAFETY: we just found a struct_info with this namespace name and the document
+                // gurantees that `analysis_doc.namespaces` contains a corresponding entry for
+                // `ns_name`.
+                let ns = analysis_doc
+                    .namespace(ns_name)
+                    .expect("namespace should be present");
+                let node = graph.get(graph.get_index(ns.source()).unwrap());
+                let imported_lines = node.parse_state().lines().unwrap().clone();
+                let imported_doc = node.document().expect("document should exist");
+
+                if let Some(original_struct) = imported_doc.struct_by_name(ident_text) {
+                    return Ok(Some(location(
+                        ns.source(),
+                        original_struct.name_span(),
+                        &imported_lines,
+                    )?));
+                }
+            }
         }
 
+        // Fallback search in case the struct is not in the current document's analysis
+        // map
         for (_, ns) in analysis_doc.namespaces() {
             let node = graph.get(graph.get_index(ns.source()).unwrap());
             let Some(imported_doc) = node.document() else {
                 continue;
             };
+
             let Some(struct_info) = imported_doc.struct_by_name(ident_text) else {
                 continue;
             };
+
             let imported_lines = node.parse_state().lines().unwrap().clone();
             return Ok(Some(location(
                 ns.source(),
@@ -235,7 +242,7 @@ impl GotoDefinitionHandler {
         }
 
         Err(anyhow!(
-            "could not resolve type reference for: {}",
+            "could not resolve type reference for `{}`",
             ident_text
         ))
     }

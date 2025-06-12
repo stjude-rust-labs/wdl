@@ -1442,6 +1442,8 @@ fn set_struct_types(document: &mut DocumentData) {
         return;
     }
 
+    /// Recursively finds all nested struct type dependencies to build
+    /// dependency graphs
     fn find_deps_in_ty(ty: &wdl_ast::v1::Type, deps: &mut Vec<String>) {
         match ty {
             wdl_ast::v1::Type::Ref(r) => {

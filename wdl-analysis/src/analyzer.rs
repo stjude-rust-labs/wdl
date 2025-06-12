@@ -721,7 +721,7 @@ where
         })
     }
 
-    /// Performs a `goto definition` for a symbol at the current position.
+    /// Performs a "goto definition" for a symbol at the current position.
     pub async fn goto_definition(
         &self,
         document: Url,
