@@ -1144,7 +1144,11 @@ mod test {
         }
         "#;
 
-        let (document, diagnostics) = Document::parse(source);
+        let wdl_ast::ParseResult {
+            document,
+            diagnostics,
+            ..
+        } = Document::parse(source);
         assert!(
             diagnostics.is_empty(),
             "parsing should succeed without diagnostics"

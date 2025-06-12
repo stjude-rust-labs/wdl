@@ -521,7 +521,7 @@ impl Document {
         let mut data = DocumentData::new(
             node.uri().clone(),
             Some(root.inner().green().into()),
-            SupportedVersion::from_str(version.text()).ok(),
+            Some(SupportedVersion::from_str(version.text()).unwrap_or_default()),
             diagnostics.to_vec(),
         );
         match root.ast() {

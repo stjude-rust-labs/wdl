@@ -72,7 +72,10 @@ type PreambleParser<'a> = Parser<'a, PreambleToken>;
 /// Parses a WDL document.
 ///
 /// Returns the parser events that result from parsing the document.
-pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>) {
+pub(crate) fn document(
+    source: &str,
+    mut parser: PreambleParser<'_>,
+) -> (Vec<Event>, Option<SupportedVersion>, Vec<Diagnostic>) {
     let root = parser.start();
     // Look for a starting `version` keyword token
     // If this fails, an error is emitted and we'll skip parsing the remainder of
@@ -103,7 +106,7 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
                     };
 
                     match effective_version {
-                        Some(_) => {
+                        Some(v) => {
                             let mut parser = parser.morph();
                             v1::items(&mut parser);
                             root.complete(&mut parser, SyntaxKind::RootNode);
@@ -111,7 +114,7 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
                             if let Some(warning) = version_warning {
                                 output.diagnostics.push(warning);
                             }
-                            return (output.events, output.diagnostics);
+                            return (output.events, Some(v), output.diagnostics);
                         }
                         _ => (
                             parser,
@@ -146,13 +149,13 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
     parser.consume_remainder();
     root.complete(&mut parser, SyntaxKind::RootNode);
     let output = parser.finish();
-    (output.events, output.diagnostics)
+    (output.events, None, output.diagnostics)
 }
 
 /// Parses the version statement of a WDL source file.
 ///
 /// Returns the source span of the version token if present.
-pub fn version_statement(
+fn version_statement(
     mut parser: Parser<'_, PreambleToken>,
     marker: Marker,
 ) -> (

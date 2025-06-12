@@ -40,6 +40,7 @@ use v1::OpenBrace;
 use v1::OpenHeredoc;
 pub use wdl_grammar::Diagnostic;
 pub use wdl_grammar::Label;
+pub use wdl_grammar::ParserConfig;
 pub use wdl_grammar::Severity;
 pub use wdl_grammar::Span;
 pub use wdl_grammar::SupportedVersion;
@@ -440,6 +441,13 @@ impl<N: TreeNode> AstNode<N> for Document<N> {
     }
 }
 
+#[derive(Clone, PartialEq, Eq)]
+pub struct ParseResult<N: TreeNode = SyntaxNode> {
+    pub document: Document<N>,
+    pub effective_version: Option<SupportedVersion>,
+    pub diagnostics: Vec<Diagnostic>,
+}
+
 impl Document {
     /// Parses a document from the given source.
     ///
@@ -468,12 +476,50 @@ impl Document {
     ///     Ast::Unsupported => panic!("should be a V1 AST"),
     /// }
     /// ```
-    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
-        let (tree, diagnostics) = SyntaxTree::parse(source);
-        (
-            Document::cast(tree.into_syntax()).expect("document should cast"),
+    pub fn parse(source: &str) -> ParseResult {
+        Self::parse_with_config(ParserConfig::default(), source)
+    }
+
+    /// Parses a document from the given source using the specified
+    /// configuration.
+    ///
+    /// A document and its AST elements are trivially cloned.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use wdl_ast::{Document, AstToken, Ast, ParserConfig};
+    /// let config = ParserConfig::default();
+    /// let (document, diagnostics) = Document::parse_with_config(config, "version 1.1");
+    /// assert!(diagnostics.is_empty());
+    ///
+    /// assert_eq!(
+    ///     document
+    ///         .version_statement()
+    ///         .expect("should have version statement")
+    ///         .version()
+    ///         .text(),
+    ///     "1.1"
+    /// );
+    ///
+    /// match document.ast() {
+    ///     Ast::V1(ast) => {
+    ///         assert_eq!(ast.items().count(), 0);
+    ///     }
+    ///     Ast::Unsupported => panic!("should be a V1 AST"),
+    /// }
+    /// ```
+    pub fn parse_with_config(config: ParserConfig, source: &str) -> ParseResult {
+        let wdl_grammar::ParseResult {
+            tree,
+            effective_version,
             diagnostics,
-        )
+        } = SyntaxTree::parse_with_config(config, source);
+        ParseResult {
+            document: Document::cast(tree.into_syntax()).expect("document should cast"),
+            effective_version,
+            diagnostics,
+        }
     }
 }
 
@@ -498,6 +544,15 @@ impl<N: TreeNode> Document<N> {
                 _ => Ast::Unsupported,
             })
             .unwrap_or(Ast::Unsupported)
+    }
+
+    /// Gets the AST representation of the document as if the version were
+    /// `effective_version` rather than the version declared in the syntax.
+    pub fn ast_as_version(&self, effective_version: SupportedVersion) -> Ast<N> {
+        match effective_version {
+            SupportedVersion::V1(_) => Ast::V1(v1::Ast(self.0.clone())),
+            _ => Ast::Unsupported,
+        }
     }
 
     /// Morphs a document of one node type to a document of a different node
