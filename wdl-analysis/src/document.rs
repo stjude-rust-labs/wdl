@@ -106,6 +106,16 @@ impl Struct {
         self.name_span
     }
 
+    /// Gets the offset of the struct
+    pub fn offset(&self) -> usize {
+        self.offset
+    }
+
+    /// Gets the node of the struct.
+    pub fn node(&self) -> &rowan::GreenNode {
+        &self.node
+    }
+
     /// Gets the namespace that defines this struct.
     ///
     /// Returns `None` for structs defined in the containing document or `Some`
@@ -120,16 +130,6 @@ impl Struct {
     /// the struct; this may happen if the struct definition is recursive.
     pub fn ty(&self) -> Option<&Type> {
         self.ty.as_ref()
-    }
-
-    /// Gets the node of the struct.
-    pub fn node(&self) -> &rowan::GreenNode {
-        &self.node
-    }
-
-    /// Gets the offset of the struct
-    pub fn offset(&self) -> usize {
-        self.offset
     }
 }
 
@@ -324,7 +324,7 @@ impl Input {
 pub struct Output {
     /// The type of the output.
     ty: Type,
-    /// The span of the output.
+    /// The span of the output name.
     name_span: Span,
 }
 
