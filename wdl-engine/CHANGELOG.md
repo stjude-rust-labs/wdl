@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fixed the macOS and Windows CI jobs to run tests with the Docker backend ([#478](https://github.com/stjude-rust-labs/wdl/pull/478)).
 * Fixed guest paths for redirected stdio for both the Docker and TES backends ([#470](https://github.com/stjude-rust-labs/wdl/pull/470)).
 
 ### Changed
