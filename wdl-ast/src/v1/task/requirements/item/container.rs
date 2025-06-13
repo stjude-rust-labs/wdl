@@ -1,7 +1,7 @@
 //! The `container` item within the `requirements` block.
 
-use wdl_grammar::SyntaxKind;
-use wdl_grammar::SyntaxNode;
+use crate::wdl_grammar::SyntaxKind;
+use crate::wdl_grammar::SyntaxNode;
 
 use crate::AstNode;
 use crate::AstToken;

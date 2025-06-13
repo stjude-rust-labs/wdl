@@ -28,8 +28,8 @@ use wdl_ast::SyntaxToken;
 use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 use wdl_ast::Whitespace;
+use wdl_ast::concrete::ALL_SYNTAX_KIND;
 use wdl_ast::v1;
-use wdl_grammar::ALL_SYNTAX_KIND;
 
 /// A private module for sealed traits.
 ///

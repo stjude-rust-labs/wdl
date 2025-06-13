@@ -11,7 +11,7 @@ use crate::v1::LiteralExpr;
 pub mod uri;
 
 pub use uri::Uri;
-use wdl_grammar::SyntaxNode;
+use crate::wdl_grammar::SyntaxNode;
 
 /// An error when parsing a [`Uri`] from an expression.
 #[derive(Debug)]

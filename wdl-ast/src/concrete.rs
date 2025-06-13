@@ -17,19 +17,12 @@
 //! An example of parsing WDL source into a CST and printing the tree:
 //!
 //! ```rust
-//! use wdl_grammar::SyntaxTree;
+//! use wdl_ast::concrete::SyntaxTree;
 //!
 //! let (tree, diagnostics) = SyntaxTree::parse("version 1.1");
 //! assert!(diagnostics.is_empty());
 //! println!("{tree:#?}");
 //! ```
-
-#![warn(missing_docs)]
-#![warn(rust_2018_idioms)]
-#![warn(rust_2021_compatibility)]
-#![warn(missing_debug_implementations)]
-#![warn(clippy::missing_docs_in_private_items)]
-#![warn(rustdoc::broken_intra_doc_links)]
 
 mod diagnostic;
 pub mod grammar;

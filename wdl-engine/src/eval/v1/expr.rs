@@ -1461,9 +1461,9 @@ pub(crate) mod test {
     use wdl_analysis::diagnostics::unknown_type;
     use wdl_analysis::types::StructType;
     use wdl_ast::NewRoot;
-    use wdl_grammar::construct_tree;
-    use wdl_grammar::grammar::v1;
-    use wdl_grammar::lexer::Lexer;
+    use wdl_ast::concrete::construct_tree;
+    use wdl_ast::concrete::grammar::v1;
+    use wdl_ast::lexer::Lexer;
 
     use super::*;
     use crate::ScopeRef;
