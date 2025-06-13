@@ -460,7 +460,7 @@ impl VersionBadge {
                     }
                 }
                 @if latest {
-                    div class="main__badge-inner" {
+                    div class="main__badge-inner main__badge-inner-latest" {
                         span class="main__badge-inner-text" {
                             "Latest"
                         }
