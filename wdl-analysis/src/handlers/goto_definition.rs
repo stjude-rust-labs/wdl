@@ -44,7 +44,7 @@ impl Default for GotoDefinitionHandler {
 }
 
 impl GotoDefinitionHandler {
-    /// Creates a new goto definition handler
+    /// Creates a new goto definition handler.
     pub fn new() -> Self {
         Self
     }
@@ -119,7 +119,7 @@ impl GotoDefinitionHandler {
         self.resolve_global_identifier(analysis_doc, ident_text, &document_uri, &lines, graph)
     }
 
-    /// Resolves identifier definition based on their parent node's syntax kind
+    /// Resolves identifier definition based on their parent node's syntax kind.
     fn resolve_by_context(
         &self,
         parent_node: &SyntaxNode,
@@ -164,7 +164,7 @@ impl GotoDefinitionHandler {
     /// Resolves type references to their definition locations.
     ///
     /// Searches for struct definitions in the current document and imported
-    /// namespaces
+    /// namespaces.
     fn resolve_type_reference(
         &self,
         analysis_doc: &Document,
@@ -342,7 +342,7 @@ impl GotoDefinitionHandler {
     }
 
     /// Searches for global definitions(structs, tasks, workflows) in the
-    /// current document and all imported namespaces
+    /// current document and all imported namespaces.
     fn resolve_global_identifier(
         &self,
         analysis_doc: &Document,
@@ -358,11 +358,16 @@ impl GotoDefinitionHandler {
         }
 
         for (_, ns) in analysis_doc.namespaces() {
+            // SAFETY: we know `get_index` will return `Some` as `ns.source` comes from
+            // `analysis_doc.namespaces` which only contains namespaces for documents that
+            // are guranteed to be present in the graph.
             let node = graph.get(graph.get_index(ns.source()).unwrap());
             let Some(imported_doc) = node.document() else {
                 continue;
             };
 
+            // SAFETY: we know `lines` will return Some as we only reach here when
+            // `node.document` is fully parsed.
             let imported_lines = node.parse_state().lines().unwrap().clone();
 
             if let Some(location) = find_global_definition_in_doc(
@@ -397,6 +402,9 @@ impl GotoDefinitionHandler {
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
     ) -> Result<Option<GotoDefinitionResponse>> {
+        // SAFETY: we already checked `parent_node.kind()` is
+        // `SyntaxKind::AccessExprNode` in the `resolve_by_context` before
+        // calling this function.
         let access_expr = wdl_ast::v1::AccessExpr::cast(parent_node.clone()).unwrap();
         let (target_expr, member_ident) = access_expr.operands();
 
@@ -433,8 +441,16 @@ impl GotoDefinitionHandler {
 
             let (uri, def_lines) = match struct_def.namespace() {
                 Some(ns_name) => {
+                    // SAFETY: `namepsace` returns `Some` only when struct was imported from a
+                    // namepsace that exists in the document.
                     let ns = analysis_doc.namespace(ns_name).unwrap();
+
+                    // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
+                    // document exists in the graph.
                     let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+
+                    // SAFETY: we successfully got the document above, it's in
+                    // `ParseState::Parsed` which always has a valid lines field.
                     let lines = imported_node.parse_state().lines().unwrap().clone();
                     (ns.source().as_ref(), lines)
                 }
@@ -451,25 +467,36 @@ impl GotoDefinitionHandler {
             {
                 let member_span = member.name().span();
                 let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
+                // Returns found struct member definition location.
                 return Ok(Some(location(uri, span, &def_lines)?));
             }
         }
 
         if let Some(call_ty) = target_type.as_call() {
             let Some(output) = call_ty.outputs().get(member_ident.text()) else {
+                // Call output not found for the requested member.
                 return Ok(None);
             };
 
             let (uri, callee_lines) = match call_ty.namespace() {
                 Some(ns_name) => {
+                    // SAFETY: `namespace` returns `Some` only when the call type references
+                    // a namespace that exists in document.
                     let ns = analysis_doc.namespace(ns_name).unwrap();
+
+                    // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
+                    // document exists in the graph.
                     let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+
+                    // SAFETY: we successfully got the document above, it's in
+                    // `ParseState::Parsed` which always has a valid lines field.
                     let lines = imported_node.parse_state().lines().unwrap().clone();
                     (ns.source().as_ref(), lines.clone())
                 }
                 None => (document_uri, lines.clone()),
             };
 
+            // Returns found call output definition location.
             return Ok(Some(location(uri, output.name_span(), &callee_lines)?));
         }
 
@@ -500,7 +527,7 @@ fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
     Ok(Position::new(line_col.line, line_col.col))
 }
 
-/// Converts a `Span` to an LSP location
+/// Converts a `Span` to an LSP location.
 fn location(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionResponse> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
@@ -515,7 +542,7 @@ fn location(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinit
     )))
 }
 
-/// Finds global structs, tasks and workflow definition in a document
+/// Finds global structs, tasks and workflow definition in a document.
 fn find_global_definition_in_doc(
     analysis_doc: &Document,
     ident_text: &str,
@@ -568,7 +595,7 @@ fn position_to_offset(
 /// Context for evaluating expressions during goto definition resolution.
 struct GotoDefEvalContext<'a> {
     /// The scope reference containing the variable and name bindings at the
-    /// current position
+    /// current position.
     scope: ScopeRef<'a>,
 
     /// The document being analyzed.
