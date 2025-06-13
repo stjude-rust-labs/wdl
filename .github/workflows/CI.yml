@@ -54,8 +54,7 @@ jobs:
           brew install colima
           brew install lima-additional-guestagents
           # M1 and M2 Macs that the Github Actions supplies don't support nested virtualization. This forces x86 emulation to get around this
-          #--mount /private is necessary here in order to give docker access to mac's temp directory for tests
-          colima start --mount /private --memory 4 --network-address --arch x86_64
+          colima start --mount $TMPDIR:w --mount $(pwd) --mount $HOME/Library/Caches/wdl:w --memory 4 --network-address --arch x86_64
           echo "DOCKER_HOST=unix:///Users/runner/.colima/docker.sock" >> $GITHUB_ENV
       - name: Setup WSL (Windows)
         if: ${{'windows-latest' == matrix.os}}
