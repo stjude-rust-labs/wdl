@@ -174,10 +174,6 @@ fn configs() -> Vec<config::Config> {
                 ..Default::default()
             }
         },
-        // Currently we limit running the Docker backend to Linux as GitHub does not have Docker
-        // installed on macOS hosted runners and the Windows hosted runners are configured to use
-        // Windows containers
-        #[cfg(target_os = "linux")]
         {
             config::Config {
                 backends: [(
