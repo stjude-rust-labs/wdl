@@ -29,8 +29,8 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
-use wdl_grammar::Diagnostic;
-use wdl_grammar::SyntaxTree;
+use wdl_ast::Diagnostic;
+use wdl_ast::SyntaxTree;
 
 /// Finds tests for this package.
 fn find_tests() -> Vec<PathBuf> {

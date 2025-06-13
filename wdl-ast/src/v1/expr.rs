@@ -1,8 +1,6 @@
 //! V1 AST representation for expressions.
 
 use rowan::NodeOrToken;
-use wdl_grammar::lexer::v1::EscapeToken;
-use wdl_grammar::lexer::v1::Logos;
 
 use super::Minus;
 use crate::AstNode;
@@ -13,6 +11,8 @@ use crate::SyntaxNode;
 use crate::SyntaxToken;
 use crate::TreeNode;
 use crate::TreeToken;
+use crate::concrete::lexer::v1::EscapeToken;
+use crate::concrete::lexer::v1::Logos;
 
 /// Represents an expression.
 #[derive(Clone, Debug, PartialEq, Eq)]

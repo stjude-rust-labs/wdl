@@ -6,9 +6,9 @@ use std::iter::FusedIterator;
 use rowan::Language;
 use rowan::api::PreorderWithTokens;
 
-use crate::SyntaxElement;
-use crate::SyntaxNode;
-use crate::WorkflowDescriptionLanguage;
+use crate::concrete::SyntaxElement;
+use crate::concrete::SyntaxNode;
+use crate::concrete::WorkflowDescriptionLanguage;
 
 /// An iterator that performs a pre-order traversal of a
 /// [`SyntaxNode`](rowan::SyntaxNode)'s descendants and yields all elements
@@ -152,7 +152,7 @@ mod tests {
     use crate::SyntaxKind;
     use crate::SyntaxNode;
     use crate::SyntaxTree;
-    use crate::dive::Divable;
+    use crate::concrete::dive::Divable as _;
 
     fn get_syntax_node() -> SyntaxNode {
         static GREEN_NODE: OnceLock<GreenNode> = OnceLock::new();

@@ -18,7 +18,6 @@ wdl-cli = { path = "../wdl-cli", version = "0.2.0", optional = true }
 wdl-doc = { path = "../wdl-doc", version = "0.4.0", optional = true }
 wdl-engine = { path = "../wdl-engine", version = "0.4.0", optional = true }
 wdl-format = { path = "../wdl-format", version = "0.7.0", optional = true }
-wdl-grammar = { path = "../wdl-grammar", version = "0.13.0", optional = true }
 wdl-lint = { path = "../wdl-lint", version = "0.12.0", optional = true }
 wdl-lsp = { path = "../wdl-lsp", version = "0.9.0", optional = true }
 
@@ -55,7 +54,6 @@ default = [
     "format",
     "cli",
     "doc",
-    "grammar",
     "lint",
     "lsp",
 ]
@@ -65,7 +63,6 @@ cli = ["dep:wdl-cli"]
 doc = ["dep:wdl-doc"]
 engine = ["dep:wdl-engine"]
 format = ["dep:wdl-format"]
-grammar = ["dep:wdl-grammar"]
 lint = ["dep:wdl-lint"]
 lsp = ["dep:wdl-lsp"]
 codespan = ["ast", "wdl-ast/codespan", "dep:codespan-reporting"]

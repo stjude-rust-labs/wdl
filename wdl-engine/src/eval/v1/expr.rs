@@ -1461,9 +1461,9 @@ pub(crate) mod test {
     use wdl_analysis::diagnostics::unknown_type;
     use wdl_analysis::types::StructType;
     use wdl_ast::NewRoot;
-    use wdl_grammar::construct_tree;
-    use wdl_grammar::grammar::v1;
-    use wdl_grammar::lexer::Lexer;
+    use wdl_ast::concrete::construct_tree;
+    use wdl_ast::concrete::grammar::v1;
+    use wdl_ast::concrete::lexer::Lexer;
 
     use super::*;
     use crate::ScopeRef;
@@ -1679,6 +1679,12 @@ pub(crate) mod test {
         context: TestEvaluationContext<'_>,
         source: &str,
     ) -> Result<Value, Diagnostic> {
+        // TODO ACF 2025-06-16: abstract out this dance of building a lexer and manually
+        // parsing into a per-production utility parse function; we really
+        // shouldn't have to reach into the guts of the lexer and parser modules
+        // in order to write a test here. Main abstraction challenge is the use
+        // of `v1::expr`, but perhaps the CST parse function could be included
+        // in `AstNode` or another trait.
         let source = source.trim();
         let mut parser = v1::Parser::new(Lexer::new(source));
         let marker = parser.start();

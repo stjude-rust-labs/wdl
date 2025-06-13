@@ -4,10 +4,9 @@
 use std::ops::Deref;
 use std::str::FromStr;
 
-use wdl_grammar::SyntaxNode;
-
 use crate::AstNode;
 use crate::AstToken;
+use crate::SyntaxNode;
 use crate::TreeNode;
 use crate::v1::LiteralString;
 

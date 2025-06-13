@@ -1,17 +1,25 @@
-//! An abstract syntax tree for Workflow Description Language (WDL) documents.
+//! Abstract and concrete syntax representations for [Workflow Description
+//! Language (WDL)][wdl] documents.
 //!
-//! The AST implementation is effectively a facade over the concrete syntax tree
-//! (CST) implemented by [SyntaxTree] from `wdl-grammar`.
+//! # Abstract syntax
 //!
-//! An AST is cheap to construct and may be cheaply cloned at any level.
+//! Abstract syntax trees (AST) are available via the [`Document`] type. ASTs
+//! are cheap to construct and they or their subtrees can be cloned cheaply.
 //!
-//! However, an AST (and the underlying CST) are immutable; updating the tree
+//! An AST (and the underlying concrete syntax) are immutable; updating the tree
 //! requires replacing a node in the tree to produce a new tree. The unaffected
 //! nodes of the replacement are reused from the old tree to the new tree.
 //!
-//! # Examples
+//! ## Relation to concrete syntax
 //!
-//! An example of parsing a WDL document into an AST and validating it:
+//! The AST implementation is a wrapper around concrete syntax trees (CST). To
+//! access the underlying CST, you can use methods from the [`AstNode`] trait,
+//! or build CSTs directly using [`SyntaxTree`] or the other types defined in
+//! the [`concrete`] module.
+//!
+//! ## Examples
+//!
+//! Parsing a WDL document into an AST and validating it:
 //!
 //! ```rust
 //! # let source = "version 1.1\nworkflow test {}";
@@ -22,6 +30,8 @@
 //!     // Handle the failure to parse
 //! }
 //! ```
+//!
+//! [wdl]: https://openwdl.org/
 
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
@@ -32,32 +42,46 @@
 
 use std::fmt;
 
+#[doc(inline)]
+pub use concrete::SyntaxElement;
+#[doc(inline)]
+pub use concrete::SyntaxKind;
+#[doc(inline)]
+pub use concrete::SyntaxNode;
+#[doc(inline)]
+pub use concrete::SyntaxToken;
+#[doc(inline)]
+pub use concrete::SyntaxTokenExt;
+#[doc(inline)]
+pub use concrete::SyntaxTree;
+#[doc(inline)]
+pub use concrete::WorkflowDescriptionLanguage;
+#[doc(inline)]
+pub use concrete::lexer::v1::is_ident;
+#[doc(inline)]
+pub use diagnostic::Diagnostic;
+#[doc(inline)]
+pub use diagnostic::Label;
+#[doc(inline)]
+pub use diagnostic::Severity;
+#[doc(inline)]
+pub use diagnostic::Span;
+pub use element::*;
+#[doc(inline)]
 pub use rowan::Direction;
 use rowan::NodeOrToken;
 use v1::CloseBrace;
 use v1::CloseHeredoc;
 use v1::OpenBrace;
 use v1::OpenHeredoc;
-pub use wdl_grammar::Diagnostic;
-pub use wdl_grammar::Label;
-pub use wdl_grammar::Severity;
-pub use wdl_grammar::Span;
-pub use wdl_grammar::SupportedVersion;
-pub use wdl_grammar::SyntaxElement;
-pub use wdl_grammar::SyntaxKind;
-pub use wdl_grammar::SyntaxNode;
-pub use wdl_grammar::SyntaxToken;
-pub use wdl_grammar::SyntaxTokenExt;
-pub use wdl_grammar::SyntaxTree;
-pub use wdl_grammar::WorkflowDescriptionLanguage;
-pub use wdl_grammar::lexer;
-pub use wdl_grammar::version;
+#[doc(inline)]
+pub use version::SupportedVersion;
 
-pub mod v1;
-
+pub mod concrete;
+pub mod diagnostic;
 mod element;
-
-pub use element::*;
+pub mod v1;
+pub mod version;
 
 /// A trait that abstracts the underlying representation of a syntax tree node.
 ///
@@ -494,7 +518,6 @@ impl<N: TreeNode> Document<N> {
             .and_then(|s| s.version().text().parse::<SupportedVersion>().ok())
             .map(|v| match v {
                 SupportedVersion::V1(_) => Ast::V1(v1::Ast(self.0.clone())),
-                _ => Ast::Unsupported,
             })
             .unwrap_or(Ast::Unsupported)
     }
