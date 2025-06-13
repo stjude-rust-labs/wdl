@@ -1,8 +1,8 @@
 //! V1 AST representation for expressions.
 
 use rowan::NodeOrToken;
-use wdl_grammar::lexer::v1::EscapeToken;
-use wdl_grammar::lexer::v1::Logos;
+use crate::wdl_grammar::lexer::v1::EscapeToken;
+use crate::wdl_grammar::lexer::v1::Logos;
 
 use super::Minus;
 use crate::AstNode;

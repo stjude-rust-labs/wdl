@@ -56,6 +56,8 @@ pub use wdl_grammar::version;
 
 pub mod v1;
 
+pub mod concrete;
+use concrete as wdl_grammar;
 mod element;
 
 pub use element::*;
@@ -495,7 +497,6 @@ impl<N: TreeNode> Document<N> {
             .and_then(|s| s.version().text().parse::<SupportedVersion>().ok())
             .map(|v| match v {
                 SupportedVersion::V1(_) => Ast::V1(v1::Ast(self.0.clone())),
-                _ => Ast::Unsupported,
             })
             .unwrap_or(Ast::Unsupported)
     }

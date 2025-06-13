@@ -41,7 +41,6 @@ use wdl_ast::v1::TASK_FIELD_META;
 use wdl_ast::v1::TASK_FIELD_NAME;
 use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
 use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
-use wdl_grammar::lexer::v1::is_ident;
 
 use crate::EvaluationContext;
 use crate::Outputs;
@@ -867,7 +866,7 @@ impl<'de> serde::Deserialize<'de> for Value {
 
                 let mut members = IndexMap::new();
                 while let Some(key) = map.next_key::<String>()? {
-                    if !is_ident(&key) {
+                    if !wdl_ast::concrete::lexer::v1::is_ident(&key) {
                         return Err(A::Error::custom(format!(
                             "object key `{key}` is not a valid WDL identifier"
                         )));

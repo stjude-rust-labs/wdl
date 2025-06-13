@@ -2,13 +2,13 @@
 
 use super::Diagnostic;
 use super::Span;
+use super::SupportedVersion;
 use super::lexer::PreambleToken;
+use super::lexer::VersionStatementToken;
 use super::parser::Event;
 use super::parser::Marker;
 use super::parser::Parser;
 use super::tree::SyntaxKind;
-use crate::SupportedVersion;
-use crate::lexer::VersionStatementToken;
 
 pub mod v1;
 

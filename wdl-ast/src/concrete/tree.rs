@@ -17,7 +17,7 @@ use super::Diagnostic;
 use super::grammar;
 use super::lexer::Lexer;
 use super::parser::Event;
-use crate::parser::Parser;
+use super::parser::Parser;
 
 /// Represents the kind of syntax element (node or token) in a WDL concrete
 /// syntax tree (CST).
@@ -672,7 +672,7 @@ impl SyntaxTree {
     /// # Example
     ///
     /// ```rust
-    /// # use wdl_grammar::SyntaxTree;
+    /// # use wdl_ast::concrete::SyntaxTree;
     /// let (tree, diagnostics) = SyntaxTree::parse("version 1.1");
     /// assert!(diagnostics.is_empty());
     /// println!("{tree:#?}");
