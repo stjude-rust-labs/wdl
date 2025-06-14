@@ -8,6 +8,8 @@
       "Courier New", monospace;
     --color-yellow-50: oklch(98.7% 0.026 102.212);
     --color-yellow-900: oklch(42.1% 0.095 57.708);
+    --color-green-100: oklch(96.2% 0.044 156.743);
+    --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-emerald-400: oklch(76.5% 0.177 163.223);
     --color-violet-400: oklch(70.2% 0.183 293.541);
@@ -1353,6 +1355,25 @@
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
     color: var(--color-slate-100);
+  }
+  .main__badge-green {
+    margin-block: calc(var(--spacing) * 2);
+    display: flex;
+    max-width: fit-content;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    border-radius: var(--radius-md);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-green-400);
+    background-color: var(--color-green-600);
+    padding: calc(var(--spacing) * 1.5);
+  }
+  .main__badge-green-text {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-green-100);
   }
 }
 @property --tw-rotate-x {

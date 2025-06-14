@@ -82,14 +82,48 @@ impl Workflow {
     /// Renders the meta section of the workflow as HTML.
     ///
     /// This will render all metadata key-value pairs except for `name`,
-    /// `category`, `description`, and `outputs`.
+    /// `category`, `description`, `allowNestedInputs`/`allow_nested_inputs`,
+    /// and `outputs`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
         render_meta_map(
             self.meta(),
-            &["name", "category", "outputs", "description"],
+            &[
+                "name",
+                "category",
+                "outputs",
+                "description",
+                "allowNestedInputs",
+                "allow_nested_inputs",
+            ],
             false,
             assets,
         )
+    }
+
+    /// Render the `allowNestedInputs`/`allow_nested_inputs` meta entry as HTML.
+    pub fn render_allow_nested_inputs(&self) -> Markup {
+        if let Some(MetadataValue::Boolean(b)) = self
+            .meta
+            .get("allowNestedInputs")
+            .or(self.meta.get("allow_nested_inputs"))
+        {
+            if b.value() {
+                return html! {
+                    div class="main__badge-green" {
+                        span class="main__badge-green-text" {
+                            "Nested Inputs Allowed"
+                        }
+                    }
+                };
+            }
+        }
+        html! {
+            div class="main__badge" {
+                span class="main__badge-text" {
+                    "Nested Inputs Not Allowed"
+                }
+            }
+        }
     }
 
     /// Render the workflow as HTML.
@@ -126,6 +160,7 @@ impl Workflow {
                                     }
                                 }
                             }
+                            (self.render_allow_nested_inputs())
                         }
                         (self.description(false))
                         (meta_markup)
