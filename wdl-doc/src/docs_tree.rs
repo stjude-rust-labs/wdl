@@ -915,7 +915,9 @@ impl DocsTree {
         let content = html! {
             h1 class="main__title" { "Home" }
             @if let Some(homepage) = &self.homepage {
-                (Markdown(std::fs::read_to_string(homepage)?).render())
+                div class="markdown-body" {
+                    (Markdown(std::fs::read_to_string(homepage)?).render())
+                }
             } @else {
                 div class="flex flex-col flex-grow items-center justify-center size-full gap-y-2 pt-8" {
                     img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
@@ -940,9 +942,7 @@ impl DocsTree {
                                 rect y="70" width="100" height="15" {}
                             }
                         }
-                        article class="main__prose" {
-                            (content)
-                        }
+                        (content)
                     }
                     div class="layout__sidebar-right" {
                         (self.render_right_sidebar(PageHeaders::default()))
@@ -981,7 +981,7 @@ impl DocsTree {
                         (left_sidebar)
                     }
                     div class="layout__main-center" {
-                        article class="main__prose" {
+                        div class="layout__breadcrumbs" {
                             (breadcrumbs)
                         }
                         button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {

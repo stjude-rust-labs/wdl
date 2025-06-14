@@ -176,7 +176,7 @@ pub(crate) trait Callable {
             ));
         }
         let markup = html! {
-            div class="parameter__section" {
+            div class="main__section" {
                 h2 id="inputs" class="main__section-header" { "Inputs" }
                 @for html in inner_markup {
                     (html)
