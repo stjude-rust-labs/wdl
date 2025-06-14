@@ -40,6 +40,14 @@
   h4 {
     @apply text-2xl; /* 24px */
   }
+  
+  /*
+   * Code smell, required because @tailwindcss/typography does not support customization yet in Tailwind V4 and might not ever support it,
+   * this also sadly means this style might be impossible to override as a one-off in the template with TW utility classes unless we get into CSS specificity wars
+   */
+  .prose a:hover, .main__prose a:hover {
+    color: #949BB8 !important;
+  }
 }
 
 @utility dark-scrollbar {
@@ -68,12 +76,11 @@
     @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
   }
   .layout__main-center {
-    @apply flex-grow bg-slate-950 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
+    @apply flex-grow bg-slate-950 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:w-4xl xl:grow-0;
   }
-
   /* should take up w-72 space and NOT grow or shrink */
   .layout__sidebar-right {
-    @apply w-72 max-xl:hidden;
+    @apply w-72 max-xl:hidden xl:flex-grow;
   }
 
   .main__container {
@@ -120,7 +127,7 @@
   }
 
   .right-sidebar__container {
-    @apply p-4 size-full bg-slate-900 text-white isolate flex flex-col gap-1.5;
+    @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col gap-1.5;
   }
   .right-sidebar__header {
     @apply text-xs text-slate-600;
@@ -167,13 +174,17 @@
     @apply prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden
   }
   .main__badge {
-    @apply flex flex-row max-w-fit items-center border border-slate-700 px-2 py-1 rounded-md bg-slate-800 my-2;
+    @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 my-2;
   }
   .main__badge-text {
     @apply text-xs text-slate-100;
   }
   .main__badge-inner {
-    @apply flex items-center gap-1 bg-slate-700 px-2 py-1 rounded-md mx-2 my-1;
+    @apply flex items-center gap-1 bg-slate-700 px-1 rounded-md h-[18px];
+  } 
+  .main__badge-inner-latest::before {
+    content: "";
+    @apply w-1.5 h-1.5 rounded-full bg-green-600;
   }
   .main__badge-inner-text {
     @apply text-xs text-slate-100;
