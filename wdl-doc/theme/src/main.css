@@ -162,6 +162,9 @@
   .main__button {
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
   }
+  .main__badge-container {
+    @apply flex flex-row items-center gap-2
+  }
   .main__badge {
     @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 my-2;
   }
