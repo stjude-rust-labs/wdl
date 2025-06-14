@@ -1,16 +1,190 @@
-@import "tailwindcss" important;
-@import "tailwindcss/preflight";
+@import "tailwindcss";
+@import "./markdown.css";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Local imports */
-@import "./headings.css";
 
 /* Custom theme variables */
 @theme {
   --font-sans: "DM Sans";
 }
 
+[x-cloak] {
+  display: none !important;
+}
+
 /* Scan Rust source code */
 @source "../../src/";
+
+@layer base {
+  body {
+    @apply text-sm;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply leading-none break-words;
+  }
+
+  h1 {
+    @apply text-5xl; /* 48px */
+  }
+
+  h2 {
+    @apply text-4xl; /* 36px */
+  }
+
+  h3 {
+    @apply text-3xl; /* 30px */
+  }
+
+  h4 {
+    @apply text-2xl; /* 24px */
+  }
+}
+
+@utility dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #1f2937;
+}
+
+@layer components {
+  .layout__container {
+    @apply h-screen w-screen flex pl-72 transition-all duration-150;
+  }
+  .layout__container--with-mobile-menu .layout__sidebar-left {
+    @apply max-md:pl-0 max-md:-translate-x-full transition-all;
+  }
+  .layout__container--with-mobile-menu.open .layout__sidebar-left {
+    @apply max-md:translate-x-0 max-md:shadow-2xl max-md:shadow-black; 
+  }
+  .layout__container--with-mobile-menu {
+    @apply max-md:pl-0;
+  }
+  /* small tab on the top right of the sidebar */
+  .layout__mobile-menu-button {
+    @apply absolute top-4 right-4 z-50 p-2 rounded-lg transition-all duration-150 bg-slate-700 text-slate-950 cursor-pointer md:hidden hover:bg-slate-600 select-none;
+  } 
+  .layout__sidebar-left {
+    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
+  }
+  .layout__main-center {
+    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:w-4xl xl:grow-0;
+  }
+  /* should take up w-72 space and NOT grow or shrink */
+  .layout__sidebar-right {
+    @apply w-72 max-xl:hidden xl:flex-grow;
+  }
+
+  .main__container {
+    @apply flex flex-col gap-y-6;
+  }
+
+  .main__title {
+    @apply text-5xl text-slate-50 mt-8 mb-4;
+  }
+  .main__section {
+    @apply flex flex-col;
+  }
+  .main__section-header {
+    @apply text-2xl text-slate-50 mt-8 mb-4;
+  }
+  .main__section-subheader {
+    @apply text-lg text-slate-50 mt-8 mb-4;
+  }
+  .main__section-text {
+    @apply mt-3 text-slate-300 text-sm;
+  }
+  /* We need tables to be scrollable on the X axis */
+  .main__table-outer-container {
+    @apply overflow-x-auto dark-scrollbar;
+  }
+  .main__table-inner-container {
+    @apply w-3xl md:w-4xl lg:w-auto;
+  }
+  .main__table {
+    @apply text-slate-50 mt-3 table-fixed;
+  }
+  .main__table th {
+    @apply text-left py-3.5 border-b border-b-slate-700 pr-5;
+  }
+  .main__table td {
+    @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
+  }
+  .main__table td code {
+    @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
+  }
+
+  .docs-tree__container {
+    @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
+  }
+
+  .right-sidebar__container {
+    @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col gap-1.5;
+  }
+  .right-sidebar__header {
+    @apply text-xs text-slate-600;
+  }
+  .right-sidebar__section-header {
+    @apply h-7 px-2 flex items-center rounded-sm text-sm text-slate-400 hover:text-slate-300 hover:bg-slate-800 cursor-pointer;
+  }
+  .right-sidebar__section-header--active {
+    @apply bg-slate-700 text-white;
+  }
+
+  .right-sidebar__section-items {
+    @apply flex flex-col gap-1.5 ml-4 border-l border-slate-600;
+  }
+  .right-sidebar__section-item {
+    @apply h-7 px-4 flex items-center rounded-sm text-sm text-slate-400 -ml-2 hover:text-slate-300 hover:bg-slate-400/30 cursor-pointer;
+  }
+  .right-sidebar__section-item--active {
+    @apply bg-slate-400/20 text-white;
+  }
+
+  .right-sidebar__back-to-top-container {
+    @apply mt-4;
+  }
+  .right-sidebar__back-to-top {
+    @apply flex items-center text-slate-400 hover:text-slate-300 cursor-pointer;
+  }
+  .right-sidebar__back-to-top-icon {
+    @apply mr-2 flex items-center justify-center w-6 h-6 rounded-full border border-slate-500;
+  }
+  .right-sidebar__back-to-top-text {
+    @apply text-sm;
+  }
+
+  .metadata__warning {
+    /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
+    @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm;
+  }
+
+  .main__button {
+    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
+  }
+  .main__badge-container {
+    @apply flex flex-row items-center gap-2
+  }
+  .main__badge {
+    @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 my-2;
+  }
+  .main__badge-text {
+    @apply text-xs text-slate-100;
+  }
+  .main__badge-inner {
+    @apply flex items-center gap-1 bg-slate-700 px-1 rounded-md h-[18px];
+  } 
+  .main__badge-inner-latest::before {
+    content: "";
+    @apply w-1.5 h-1.5 rounded-full bg-green-600;
+  }
+  .main__badge-inner-text {
+    @apply text-xs text-slate-100;
+  }
+  .main__badge-green {
+    @apply flex flex-row max-w-fit gap-1 items-center border border-green-400 p-1.5 rounded-md bg-green-600 my-2;
+  }
+  .main__badge-green-text {
+    @apply text-xs text-green-100;
+  }
+}
