@@ -1,5 +1,5 @@
-@plugin "@tailwindcss/typography";
 @import "tailwindcss";
+@import "./markdown.css";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -40,14 +40,6 @@
   h4 {
     @apply text-2xl; /* 24px */
   }
-  
-  /*
-   * Code smell, required because @tailwindcss/typography does not support customization yet in Tailwind V4 and might not ever support it,
-   * this also sadly means this style might be impossible to override as a one-off in the template with TW utility classes unless we get into CSS specificity wars
-   */
-  .prose a:hover, .main__prose a:hover {
-    color: #949BB8 !important;
-  }
 }
 
 @utility dark-scrollbar {
@@ -76,7 +68,7 @@
     @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
   }
   .layout__main-center {
-    @apply flex-grow bg-slate-950 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:w-4xl xl:grow-0;
+    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:w-4xl xl:grow-0;
   }
   /* should take up w-72 space and NOT grow or shrink */
   .layout__sidebar-right {
@@ -84,23 +76,23 @@
   }
 
   .main__container {
-    @apply flex flex-col;
+    @apply flex flex-col gap-y-6;
   }
 
   .main__title {
-    @apply text-5xl;
+    @apply text-5xl text-slate-50 mt-8 mb-4;
   }
   .main__section {
     @apply flex flex-col;
   }
   .main__section-header {
-    @apply text-2xl;
+    @apply text-2xl text-slate-50 mt-8 mb-4;
   }
   .main__section-subheader {
-    @apply text-lg;
+    @apply text-lg text-slate-50 mt-8 mb-4;
   }
   .main__section-text {
-    @apply mt-3 text-sm;
+    @apply mt-3 text-slate-300 text-sm;
   }
   /* We need tables to be scrollable on the X axis */
   .main__table-outer-container {
@@ -110,16 +102,16 @@
     @apply w-3xl md:w-4xl lg:w-auto;
   }
   .main__table {
-    @apply mt-3 table-fixed;
+    @apply text-slate-50 mt-3 table-fixed;
   }
   .main__table th {
     @apply text-left py-3.5 border-b border-b-slate-700 pr-5;
   }
   .main__table td {
-    @apply text-left pr-5 py-4 border-b border-b-slate-800;
+    @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
   }
   .main__table td code {
-    @apply inline border border-slate-700 bg-slate-800 rounded-md font-mono text-[0.8em] p-[0.2em];
+    @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
   }
 
   .docs-tree__container {
@@ -169,9 +161,6 @@
 
   .main__button {
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
-  }
-  .main__prose {
-    @apply prose prose-slate prose-invert prose-code:before:hidden prose-code:after:hidden
   }
   .main__badge {
     @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 my-2;

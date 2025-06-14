@@ -130,7 +130,6 @@ impl Workflow {
     pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut headers = PageHeaders::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
             meta
         } else {
             html! {}
@@ -142,32 +141,30 @@ impl Workflow {
 
         let markup = html! {
             div class="main__container" {
-                div class="main__section" {
-                    article class="main__prose" {
-                        span class="text-emerald-400 not-prose" { "Workflow" }
-                        h1 id="title" class="main__title" { (self.pretty_name()) }
-                        div class="flex flex-row not-prose items-center gap-2" {
-                            (self.version().render())
-                            @if let Some(category) = self.category() {
-                                div class="main__badge" {
-                                    span class="main__badge-text" {
-                                        "Category"
-                                    }
-                                    div class="main__badge-inner" {
-                                        span class="main__badge-inner-text" {
-                                            (category)
-                                        }
-                                    }
+                span class="text-emerald-400" { "Workflow" }
+                h1 id="title" class="main__title" { (self.pretty_name()) }
+                div class="flex flex-row items-center gap-2" {
+                    (self.version().render())
+                    @if let Some(category) = self.category() {
+                        div class="main__badge" {
+                            span class="main__badge-text" {
+                                "Category"
+                            }
+                            div class="main__badge-inner" {
+                                span class="main__badge-inner-text" {
+                                    (category)
                                 }
                             }
-                            (self.render_allow_nested_inputs())
                         }
-                        (self.description(false))
-                        (meta_markup)
-                        (input_markup)
-                        (self.render_outputs(assets))
                     }
+                    (self.render_allow_nested_inputs())
                 }
+                div class="markdown-body" {
+                    (self.description(false))
+                }
+                (meta_markup)
+                (input_markup)
+                (self.render_outputs(assets))
             }
         };
 

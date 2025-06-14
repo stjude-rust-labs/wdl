@@ -319,10 +319,11 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
 pub(crate) struct Document {
     /// The name of the document.
     name: String,
+    /// The version badge for the document.
+    version: VersionBadge,
     /// The AST node for the version statement.
     ///
-    /// This is used both to display the WDL version number and to fetch the
-    /// preamble comments.
+    /// This is used to fetch to the preamble comments.
     version_statement: VersionStatement,
     /// The pages that this document should link to.
     local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -332,12 +333,14 @@ impl Document {
     /// Create a new document.
     pub(crate) fn new(
         name: String,
-        version: VersionStatement,
+        version: SupportedVersion,
+        version_statement: VersionStatement,
         local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
     ) -> Self {
         Self {
             name,
-            version_statement: version,
+            version: VersionBadge::new(version),
+            version_statement,
             local_pages,
         }
     }
@@ -348,8 +351,8 @@ impl Document {
     }
 
     /// Get the version of the document as text.
-    pub fn version(&self) -> String {
-        self.version_statement.version().text().to_string()
+    pub fn version(&self) -> &VersionBadge {
+        &self.version
     }
 
     /// Get the preamble comments of the document.
@@ -362,46 +365,45 @@ impl Document {
     pub fn render(&self) -> (Markup, PageHeaders) {
         let markup = html! {
             div class="main__container" {
-                article id="preamble" class="main__prose" {
-                    h1 id="title" class="main__title" { (self.name()) }
-                    // TODO: does this need better styling?
-                    h3 class="main__section-subheader" { "WDL Version: " (self.version()) }
+                h1 id="title" class="main__title" { (self.name()) }
+                div id="preamble" class="main__section" {
+                    (self.version().render())
                     (self.preamble())
-                    div class="main__section" {
-                        h2 id="toc" class="main__section-header" { "Table of Contents" }
-                        div class="main__table-outer-container not-prose" {
-                            div class="main__table-inner-container" {
-                                table class="main__table" {
-                                    thead { tr {
-                                        th { "Page" }
-                                        th { "Type" }
-                                        th { "Description" }
-                                    }}
-                                    tbody {
-                                        @for page in &self.local_pages {
-                                            tr {
-                                                td {
-                                                    a class="text-violet-400" href=(page.0.to_string_lossy()) {
-                                                        (page.1.name())
-                                                    }
+                }
+                div class="main__section" {
+                    h2 id="toc" class="main__section-header" { "Table of Contents" }
+                    div class="main__table-outer-container" {
+                        div class="main__table-inner-container" {
+                            table class="main__table" {
+                                thead { tr {
+                                    th { "Page" }
+                                    th { "Type" }
+                                    th { "Description" }
+                                }}
+                                tbody {
+                                    @for page in &self.local_pages {
+                                        tr {
+                                            td {
+                                                a class="text-violet-400" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
                                                 }
-                                                td { code {
-                                                    @match page.1.page_type() {
-                                                        PageType::Struct(_) => { "struct" }
-                                                        PageType::Task(_) => { "task" }
-                                                        PageType::Workflow(_) => { "workflow" }
-                                                        // Index pages should not link to other index pages.
-                                                        PageType::Index(_) => { "ERROR" }
-                                                    }
-                                                } }
-                                                td {
-                                                    @match page.1.page_type() {
-                                                        PageType::Struct(_) => { "N/A" }
-                                                        PageType::Task(t) => { (t.description(true)) }
-                                                        PageType::Workflow(w) => { (w.description(true)) }
-                                                        // Index pages should not link to other index pages.
-                                                        PageType::Index(_) => { "ERROR" }
-                                                    }
+                                            }
+                                            td { code {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "struct" }
+                                                    PageType::Task(_) => { "task" }
+                                                    PageType::Workflow(_) => { "workflow" }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
+                                                }
+                                            } }
+                                            td {
+                                                @match page.1.page_type() {
+                                                    PageType::Struct(_) => { "N/A" }
+                                                    PageType::Task(t) => { (t.description(true)) }
+                                                    PageType::Workflow(w) => { (w.description(true)) }
+                                                    // Index pages should not link to other index pages.
+                                                    PageType::Index(_) => { "ERROR" }
                                                 }
                                             }
                                         }
@@ -450,7 +452,7 @@ impl VersionBadge {
         };
         let text = self.version.to_string();
         html! {
-            div class="main__badge not-prose" {
+            div class="main__badge" {
                 span class="main__badge-text" {
                     "WDL Version"
                 }
@@ -571,7 +573,7 @@ pub async fn document_workspace(
             }
         }
         let name = rel_wdl_path.file_stem().unwrap().to_str().unwrap();
-        let document = Document::new(name.to_string(), version_statement, local_pages);
+        let document = Document::new(name.to_string(), version, version_statement, local_pages);
 
         let index_path = cur_dir.join("index.html");
 

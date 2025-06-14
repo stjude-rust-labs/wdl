@@ -75,7 +75,6 @@ impl Task {
         let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
         Some(html! {
             div class="main__section" {
-                h2 id="meta" class="main__section-header" { "Meta" }
                 (content)
             }
         })
@@ -88,7 +87,7 @@ impl Task {
                 html! {
                     div class="main__section" {
                         h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
-                        div class="main__table-outer-container not-prose" {
+                        div class="main__table-outer-container" {
                             div class="main__table-inner-container" {
                                 table class="main__table" {
                                     thead { tr {
@@ -138,7 +137,6 @@ impl Task {
     pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
         let mut headers = PageHeaders::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            headers.push(Header::Header("Meta".to_string(), "meta".to_string()));
             meta
         } else {
             html! {}
@@ -149,19 +147,17 @@ impl Task {
 
         let markup = html! {
             div class="main__container" {
-                div class="main__section" {
-                    article class="main__prose" {
-                        span class="text-violet-400 not-prose" { "Task" }
-                        h1 id="title" class="main__title" { code { (self.name()) } }
-                        (self.version().render())
-                        (self.description(false))
-                        (meta_markup)
-                        (input_markup)
-                        (self.render_outputs(assets))
-                        (self.render_runtime_section())
-                        (self.render_command_section())
-                    }
+                span class="text-violet-400" { "Task" }
+                h1 id="title" class="main__title" { code { (self.name()) } }
+                (self.version().render())
+                div class="markdown-body" {
+                    (self.description(false))
                 }
+                (meta_markup)
+                (input_markup)
+                (self.render_outputs(assets))
+                (self.render_runtime_section())
+                (self.render_command_section())
             }
         };
         headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
