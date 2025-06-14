@@ -189,4 +189,10 @@
   .main__badge-inner-text {
     @apply text-xs text-slate-100;
   }
+  .main__badge-green {
+    @apply flex flex-row max-w-fit gap-1 items-center border border-green-400 p-1.5 rounded-md bg-green-600 my-2;
+  }
+  .main__badge-green-text {
+    @apply text-xs text-green-100;
+  }
 }
