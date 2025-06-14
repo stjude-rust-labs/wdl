@@ -1647,6 +1647,12 @@
       }
     }
   }
+  .main__badge-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
   .main__badge {
     margin-block: calc(var(--spacing) * 2);
     display: flex;

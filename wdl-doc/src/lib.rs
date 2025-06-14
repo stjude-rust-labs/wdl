@@ -366,8 +366,10 @@ impl Document {
         let markup = html! {
             div class="main__container" {
                 h1 id="title" class="main__title" { (self.name()) }
-                div id="preamble" class="main__section" {
+                div class="main__badge-container" {
                     (self.version().render())
+                }
+                div id="preamble" class="main__section" {
                     (self.preamble())
                 }
                 div class="main__section" {
