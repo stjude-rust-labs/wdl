@@ -37,7 +37,9 @@ impl Struct {
             div class="main__container" {
                 p class="text-pink-400" { "Struct" }
                 h1 id="title" class="main__title" { code { (name) } }
-                (self.version.render())
+                div class="main__badge-container" {
+                    (self.version.render())
+                }
                 div class="main__section" {
                     sprocket-code language="wdl" { (self.definition.inner().to_string()) }
                 }

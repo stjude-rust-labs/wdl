@@ -143,7 +143,7 @@ impl Workflow {
             div class="main__container" {
                 span class="text-emerald-400" { "Workflow" }
                 h1 id="title" class="main__title" { (self.pretty_name()) }
-                div class="flex flex-row items-center gap-2" {
+                div class="main__badge-container" {
                     (self.version().render())
                     @if let Some(category) = self.category() {
                         div class="main__badge" {

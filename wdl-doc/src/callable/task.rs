@@ -149,7 +149,9 @@ impl Task {
             div class="main__container" {
                 span class="text-violet-400" { "Task" }
                 h1 id="title" class="main__title" { code { (self.name()) } }
-                (self.version().render())
+                div class="main__badge-container" {
+                    (self.version().render())
+                }
                 div class="markdown-body" {
                     (self.description(false))
                 }
