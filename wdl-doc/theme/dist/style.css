@@ -8,6 +8,7 @@
       "Courier New", monospace;
     --color-yellow-50: oklch(98.7% 0.026 102.212);
     --color-yellow-900: oklch(42.1% 0.095 57.708);
+    --color-green-600: oklch(62.7% 0.194 149.214);
     --color-emerald-400: oklch(76.5% 0.177 163.223);
     --color-violet-400: oklch(70.2% 0.183 293.541);
     --color-pink-400: oklch(71.8% 0.202 349.761);
@@ -496,6 +497,9 @@
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
+  .prose a:hover, .main__prose a:hover {
+    color: #949BB8 !important;
+  }
 }
 @layer components {
   .layout__container {
@@ -586,11 +590,20 @@
     padding: calc(var(--spacing) * 10);
     scrollbar-width: thin;
     scrollbar-color: #4b5563 #1f2937;
+    @media (width >= 80rem) {
+      width: var(--container-4xl);
+    }
+    @media (width >= 80rem) {
+      flex-grow: 0;
+    }
   }
   .layout__sidebar-right {
     width: calc(var(--spacing) * 72);
     @media (width < 80rem) {
       display: none;
+    }
+    @media (width >= 80rem) {
+      flex-grow: 1;
     }
   }
   .main__container {
@@ -682,7 +695,7 @@
     height: 100%;
     flex-direction: column;
     gap: calc(var(--spacing) * 1.5);
-    background-color: var(--color-slate-900);
+    background-color: var(--color-slate-950);
     padding: calc(var(--spacing) * 4);
     color: var(--color-white);
   }
@@ -1307,13 +1320,13 @@
     max-width: fit-content;
     flex-direction: row;
     align-items: center;
+    gap: calc(var(--spacing) * 1);
     border-radius: var(--radius-md);
     border-style: var(--tw-border-style);
     border-width: 1px;
     border-color: var(--color-slate-700);
     background-color: var(--color-slate-800);
-    padding-inline: calc(var(--spacing) * 2);
-    padding-block: calc(var(--spacing) * 1);
+    padding: calc(var(--spacing) * 1.5);
   }
   .main__badge-text {
     font-size: var(--text-xs);
@@ -1321,15 +1334,20 @@
     color: var(--color-slate-100);
   }
   .main__badge-inner {
-    margin-inline: calc(var(--spacing) * 2);
-    margin-block: calc(var(--spacing) * 1);
     display: flex;
+    height: 18px;
     align-items: center;
     gap: calc(var(--spacing) * 1);
     border-radius: var(--radius-md);
     background-color: var(--color-slate-700);
-    padding-inline: calc(var(--spacing) * 2);
-    padding-block: calc(var(--spacing) * 1);
+    padding-inline: calc(var(--spacing) * 1);
+  }
+  .main__badge-inner-latest::before {
+    content: "";
+    height: calc(var(--spacing) * 1.5);
+    width: calc(var(--spacing) * 1.5);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-green-600);
   }
   .main__badge-inner-text {
     font-size: var(--text-xs);
