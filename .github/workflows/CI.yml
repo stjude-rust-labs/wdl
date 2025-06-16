@@ -45,8 +45,8 @@ jobs:
       - uses: ./.github/actions/install-shellcheck
       - name: Update Rust
         run: rustup update stable && rustup default stable
-      - name: Setup Docker (Mac)
-        if: ${{'macos-latest' == matrix.os}}
+      - name: Setup Docker (macOS)
+        if: ${{ matrix.os == 'macos-latest' }}
         run: |
           brew update
           brew install docker
@@ -57,22 +57,23 @@ jobs:
           colima start --mount $TMPDIR:w --mount $(pwd) --mount $HOME/Library/Caches/wdl:w --memory 4 --network-address --arch x86_64
           echo "DOCKER_HOST=unix:///Users/runner/.colima/docker.sock" >> $GITHUB_ENV
       - name: Setup WSL (Windows)
-        if: ${{'windows-latest' == matrix.os}}
+        if: ${{ matrix.os == 'windows-latest' }}
         uses: Vampire/setup-wsl@v5
       - name: Install Podman (Windows)
-        if: ${{'windows-latest' == matrix.os}}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
           curl -L --url "https://github.com/containers/podman/releases/download/v5.5.1/podman-5.5.1-setup.exe" -o Podman.exe
           Start-Process Podman.exe -Wait -ArgumentList "/norestart /passive" -Verb runAs;
           Add-Content $env:GITHUB_PATH "C:\Program Files\RedHat\Podman\"
       - name: Startup Docker (Windows)
-        if: ${{'windows-latest' == matrix.os}}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          podman machine init
+          podman machine init -v $env:TEMP:/tmp/win
           podman machine set --rootful
           podman machine start
           Add-Content $env:GITHUB_ENV "DOCKER_HOST=npipe:////./pipe/podman-machine-default"
       - name: Run tests
+        if: ${{ matrix.os != 'windows-latest' }}
         run: cargo test --all-features
       - uses: actions/cache@v4
         with:
