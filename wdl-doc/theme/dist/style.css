@@ -1434,6 +1434,22 @@
       display: none;
     }
   }
+  .layout__breadcrumb-clickable {
+    color: var(--color-slate-50);
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-slate-300);
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        text-decoration-line: underline;
+      }
+    }
+  }
+  .layout__breadcrumb-inactive {
+    color: var(--color-slate-400);
+  }
   .main__container {
     display: flex;
     flex-direction: column;
