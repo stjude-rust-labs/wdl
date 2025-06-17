@@ -379,6 +379,7 @@ impl<'a> CommandContext<'a> {
 }
 
 /// Detect embedded quotes surrounding an expression in a string.
+///
 /// This is a utility function called by `evaluates_to_literal`. Only `expr`
 /// that are addition or strings with potentially embedded placeholders are
 /// valid input. For a given expression, it checks through all descendants to
