@@ -57,7 +57,7 @@ impl Span {
     /// # Examples
     ///
     /// ```rust
-    /// # use wdl_grammar::Span;
+    /// # use wdl_ast::Span;
     /// assert_eq!(
     ///     Span::intersect(Span::new(0, 10), Span::new(5, 10)),
     ///     Some(Span::new(5, 5)),

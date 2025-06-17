@@ -11,7 +11,6 @@ use tokio::io::BufReader;
 use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
-use wdl_grammar::lexer::v1::is_ident;
 
 use super::CallContext;
 use super::Callback;
@@ -100,7 +99,7 @@ fn read_object(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnost
         for e in names.split('\t').zip_longest(values.split('\t')) {
             match e {
                 EitherOrBoth::Both(name, value) => {
-                    if !is_ident(name) {
+                    if !wdl_ast::is_ident(name) {
                         return Err(function_call_failed(
                             FUNCTION_NAME,
                             format!(

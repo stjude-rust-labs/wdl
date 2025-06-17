@@ -1,10 +1,9 @@
 //! The `container` item within the `runtime` block.
 
-use wdl_grammar::SyntaxKind;
-use wdl_grammar::SyntaxNode;
-
 use crate::AstNode;
 use crate::AstToken;
+use crate::SyntaxKind;
+use crate::SyntaxNode;
 use crate::TreeNode;
 use crate::v1::RuntimeItem;
 use crate::v1::TASK_REQUIREMENT_CONTAINER;

@@ -4,14 +4,13 @@
 use std::ops::Deref;
 
 use crate::AstNode;
+use crate::SyntaxNode;
 use crate::TreeNode;
 use crate::v1::Expr;
 use crate::v1::LiteralExpr;
 
 pub mod uri;
-
 pub use uri::Uri;
-use wdl_grammar::SyntaxNode;
 
 /// An error when parsing a [`Uri`] from an expression.
 #[derive(Debug)]

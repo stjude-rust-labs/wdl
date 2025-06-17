@@ -11,7 +11,6 @@ use tokio::io::BufReader;
 use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
-use wdl_grammar::lexer::v1::is_ident;
 
 use super::CallContext;
 use super::Callback;
@@ -88,7 +87,7 @@ fn read_objects(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnos
         };
 
         for name in names.split('\t') {
-            if !is_ident(name) {
+            if !wdl_ast::is_ident(name) {
                 return Err(function_call_failed(
                     FUNCTION_NAME,
                     format!(

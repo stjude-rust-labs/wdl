@@ -9,7 +9,6 @@ members = [
     "wdl-doc",
     "wdl-engine",
     "wdl-format",
-    "wdl-grammar",
     "wdl-lint",
     "wdl-lsp",
 ]

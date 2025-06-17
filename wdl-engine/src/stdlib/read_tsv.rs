@@ -12,7 +12,6 @@ use tokio::io::BufReader;
 use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
-use wdl_grammar::lexer::v1::is_ident;
 
 use super::CallContext;
 use super::Callback;
@@ -198,7 +197,7 @@ fn read_tsv(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>
         let mut column_count = 0;
         if let Some(invalid) = header.columns().find(|c| {
             column_count += 1;
-            !is_ident(c)
+            !wdl_ast::is_ident(c)
         }) {
             return Err(function_call_failed(
                 FUNCTION_NAME,

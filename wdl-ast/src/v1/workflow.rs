@@ -1,8 +1,6 @@
 //! V1 AST representation for workflows.
 
 use rowan::NodeOrToken;
-use wdl_grammar::SupportedVersion;
-use wdl_grammar::version::V1;
 
 use super::BoundDecl;
 use super::Expr;
@@ -18,9 +16,11 @@ use super::ParameterMetadataSection;
 use crate::AstNode;
 use crate::AstToken;
 use crate::Ident;
+use crate::SupportedVersion;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
+use crate::version::V1;
 
 /// The name of the `allow_nested_inputs` workflow hint. Note that this
 /// is not a standard WDL v1.1 hint, but is used in WDL >=v1.2.
@@ -112,7 +112,6 @@ impl<N: TreeNode> WorkflowDefinition<N> {
 
                 // Fall through to below
             }
-            _ => return false,
         }
 
         // Check the metadata section

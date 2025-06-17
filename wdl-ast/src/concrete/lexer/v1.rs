@@ -3,13 +3,13 @@
 pub use logos::Logos;
 
 use crate::Span;
-use crate::grammar::v1::HeredocContext;
-use crate::grammar::v1::interpolate_dq_string;
-use crate::grammar::v1::interpolate_heredoc;
-use crate::grammar::v1::interpolate_sq_string;
-use crate::parser::Parser;
-use crate::parser::ParserToken;
-use crate::tree::SyntaxKind;
+use crate::concrete::grammar::v1::HeredocContext;
+use crate::concrete::grammar::v1::interpolate_dq_string;
+use crate::concrete::grammar::v1::interpolate_heredoc;
+use crate::concrete::grammar::v1::interpolate_sq_string;
+use crate::concrete::parser::Parser;
+use crate::concrete::parser::ParserToken;
+use crate::concrete::tree::SyntaxKind;
 
 /// Determines if the given string is a valid WDL identifier.
 pub fn is_ident(s: &str) -> bool {
@@ -741,8 +741,8 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use super::*;
-    use crate::lexer::Lexer;
-    use crate::lexer::test::map;
+    use crate::concrete::lexer::Lexer;
+    use crate::concrete::lexer::test::map;
 
     #[test]
     pub fn whitespace() {

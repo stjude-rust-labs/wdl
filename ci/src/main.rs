@@ -51,7 +51,6 @@ use toml_edit::DocumentMut;
 /// Crates names to publish.
 // Note that this list must be topologically sorted by dependencies.
 const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
-    "wdl-grammar",
     "wdl-ast",
     "wdl-lint",
     "wdl-format",

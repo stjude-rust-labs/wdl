@@ -25,7 +25,7 @@
 //! An example of parsing WDL source into a CST and printing the tree:
 //!
 //! ```rust
-//! use wdl::grammar::SyntaxTree;
+//! use wdl::ast::concrete::SyntaxTree;
 //!
 //! let (tree, diagnostics) = SyntaxTree::parse("version 1.1");
 //! assert!(diagnostics.is_empty());
@@ -64,9 +64,6 @@ pub use wdl_engine as engine;
 #[cfg(feature = "format")]
 #[doc(inline)]
 pub use wdl_format as format;
-#[cfg(feature = "grammar")]
-#[doc(inline)]
-pub use wdl_grammar as grammar;
 #[cfg(feature = "lint")]
 #[doc(inline)]
 pub use wdl_lint as lint;

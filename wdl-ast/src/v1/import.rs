@@ -5,8 +5,8 @@ use std::path::Path;
 
 use rowan::NodeOrToken;
 use url::Url;
-use wdl_grammar::lexer::v1::Logos;
-use wdl_grammar::lexer::v1::Token;
+use crate::concrete::lexer::v1::Logos;
+use crate::concrete::lexer::v1::Token;
 
 use super::AliasKeyword;
 use super::AsKeyword;
