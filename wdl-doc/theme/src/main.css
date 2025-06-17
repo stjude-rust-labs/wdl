@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import "./markdown.css";
+@import "tailwindcss";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -40,6 +40,7 @@
   h4 {
     @apply text-2xl; /* 24px */
   }
+
 }
 
 @utility dark-scrollbar {
@@ -48,9 +49,60 @@
 }
 
 @layer components {
+  /**
+   * Layout
+   */
   .layout__container {
     @apply h-screen w-screen flex pl-72 transition-all duration-150;
   }
+  .layout__sidebar-left {
+    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
+  }
+  .layout__main-center {
+    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:max-w-5xl 2xl:max-w-[1300px] xl:grow-0;
+  }
+  .layout__sidebar-right {
+    /* should take up w-72 space and NOT grow or shrink */
+    @apply w-72 max-xl:hidden xl:flex-grow;
+  }
+  /**
+   * Layout - Alternative Layouts
+   * Ex: The following layout states are supported. Requires the .layout__container--alt-layout class
+   * .layout__container--left-hidden // left sidebar is hidden for larger center column (similar to mobile view)
+   * .layout__container--left-lg // left sidebar is 50% larger than normal
+   * .layout__container--left-xl // left sidebar is 100% larger than normal
+   * .layout__container--right-hidden // right sidebar is hidden for larger center column (similar to mobile view)
+   */
+  .layout__container--alt-layout.layout__container--left-hidden .layout__sidebar-left {
+    @apply hidden;
+  }
+  .layout__container--alt-layout.layout__container--left-hidden {
+    @apply pl-0;
+  }
+  
+  .layout__container--alt-layout.layout__container--left-lg .layout__sidebar-left {
+    @apply w-96;
+  }
+  .layout__container--alt-layout.layout__container--left-lg {
+    @apply pl-96;
+  }
+  
+  .layout__container--alt-layout.layout__container--left-xl .layout__sidebar-left {
+    @apply w-144;
+  }
+  .layout__container--alt-layout.layout__container--left-xl {
+    @apply pl-144;
+  }
+
+  .layout__container--alt-layout.layout__container--right-hidden .layout__sidebar-right {
+    @apply hidden;
+  }
+  .layout__container--alt-layout.layout__container--right-hidden .layout__main-center {
+    @apply max-w-full;
+  }
+  /**
+   * Layout - Mobile Menu
+   */
   .layout__container--with-mobile-menu .layout__sidebar-left {
     @apply max-md:pl-0 max-md:-translate-x-full transition-all;
   }
@@ -60,25 +112,16 @@
   .layout__container--with-mobile-menu {
     @apply max-md:pl-0;
   }
-  /* small tab on the top right of the sidebar */
   .layout__mobile-menu-button {
+    /* small tab on the top right of the sidebar */
     @apply absolute top-4 right-4 z-50 p-2 rounded-lg transition-all duration-150 bg-slate-700 text-slate-950 cursor-pointer md:hidden hover:bg-slate-600 select-none;
   } 
-  .layout__sidebar-left {
-    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
-  }
-  .layout__main-center {
-    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:w-4xl xl:grow-0;
-  }
-  /* should take up w-72 space and NOT grow or shrink */
-  .layout__sidebar-right {
-    @apply w-72 max-xl:hidden xl:flex-grow;
-  }
-
+  /**
+   * Main Content, Headers, and Text
+   */
   .main__container {
-    @apply flex flex-col gap-y-6;
+    @apply flex flex-col;
   }
-
   .main__title {
     @apply text-5xl text-slate-50 mt-8 mb-4;
   }
@@ -86,14 +129,48 @@
     @apply flex flex-col;
   }
   .main__section-header {
-    @apply text-2xl text-slate-50 mt-8 mb-4;
+    @apply text-2xl text-slate-50 mt-8;
   }
   .main__section-subheader {
-    @apply text-lg text-slate-50 mt-8 mb-4;
+    @apply text-lg text-slate-50 mt-8;
   }
   .main__section-text {
     @apply mt-3 text-slate-300 text-sm;
   }
+  /**
+   * Badges & Buttons
+   */
+  .main__badge-container {
+    @apply flex flex-row items-center gap-2
+  }
+  .main__badge {
+    @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800;
+  }
+  .main__badge-text {
+    @apply text-xs text-slate-100;
+  }
+  .main__badge-inner {
+    @apply flex items-center gap-1 bg-slate-700 px-1 rounded-md h-[18px];
+  } 
+  .main__badge-inner-latest::before {
+    content: "";
+    @apply w-1.5 h-1.5 rounded-full bg-green-600;
+  }
+  .main__badge-inner-text {
+    @apply text-xs text-slate-100;
+  }
+  .main__badge-green {
+    @apply flex flex-row max-w-fit gap-1 items-center border border-green-400 p-1.5 rounded-md bg-green-600;
+  }
+  .main__badge-green-text {
+    @apply text-xs text-green-100;
+  }
+  .main__button {
+    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
+  }
+  /**
+   * Main Tables
+   */
   /* We need tables to be scrollable on the X axis */
   .main__table-outer-container {
     @apply overflow-x-auto dark-scrollbar;
@@ -113,11 +190,15 @@
   .main__table td code {
     @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
   }
-
+  /**
+   * Docs Tree
+   */
   .docs-tree__container {
     @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
   }
-
+  /**
+   * Main Right Sidebar
+   */
   .right-sidebar__container {
     @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col gap-1.5;
   }
@@ -130,7 +211,6 @@
   .right-sidebar__section-header--active {
     @apply bg-slate-700 text-white;
   }
-
   .right-sidebar__section-items {
     @apply flex flex-col gap-1.5 ml-4 border-l border-slate-600;
   }
@@ -140,7 +220,6 @@
   .right-sidebar__section-item--active {
     @apply bg-slate-400/20 text-white;
   }
-
   .right-sidebar__back-to-top-container {
     @apply mt-4;
   }
@@ -158,33 +237,21 @@
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
     @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm;
   }
+}
 
-  .main__button {
-    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10
-  }
-  .main__badge-container {
-    @apply flex flex-row items-center gap-2
-  }
-  .main__badge {
-    @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 my-2;
-  }
-  .main__badge-text {
-    @apply text-xs text-slate-100;
-  }
-  .main__badge-inner {
-    @apply flex items-center gap-1 bg-slate-700 px-1 rounded-md h-[18px];
-  } 
-  .main__badge-inner-latest::before {
-    content: "";
-    @apply w-1.5 h-1.5 rounded-full bg-green-600;
-  }
-  .main__badge-inner-text {
-    @apply text-xs text-slate-100;
-  }
-  .main__badge-green {
-    @apply flex flex-row max-w-fit gap-1 items-center border border-green-400 p-1.5 rounded-md bg-green-600 my-2;
-  }
-  .main__badge-green-text {
-    @apply text-xs text-green-100;
-  }
+/* Markdown Overrides */
+.markdown-body, .markdown-body a {
+  @apply text-slate-300;
+}
+
+.markdown-body a {
+  @apply underline;
+}
+
+.markdown-body a:hover {
+  @apply text-slate-400;
+}
+
+.main__container .markdown-body {
+  @apply mt-4 max-w-4xl;
 }
