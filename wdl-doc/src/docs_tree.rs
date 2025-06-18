@@ -12,9 +12,9 @@ use maud::Markup;
 use maud::html;
 use pathdiff::diff_paths;
 
-use crate::Document;
 use crate::Markdown;
 use crate::Render;
+use crate::document::Document;
 use crate::full_page;
 use crate::r#struct::Struct;
 use crate::task::Task;
@@ -193,6 +193,8 @@ pub struct DocsTreeBuilder {
     root: PathBuf,
     /// The path to a Markdown file to embed in the `<root>/index.html` page.
     homepage: Option<PathBuf>,
+    /// An optional path to a custom theme to use for the docs.
+    custom_theme: Option<PathBuf>,
 }
 
 impl DocsTreeBuilder {
@@ -202,6 +204,7 @@ impl DocsTreeBuilder {
         Self {
             root,
             homepage: None,
+            custom_theme: None,
         }
     }
 
@@ -216,9 +219,20 @@ impl DocsTreeBuilder {
         self.maybe_homepage(Some(homepage))
     }
 
+    /// Set the custom theme for the docs with an option.
+    pub fn maybe_custom_theme(mut self, theme: Option<impl Into<PathBuf>>) -> Self {
+        self.custom_theme = theme.map(|s| s.into());
+        self
+    }
+
+    /// Set the custom theme for the docs.
+    pub fn custom_theme(self, theme: impl Into<PathBuf>) -> Self {
+        self.maybe_custom_theme(Some(theme))
+    }
+
     /// Build the docs tree.
     pub fn build(self) -> Result<DocsTree> {
-        write_assets(&self.root)?;
+        write_assets(&self.root, self.custom_theme.as_ref())?;
         let node = Node::new(
             self.root
                 .file_name()
@@ -436,7 +450,7 @@ impl DocsTree {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
                     div class="flex items-center gap-x-1 h-6 text-slate-50" {
-                        img src=(self.get_asset(base, "category-selected.svg")) class="size-4" alt="Category icon";
+                        img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
                         p class="" { (category) }
                     }
                     ul class="" {
@@ -461,7 +475,7 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2 flex-none" {}
                                             div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
                                             div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
-                                                img x-bind:src="node.icon" class="size-4" alt="Workflow icon";
+                                                img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
                                                 sprocket-tooltip content=(wf.pretty_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
                                                     a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) {
                                                         (wf.pretty_name())
@@ -485,6 +499,7 @@ impl DocsTree {
     /// Render a left sidebar component given a path.
     ///
     /// Path is expected to be an absolute path.
+    // TODO: lots here can be improved
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
@@ -751,42 +766,42 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView(); })" class="docs-tree__container" {
+            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView(); })" class="left-sidebar__container" {
                 div class="sticky" {
                     img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
-                    form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
-                        div class="flex flex-row items-center size-full" {
+                    form id="searchbar" class="left-sidebar__searchbar-form" {
+                        div class="left-sidebar__searchbar" {
                             img src=(self.get_asset(base, "search.svg")) class="flex size-6" alt="Search icon";
-                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex size-full text-slate-300 pl-2";
-                            img src=(self.get_asset(base, "x-mark.svg")) class="flex size-6 hover:cursor-pointer ml-2 pr-2" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
+                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="left-sidebar__searchbox";
+                            img src=(self.get_asset(base, "x-mark.svg")) class="left-sidebar__search-clear" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                         }
                     }
-                    div class="flex items-center gap-x-1 pr-4" {
-                        div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.get_asset(base, "list-bullet-selected.svg")) class="size-4" alt="List icon";
+                    div class="left-sidebar__tabs-container" {
+                        div x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                            img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b hover:cursor-pointer" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.get_asset(base, "folder-selected.svg")) class="size-4" alt="List icon";
+                        div x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                            img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
                         }
                     }
                 }
-                div x-cloak class="size-full rounded-md pt-2 pl-2 overflow-x-clip overflow-y-scroll" {
-                    ul x-show="! showWorkflows || search != ''" class="w-max pr-3" {
-                        li class="flex flex-row items-center gap-x-1 text-slate-50" {
-                            img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="size-4" alt="Directory icon";
+                div x-cloak class="left-sidebar__content-container" {
+                    ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
+                        li class="left-sidebar__content-item text-slate-50" {
+                            img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
                             sprocket-tooltip content=(root.name()) x-show="search === ''" {
                                 a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) }
                             }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : hover ? 'bg-slate-700' : ''" {
+                            li x-data="{ hover: false }" class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
-                                    div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-700 mr-2" {}
+                                    div x-show="showSelfCache[node.key]" class="sidebar__indent" {}
                                 }
                                 div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
-                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="size-4" alt="Node icon";
+                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="left-sidebar__icon" alt="Node icon";
                                     sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
@@ -797,7 +812,7 @@ impl DocsTree {
                             li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 text-slate-50 pl-2" {
                                 p class="text-xs" x-text="node.parent" {}
                                 div class="flex flex-row items-center gap-x-1 mb-2" {
-                                    img x-bind:src="node.icon" class="size-4" alt="Node icon";
+                                    img x-bind:src="node.icon" class="left-sidebar__icon" alt="Node icon";
                                     sprocket-tooltip x-bind:content="node.display_name" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
@@ -811,7 +826,7 @@ impl DocsTree {
                             p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
                         }
                     }
-                    ul x-show="showWorkflows && search === ''" class="w-max pr-3" {
+                    ul x-show="showWorkflows && search === ''" class="left-sidebar__content" {
                         (self.sidebar_workflows_view(path))
                     }
                 }
@@ -855,7 +870,14 @@ impl DocsTree {
         let mut breadcrumbs = vec![];
 
         let cur_page = self.get_page(path).expect("path should have a page");
-        breadcrumbs.push((cur_page.name(), None));
+        match cur_page.page_type() {
+            PageType::Index(_) => {
+                // Index pages should not appear in the breadcrumbs.
+            }
+            _ => {
+                breadcrumbs.push((cur_page.name(), None));
+            }
+        }
 
         while let Some(parent) = current_path.parent() {
             let cur_node = self.get_node(parent).expect("path should have a node");
@@ -875,7 +897,7 @@ impl DocsTree {
             .next()
             .expect("should have at least one breadcrumb");
         let first = html! {
-            a href=(self.root_index_relative_to(base).to_string_lossy()) { (first.0) }
+            a class="layout__breadcrumb-clickable" href=(self.root_index_relative_to(base).to_string_lossy()) { (first.0) }
         };
 
         html! {
@@ -915,8 +937,10 @@ impl DocsTree {
         let content = html! {
             h1 class="main__title" { "Home" }
             @if let Some(homepage) = &self.homepage {
-                div class="markdown-body" {
-                    (Markdown(std::fs::read_to_string(homepage)?).render())
+                div class="main__section" {
+                    div class="markdown-body" {
+                        (Markdown(std::fs::read_to_string(homepage)?).render())
+                    }
                 }
             } @else {
                 div class="flex flex-col flex-grow items-center justify-center size-full gap-y-2 pt-8" {
