@@ -44,7 +44,7 @@ use crate::document::Document;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
-use crate::handlers::GotoDefinitionHandler;
+use crate::handlers;
 use crate::rayon::RayonHandle;
 
 /// The minimum number of milliseconds between analysis progress reports.
@@ -346,8 +346,7 @@ where
                     );
 
                     let graph = self.graph.read();
-                    let handler = GotoDefinitionHandler;
-                    match handler.goto_definition(&graph, document, position, encoding) {
+                    match handlers::goto_definition(&graph, document, position, encoding) {
                         Ok(result) => {
                             debug!(
                                 "goto definition request completed in {elapsed:?}",

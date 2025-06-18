@@ -30,6 +30,7 @@ use wdl_ast::v1::ImportStatement;
 use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TypeRef;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::version::V1;
 
@@ -1444,22 +1445,20 @@ fn set_struct_types(document: &mut DocumentData) {
 
     /// Recursively finds all nested struct type dependencies to build
     /// dependency graphs
-    fn find_deps_in_ty(ty: &wdl_ast::v1::Type, deps: &mut Vec<String>) {
+    fn find_type_refs(ty: &wdl_ast::v1::Type, deps: &mut Vec<TypeRef>) {
         match ty {
-            wdl_ast::v1::Type::Ref(r) => {
-                deps.push(r.name().text().to_string());
-            }
+            wdl_ast::v1::Type::Ref(r) => deps.push(r.clone()),
             wdl_ast::v1::Type::Array(a) => {
-                find_deps_in_ty(&a.element_type(), deps);
+                find_type_refs(&a.element_type(), deps);
             }
             wdl_ast::v1::Type::Map(m) => {
                 let (_, v) = m.types();
-                find_deps_in_ty(&v, deps);
+                find_type_refs(&v, deps);
             }
             wdl_ast::v1::Type::Pair(p) => {
                 let (left, right) = p.types();
-                find_deps_in_ty(&left, deps);
-                find_deps_in_ty(&right, deps);
+                find_type_refs(&left, deps);
+                find_type_refs(&right, deps);
             }
             wdl_ast::v1::Type::Object(_) | wdl_ast::v1::Type::Primitive(_) => {}
         }
@@ -1480,11 +1479,11 @@ fn set_struct_types(document: &mut DocumentData) {
             StructDefinition::cast(SyntaxNode::new_root(s.node.clone())).expect("node should cast");
         for member in definition.members() {
             let mut deps = Vec::new();
-            find_deps_in_ty(&member.ty(), &mut deps);
+            find_type_refs(&member.ty(), &mut deps);
 
             for dep in deps {
                 // Add an edge to the referenced struct
-                if let Some(to) = document.structs.get_index_of(&dep) {
+                if let Some(to) = document.structs.get_index_of(dep.name().text()) {
                     // Only add an edge to another local struct definition
                     if document.structs[to].namespace.is_some() {
                         continue;

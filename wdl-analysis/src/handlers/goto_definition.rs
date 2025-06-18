@@ -5,6 +5,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
+use anyhow::bail;
 use line_index::LineIndex;
 use line_index::WideEncoding;
 use lsp_types::Location;
@@ -32,489 +33,466 @@ use crate::graph::ParseState;
 use crate::types::v1::EvaluationContext;
 use crate::types::v1::ExprTypeEvaluator;
 
-/// Handler for goto definition requests.
-#[derive(Debug)]
-pub struct GotoDefinitionHandler;
+/// Finds the definition location for an identifier at the given position.
+///
+/// Searches the document and its imports for the definition of the
+/// identifier at the specified position, returning the location if
+/// found.
+///
+/// * If a definition is found for the identifier then a [`Location`] containing
+///   the URI and range is returned wrapped in [`Some`].
+///
+/// * Else, [`None`] is returned.
+pub fn goto_definition(
+    graph: &DocumentGraph,
+    document_uri: Url,
+    position: SourcePosition,
+    encoding: SourcePositionEncoding,
+) -> Result<Option<Location>> {
+    let index = graph
+        .get_index(&document_uri)
+        .ok_or_else(|| anyhow!("document `{uri}` not found in graph", uri = document_uri))?;
 
-impl Default for GotoDefinitionHandler {
-    fn default() -> Self {
-        Self
+    let node = graph.get(index);
+    let (root, lines) = match node.parse_state() {
+        ParseState::Parsed { lines, root, .. } => {
+            (SyntaxNode::new_root(root.clone()), lines.clone())
+        }
+        _ => bail!("document `{uri}` has not been parsed", uri = document_uri),
+    };
+
+    let Some(analysis_doc) = node.document() else {
+        bail!("document analysis data not available for {}", document_uri);
+    };
+
+    let offset = position_to_offset(&lines, position, encoding)?;
+    let Some(token) = find_identifier_token_at_offset(&root, offset) else {
+        bail!("no identifier found at position");
+    };
+
+    let ident_text = token.text();
+    let parent_node = token.parent().expect("identifier has not parent");
+
+    // Context based resolution
+    if let Some(location) = resolve_by_context(
+        &parent_node,
+        &token,
+        analysis_doc,
+        &document_uri,
+        &lines,
+        graph,
+    )? {
+        return Ok(Some(location));
+    }
+
+    // Scope based resolution
+    if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
+        if let Some(name_def) = scope_ref.lookup(ident_text) {
+            return Ok(Some(location_from_span(
+                &document_uri,
+                name_def.span(),
+                &lines,
+            )?));
+        }
+    }
+
+    // Global resolution
+    resolve_global_identifier(analysis_doc, ident_text, &document_uri, &lines, graph)
+}
+
+/// Resolves identifier definition based on their parent node's syntax kind.
+fn resolve_by_context(
+    parent_node: &SyntaxNode,
+    token: &SyntaxToken,
+    analysis_doc: &Document,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+    graph: &DocumentGraph,
+) -> Result<Option<Location>> {
+    match parent_node.kind() {
+        SyntaxKind::TypeRefNode | SyntaxKind::LiteralStructNode => {
+            resolve_type_reference(analysis_doc, token, document_uri, lines, graph)
+        }
+
+        SyntaxKind::CallTargetNode => {
+            resolve_call_target(parent_node, token, analysis_doc, document_uri, lines, graph)
+        }
+        SyntaxKind::ImportStatementNode => {
+            resolve_import_namespace(parent_node, token, document_uri, lines)
+        }
+
+        SyntaxKind::AccessExprNode => {
+            resolve_access_expression(parent_node, token, analysis_doc, document_uri, lines, graph)
+        }
+
+        // This case is handled by scope resolution.
+        SyntaxKind::NameRefExprNode => Ok(None),
+        _ => Ok(None),
     }
 }
 
-impl GotoDefinitionHandler {
-    /// Finds the definition location for an identifier at the given position.
-    ///
-    /// Searches the document and its imports for the definition of the
-    /// identifier at the specified position, returning the location if
-    /// found.
-    ///
-    /// * If a definition is found for the identifier then a [`Location`]
-    ///   containing the URI and range is returned wrapped in [`Some`].
-    ///
-    /// * Else, [`None`] is returned.
-    pub fn goto_definition(
-        &self,
-        graph: &DocumentGraph,
-        document_uri: Url,
-        position: SourcePosition,
-        encoding: SourcePositionEncoding,
-    ) -> Result<Option<Location>> {
-        let index = graph
-            .get_index(&document_uri)
-            .ok_or_else(|| anyhow!("document not found in graph"))?;
-
-        let node = graph.get(index);
-        let (root, lines) = match node.parse_state() {
-            ParseState::Parsed { lines, root, .. } => {
-                (SyntaxNode::new_root(root.clone()), lines.clone())
-            }
-            _ => return Err(anyhow!("document not yet parsed: {}", document_uri)),
-        };
-
-        let Some(analysis_doc) = node.document() else {
-            return Err(anyhow!(
-                "document analysis data not available for {}",
-                document_uri
-            ));
-        };
-
-        let offset = position_to_offset(&lines, position, encoding)?;
-        let Some(token) = find_identifier_token_at_offset(&root, offset) else {
-            return Err(anyhow!("no identifier found at position"));
-        };
-
-        let ident_text = token.text();
-        let parent_node = token
-            .parent()
-            .ok_or_else(|| anyhow!("identifier token has no parent"))?;
-
-        // Context based resolution
-        if let Some(location) = self.resolve_by_context(
-            &parent_node,
-            &token,
-            analysis_doc,
-            &document_uri,
-            &lines,
-            graph,
-        )? {
-            return Ok(Some(location));
-        }
-
-        // Scope based resolution
-        if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
-            if let Some(name_def) = scope_ref.lookup(ident_text) {
-                return Ok(Some(location_from_span(
-                    &document_uri,
-                    name_def.span(),
-                    &lines,
-                )?));
-            }
-        }
-
-        // Global resolution
-        self.resolve_global_identifier(analysis_doc, ident_text, &document_uri, &lines, graph)
-    }
-
-    /// Resolves identifier definition based on their parent node's syntax kind.
-    fn resolve_by_context(
-        &self,
-        parent_node: &SyntaxNode,
-        token: &SyntaxToken,
-        analysis_doc: &Document,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-        graph: &DocumentGraph,
-    ) -> Result<Option<Location>> {
-        match parent_node.kind() {
-            SyntaxKind::TypeRefNode | SyntaxKind::LiteralStructNode => {
-                self.resolve_type_reference(analysis_doc, token, document_uri, lines, graph)
-            }
-
-            SyntaxKind::CallTargetNode => self.resolve_call_target(
-                parent_node,
-                token,
-                analysis_doc,
-                document_uri,
-                lines,
-                graph,
-            ),
-            SyntaxKind::ImportStatementNode => {
-                self.resolve_import_namespace(parent_node, token, document_uri, lines)
-            }
-
-            SyntaxKind::AccessExprNode => self.resolve_access_expression(
-                parent_node,
-                token,
-                analysis_doc,
-                document_uri,
-                lines,
-                graph,
-            ),
-
-            // This case is handled by scope resolution.
-            SyntaxKind::NameRefExprNode => Ok(None),
-            _ => Ok(None),
-        }
-    }
-
-    /// Resolves type references to their definition locations.
-    ///
-    /// Searches for struct definitions in the current document and imported
-    /// namespaces.
-    fn resolve_type_reference(
-        &self,
-        analysis_doc: &Document,
-        token: &SyntaxToken,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-        graph: &DocumentGraph,
-    ) -> Result<Option<Location>> {
-        let ident_text = token.text();
-        if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
-            if struct_info.namespace().is_none() {
-                // Handle struct defined in local document.
-                return Ok(Some(location_from_span(
-                    document_uri,
-                    struct_info.name_span(),
-                    lines,
-                )?));
-            }
-
-            let is_aliased_import = struct_info
-                .ty()
-                .and_then(|t| t.as_struct())
-                .map(|st| st.name().as_str() != ident_text)
-                .unwrap_or(false);
-
-            if is_aliased_import {
-                // Returns the location where alias import was defined.
-                return Ok(Some(location_from_span(
-                    document_uri,
-                    struct_info.name_span(),
-                    lines,
-                )?));
-            } else {
-                // Return the location in the imported file.
-                let ns_name = struct_info.namespace().unwrap();
-
-                // SAFETY: we just found a struct_info with this namespace name and the document
-                // gurantees that `analysis_doc.namespaces` contains a corresponding entry for
-                // `ns_name`.
-                let ns = analysis_doc
-                    .namespace(ns_name)
-                    .expect("namespace should be present");
-                let node = graph.get(graph.get_index(ns.source()).unwrap());
-                let imported_lines = node.parse_state().lines().unwrap().clone();
-                let imported_doc = node.document().expect("document should exist");
-
-                if let Some(original_struct) = imported_doc.struct_by_name(ident_text) {
-                    return Ok(Some(location_from_span(
-                        ns.source(),
-                        original_struct.name_span(),
-                        &imported_lines,
-                    )?));
-                }
-            }
-        }
-
-        // Fallback search in case the struct is not in the current document's analysis
-        // map
-        for (_, ns) in analysis_doc.namespaces() {
-            let node = graph.get(graph.get_index(ns.source()).unwrap());
-            let Some(imported_doc) = node.document() else {
-                continue;
-            };
-
-            let Some(struct_info) = imported_doc.struct_by_name(ident_text) else {
-                continue;
-            };
-
-            let imported_lines = node.parse_state().lines().unwrap().clone();
+/// Resolves type references to their definition locations.
+///
+/// Searches for struct definitions in the current document and imported
+/// namespaces.
+fn resolve_type_reference(
+    analysis_doc: &Document,
+    token: &SyntaxToken,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+    graph: &DocumentGraph,
+) -> Result<Option<Location>> {
+    let ident_text = token.text();
+    if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
+        if struct_info.namespace().is_none() {
+            // Handle struct defined in local document.
             return Ok(Some(location_from_span(
-                ns.source(),
+                document_uri,
                 struct_info.name_span(),
-                &imported_lines,
-            )?));
-        }
-
-        Err(anyhow!(
-            "could not resolve type reference for `{}`",
-            ident_text
-        ))
-    }
-
-    /// Resolves call targets to their definition locations.
-    ///
-    /// Handles both local and namespaced function calls, resolving them to task
-    /// and workflow definition in the current document or imported
-    /// namespaces.
-    fn resolve_call_target(
-        &self,
-        parent_node: &SyntaxNode,
-        token: &SyntaxToken,
-        analysis_doc: &Document,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-        graph: &DocumentGraph,
-    ) -> Result<Option<Location>> {
-        let ident_text = token.text();
-        let target = wdl_ast::v1::CallTarget::cast(parent_node.clone()).unwrap();
-        let target_names: Vec<_> = target.names().collect();
-        let is_callee_name_clicked = target_names.last().is_some_and(|n| n.text() == ident_text);
-
-        if is_callee_name_clicked {
-            let callee_name_str = token.text();
-
-            // NOTE: Namespaced (foo.bar)
-            if target_names.len() > 1 {
-                let namespaced_name_str = target_names.first().unwrap().text();
-                let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) else {
-                    return Ok(None);
-                };
-
-                let node = graph.get(graph.get_index(ns_info.source()).unwrap());
-                let Some(imported_doc) = node.document() else {
-                    return Ok(None);
-                };
-                let imported_lines = node.parse_state().lines().unwrap().clone();
-
-                if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
-                    return Ok(Some(location_from_span(
-                        ns_info.source(),
-                        task_def.name_span(),
-                        &imported_lines,
-                    )?));
-                }
-
-                if let Some(wf_def) = imported_doc
-                    .workflow()
-                    .filter(|w| w.name() == callee_name_str)
-                {
-                    return Ok(Some(location_from_span(
-                        ns_info.source(),
-                        wf_def.name_span(),
-                        &imported_lines,
-                    )?));
-                }
-            } else {
-                // NOTE: Local calls
-                if let Some(task_def) = analysis_doc.task_by_name(callee_name_str) {
-                    return Ok(Some(location_from_span(
-                        document_uri,
-                        task_def.name_span(),
-                        lines,
-                    )?));
-                }
-
-                if let Some(wf_def) = analysis_doc
-                    .workflow()
-                    .filter(|w| w.name() == callee_name_str)
-                {
-                    return Ok(Some(location_from_span(
-                        document_uri,
-                        wf_def.name_span(),
-                        lines,
-                    )?));
-                }
-            }
-        } else if let Some(ns_info) = analysis_doc.namespace(token.text()) {
-            return Ok(Some(location_from_span(
-                document_uri,
-                ns_info.span(),
                 lines,
             )?));
         }
 
-        Ok(None)
-    }
+        let is_aliased_import = struct_info
+            .ty()
+            .and_then(|t| t.as_struct())
+            .map(|st| st.name().as_str() != ident_text)
+            .unwrap_or(false);
 
-    /// Resolves import namespace identifier to their definition locations.
-    fn resolve_import_namespace(
-        &self,
-        parent_node: &SyntaxNode,
-        token: &SyntaxToken,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-    ) -> Result<Option<Location>> {
-        let import_stmt = wdl_ast::v1::ImportStatement::cast(parent_node.clone()).unwrap();
-        let ident_text = token.text();
+        if is_aliased_import {
+            // Returns the location where alias import was defined.
+            return Ok(Some(location_from_span(
+                document_uri,
+                struct_info.name_span(),
+                lines,
+            )?));
+        } else {
+            // Return the location in the imported file.
+            let ns_name = struct_info.namespace().unwrap();
 
-        if import_stmt
-            .explicit_namespace()
-            .is_some_and(|ns_ident| ns_ident.text() == ident_text)
-        {
-            return Ok(Some(location_from_span(document_uri, token.span(), lines)?));
-        }
-
-        Ok(None)
-    }
-
-    /// Searches for global definitions(structs, tasks, workflows) in the
-    /// current document and all imported namespaces.
-    fn resolve_global_identifier(
-        &self,
-        analysis_doc: &Document,
-        ident_text: &str,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-        graph: &DocumentGraph,
-    ) -> Result<Option<Location>> {
-        if let Some(location) =
-            find_global_definition_in_doc(analysis_doc, ident_text, document_uri, lines)?
-        {
-            return Ok(Some(location));
-        }
-
-        for (_, ns) in analysis_doc.namespaces() {
-            // SAFETY: we know `get_index` will return `Some` as `ns.source` comes from
-            // `analysis_doc.namespaces` which only contains namespaces for documents that
-            // are guranteed to be present in the graph.
+            // SAFETY: we just found a struct_info with this namespace name and the document
+            // gurantees that `analysis_doc.namespaces` contains a corresponding entry for
+            // `ns_name`.
+            let ns = analysis_doc
+                .namespace(ns_name)
+                .expect("namespace should be present");
             let node = graph.get(graph.get_index(ns.source()).unwrap());
-            let Some(imported_doc) = node.document() else {
-                continue;
-            };
-
-            // SAFETY: we know `lines` will return Some as we only reach here when
-            // `node.document` is fully parsed.
             let imported_lines = node.parse_state().lines().unwrap().clone();
+            let imported_doc = node.document().expect("document should exist");
 
-            if let Some(location) = find_global_definition_in_doc(
-                imported_doc,
-                ident_text,
-                ns.source().as_ref(),
-                &imported_lines,
-            )? {
-                return Ok(Some(location));
+            if let Some(original_struct) = imported_doc.struct_by_name(ident_text) {
+                return Ok(Some(location_from_span(
+                    ns.source(),
+                    original_struct.name_span(),
+                    &imported_lines,
+                )?));
             }
         }
-
-        Ok(None)
     }
 
-    /// Resolves access expressions to their member definition locations.
-    ///
-    /// Evaluates the target expression's type and resolves member access to the
-    /// appropriate def. location.
-    ///
-    /// # Supports:
-    /// - Struct member access (`person.name`)
-    /// - Call output access (`call_result.output`)
-    /// - Arrays (persons[0].name)
-    /// - Chained Access Expressions (documents.persons[0].address.street)
-    fn resolve_access_expression(
-        &self,
-        parent_node: &SyntaxNode,
-        token: &SyntaxToken,
-        analysis_doc: &Document,
-        document_uri: &Url,
-        lines: &Arc<LineIndex>,
-        graph: &DocumentGraph,
-    ) -> Result<Option<Location>> {
-        // SAFETY: we already checked `parent_node.kind()` is
-        // `SyntaxKind::AccessExprNode` in the `resolve_by_context` before
-        // calling this function.
-        let access_expr = wdl_ast::v1::AccessExpr::cast(parent_node.clone()).unwrap();
-        let (target_expr, member_ident) = access_expr.operands();
-
-        if member_ident.span() != token.span() {
-            return Ok(None);
-        }
-
-        let scope = analysis_doc
-            .find_scope_by_position(parent_node.span().start())
-            .ok_or_else(|| anyhow!("could not find scope for access expression"))?;
-
-        let mut ctx = GotoDefEvalContext {
-            scope,
-            document: analysis_doc,
+    // Fallback search in case the struct is not in the current document's analysis
+    // map
+    for (_, ns) in analysis_doc.namespaces() {
+        let node = graph.get(graph.get_index(ns.source()).unwrap());
+        let Some(imported_doc) = node.document() else {
+            continue;
         };
-        let mut evaluator = ExprTypeEvaluator::new(&mut ctx);
-        let target_type = evaluator
-            .evaluate_expr(&target_expr)
-            .unwrap_or(crate::types::Type::Union);
 
-        if let Some(struct_ty) = target_type.as_struct() {
-            let struct_def = analysis_doc
-                .structs()
-                .find(|(_, s)| {
-                    if let Some(s_ty) = s.ty() {
-                        if let Some(s_struct_ty) = s_ty.as_struct() {
-                            return s_struct_ty.name() == struct_ty.name();
-                        }
-                    }
-                    s.name() == struct_ty.name().as_str()
-                })
-                .map(|(_, s)| s)
-                .ok_or_else(|| anyhow!("struct definition not found for {}", struct_ty.name()))?;
+        let Some(struct_info) = imported_doc.struct_by_name(ident_text) else {
+            continue;
+        };
 
-            let (uri, def_lines) = match struct_def.namespace() {
-                Some(ns_name) => {
-                    // SAFETY: `namepsace` returns `Some` only when struct was imported from a
-                    // namepsace that exists in the document.
-                    let ns = analysis_doc.namespace(ns_name).unwrap();
+        let imported_lines = node.parse_state().lines().unwrap().clone();
+        return Ok(Some(location_from_span(
+            ns.source(),
+            struct_info.name_span(),
+            &imported_lines,
+        )?));
+    }
 
-                    // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
-                    // document exists in the graph.
-                    let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+    Err(anyhow!(
+        "could not resolve type reference for `{}`",
+        ident_text
+    ))
+}
 
-                    // SAFETY: we successfully got the document above, it's in
-                    // `ParseState::Parsed` which always has a valid lines field.
-                    let lines = imported_node.parse_state().lines().unwrap().clone();
-                    (ns.source().as_ref(), lines)
-                }
-                None => (document_uri, lines.clone()),
-            };
+/// Resolves call targets to their definition locations.
+///
+/// Handles both local and namespaced function calls, resolving them to task
+/// and workflow definition in the current document or imported
+/// namespaces.
+fn resolve_call_target(
+    parent_node: &SyntaxNode,
+    token: &SyntaxToken,
+    analysis_doc: &Document,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+    graph: &DocumentGraph,
+) -> Result<Option<Location>> {
+    let target = wdl_ast::v1::CallTarget::cast(parent_node.clone()).unwrap();
+    let target_names: Vec<_> = target.names().collect();
+    let is_callee_name_clicked = target_names
+        .last()
+        .is_some_and(|n| n.span() == token.span());
 
-            let struct_node =
-                v1::StructDefinition::cast(SyntaxNode::new_root(struct_def.node().clone()))
-                    .expect("should cast to struct definition");
+    if is_callee_name_clicked {
+        let callee_name_str = token.text();
 
-            if let Some(member) = struct_node
-                .members()
-                .find(|m| m.name().text() == member_ident.text())
-            {
-                let member_span = member.name().span();
-                let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
-                // Returns found struct member definition location.
-                return Ok(Some(location_from_span(uri, span, &def_lines)?));
-            }
-        }
-
-        if let Some(call_ty) = target_type.as_call() {
-            let Some(output) = call_ty.outputs().get(member_ident.text()) else {
-                // Call output not found for the requested member.
+        // NOTE: Namespaced (foo.bar)
+        if target_names.len() == 2 {
+            let namespaced_name_str = target_names.first().unwrap().text();
+            let Some(ns_info) = analysis_doc.namespace(namespaced_name_str) else {
                 return Ok(None);
             };
 
-            let (uri, callee_lines) = match call_ty.namespace() {
-                Some(ns_name) => {
-                    // SAFETY: `namespace` returns `Some` only when the call type references
-                    // a namespace that exists in document.
-                    let ns = analysis_doc.namespace(ns_name).unwrap();
-
-                    // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
-                    // document exists in the graph.
-                    let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
-
-                    // SAFETY: we successfully got the document above, it's in
-                    // `ParseState::Parsed` which always has a valid lines field.
-                    let lines = imported_node.parse_state().lines().unwrap().clone();
-                    (ns.source().as_ref(), lines.clone())
-                }
-                None => (document_uri, lines.clone()),
+            let node = graph.get(graph.get_index(ns_info.source()).unwrap());
+            let Some(imported_doc) = node.document() else {
+                return Ok(None);
             };
+            let imported_lines = node.parse_state().lines().unwrap().clone();
 
-            // Returns found call output definition location.
-            return Ok(Some(location_from_span(
-                uri,
-                output.name_span(),
-                &callee_lines,
-            )?));
+            if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
+                return Ok(Some(location_from_span(
+                    ns_info.source(),
+                    task_def.name_span(),
+                    &imported_lines,
+                )?));
+            }
+
+            if let Some(wf_def) = imported_doc
+                .workflow()
+                .filter(|w| w.name() == callee_name_str)
+            {
+                return Ok(Some(location_from_span(
+                    ns_info.source(),
+                    wf_def.name_span(),
+                    &imported_lines,
+                )?));
+            }
+        } else if target_names.len() == 1 {
+            // NOTE: Local calls
+            if let Some(task_def) = analysis_doc.task_by_name(callee_name_str) {
+                return Ok(Some(location_from_span(
+                    document_uri,
+                    task_def.name_span(),
+                    lines,
+                )?));
+            }
+
+            if let Some(wf_def) = analysis_doc
+                .workflow()
+                .filter(|w| w.name() == callee_name_str)
+            {
+                return Ok(Some(location_from_span(
+                    document_uri,
+                    wf_def.name_span(),
+                    lines,
+                )?));
+            }
+        } else {
+            // More than 2 names (e.g. foo.bar.baz) - invalid expression.
+            return Ok(None);
         }
-
-        Ok(None)
+    } else if let Some(ns_info) = analysis_doc.namespace(token.text()) {
+        return Ok(Some(location_from_span(
+            document_uri,
+            ns_info.span(),
+            lines,
+        )?));
     }
+
+    Ok(None)
+}
+
+/// Resolves import namespace identifier to their definition locations.
+fn resolve_import_namespace(
+    parent_node: &SyntaxNode,
+    token: &SyntaxToken,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+) -> Result<Option<Location>> {
+    let import_stmt = wdl_ast::v1::ImportStatement::cast(parent_node.clone()).unwrap();
+    let ident_text = token.text();
+
+    if import_stmt
+        .explicit_namespace()
+        .is_some_and(|ns_ident| ns_ident.text() == ident_text)
+    {
+        return Ok(Some(location_from_span(document_uri, token.span(), lines)?));
+    }
+
+    Ok(None)
+}
+
+/// Searches for global definitions(structs, tasks, workflows) in the
+/// current document and all imported namespaces.
+fn resolve_global_identifier(
+    analysis_doc: &Document,
+    ident_text: &str,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+    graph: &DocumentGraph,
+) -> Result<Option<Location>> {
+    if let Some(location) =
+        find_global_definition_in_doc(analysis_doc, ident_text, document_uri, lines)?
+    {
+        return Ok(Some(location));
+    }
+
+    for (_, ns) in analysis_doc.namespaces() {
+        // SAFETY: we know `get_index` will return `Some` as `ns.source` comes from
+        // `analysis_doc.namespaces` which only contains namespaces for documents that
+        // are guranteed to be present in the graph.
+        let node = graph.get(graph.get_index(ns.source()).unwrap());
+        let Some(imported_doc) = node.document() else {
+            continue;
+        };
+
+        // SAFETY: we know `lines` will return Some as we only reach here when
+        // `node.document` is fully parsed.
+        let imported_lines = node.parse_state().lines().unwrap().clone();
+
+        if let Some(location) = find_global_definition_in_doc(
+            imported_doc,
+            ident_text,
+            ns.source().as_ref(),
+            &imported_lines,
+        )? {
+            return Ok(Some(location));
+        }
+    }
+
+    Ok(None)
+}
+
+/// Resolves access expressions to their member definition locations.
+///
+/// Evaluates the target expression's type and resolves member access to the
+/// appropriate def. location.
+///
+/// # Supports:
+/// - Struct member access (`person.name`)
+/// - Call output access (`call_result.output`)
+/// - Arrays (persons[0].name)
+/// - Chained Access Expressions (documents.persons[0].address.street)
+fn resolve_access_expression(
+    parent_node: &SyntaxNode,
+    token: &SyntaxToken,
+    analysis_doc: &Document,
+    document_uri: &Url,
+    lines: &Arc<LineIndex>,
+    graph: &DocumentGraph,
+) -> Result<Option<Location>> {
+    // SAFETY: we already checked `parent_node.kind()` is
+    // `SyntaxKind::AccessExprNode` in the `resolve_by_context` before
+    // calling this function.
+    let access_expr = wdl_ast::v1::AccessExpr::cast(parent_node.clone()).unwrap();
+    let (target_expr, member_ident) = access_expr.operands();
+
+    if member_ident.span() != token.span() {
+        return Ok(None);
+    }
+
+    let scope = analysis_doc
+        .find_scope_by_position(parent_node.span().start())
+        .context("could not find scope for access expression")?;
+
+    let mut ctx = GotoDefEvalContext {
+        scope,
+        document: analysis_doc,
+    };
+    let mut evaluator = ExprTypeEvaluator::new(&mut ctx);
+    let target_type = evaluator
+        .evaluate_expr(&target_expr)
+        .unwrap_or(crate::types::Type::Union);
+
+    if let Some(struct_ty) = target_type.as_struct() {
+        let struct_def = analysis_doc
+            .structs()
+            .find(|(_, s)| {
+                if let Some(s_ty) = s.ty() {
+                    if let Some(s_struct_ty) = s_ty.as_struct() {
+                        return s_struct_ty.name() == struct_ty.name();
+                    }
+                }
+                s.name() == struct_ty.name().as_str()
+            })
+            .map(|(_, s)| s)
+            .ok_or_else(|| {
+                anyhow!(
+                    "definition not found for struct `{name}`",
+                    name = struct_ty.name()
+                )
+            })?;
+
+        let (uri, def_lines) = match struct_def.namespace() {
+            Some(ns_name) => {
+                // SAFETY: `namepsace` returns `Some` only when struct was imported from a
+                // namepsace that exists in the document.
+                let ns = analysis_doc.namespace(ns_name).unwrap();
+
+                // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
+                // document exists in the graph.
+                let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+
+                // SAFETY: we successfully got the document above, it's in
+                // `ParseState::Parsed` which always has a valid lines field.
+                let lines = imported_node.parse_state().lines().unwrap().clone();
+                (ns.source().as_ref(), lines)
+            }
+            None => (document_uri, lines.clone()),
+        };
+
+        let struct_node =
+            v1::StructDefinition::cast(SyntaxNode::new_root(struct_def.node().clone()))
+                .expect("should cast to struct definition");
+
+        let Some(member) = struct_node
+            .members()
+            .find(|m| m.name().text() == member_ident.text())
+        else {
+            return Ok(None);
+        };
+
+        let member_span = member.name().span();
+        let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
+        // Returns found struct member definition location.
+        return Ok(Some(location_from_span(uri, span, &def_lines)?));
+    }
+
+    if let Some(call_ty) = target_type.as_call() {
+        let Some(output) = call_ty.outputs().get(member_ident.text()) else {
+            // Call output not found for the requested member.
+            return Ok(None);
+        };
+
+        let (uri, callee_lines) = match call_ty.namespace() {
+            Some(ns_name) => {
+                // SAFETY: `namespace` returns `Some` only when the call type references
+                // a namespace that exists in document.
+                let ns = analysis_doc.namespace(ns_name).unwrap();
+
+                // SAFETY: `ns.source` comes from a valid namepsace entry which gurantees the
+                // document exists in the graph.
+                let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
+
+                // SAFETY: we successfully got the document above, it's in
+                // `ParseState::Parsed` which always has a valid lines field.
+                let lines = imported_node.parse_state().lines().unwrap().clone();
+                (ns.source().as_ref(), lines.clone())
+            }
+            None => (document_uri, lines.clone()),
+        };
+
+        // Returns found call output definition location.
+        return Ok(Some(location_from_span(
+            uri,
+            output.name_span(),
+            &callee_lines,
+        )?));
+    }
+
+    Ok(None)
 }
 
 /// Finds an identifier token at the specified `TextSize` offset in the concrete
