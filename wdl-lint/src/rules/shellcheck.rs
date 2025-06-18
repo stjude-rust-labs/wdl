@@ -494,7 +494,7 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     };
 
     // don't start variable with numbers
-    let mut bash_var = String::from("WDL");
+    let mut bash_var = String::from("wdl");
     bash_var
         .push_str(&Alphanumeric.sample_string(&mut rand::rng(), placeholder_len.saturating_sub(3)));
     (bash_var, false)
