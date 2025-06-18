@@ -354,7 +354,8 @@ where
                                 elapsed = start.elapsed()
                             );
 
-                            completed.send(result).ok();
+                            let location = result.map(GotoDefinitionResponse::Scalar);
+                            completed.send(location).ok();
                         }
                         Err(err) => {
                             debug!(

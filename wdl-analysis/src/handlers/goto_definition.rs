@@ -7,7 +7,6 @@ use anyhow::Result;
 use anyhow::anyhow;
 use line_index::LineIndex;
 use line_index::WideEncoding;
-use lsp_types::GotoDefinitionResponse;
 use lsp_types::Location;
 use lsp_types::Position;
 use rowan::TextSize;
@@ -55,9 +54,8 @@ impl GotoDefinitionHandler {
     /// identifier at the specified position, returning the location if
     /// found.
     ///
-    /// * If a definition is found for the identifier then a
-    ///   [`GotoDefinitionResponse`] containing the URI and range is returned
-    ///   wrapped in [`Some`].
+    /// * If a definition is found for the identifier then a [`Location`]
+    ///   containing the URI and range is returned wrapped in [`Some`].
     ///
     /// * Else, [`None`] is returned.
     pub fn goto_definition(
@@ -66,7 +64,7 @@ impl GotoDefinitionHandler {
         document_uri: Url,
         position: SourcePosition,
         encoding: SourcePositionEncoding,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         let index = graph
             .get_index(&document_uri)
             .ok_or_else(|| anyhow!("document not found in graph"))?;
@@ -111,7 +109,11 @@ impl GotoDefinitionHandler {
         // Scope based resolution
         if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
             if let Some(name_def) = scope_ref.lookup(ident_text) {
-                return Ok(Some(location(&document_uri, name_def.span(), &lines)?));
+                return Ok(Some(location_from_span(
+                    &document_uri,
+                    name_def.span(),
+                    &lines,
+                )?));
             }
         }
 
@@ -128,7 +130,7 @@ impl GotoDefinitionHandler {
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         match parent_node.kind() {
             SyntaxKind::TypeRefNode | SyntaxKind::LiteralStructNode => {
                 self.resolve_type_reference(analysis_doc, token, document_uri, lines, graph)
@@ -172,12 +174,12 @@ impl GotoDefinitionHandler {
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         let ident_text = token.text();
         if let Some(struct_info) = analysis_doc.struct_by_name(ident_text) {
             if struct_info.namespace().is_none() {
                 // Handle struct defined in local document.
-                return Ok(Some(location(
+                return Ok(Some(location_from_span(
                     document_uri,
                     struct_info.name_span(),
                     lines,
@@ -192,7 +194,7 @@ impl GotoDefinitionHandler {
 
             if is_aliased_import {
                 // Returns the location where alias import was defined.
-                return Ok(Some(location(
+                return Ok(Some(location_from_span(
                     document_uri,
                     struct_info.name_span(),
                     lines,
@@ -212,7 +214,7 @@ impl GotoDefinitionHandler {
                 let imported_doc = node.document().expect("document should exist");
 
                 if let Some(original_struct) = imported_doc.struct_by_name(ident_text) {
-                    return Ok(Some(location(
+                    return Ok(Some(location_from_span(
                         ns.source(),
                         original_struct.name_span(),
                         &imported_lines,
@@ -234,7 +236,7 @@ impl GotoDefinitionHandler {
             };
 
             let imported_lines = node.parse_state().lines().unwrap().clone();
-            return Ok(Some(location(
+            return Ok(Some(location_from_span(
                 ns.source(),
                 struct_info.name_span(),
                 &imported_lines,
@@ -260,7 +262,7 @@ impl GotoDefinitionHandler {
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         let ident_text = token.text();
         let target = wdl_ast::v1::CallTarget::cast(parent_node.clone()).unwrap();
         let target_names: Vec<_> = target.names().collect();
@@ -283,7 +285,7 @@ impl GotoDefinitionHandler {
                 let imported_lines = node.parse_state().lines().unwrap().clone();
 
                 if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
-                    return Ok(Some(location(
+                    return Ok(Some(location_from_span(
                         ns_info.source(),
                         task_def.name_span(),
                         &imported_lines,
@@ -294,7 +296,7 @@ impl GotoDefinitionHandler {
                     .workflow()
                     .filter(|w| w.name() == callee_name_str)
                 {
-                    return Ok(Some(location(
+                    return Ok(Some(location_from_span(
                         ns_info.source(),
                         wf_def.name_span(),
                         &imported_lines,
@@ -303,18 +305,30 @@ impl GotoDefinitionHandler {
             } else {
                 // NOTE: Local calls
                 if let Some(task_def) = analysis_doc.task_by_name(callee_name_str) {
-                    return Ok(Some(location(document_uri, task_def.name_span(), lines)?));
+                    return Ok(Some(location_from_span(
+                        document_uri,
+                        task_def.name_span(),
+                        lines,
+                    )?));
                 }
 
                 if let Some(wf_def) = analysis_doc
                     .workflow()
                     .filter(|w| w.name() == callee_name_str)
                 {
-                    return Ok(Some(location(document_uri, wf_def.name_span(), lines)?));
+                    return Ok(Some(location_from_span(
+                        document_uri,
+                        wf_def.name_span(),
+                        lines,
+                    )?));
                 }
             }
         } else if let Some(ns_info) = analysis_doc.namespace(token.text()) {
-            return Ok(Some(location(document_uri, ns_info.span(), lines)?));
+            return Ok(Some(location_from_span(
+                document_uri,
+                ns_info.span(),
+                lines,
+            )?));
         }
 
         Ok(None)
@@ -327,7 +341,7 @@ impl GotoDefinitionHandler {
         token: &SyntaxToken,
         document_uri: &Url,
         lines: &Arc<LineIndex>,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         let import_stmt = wdl_ast::v1::ImportStatement::cast(parent_node.clone()).unwrap();
         let ident_text = token.text();
 
@@ -335,7 +349,7 @@ impl GotoDefinitionHandler {
             .explicit_namespace()
             .is_some_and(|ns_ident| ns_ident.text() == ident_text)
         {
-            return Ok(Some(location(document_uri, token.span(), lines)?));
+            return Ok(Some(location_from_span(document_uri, token.span(), lines)?));
         }
 
         Ok(None)
@@ -350,7 +364,7 @@ impl GotoDefinitionHandler {
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         if let Some(location) =
             find_global_definition_in_doc(analysis_doc, ident_text, document_uri, lines)?
         {
@@ -401,7 +415,7 @@ impl GotoDefinitionHandler {
         document_uri: &Url,
         lines: &Arc<LineIndex>,
         graph: &DocumentGraph,
-    ) -> Result<Option<GotoDefinitionResponse>> {
+    ) -> Result<Option<Location>> {
         // SAFETY: we already checked `parent_node.kind()` is
         // `SyntaxKind::AccessExprNode` in the `resolve_by_context` before
         // calling this function.
@@ -468,7 +482,7 @@ impl GotoDefinitionHandler {
                 let member_span = member.name().span();
                 let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
                 // Returns found struct member definition location.
-                return Ok(Some(location(uri, span, &def_lines)?));
+                return Ok(Some(location_from_span(uri, span, &def_lines)?));
             }
         }
 
@@ -497,7 +511,11 @@ impl GotoDefinitionHandler {
             };
 
             // Returns found call output definition location.
-            return Ok(Some(location(uri, output.name_span(), &callee_lines)?));
+            return Ok(Some(location_from_span(
+                uri,
+                output.name_span(),
+                &callee_lines,
+            )?));
         }
 
         Ok(None)
@@ -512,7 +530,7 @@ fn find_identifier_token_at_offset(node: &SyntaxNode, offset: TextSize) -> Optio
 }
 
 /// Converts a text size offset to LSP position.
-fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
+pub fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
     let line_col = index.line_col(offset);
     let line_col = index
         .to_wide(WideEncoding::Utf16, line_col)
@@ -528,7 +546,7 @@ fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
 }
 
 /// Converts a `Span` to an LSP location.
-fn location(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinitionResponse> {
+pub fn location_from_span(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<Location> {
     let start_offset = TextSize::from(span.start() as u32);
     let end_offset = TextSize::from(span.end() as u32);
     let range = lsp_types::Range {
@@ -536,10 +554,7 @@ fn location(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<GotoDefinit
         end: position(lines, end_offset)?,
     };
 
-    Ok(GotoDefinitionResponse::Scalar(Location::new(
-        uri.clone(),
-        range,
-    )))
+    Ok(Location::new(uri.clone(), range))
 }
 
 /// Finds global structs, tasks and workflow definition in a document.
@@ -548,25 +563,37 @@ fn find_global_definition_in_doc(
     ident_text: &str,
     document_uri: &Url,
     lines: &Arc<LineIndex>,
-) -> Result<Option<GotoDefinitionResponse>> {
+) -> Result<Option<Location>> {
     if let Some(s) = analysis_doc.struct_by_name(ident_text) {
-        return Ok(Some(location(document_uri, s.name_span(), lines)?));
+        return Ok(Some(location_from_span(
+            document_uri,
+            s.name_span(),
+            lines,
+        )?));
     }
     if let Some(t) = analysis_doc.task_by_name(ident_text) {
-        return Ok(Some(location(document_uri, t.name_span(), lines)?));
+        return Ok(Some(location_from_span(
+            document_uri,
+            t.name_span(),
+            lines,
+        )?));
     }
     if let Some(w) = analysis_doc
         .workflow()
         .filter(|w_def| w_def.name() == ident_text)
     {
-        return Ok(Some(location(document_uri, w.name_span(), lines)?));
+        return Ok(Some(location_from_span(
+            document_uri,
+            w.name_span(),
+            lines,
+        )?));
     }
 
     Ok(None)
 }
 
 /// Converts a source postion to a text offset based on the specified encoding.
-fn position_to_offset(
+pub fn position_to_offset(
     lines: &Arc<LineIndex>,
     position: SourcePosition,
     encoding: SourcePositionEncoding,
