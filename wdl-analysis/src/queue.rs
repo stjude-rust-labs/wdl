@@ -357,7 +357,7 @@ where
                             completed.send(location).ok();
                         }
                         Err(err) => {
-                            debug!(
+                            error!(
                                 "error occurred while completing the goto definition request: \
                                  {err:?}"
                             );
