@@ -43,11 +43,6 @@ impl Default for GotoDefinitionHandler {
 }
 
 impl GotoDefinitionHandler {
-    /// Creates a new goto definition handler.
-    pub fn new() -> Self {
-        Self
-    }
-
     /// Finds the definition location for an identifier at the given position.
     ///
     /// Searches the document and its imports for the definition of the

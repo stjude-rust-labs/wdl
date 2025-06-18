@@ -346,7 +346,7 @@ where
                     );
 
                     let graph = self.graph.read();
-                    let handler = GotoDefinitionHandler::new();
+                    let handler = GotoDefinitionHandler;
                     match handler.goto_definition(&graph, document, position, encoding) {
                         Ok(result) => {
                             debug!(
