@@ -200,11 +200,46 @@
     @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
   }
   /**
-   * Docs Tree
+   * Left sidebar
+   * TODO lots not done yet for this sidebar
    */
-  .docs-tree__container {
+  .sidebar__indent {
+    @apply w-px h-6 border rounded-none border-gray-700 mr-2;
+  }
+  .left-sidebar__container {
     @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
   }
+  .left-sidebar__searchbar-form {
+    @apply flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4;
+  }
+  .left-sidebar__searchbar {
+    @apply flex flex-row items-center size-full;
+  }
+  .left-sidebar__searchbox {
+    @apply flex size-full text-slate-300 pl-2;
+  }
+  .left-sidebar__search-clear {
+    @apply flex size-6 hover:cursor-pointer ml-2 pr-2;
+  }
+  .left-sidebar__tabs-container {
+    @apply flex items-center gap-x-1 pr-4;
+  }
+  .left-sidebar__tabs {
+    @apply flex grow items-center gap-x-1 border-b hover:cursor-pointer;
+  }
+  .left-sidebar__icon {
+    @apply size-4;
+  }
+  .left-sidebar__content-container {
+    @apply size-full rounded-md pt-2 pl-2 overflow-x-clip overflow-y-scroll;
+  }
+  .left-sidebar__content {
+    @apply w-max pr-3;
+  }
+  .left-sidebar__content-item {
+    @apply flex flex-row items-center gap-x-1;
+  }
+
   /**
    * Main Right Sidebar
    */
