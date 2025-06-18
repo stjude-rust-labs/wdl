@@ -161,7 +161,7 @@ pub(crate) fn render_meta_map(
             }
         }
         @if any_additional_items {
-            div class="main__table-outer-container" {
+            div class="main__table-outer-container main__metadata-table" {
                 div class="main__table-inner-container" {
                     table class="main__table" {
                         tbody {

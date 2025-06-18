@@ -884,9 +884,9 @@ impl DocsTree {
                 @for crumb in breadcrumbs {
                     span { " / " }
                     @if let Some(path) = crumb.1 {
-                        a href=(path.to_string_lossy()) { (crumb.0) }
+                        a href=(path.to_string_lossy()) class="layout__breadcrumb-clickable" { (crumb.0) }
                     } @else {
-                        span { (crumb.0) }
+                        span class="layout__breadcrumb-inactive" { (crumb.0) }
                     }
                 }
             }
