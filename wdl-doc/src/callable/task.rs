@@ -87,19 +87,18 @@ impl Task {
                 html! {
                     div class="main__section" {
                         h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
-                        div class="main__table-outer-container" {
-                            div class="main__table-inner-container" {
-                                table class="main__table" {
-                                    thead { tr {
-                                        th { "Attribute" }
-                                        th { "Value" }
-                                    }}
-                                    tbody {
-                                        @for entry in runtime_section.items() {
-                                            tr {
-                                                td { code { (entry.name().text()) } }
-                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) }) }
-                                            }
+                        div class="main__grid-container" {
+                            div class="main__grid-runtime-container" {
+                                div class="main__grid-header-cell" { "Attribute" }
+                                div class="main__grid-header-cell" { "Value" }
+                                div class="main__grid-header-separator" {}
+                                @for entry in runtime_section.items() {
+                                    div class="main__grid-row" {
+                                        div class="main__grid-cell" {
+                                            code { (entry.name().text()) }
+                                        }
+                                        div class="main__grid-cell" {
+                                            ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) })
                                         }
                                     }
                                 }

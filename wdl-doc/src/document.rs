@@ -101,53 +101,48 @@ impl Document {
                 }
                 div class="main__section" {
                     h2 id="toc" class="main__section-header" { "Table of Contents" }
-                    div class="main__table-outer-container" {
-                        div class="main__table-inner-container" {
-                            table class="main__table" {
-                                thead { tr {
-                                    th { "Page" }
-                                    th { "Type" }
-                                    th { "Description" }
-                                }}
-                                tbody {
-                                    @for page in &self.local_pages {
-                                        tr {
-                                            @match page.1.page_type() {
-                                                PageType::Struct(_) => {
-                                                    td {
-                                                        a class="text-pink-400 main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "struct" } }
-                                                    td { "N/A" }
-                                                }
-                                                PageType::Task(t) => {
-                                                    td {
-                                                        a class="text-violet-400 main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "task" } }
-                                                    td { (t.description(true)) }
-                                                }
-                                                PageType::Workflow(w) => {
-                                                    td {
-                                                        a class="text-emerald-400 main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "workflow" } }
-                                                    td { (w.description(true)) }
-                                                }
-                                                // Index pages should not link to other index pages.
-                                                PageType::Index(_) => {
-                                                    // This should never happen
-                                                    td { "ERROR" }
-                                                    td { "ERROR" }
-                                                    td { "ERROR" }
+                    div class="main__grid-container" {
+                        div class="main__grid-toc-container" {
+                            div class="main__grid-header-cell" { "Page" }
+                            div class="main__grid-header-cell" { "Type" }
+                            div class="main__grid-header-cell" { "Description" }
+                            div class="main__grid-header-separator" {}
+                            @for page in &self.local_pages {
+                                div class="main__grid-row" {
+                                    @match page.1.page_type() {
+                                        PageType::Struct(_) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-pink-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
                                                 }
                                             }
+                                            div class="main__grid-cell" { code { "struct" } }
+                                            div class="main__grid-cell" { "N/A" }
+                                        }
+                                        PageType::Task(t) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-violet-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
+                                                }
+                                            }
+                                            div class="main__grid-cell" { code { "task" } }
+                                            div class="main__grid-cell" { (t.description(true)) }
+                                        }
+                                        PageType::Workflow(w) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-emerald-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
+                                                }
+                                            }
+                                            div class="main__grid-cell" { code { "workflow" } }
+                                            div class="main__grid-cell" { (w.description(true)) }
+                                        }
+                                        // Index pages should not link to other index pages.
+                                        PageType::Index(_) => {
+                                            // This should be unreachable
+                                            div class="main__grid-cell" { "ERROR" }
+                                            div class="main__grid-cell" { "ERROR" }
+                                            div class="main__grid-cell" { "ERROR" }
                                         }
                                     }
                                 }

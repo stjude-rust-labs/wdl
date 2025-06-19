@@ -20,7 +20,10 @@ pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> 
     fn render_value_inner(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
         match value {
             MetadataValue::String(s) => {
-                let inner_text = s.text().map(|t| t.text().to_string()).unwrap_or_default();
+                let inner_text = s
+                    .text()
+                    .map(|t| t.text().to_string())
+                    .expect("meta string should not be interpolated");
                 if summarize_if_needed {
                     return html! { (summarize_markdown_if_needed(inner_text)) };
                 }
@@ -146,7 +149,9 @@ pub(crate) fn render_meta_map(
 
     Some(html! {
         @if let Some(help) = help_item {
-            (render_value(help, summarize_if_needed))
+            div class="markdown-body" {
+                (render_value(help, summarize_if_needed))
+            }
         }
         @if let Some(on_click) = external_link_on_click {
             button type="button" class="main__button" x-on:click=(on_click) {
