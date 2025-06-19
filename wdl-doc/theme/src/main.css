@@ -214,6 +214,36 @@
     /* TODO */
   }
   /**
+   * Main Grids
+   */
+  .main__grid-container {
+    @apply max-w-4xl rounded p-8;
+  }
+  .main__grid-header-separator {
+    @apply col-span-full border-b mb-4;
+  }
+  .main__grid-row {
+    @apply contents;
+  }
+  .main__grid-header-cell {
+    @apply text-sm font-bold;
+  }
+  .main__grid-cell {
+    @apply text-sm;
+  }
+  .main__grid-toc-container {
+    @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
+  }
+  .main__grid-runtime-container {
+    @apply grid grid-cols-[1fr_3fr] gap-4;
+  }
+  .main__grid-req-inputs-container {
+    @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
+  }
+  .main__grid-non-req-param-container {
+    @apply grid grid-cols-[1fr_1fr_2fr_3fr] gap-4;
+  }
+  /**
    * Left sidebar
    */
   .left-sidebar__indent {

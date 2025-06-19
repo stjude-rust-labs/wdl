@@ -157,27 +157,27 @@ impl Parameter {
     /// Render any remaining metadata as HTML.
     ///
     /// This will render any metadata that is not rendered elsewhere if present.
-    pub fn render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
+    pub fn _render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
         render_meta_map(self.meta(), &["description", "group"], true, assets)
     }
 
     /// Render the parameter as HTML.
-    pub fn render(&self, addl_meta: bool, assets: &Path) -> Markup {
+    pub fn render(&self, _assets: &Path) -> Markup {
         html! {
-            tr {
-                td { code { (self.name()) } }
-                td { code { (self.ty()) } }
+            div class="main__grid-row" {
+                div class="main__grid-cell" {
+                    code { (self.name()) }
+                }
+                div class="main__grid-cell" {
+                    code { (self.ty()) }
+                }
                 @if self.required() != Some(true) {
-                    td { (shorten_expr_if_needed(self.expr())) }
+                    div class="main__grid-cell" { (shorten_expr_if_needed(self.expr())) }
                 }
-                td { (self.description(true)) }
-                @if addl_meta {
-                    @if let Some(markup) = self.render_remaining_meta(assets) {
-                        td { (markup) }
-                    } @else {
-                        td { }
-                    }
+                div class="main__grid-cell" {
+                    (self.description(true))
                 }
+                // TODO collapsable row for additional metadata
             }
         }
     }
@@ -215,36 +215,33 @@ pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
     }
 }
 
-/// Render a table with the given headers and parameters
-///
-/// If any of the parameters return `Some(_)` for `render_remaining_meta()`, an
-/// "Additional Meta" column will be added to the table.
-pub(crate) fn render_parameter_table<'a, I>(headers: &[&str], params: I, assets: &Path) -> Markup
+/// Render a table for non-required parameters (both inputs and outputs
+/// accepted).
+pub(crate) fn render_non_required_parameters_table<'a, I>(params: I, assets: &Path) -> Markup
 where
     I: Iterator<Item = &'a Parameter>,
 {
     let params = params.collect::<Vec<_>>();
-    let addl_meta = params
-        .iter()
-        .any(|param| param.render_remaining_meta(assets).is_some());
+
+    let third_col = if params.iter().any(|p| p.required().is_none()) {
+        // If any parameter is an output, we use "Expression" as the third column
+        // header.
+        "Expression"
+    } else {
+        // If all parameters are inputs, we use "Default" as the third column header.
+        "Default"
+    };
 
     html! {
-        div class="main__table-outer-container" {
-            div class="main__table-inner-container" {
-                table class="main__table" {
-                    thead { tr {
-                        @for header in headers {
-                            th { (header) }
-                        }
-                        @if addl_meta {
-                            th { "Additional Meta" }
-                        }
-                    }}
-                    tbody {
-                        @for param in params {
-                            (param.render(addl_meta, assets))
-                        }
-                    }
+        div class="main__grid-container" {
+            div class="main__grid-non-req-param-container" {
+                div class="main__grid-header-cell" { "Name" }
+                div class="main__grid-header-cell" { "Type" }
+                div class="main__grid-header-cell" { (third_col) }
+                div class="main__grid-header-cell" { "Description" }
+                div class="main__grid-header-separator" {}
+                @for param in params {
+                    (param.render(assets))
                 }
             }
         }
