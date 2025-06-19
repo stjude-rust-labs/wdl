@@ -449,32 +449,32 @@ impl DocsTree {
         html! {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
-                    div class="flex items-center gap-x-1 h-6 text-slate-50" {
+                    div class="left-sidebar__category" {
                         img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
                         p class="" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
                             li x-data=(format!(r#"{{
-                                hover: false,
-                                node: {{
-                                    current: {},
-                                    icon: '{}',
-                                }}
-                            }}"#,
-                            self.root_abs_path().join(node.path()) == destination,
-                            self.get_asset(base, if self.root_abs_path().join(node.path()) == destination {
-                                    "workflow-selected.svg"
-                                } else {
-                                    "workflow-unselected.svg"
-                                },
-                            ))) class="flex flex-row items-center gap-x-1" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                                    hover: false,
+                                    node: {{
+                                        current: {},
+                                        icon: '{}',
+                                    }}
+                                }}"#,
+                                self.root_abs_path().join(node.path()) == destination,
+                                self.get_asset(base, if self.root_abs_path().join(node.path()) == destination {
+                                        "workflow-selected.svg"
+                                    } else {
+                                        "workflow-unselected.svg"
+                                    },
+                            ))) class="left-sidebar__workflow" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
-                                            div class="w-px h-6 mr-2 flex-none" {}
-                                            div class="w-px h-6 mr-2 flex-none border rounded-none border-gray-700" {}
-                                            div class="flex flex-row items-center gap-x-1" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
+                                            div class="left-sidebar__workflow-indent-hidden" {}
+                                            div class="left-sidebar__workflow-indent" {}
+                                            div class="left-sidebar__workflow-container" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
                                                 sprocket-tooltip content=(wf.pretty_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
                                                     a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) {
@@ -798,9 +798,9 @@ impl DocsTree {
                         template x-for="node in shownNodes" {
                             li x-data="{ hover: false }" class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : hover ? 'bg-slate-700' : ''" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
-                                    div x-show="showSelfCache[node.key]" class="sidebar__indent" {}
+                                    div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
                                 }
-                                div class="flex flex-row items-center gap-x-1" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
+                                div class="left-sidebar__content-item-container" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
                                     img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="left-sidebar__icon" alt="Node icon";
                                     sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
@@ -809,11 +809,11 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in searchedNodes" {
-                            li class="flex flex-col hover:bg-slate-800 border-b border-gray-600 text-slate-50 pl-2" {
+                            li class="left-sidebar__search-result-item" {
                                 p class="text-xs" x-text="node.parent" {}
-                                div class="flex flex-row items-center gap-x-1 mb-2" {
+                                div class="left-sidebar__search-result-item-container" {
                                     img x-bind:src="node.icon" class="left-sidebar__icon" alt="Node icon";
-                                    sprocket-tooltip x-bind:content="node.display_name" {
+                                    sprocket-tooltip class="" x-bind:content="node.display_name" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
                                 }
