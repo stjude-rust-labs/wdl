@@ -36,7 +36,7 @@ impl Struct {
         let markup = html! {
             div class="main__container" {
                 p class="text-pink-400" { "Struct" }
-                h1 id="title" class="main__title" { code { (name) } }
+                h1 id="title" class="main__title main__title-code" { code { (name) } }
                 div class="main__badge-container" {
                     (self.version.render())
                 }

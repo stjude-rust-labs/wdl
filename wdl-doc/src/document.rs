@@ -112,27 +112,40 @@ impl Document {
                                 tbody {
                                     @for page in &self.local_pages {
                                         tr {
-                                            td {
-                                                a class="text-violet-400" href=(page.0.to_string_lossy()) {
-                                                    (page.1.name())
+                                            @match page.1.page_type() {
+                                                PageType::Struct(_) => {
+                                                    td {
+                                                        a class="text-pink-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                            (page.1.name())
+                                                        }
+                                                    }
+                                                    td { code { "struct" } }
+                                                    td { "N/A" }
                                                 }
-                                            }
-                                            td { code {
-                                                @match page.1.page_type() {
-                                                    PageType::Struct(_) => { "struct" }
-                                                    PageType::Task(_) => { "task" }
-                                                    PageType::Workflow(_) => { "workflow" }
-                                                    // Index pages should not link to other index pages.
-                                                    PageType::Index(_) => { "ERROR" }
+                                                PageType::Task(t) => {
+                                                    td {
+                                                        a class="text-violet-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                            (page.1.name())
+                                                        }
+                                                    }
+                                                    td { code { "task" } }
+                                                    td { (t.description(true)) }
                                                 }
-                                            } }
-                                            td {
-                                                @match page.1.page_type() {
-                                                    PageType::Struct(_) => { "N/A" }
-                                                    PageType::Task(t) => { (t.description(true)) }
-                                                    PageType::Workflow(w) => { (w.description(true)) }
-                                                    // Index pages should not link to other index pages.
-                                                    PageType::Index(_) => { "ERROR" }
+                                                PageType::Workflow(w) => {
+                                                    td {
+                                                        a class="text-emerald-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                            (page.1.name())
+                                                        }
+                                                    }
+                                                    td { code { "workflow" } }
+                                                    td { (w.description(true)) }
+                                                }
+                                                // Index pages should not link to other index pages.
+                                                PageType::Index(_) => {
+                                                    // This should never happen
+                                                    td { "ERROR" }
+                                                    td { "ERROR" }
+                                                    td { "ERROR" }
                                                 }
                                             }
                                         }

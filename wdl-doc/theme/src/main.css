@@ -119,6 +119,9 @@
   /**
    * Layout - Breadcrumbs
    */
+  .layout__breadcrumb-container {
+    @apply mb-4;
+  }
   .layout__breadcrumb-clickable {
     @apply text-slate-50 hover:text-slate-300 hover:underline;
   }
@@ -133,6 +136,9 @@
   }
   .main__title {
     @apply text-5xl text-slate-50 mt-8 mb-4;
+  }
+  .main__title-code {
+    @apply border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono max-w-fit p-[0.2em];
   }
   .main__section {
     @apply flex flex-col;
@@ -203,6 +209,9 @@
   }
   .main__table td code {
     @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
+  }
+  .main__toc-link {
+    /* TODO */
   }
   /**
    * Left sidebar
