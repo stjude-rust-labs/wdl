@@ -109,8 +109,8 @@ impl Workflow {
         {
             if b.value() {
                 return html! {
-                    div class="main__badge-green" {
-                        span class="main__badge-green-text" {
+                    div class="main__badge main__badge--success" {
+                        span class="main__badge-text" {
                             "Nested Inputs Allowed"
                         }
                     }
@@ -118,7 +118,7 @@ impl Workflow {
             }
         }
         html! {
-            div class="main__badge" {
+            div class="main__badge main__badge--disabled" {
                 span class="main__badge-text" {
                     "Nested Inputs Not Allowed"
                 }

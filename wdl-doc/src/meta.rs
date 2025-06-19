@@ -149,7 +149,7 @@ pub(crate) fn render_meta_map(
             (render_value(help, summarize_if_needed))
         }
         @if let Some(on_click) = external_link_on_click {
-            button type="button" class="main__button flex items-center gap-2" x-on:click=(on_click) {
+            button type="button" class="main__button" x-on:click=(on_click) {
                 b { "Go to External Documentation" }
                 img src=(assets.join("link.svg").to_string_lossy()) alt="External Documentation Icon" class="size-5";
             }
