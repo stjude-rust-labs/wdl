@@ -938,7 +938,6 @@ impl DocsTree {
 
         let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
-            h1 class="main__title" { "Home" }
             @if let Some(homepage) = &self.homepage {
                 div class="main__section" {
                     div class="markdown-body" {
