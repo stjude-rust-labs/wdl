@@ -148,7 +148,7 @@ impl Task {
         let markup = html! {
             div class="main__container" {
                 span class="text-violet-400" { "Task" }
-                h1 id="title" class="main__title" { code { (self.name()) } }
+                h1 id="title" class="main__title main__title-code" { code { (self.name()) } }
                 div class="main__badge-container" {
                     (self.version().render())
                 }

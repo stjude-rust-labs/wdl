@@ -872,37 +872,40 @@ impl DocsTree {
         let cur_page = self.get_page(path).expect("path should have a page");
         match cur_page.page_type() {
             PageType::Index(_) => {
-                // Index pages should not appear in the breadcrumbs.
+                // Index pages should not have breadcrumbs.
+                return html! {};
             }
             _ => {
+                // Last crumb should not be clickable
                 breadcrumbs.push((cur_page.name(), None));
             }
         }
 
         while let Some(parent) = current_path.parent() {
             let cur_node = self.get_node(parent).expect("path should have a node");
-            breadcrumbs.push((
-                cur_node.page().map(|n| n.name()).unwrap_or(cur_node.name()),
-                if cur_node.page().is_some() {
-                    Some(diff_paths(self.root_abs_path().join(cur_node.path()), base).unwrap())
-                } else {
-                    None
-                },
-            ));
+            // Only nodes with pages should be included in the breadcrumbs.
+            if let Some(page) = cur_node.page() {
+                breadcrumbs.push((
+                    page.name(),
+                    Some(diff_paths(self.root_abs_path().join(cur_node.path()), base).unwrap()),
+                ));
+            } else if cur_node.name() == self.root().name() {
+                breadcrumbs.push((cur_node.name(), Some(self.root_index_relative_to(base))))
+            }
             current_path = parent;
         }
         breadcrumbs.reverse();
         let mut breadcrumbs = breadcrumbs.into_iter();
-        let first = breadcrumbs
+        let root_crumb = breadcrumbs
             .next()
             .expect("should have at least one breadcrumb");
-        let first = html! {
-            a class="layout__breadcrumb-clickable" href=(self.root_index_relative_to(base).to_string_lossy()) { (first.0) }
+        let root_crumb = html! {
+            a class="layout__breadcrumb-clickable" href=(root_crumb.1.expect("root crumb should have path").to_string_lossy()) { (root_crumb.0) }
         };
 
         html! {
-            div class="mb-4" {
-                (first)
+            div class="layout__breadcrumb-container" {
+                (root_crumb)
                 @for crumb in breadcrumbs {
                     span { " / " }
                     @if let Some(path) = crumb.1 {
