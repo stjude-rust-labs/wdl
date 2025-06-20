@@ -61,23 +61,31 @@ impl HTMLPage {
 }
 
 /// A page header or page sub header.
+///
+/// This is used to represent the headers in the right sidebar of the
+/// documentation pages. Each header has a name (first String) and an ID (second
+/// String), which is used to link to the header in the page.
 #[derive(Debug)]
-pub enum Header {
+pub(crate) enum Header {
     /// A header in the page.
     Header(String, String),
     /// A sub header in the page.
     SubHeader(String, String),
 }
 
-/// A sorted collection of headers in a page.
+/// A collection of page headers representing the sections of a page.
+///
+/// This is used to render the right sidebar of documentation pages.
+/// Each section added to this collection will be rendered in the
+/// order it was added.
 #[derive(Debug, Default)]
-pub struct PageHeaders {
-    /// The headers of the page.
+pub(crate) struct PageSections {
+    /// The headers found in the page.
     pub headers: Vec<Header>,
 }
 
-impl PageHeaders {
-    /// Push a header to the page headers.
+impl PageSections {
+    /// Push a header to the page sections.
     pub fn push(&mut self, header: Header) {
         self.headers.push(header);
     }
@@ -87,7 +95,7 @@ impl PageHeaders {
         self.headers.extend(headers.headers);
     }
 
-    /// Render the page headers as HTML.
+    /// Render the page sections as HTML for the right sidebar.
     pub fn render(&self) -> Markup {
         html!(
             @for header in &self.headers {
@@ -162,8 +170,8 @@ impl Node {
 
     /// Gather the node and its children in a Depth First Traversal order.
     ///
-    /// Traversal order is alphabetical by node name, with the exception of the
-    /// "external" node, which is always last.
+    /// Traversal order among children is alphabetical by node name, with the
+    /// exception of any "external" node, which is always last.
     pub fn depth_first_traversal(&self) -> Vec<&Node> {
         fn recurse_depth_first<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
             nodes.push(node);
@@ -255,8 +263,8 @@ pub struct DocsTree {
     root: Node,
     /// The absolute path to the root directory.
     path: PathBuf,
-    /// An optional path to a Markdown file to embed in the `<root>/index.html`
-    /// page.
+    /// An optional path to a Markdown file which will be embedded in the
+    /// `<root>/index.html` page.
     homepage: Option<PathBuf>,
 }
 
@@ -476,9 +484,9 @@ impl DocsTree {
                                             div class="left-sidebar__workflow-indent" {}
                                             div class="left-sidebar__workflow-container" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
-                                                sprocket-tooltip content=(wf.pretty_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
+                                                sprocket-tooltip content=(wf.render_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
                                                     a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) {
-                                                        (wf.pretty_name())
+                                                        (wf.render_name())
                                                     }
                                                 }
                                             }
@@ -835,7 +843,7 @@ impl DocsTree {
     }
 
     /// Render a right sidebar component.
-    fn render_right_sidebar(&self, headers: PageHeaders) -> Markup {
+    fn render_right_sidebar(&self, headers: PageSections) -> Markup {
         html! {
             div class="right-sidebar__container" {
                 div class="right-sidebar__header" {
@@ -945,7 +953,7 @@ impl DocsTree {
                     }
                 }
             } @else {
-                div class="flex flex-col flex-grow items-center justify-center size-full gap-y-2 pt-8" {
+                div class="main__section--empty" {
                     img src=(self.get_asset(self.root_abs_path(), "missing-home.svg")) class="size-12" alt="Missing home icon";
                     h2 class="main__section-header" { "There's nothing to see on this page" }
                     p { "The markdown file for this page wasn't supplied." }
@@ -971,7 +979,7 @@ impl DocsTree {
                         (content)
                     }
                     div class="layout__sidebar-right" {
-                        (self.render_right_sidebar(PageHeaders::default()))
+                        (self.render_right_sidebar(PageSections::default()))
                     }
                 }
             },

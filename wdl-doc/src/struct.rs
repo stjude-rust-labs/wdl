@@ -9,7 +9,7 @@ use wdl_ast::SupportedVersion;
 use wdl_ast::v1::StructDefinition;
 
 use crate::VersionBadge;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -30,7 +30,7 @@ impl Struct {
     }
 
     /// Render the struct as HTML.
-    pub fn render(&self) -> (Markup, PageHeaders) {
+    pub fn render(&self) -> (Markup, PageSections) {
         let name = self.definition.name();
         let name = name.text();
         let markup = html! {
@@ -45,6 +45,6 @@ impl Struct {
                 }
             }
         };
-        (markup, PageHeaders::default())
+        (markup, PageSections::default())
     }
 }

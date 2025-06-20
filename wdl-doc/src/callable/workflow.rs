@@ -8,7 +8,7 @@ use wdl_ast::v1::WorkflowDefinition;
 
 use super::*;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::meta::render_meta_map;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
@@ -18,7 +18,7 @@ use crate::parameter::Parameter;
 pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
-    /// The version of WDL this workflow is defined in.
+    /// The [`VersionBadge`] which displays the WDL version of the workflow.
     version: VersionBadge,
     /// The meta of the workflow.
     meta: MetaMap,
@@ -62,21 +62,24 @@ impl Workflow {
         self.meta.get("name").map(|v| render_value(v, false))
     }
 
-    /// Returns the "pretty" name of the workflow as HTML.
-    pub fn pretty_name(&self) -> Markup {
-        if let Some(name) = self.name_override() {
-            name
-        } else {
-            html! { (self.name) }
-        }
-    }
-
     /// Returns the `category` entry from the meta section, if it exists.
     pub fn category(&self) -> Option<String> {
         self.meta.get("category").and_then(|v| match v {
             MetadataValue::String(s) => Some(s.text().unwrap().text().to_string()),
             _ => None,
         })
+    }
+
+    /// Returns the name of the workflow as HTML.
+    ///
+    /// If the `name` entry exists in the meta section, it will be used
+    /// instead of the `name` field.
+    pub fn render_name(&self) -> Markup {
+        if let Some(name) = self.name_override() {
+            name
+        } else {
+            html! { (self.name) }
+        }
     }
 
     /// Renders the meta section of the workflow as HTML.
@@ -127,8 +130,8 @@ impl Workflow {
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
-        let mut headers = PageHeaders::default();
+    pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
+        let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
             meta
         } else {
@@ -142,7 +145,7 @@ impl Workflow {
         let markup = html! {
             div class="main__container" {
                 span class="text-emerald-400" { "Workflow" }
-                h1 id="title" class="main__title" { (self.pretty_name()) }
+                h1 id="title" class="main__title" { (self.render_name()) }
                 div class="main__badge-container" {
                     (self.version().render())
                     @if let Some(category) = self.category() {

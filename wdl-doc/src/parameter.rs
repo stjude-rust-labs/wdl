@@ -217,6 +217,16 @@ pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
 
 /// Render a table for non-required parameters (both inputs and outputs
 /// accepted).
+///
+/// A separate implementation is used for non-required parameters
+/// because they require an extra column for the default value (when inputs)
+/// or expression (when outputs). This may seem like a duplication on its
+/// surface, but because of the way CSS/HTML grids work, this is the most
+/// straightforward way to handle the different shape grids.
+///
+/// The distinction between inputs and outputs is made by checking if the
+/// `required` field is `None` for all parameters. If any parameter has
+/// `required` set to `Some(_)`, then all parameters are considered inputs.
 pub(crate) fn render_non_required_parameters_table<'a, I>(params: I, assets: &Path) -> Markup
 where
     I: Iterator<Item = &'a Parameter>,

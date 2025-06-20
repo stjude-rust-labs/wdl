@@ -49,6 +49,9 @@
 }
 
 @layer components {
+  .body--base {
+    @apply size-full table-auto border-collapse text-base;
+  }
   /**
    * Layout
    */
@@ -143,6 +146,9 @@
   .main__section {
     @apply flex flex-col;
   }
+  .main__section--empty {
+    @apply flex flex-col flex-grow items-center justify-center size-full gap-y-2 pt-8;
+  }
   .main__section-header {
     @apply text-2xl text-slate-50 mt-8;
   }
@@ -188,30 +194,12 @@
   .main__button {
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10 text-slate-50 text-sm flex items-center gap-1.5 [&>b]:font-semibold [&>b]:text-nowrap [&>b]:overflow-x-hidden [&>b]:text-ellipsis max-w-[max-content];
   }
-  /**
-   * Main Tables
-   */
-  /* We need tables to be scrollable on the X axis */
-  .main__table-outer-container {
-    @apply overflow-x-auto dark-scrollbar;
-  }
-  .main__table-inner-container {
-    @apply w-3xl md:w-4xl lg:w-auto;
-  }
-  .main__table {
-    @apply text-slate-50 mt-3 table-fixed;
-  }
-  .main__table th {
-    @apply text-left py-3.5 border-b border-b-slate-700 pr-5;
-  }
-  .main__table td {
-    @apply text-slate-400 text-left pr-5 py-4 border-b border-b-slate-800;
-  }
-  .main__table td code {
-    @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
-  }
   .main__toc-link {
     /* TODO */
+  }
+  .metadata__warning {
+    /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
+    @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm mt-3;
   }
   /**
    * Main Grids
@@ -308,7 +296,7 @@
   }
 
   /**
-   * Main Right Sidebar
+   * Right Sidebar
    */
   .right-sidebar__container {
     @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col gap-1.5;
@@ -342,11 +330,6 @@
   }
   .right-sidebar__back-to-top-text {
     @apply text-sm;
-  }
-
-  .metadata__warning {
-    /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
-    @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm mt-3;
   }
 }
 
