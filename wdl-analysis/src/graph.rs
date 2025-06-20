@@ -629,3 +629,40 @@ impl DocumentGraph {
             .retain(|(from, to)| !collected.contains(from) && !collected.contains(to));
     }
 }
+
+/// An extension trait for [`DocumentGraph`].
+pub trait DocumentGraphExt {
+    /// Gets all nodes that have a dependency on the given node.
+    fn dependents(
+        &self,
+        index: petgraph::graph::NodeIndex,
+    ) -> Box<dyn Iterator<Item = petgraph::graph::NodeIndex> + '_>;
+}
+
+impl DocumentGraphExt for DocumentGraph {
+    fn dependents(
+        &self,
+        index: petgraph::graph::NodeIndex,
+    ) -> Box<dyn Iterator<Item = petgraph::graph::NodeIndex> + '_> {
+        let mut dependents = HashSet::new();
+        let mut queue = vec![index];
+        let mut visited = HashSet::new();
+
+        while let Some(current_index) = queue.pop() {
+            if visited.contains(&current_index) {
+                continue;
+            }
+            visited.insert(current_index);
+
+            for edge in self
+                .inner
+                .edges_directed(current_index, petgraph::Direction::Outgoing)
+            {
+                let dependent_index = edge.target();
+                dependents.insert(dependent_index);
+                queue.push(dependent_index);
+            }
+        }
+        Box::new(dependents.into_iter())
+    }
+}
