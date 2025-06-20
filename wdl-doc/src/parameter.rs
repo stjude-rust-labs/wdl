@@ -20,13 +20,13 @@ pub(crate) struct Group(pub String);
 
 impl Group {
     /// Get the display name of the group.
-    pub fn display_name(&self) -> String {
-        self.0.clone()
+    pub fn display_name(&self) -> &str {
+        &self.0
     }
 
     /// Get the id of the group.
     pub fn id(&self) -> String {
-        format!("inputs-{}", self.0.replace(" ", "-"))
+        self.0.replace(" ", "-").to_lowercase()
     }
 }
 
@@ -108,12 +108,12 @@ impl Parameter {
         &self.meta
     }
 
-    /// Get the type of the parameter.
+    /// Get the type of the parameter as a String.
     pub fn ty(&self) -> String {
         self.decl.ty().to_string()
     }
 
-    /// Get the Expr value of the parameter as a String.
+    /// Get the expr of the parameter as a String.
     pub fn expr(&self) -> String {
         self.decl
             .expr()
@@ -139,7 +139,9 @@ impl Parameter {
         self.meta().get("group").and_then(|value| {
             if let MetadataValue::String(s) = value {
                 Some(Group(
-                    s.text().map(|t| t.text().to_string()).unwrap_or_default(),
+                    s.text()
+                        .map(|t| t.text().to_string())
+                        .expect("group should not be interpolated"),
                 ))
             } else {
                 None
@@ -182,15 +184,14 @@ impl Parameter {
                     code { (self.ty()) }
                 }
                 @if self.required() != Some(true) {
+                    // TODO: handle overflow
                     div class="main__grid-cell" { (shorten_expr_if_needed(self.expr())) }
                 }
                 div class="main__grid-cell" {
-                    (match self.description() {
-                        MaybeTruncatedDescription::No(desc) => desc,
-                        MaybeTruncatedDescription::Yes(summary, _full) => {
-                            html! { (summary) }
-                        }
-                    })
+                    @match self.description() {
+                        MaybeTruncatedDescription::No(desc) => (desc),
+                        MaybeTruncatedDescription::Yes(summary, _full) => (summary)
+                    }
                 }
                 // TODO collapsable row for additional metadata
             }

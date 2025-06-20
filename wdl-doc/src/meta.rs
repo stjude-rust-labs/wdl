@@ -37,7 +37,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
                             (render_value_inner(&item))
                         }
                         _ => {
-                            // TODO
+                            // TODO: placeholder code
                             code { (item.text().to_string()) }
                         }
                     }
@@ -47,7 +47,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             html! {
                 @for item in o.items() {
-                    // TODO
+                    // TODO: placeholder code
                     b { (item.name().text()) ":" } " " (render_value_inner(&item.value())) ","
                 }
             }

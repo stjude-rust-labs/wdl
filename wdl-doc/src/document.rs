@@ -136,15 +136,13 @@ impl Document {
                                             }
                                             div class="main__grid-cell" { code { "task" } }
                                             div class="main__grid-cell" {
-                                                (match t.description() {
-                                                    MaybeTruncatedDescription::No(desc) => desc,
+                                                @match t.description() {
+                                                    MaybeTruncatedDescription::No(desc) => (desc),
                                                     MaybeTruncatedDescription::Yes(summary, _full) => {
-                                                        html! {
-                                                            (summary)
-                                                            button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
-                                                        }
+                                                        (summary)
+                                                        button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
                                                     }
-                                                })
+                                                }
                                             }
                                         }
                                         PageType::Workflow(w) => {
@@ -156,15 +154,13 @@ impl Document {
                                             div class="main__grid-cell" { code { "workflow" } }
                                             div class="main__grid-cell" {
                                                 // TODO duplicate code
-                                                (match w.description() {
-                                                    MaybeTruncatedDescription::No(desc) => desc,
+                                                @match w.description() {
+                                                    MaybeTruncatedDescription::No(desc) => (desc),
                                                     MaybeTruncatedDescription::Yes(summary, _full) => {
-                                                        html! {
-                                                            (summary)
-                                                            button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
-                                                        }
+                                                        (summary)
+                                                        button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
                                                     }
-                                                })
+                                                }
                                             }
                                         }
                                         // Index pages should not link to other index pages.
@@ -178,28 +174,20 @@ impl Document {
                                     div x-show="expanded" class="main__grid-full-width-cell" {
                                         // TODO inefficient. Redundantly allocates the description
                                         @match page.1.page_type() {
-                                            PageType::Struct(_) => {
-                                               "ERROR"
-                                            }
+                                            PageType::Struct(_) => "ERROR"
                                             PageType::Task(t) => {
-                                                (match t.description() {
-                                                    MaybeTruncatedDescription::No(_) => html! { "ERROR" },
-                                                    MaybeTruncatedDescription::Yes(_summary, full) => {
-                                                        full
-                                                    }
-                                                })
+                                                @match t.description() {
+                                                    MaybeTruncatedDescription::No(_) => "ERROR",
+                                                    MaybeTruncatedDescription::Yes(_summary, full) => (full)
+                                                }
                                             }
                                             PageType::Workflow(w) => {
-                                                (match w.description() {
-                                                    MaybeTruncatedDescription::No(_) => html! { "ERROR" },
-                                                    MaybeTruncatedDescription::Yes(_summary, full) => {
-                                                        full
-                                                    }
-                                                })
+                                                @match w.description() {
+                                                    MaybeTruncatedDescription::No(_) => "ERROR",
+                                                    MaybeTruncatedDescription::Yes(_summary, full) => (full)
+                                                }
                                             }
-                                            PageType::Index(_) => {
-                                               "ERROR"
-                                            }
+                                            PageType::Index(_) => "ERROR"
                                         }
                                     }
                                 }

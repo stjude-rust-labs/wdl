@@ -162,12 +162,10 @@ impl Workflow {
                     (self.render_allow_nested_inputs())
                 }
                 div class="markdown-body" {
-                    (match self.description() {
-                        MaybeTruncatedDescription::No(desc) => desc,
-                        MaybeTruncatedDescription::Yes(_summary, full) => {
-                            html! { (full) }
-                        }
-                    })
+                    @match self.description() {
+                        MaybeTruncatedDescription::No(desc) => (desc),
+                        MaybeTruncatedDescription::Yes(_summary, full) => (full),
+                    }
                 }
                 (meta_markup)
                 (input_markup)

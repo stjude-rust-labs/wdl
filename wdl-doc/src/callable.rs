@@ -110,7 +110,7 @@ pub(crate) trait Callable {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
-                h3 id="inputs-required-inputs" class="main__section-subheader" { "Required Inputs" }
+                h3 id="required-inputs" class="main__section-subheader" { "Required Inputs" }
                 div class="main__grid-container" {
                     div class="main__grid-req-inputs-container" {
                         div class="main__grid-header-cell" { "Name" }
@@ -120,22 +120,16 @@ pub(crate) trait Callable {
                         @for param in iter {
                             div class="main__grid-row" {
                                 div class="main__grid-cell" {
-                                    code {
-                                        (param.name())
-                                    }
+                                    code { (param.name()) }
                                 }
                                 div class="main__grid-cell" {
-                                    code {
-                                        (param.ty())
-                                    }
+                                    code { (param.ty()) }
                                 }
                                 div class="main__grid-cell" {
-                                    (match self.description() {
-                                        MaybeTruncatedDescription::No(desc) => desc,
-                                        MaybeTruncatedDescription::Yes(summary, _full) => {
-                                            html! { (summary) }
-                                        }
-                                    })
+                                    @match param.description() {
+                                        MaybeTruncatedDescription::No(desc) => (desc),
+                                        MaybeTruncatedDescription::Yes(summary, _full) => (summary),
+                                    }
                                 }
                                 // TODO collapsable row for additional metadata
                             }
@@ -152,22 +146,18 @@ pub(crate) trait Callable {
     /// This will render each group as a section with a header and a table
     /// of parameters that are part of that group.
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
-        let group_tables = self
+        let mut group_tables = self
             .input_groups()
             .into_iter()
             .map(|group| {
                 html! {
                     h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
-                    (render_non_required_parameters_table(
-                        self.inputs_in_group(&group),
-                        assets,
-                    ))
+                    (render_non_required_parameters_table(self.inputs_in_group(&group), assets))
                 }
             })
-            .collect::<Vec<_>>();
-        if group_tables.is_empty() {
-            return None;
-        }
+            .peekable();
+        group_tables.peek()?;
+
         Some(html! {
             @for group_table in group_tables {
                 (group_table)
@@ -181,11 +171,8 @@ pub(crate) trait Callable {
         let mut iter = self.other_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
-                h3 id="inputs-other-inputs" class="main__section-subheader" { "Other Inputs" }
-                (render_non_required_parameters_table(
-                    iter,
-                    assets,
-                ))
+                h3 id="other-inputs" class="main__section-subheader" { "Other Inputs" }
+                (render_non_required_parameters_table(iter, assets))
             });
         };
         None
@@ -200,27 +187,30 @@ pub(crate) trait Callable {
             inner_markup.push(req);
             headers.push(Header::SubHeader(
                 "Required Inputs".to_string(),
-                "inputs-required-inputs".to_string(),
+                "required-inputs".to_string(),
             ));
         }
         if let Some(group) = self.render_group_inputs(assets) {
             inner_markup.push(group);
             for group in self.input_groups() {
-                headers.push(Header::SubHeader(group.display_name(), group.id()));
+                headers.push(Header::SubHeader(
+                    group.display_name().to_string(),
+                    group.id(),
+                ));
             }
         }
         if let Some(other) = self.render_other_inputs(assets) {
             inner_markup.push(other);
             headers.push(Header::SubHeader(
                 "Other Inputs".to_string(),
-                "inputs-other-inputs".to_string(),
+                "other-inputs".to_string(),
             ));
         }
         let markup = html! {
             div class="main__section" {
                 h2 id="inputs" class="main__section-header" { "Inputs" }
-                @for html in inner_markup {
-                    (html)
+                @for section in inner_markup {
+                    (section)
                 }
             }
         };
@@ -233,10 +223,7 @@ pub(crate) trait Callable {
         html! {
             div class="main__section" {
                 h2 id="outputs" class="main__section-header" { "Outputs" }
-                (render_non_required_parameters_table(
-                    self.outputs().iter(),
-                    assets,
-                ))
+                (render_non_required_parameters_table(self.outputs().iter(), assets))
             }
         }
     }

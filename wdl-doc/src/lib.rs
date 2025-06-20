@@ -368,8 +368,8 @@ impl<T: AsRef<str>> Render for Markdown<T> {
     }
 }
 
-/// A version badge for the WDL document. This is used to display the WDL
-/// version in the header of the documentation.
+/// A version badge for a WDL document. This is used to display the WDL
+/// version at the top of each documentation page.
 #[derive(Debug, Clone)]
 pub(crate) struct VersionBadge {
     /// The WDL version of the document.
