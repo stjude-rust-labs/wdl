@@ -1645,6 +1645,16 @@
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
   }
+  .main__grid-full-width-cell {
+    grid-column: 1 / -1;
+    margin-block: calc(var(--spacing) * 2);
+    border-radius: var(--radius-md);
+    background-color: var(--color-slate-800);
+    padding: calc(var(--spacing) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-slate-300);
+  }
   .main__grid-toc-container {
     display: grid;
     grid-template-columns: 1fr 1fr 3fr;
@@ -1663,6 +1673,11 @@
   .main__grid-non-req-param-container {
     display: grid;
     grid-template-columns: 1fr 1fr 2fr 3fr;
+    gap: calc(var(--spacing) * 4);
+  }
+  .main__grid-addl-meta-container {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
     gap: calc(var(--spacing) * 4);
   }
   .left-sidebar__indent {

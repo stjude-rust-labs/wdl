@@ -9,9 +9,10 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::meta::MaybeSummarized;
 use crate::meta::MetaMap;
-use crate::meta::render_meta_map;
-use crate::meta::render_value;
+use crate::meta::MetaMapExt;
+use crate::meta::summarize_if_needed;
 
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
@@ -19,13 +20,13 @@ pub(crate) struct Group(pub String);
 
 impl Group {
     /// Get the display name of the group.
-    pub fn display_name(&self) -> String {
-        self.0.clone()
+    pub fn display_name(&self) -> &str {
+        &self.0
     }
 
     /// Get the id of the group.
     pub fn id(&self) -> String {
-        format!("inputs-{}", self.0.replace(" ", "-"))
+        self.0.replace(" ", "-").to_lowercase()
     }
 }
 
@@ -107,17 +108,35 @@ impl Parameter {
         &self.meta
     }
 
-    /// Get the type of the parameter.
+    /// Get the type of the parameter as a String.
     pub fn ty(&self) -> String {
         self.decl.ty().to_string()
     }
 
-    /// Get the Expr value of the parameter as a String.
-    pub fn expr(&self) -> String {
-        self.decl
+    /// Get the expr of the parameter as HTML.
+    pub fn expr(&self, summarize: bool) -> Markup {
+        let expr = self
+            .decl
             .expr()
             .map(|expr| expr.text().to_string())
-            .unwrap_or("None".to_string())
+            .unwrap_or("None".to_string());
+
+        if !summarize {
+            return html! { code { (expr) } };
+        }
+
+        match summarize_if_needed(&expr) {
+            MaybeSummarized::No(expr) => {
+                html! { code { (expr) } }
+            }
+            MaybeSummarized::Yes(summary, _full) => {
+                // TODO return full?
+                html! {
+                    code { (summary) }
+                    button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                }
+            }
+        }
     }
 
     /// Get whether the input parameter is required.
@@ -138,7 +157,9 @@ impl Parameter {
         self.meta().get("group").and_then(|value| {
             if let MetadataValue::String(s) = value {
                 Some(Group(
-                    s.text().map(|t| t.text().to_string()).unwrap_or_default(),
+                    s.text()
+                        .map(|t| t.text().to_string())
+                        .expect("group should not be interpolated"),
                 ))
             } else {
                 None
@@ -146,69 +167,53 @@ impl Parameter {
         })
     }
 
-    /// Get the description of the parameter.
-    pub fn description(&self, summarize_if_needed: bool) -> Markup {
-        self.meta()
-            .get("description")
-            .map(|v| render_value(v, summarize_if_needed))
-            .unwrap_or_else(|| html! { "No description provided." })
+    /// Render the description of the parameter.
+    pub fn description(&self, summarize: bool) -> Markup {
+        self.meta().render_description(summarize)
     }
 
     /// Render any remaining metadata as HTML.
     ///
-    /// This will render any metadata that is not rendered elsewhere if present.
-    pub fn _render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
-        render_meta_map(self.meta(), &["description", "group"], true, assets)
+    /// TODO write better
+    pub fn render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
+        self.meta()
+            .render_remaining(&["description", "group"], assets)
     }
 
     /// Render the parameter as HTML.
-    pub fn render(&self, _assets: &Path) -> Markup {
+    pub fn render(&self, assets: &Path) -> Markup {
+        let show_expr = self.required() != Some(true);
         html! {
-            div class="main__grid-row" {
+            div class="main__grid-row" x-data=(
+                if show_expr { "{ description_expanded: false, expr_expanded: false }" } else { "{ description_expanded: false }" }
+            ) {
                 div class="main__grid-cell" {
                     code { (self.name()) }
                 }
                 div class="main__grid-cell" {
                     code { (self.ty()) }
                 }
-                @if self.required() != Some(true) {
-                    div class="main__grid-cell" { (shorten_expr_if_needed(self.expr())) }
+                @if show_expr {
+                    div class="main__grid-cell" { (self.expr(true)) }
                 }
                 div class="main__grid-cell" {
                     (self.description(true))
                 }
-                // TODO collapsable row for additional metadata
-            }
-        }
-    }
-}
-
-/// The maximum length of an expression before it is clipped.
-const MAX_EXPR_LENGTH: usize = 80;
-/// The amount of characters to show in the clipped expression.
-const EXPR_CLIP_LENGTH: usize = 60;
-
-/// Render a WDL expression as HTML, with a show more button if it exceeds a
-/// certain length.
-pub(crate) fn shorten_expr_if_needed(expr: String) -> Markup {
-    if expr.len() <= MAX_EXPR_LENGTH {
-        return html! { code { (expr) } };
-    }
-
-    let clipped_expr = expr[..EXPR_CLIP_LENGTH].trim();
-
-    html! {
-        div x-data="{ expanded: false }" {
-            div x-show="!expanded" {
-                p { code { (clipped_expr) } "..." }
-                button type="button" class="main__button" x-on:click="expanded = true" {
-                    b { "Show full expression" }
+                div x-show="description_expanded" class="main__grid-full-width-cell" {
+                    (self.description(false))
+                }
+                @if show_expr {
+                    div x-show="expr_expanded" class="main__grid-full-width-cell" {
+                        (self.expr(false))
+                    }
                 }
             }
-            div x-show="expanded" {
-                p { code { (expr) } }
-                button type="button" class="main__button" x-on:click="expanded = false" {
-                    b { "Show less" }
+            @if let Some(addl_meta) = self.render_remaining_meta(assets) {
+                div class="main__grid-full-width-cell" x-data="{ addl_meta_expanded: false }" {
+                    button type="button" class="main__button" x-on:click="addl_meta_expanded = !addl_meta_expanded" x-text="addl_meta_expanded ? 'Hide Additional Meta' : 'Show Additional Metadata'" {}
+                    div x-show="addl_meta_expanded" class="main__grid-additional-meta" {
+                        (addl_meta)
+                    }
                 }
             }
         }

@@ -219,6 +219,9 @@
   .main__grid-cell {
     @apply text-sm;
   }
+  .main__grid-full-width-cell {
+    @apply col-span-full p-4 my-2 text-sm text-slate-300 bg-slate-800 rounded-md;
+  }
   .main__grid-toc-container {
     @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
   }
@@ -230,6 +233,9 @@
   }
   .main__grid-non-req-param-container {
     @apply grid grid-cols-[1fr_1fr_2fr_3fr] gap-4;
+  }
+  .main__grid-addl-meta-container {
+    @apply grid grid-cols-[1fr_4fr] gap-4;
   }
   /**
    * Left sidebar
