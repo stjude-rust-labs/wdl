@@ -12,7 +12,7 @@ use wdl_ast::v1::TaskDefinition;
 use super::*;
 use crate::command_section::CommandSectionExt;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::meta::render_meta_map;
 use crate::parameter::Parameter;
 use crate::parameter::shorten_expr_if_needed;
@@ -22,7 +22,7 @@ use crate::parameter::shorten_expr_if_needed;
 pub struct Task {
     /// The name of the task.
     name: String,
-    /// The version of WDL this task is defined in.
+    /// The [`VersionBadge`] which displays the WDL version of the task.
     version: VersionBadge,
     /// The meta of the task.
     meta: MetaMap,
@@ -87,19 +87,18 @@ impl Task {
                 html! {
                     div class="main__section" {
                         h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
-                        div class="main__table-outer-container" {
-                            div class="main__table-inner-container" {
-                                table class="main__table" {
-                                    thead { tr {
-                                        th { "Attribute" }
-                                        th { "Value" }
-                                    }}
-                                    tbody {
-                                        @for entry in runtime_section.items() {
-                                            tr {
-                                                td { code { (entry.name().text()) } }
-                                                td { ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) }) }
-                                            }
+                        div class="main__grid-container" {
+                            div class="main__grid-runtime-container" {
+                                div class="main__grid-header-cell" { "Attribute" }
+                                div class="main__grid-header-cell" { "Value" }
+                                div class="main__grid-header-separator" {}
+                                @for entry in runtime_section.items() {
+                                    div class="main__grid-row" {
+                                        div class="main__grid-cell" {
+                                            code { (entry.name().text()) }
+                                        }
+                                        div class="main__grid-cell" {
+                                            ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) })
                                         }
                                     }
                                 }
@@ -114,7 +113,7 @@ impl Task {
         }
     }
 
-    /// Render the command section (Bash script) of the task as HTML.
+    /// Render the command section of the task as HTML.
     pub fn render_command_section(&self) -> Markup {
         match &self.command_section {
             Some(command_section) => {
@@ -134,8 +133,8 @@ impl Task {
     }
 
     /// Render the task as HTML.
-    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
-        let mut headers = PageHeaders::default();
+    pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
+        let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
             meta
         } else {

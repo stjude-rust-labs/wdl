@@ -286,7 +286,7 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
     Ok(())
 }
 
-/// Links to a CSS stylesheet at the given path.
+/// HTML link to a CSS stylesheet at the given path.
 struct Css<'a>(&'a str);
 
 impl Render for Css<'_> {
@@ -297,8 +297,11 @@ impl Render for Css<'_> {
     }
 }
 
-/// A basic header with a `page_title` and a relative path to the root (where
-/// `style.css` and `index.js` files are expected).
+/// An HTML header with a `page_title` and all the link/script dependencies
+/// expected by `wdl-doc`.
+///
+/// Requires a relative path to the root (where `style.css` and `index.js` files
+/// are expected).
 pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P) -> Markup {
     let root = root.as_ref();
     html! {
@@ -323,7 +326,7 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, root: P)
         (DOCTYPE)
         html class="dark" {
             (header(page_title, root))
-            body class="size-full table-auto border-collapse text-base" {
+            body class="body--base" {
                 (body)
             }
         }
@@ -341,6 +344,7 @@ impl<T: AsRef<str>> Render for Markdown<T> {
         options.insert(Options::ENABLE_TABLES);
         options.insert(Options::ENABLE_STRIKETHROUGH);
         options.insert(Options::ENABLE_GFM);
+        options.insert(Options::ENABLE_DEFINITION_LIST);
         let parser = Parser::new_ext(self.0.as_ref(), options);
         pulldown_cmark::html::push_html(&mut unsafe_html, parser);
         // Sanitize it with ammonia

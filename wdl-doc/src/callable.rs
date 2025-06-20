@@ -17,13 +17,13 @@ use wdl_ast::v1::ParameterMetadataSection;
 
 use crate::VersionBadge;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::meta::MetaMap;
 use crate::meta::render_value;
 use crate::parameter::Group;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
-use crate::parameter::render_parameter_table;
+use crate::parameter::render_non_required_parameters_table;
 
 /// A callable (workflow or task) in a WDL document.
 pub(crate) trait Callable {
@@ -39,7 +39,7 @@ pub(crate) trait Callable {
     /// Get the outputs of the callable.
     fn outputs(&self) -> &[Parameter];
 
-    /// Get the WDL version of the callable.
+    /// Get the [`VersionBadge`] of the callable.
     fn version(&self) -> &VersionBadge;
 
     /// Get the description of the callable.
@@ -96,18 +96,46 @@ pub(crate) trait Callable {
     }
 
     /// Render the required inputs of the callable if present.
-    fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
+    fn render_required_inputs(&self, _assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         if iter.peek().is_some() {
             return Some(html! {
                 h3 id="inputs-required-inputs" class="main__section-subheader" { "Required Inputs" }
-                (render_parameter_table(&["Name", "Type", "Description"], iter, assets))
+                div class="main__grid-container" {
+                    div class="main__grid-req-inputs-container" {
+                        div class="main__grid-header-cell" { "Name" }
+                        div class="main__grid-header-cell" { "Type" }
+                        div class="main__grid-header-cell" { "Description" }
+                        div class="main__grid-header-separator" {}
+                        @for param in iter {
+                            div class="main__grid-row" {
+                                div class="main__grid-cell" {
+                                    code {
+                                        (param.name())
+                                    }
+                                }
+                                div class="main__grid-cell" {
+                                    code {
+                                        (param.ty())
+                                    }
+                                }
+                                div class="main__grid-cell" {
+                                    (param.description(true))
+                                }
+                                // TODO collapsable row for additional metadata
+                            }
+                        }
+                    }
+                }
             });
         };
         None
     }
 
     /// Render the inputs with a group of the callable if present.
+    ///
+    /// This will render each group as a section with a header and a table
+    /// of parameters that are part of that group.
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
         let group_tables = self
             .input_groups()
@@ -115,8 +143,7 @@ pub(crate) trait Callable {
             .map(|group| {
                 html! {
                     h3 id=(group.id()) class="main__section-subheader" { (group.display_name()) }
-                    (render_parameter_table(
-                        &["Name", "Type", "Default", "Description"],
+                    (render_non_required_parameters_table(
                         self.inputs_in_group(&group),
                         assets,
                     ))
@@ -140,8 +167,7 @@ pub(crate) trait Callable {
         if iter.peek().is_some() {
             return Some(html! {
                 h3 id="inputs-other-inputs" class="main__section-subheader" { "Other Inputs" }
-                (render_parameter_table(
-                    &["Name", "Type", "Default", "Description"],
+                (render_non_required_parameters_table(
                     iter,
                     assets,
                 ))
@@ -151,9 +177,9 @@ pub(crate) trait Callable {
     }
 
     /// Render the inputs of the callable.
-    fn render_inputs(&self, assets: &Path) -> (Markup, PageHeaders) {
+    fn render_inputs(&self, assets: &Path) -> (Markup, PageSections) {
         let mut inner_markup = Vec::new();
-        let mut headers = PageHeaders::default();
+        let mut headers = PageSections::default();
         headers.push(Header::Header("Inputs".to_string(), "inputs".to_string()));
         if let Some(req) = self.render_required_inputs(assets) {
             inner_markup.push(req);
@@ -192,8 +218,7 @@ pub(crate) trait Callable {
         html! {
             div class="main__section" {
                 h2 id="outputs" class="main__section-header" { "Outputs" }
-                (render_parameter_table(
-                    &["Name", "Type", "Expression", "Description"],
+                (render_non_required_parameters_table(
                     self.outputs().iter(),
                     assets,
                 ))

@@ -1,4 +1,12 @@
-//! Create HTML documentation (index pages) for WDL documents.
+//! Create HTML documentation for WDL documents.
+//!
+//! This module defines the [`Document`] struct, which represents an entire WDL
+//! document's HTML representation (i.e., an index page that links to other
+//! pages).
+//!
+//! See [`crate::task::Task`], [`crate::workflow::Workflow`], and
+//! [`crate::struct::Struct`] for how to render individual tasks, workflows, and
+//! structs.
 
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -16,7 +24,7 @@ use crate::Markdown;
 use crate::VersionBadge;
 use crate::callable::Callable;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::docs_tree::PageType;
 
 /// Parse the preamble comments of a document using the version statement.
@@ -44,11 +52,11 @@ pub fn parse_preamble_comments(version: VersionStatement) -> String {
 pub(crate) struct Document {
     /// The name of the document.
     name: String,
-    /// The version badge for the document.
+    /// The [`VersionBadge`] which displays the WDL version of the document.
     version: VersionBadge,
     /// The AST node for the version statement.
     ///
-    /// This is used to fetch to the preamble comments.
+    /// This is used to fetch to any preamble comments.
     version_statement: VersionStatement,
     /// The pages that this document should link to.
     local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -75,19 +83,19 @@ impl Document {
         &self.name
     }
 
-    /// Get the version of the document as text.
+    /// Get the [`VersionBadge`] of the document.
     pub fn version(&self) -> &VersionBadge {
         &self.version
     }
 
-    /// Get the preamble comments of the document.
-    pub fn preamble(&self) -> Markup {
+    /// Get the preamble comments of the document as HTML.
+    pub fn render_preamble(&self) -> Markup {
         let preamble = parse_preamble_comments(self.version_statement.clone());
         Markdown(&preamble).render()
     }
 
     /// Render the document as HTML.
-    pub fn render(&self) -> (Markup, PageHeaders) {
+    pub fn render(&self) -> (Markup, PageSections) {
         let markup = html! {
             div class="main__container" {
                 h1 id="title" class="main__title" { (self.name()) }
@@ -96,58 +104,53 @@ impl Document {
                 }
                 div id="preamble" class="main__section" {
                     div class="markdown-body" {
-                        (self.preamble())
+                        (self.render_preamble())
                     }
                 }
                 div class="main__section" {
                     h2 id="toc" class="main__section-header" { "Table of Contents" }
-                    div class="main__table-outer-container" {
-                        div class="main__table-inner-container" {
-                            table class="main__table" {
-                                thead { tr {
-                                    th { "Page" }
-                                    th { "Type" }
-                                    th { "Description" }
-                                }}
-                                tbody {
-                                    @for page in &self.local_pages {
-                                        tr {
-                                            @match page.1.page_type() {
-                                                PageType::Struct(_) => {
-                                                    td {
-                                                        a class="text-pink-400 hover:text-pink-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "struct" } }
-                                                    td { "N/A" }
-                                                }
-                                                PageType::Task(t) => {
-                                                    td {
-                                                        a class="text-violet-400 hover:text-violet-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "task" } }
-                                                    td { (t.description(true)) }
-                                                }
-                                                PageType::Workflow(w) => {
-                                                    td {
-                                                        a class="text-emerald-400 hover:text-emerald-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
-                                                            (page.1.name())
-                                                        }
-                                                    }
-                                                    td { code { "workflow" } }
-                                                    td { (w.description(true)) }
-                                                }
-                                                // Index pages should not link to other index pages.
-                                                PageType::Index(_) => {
-                                                    // This should never happen
-                                                    td { "ERROR" }
-                                                    td { "ERROR" }
-                                                    td { "ERROR" }
+                    div class="main__grid-container" {
+                        div class="main__grid-toc-container" {
+                            div class="main__grid-header-cell" { "Page" }
+                            div class="main__grid-header-cell" { "Type" }
+                            div class="main__grid-header-cell" { "Description" }
+                            div class="main__grid-header-separator" {}
+                            @for page in &self.local_pages {
+                                div class="main__grid-row" {
+                                    @match page.1.page_type() {
+                                        PageType::Struct(_) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-pink-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
                                                 }
                                             }
+                                            div class="main__grid-cell" { code { "struct" } }
+                                            div class="main__grid-cell" { "N/A" }
+                                        }
+                                        PageType::Task(t) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-violet-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
+                                                }
+                                            }
+                                            div class="main__grid-cell" { code { "task" } }
+                                            div class="main__grid-cell" { (t.description(true)) }
+                                        }
+                                        PageType::Workflow(w) => {
+                                            div class="main__grid-cell" {
+                                                a class="text-emerald-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                    (page.1.name())
+                                                }
+                                            }
+                                            div class="main__grid-cell" { code { "workflow" } }
+                                            div class="main__grid-cell" { (w.description(true)) }
+                                        }
+                                        // Index pages should not link to other index pages.
+                                        PageType::Index(_) => {
+                                            // This should be unreachable
+                                            div class="main__grid-cell" { "ERROR" }
+                                            div class="main__grid-cell" { "ERROR" }
+                                            div class="main__grid-cell" { "ERROR" }
                                         }
                                     }
                                 }
@@ -158,7 +161,7 @@ impl Document {
             }
         };
 
-        let mut headers = PageHeaders::default();
+        let mut headers = PageSections::default();
         headers.push(Header::Header(
             "Preamble".to_string(),
             "preamble".to_string(),
