@@ -774,22 +774,22 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView(); })" class="left-sidebar__container" {
+            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); })" class="left-sidebar__container" {
                 div class="sticky" {
-                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
+                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
                     form id="searchbar" class="left-sidebar__searchbar-form" {
-                        div class="left-sidebar__searchbar" {
-                            img src=(self.get_asset(base, "search.svg")) class="flex size-6" alt="Search icon";
-                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="left-sidebar__searchbox";
-                            img src=(self.get_asset(base, "x-mark.svg")) class="left-sidebar__search-clear" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
+                        div class="left-sidebar__searchbar group relative w-full h-10" {
+                            img src=(self.get_asset(base, "search.svg")) class="absolute left-2 top-1/2 -translate-y-1/2 size-6 pointer-events-none" alt="Search icon";
+                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="left-sidebar__searchbox w-full h-full px-8 outline-none bg-transparent";
+                            img src=(self.get_asset(base, "x-mark.svg")) class="absolute right-2 top-1/2 -translate-y-1/2 size-6 hover:cursor-pointer" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                         }
                     }
                     div class="left-sidebar__tabs-container" {
-                        div x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        div x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -804,14 +804,16 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in shownNodes" {
-                            li x-data="{ hover: false }" class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : hover ? 'bg-slate-700' : ''" {
+                            // @a-frantz: we need to ensure all nodes are using top level `a` tags for accessibility reasons to increase the clickable surface area of each node. I'll let you refactor the other nodes (`.left-sidebar__content-item`). Also, we should not be relying on JS to handle any sort of hover behavior when tailwind `hover:*` classes exist.
+                            a x-bind:href="node.href" x-bind:aria-label="node.display_name" x-data="{ hover: false }" class="left-sidebar__content-item w-full group" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700/50 transition-all'" {
                                 template x-for="i in Array.from({ length: node.nest_level })" {
                                     div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
                                 }
-                                div class="left-sidebar__content-item-container" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
+                                div class="left-sidebar__content-item-container crop-ellipsis" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
+                                    // @a-frantz: the clickable surface area size that triggers this expand/collapse behavior is incredibly tiny and probably fails to meet accessibility requirements. Let's consult with @ira to find a better solution
                                     img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="left-sidebar__icon" alt="Node icon";
-                                    sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-50'" {
-                                        a x-bind:href="node.href" x-text="node.display_name" {}
+                                    sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" {
+                                        span x-text="node.display_name" {}
                                     }
                                 }
                             }
