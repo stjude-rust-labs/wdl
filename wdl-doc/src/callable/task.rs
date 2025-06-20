@@ -13,9 +13,7 @@ use super::*;
 use crate::command_section::CommandSectionExt;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
-use crate::meta::render_meta_map;
 use crate::parameter::Parameter;
-use crate::parameter::shorten_expr_if_needed;
 
 /// A task in a WDL document.
 #[derive(Debug)]
@@ -38,20 +36,20 @@ pub struct Task {
 
 impl Task {
     /// Create a new task.
-    pub fn new(name: String, version: SupportedVersion, defintion: TaskDefinition) -> Self {
-        let meta = match defintion.metadata() {
+    pub fn new(name: String, version: SupportedVersion, definition: TaskDefinition) -> Self {
+        let meta = match definition.metadata() {
             Some(mds) => parse_meta(&mds),
             _ => MetaMap::default(),
         };
-        let parameter_meta = match defintion.parameter_metadata() {
+        let parameter_meta = match definition.parameter_metadata() {
             Some(pmds) => parse_parameter_meta(&pmds),
             _ => MetaMap::default(),
         };
-        let inputs = match defintion.input() {
+        let inputs = match definition.input() {
             Some(is) => parse_inputs(&is, &parameter_meta),
             _ => Vec::new(),
         };
-        let outputs = match defintion.output() {
+        let outputs = match definition.output() {
             Some(os) => parse_outputs(&os, &meta, &parameter_meta),
             _ => Vec::new(),
         };
@@ -62,8 +60,8 @@ impl Task {
             meta,
             inputs,
             outputs,
-            runtime_section: defintion.runtime(),
-            command_section: defintion.command(),
+            runtime_section: definition.runtime(),
+            command_section: definition.command(),
         }
     }
 
@@ -72,12 +70,8 @@ impl Task {
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
-        let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
-        Some(html! {
-            div class="main__section" {
-                (content)
-            }
-        })
+        self.meta()
+            .render_remaining(&["description", "outputs"], assets)
     }
 
     /// Render the runtime section of the task as HTML.
@@ -98,7 +92,7 @@ impl Task {
                                             code { (entry.name().text()) }
                                         }
                                         div class="main__grid-cell" {
-                                            ({let e = entry.expr(); shorten_expr_if_needed(e.text().to_string()) })
+                                            code { ({let e = entry.expr(); e.text().to_string()}) }
                                         }
                                     }
                                 }
@@ -136,7 +130,11 @@ impl Task {
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            meta
+            html! {
+                div class="main__section" {
+                    (meta)
+                }
+            }
         } else {
             html! {}
         };

@@ -9,7 +9,6 @@ use wdl_ast::v1::WorkflowDefinition;
 use super::*;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
-use crate::meta::render_meta_map;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
@@ -59,7 +58,7 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(|v| render_value(v, false))
+        self.meta.get("name").map(render_value)
     }
 
     /// Returns the `category` entry from the meta section, if it exists.
@@ -88,17 +87,15 @@ impl Workflow {
     /// `category`, `description`, `allowNestedInputs`/`allow_nested_inputs`,
     /// and `outputs`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
-        render_meta_map(
-            self.meta(),
+        self.meta().render_remaining(
             &[
+                "description",
                 "name",
                 "category",
                 "outputs",
-                "description",
                 "allowNestedInputs",
                 "allow_nested_inputs",
             ],
-            false,
             assets,
         )
     }
@@ -133,7 +130,11 @@ impl Workflow {
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            meta
+            html! {
+                div class="main__section" {
+                    (meta)
+                }
+            }
         } else {
             html! {}
         };

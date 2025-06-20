@@ -116,7 +116,7 @@ impl Document {
                             div class="main__grid-header-cell" { "Description" }
                             div class="main__grid-header-separator" {}
                             @for page in &self.local_pages {
-                                div class="main__grid-row" {
+                                div class="main__grid-row" x-data="{ description_expanded: false }" {
                                     @match page.1.page_type() {
                                         PageType::Struct(_) => {
                                             div class="main__grid-cell" {
@@ -134,7 +134,9 @@ impl Document {
                                                 }
                                             }
                                             div class="main__grid-cell" { code { "task" } }
-                                            div class="main__grid-cell" { (t.description(true)) }
+                                            div class="main__grid-cell" {
+                                                (t.description(true))
+                                            }
                                         }
                                         PageType::Workflow(w) => {
                                             div class="main__grid-cell" {
@@ -143,7 +145,9 @@ impl Document {
                                                 }
                                             }
                                             div class="main__grid-cell" { code { "workflow" } }
-                                            div class="main__grid-cell" { (w.description(true)) }
+                                            div class="main__grid-cell" {
+                                                (w.description(true))
+                                            }
                                         }
                                         // Index pages should not link to other index pages.
                                         PageType::Index(_) => {
@@ -151,6 +155,18 @@ impl Document {
                                             div class="main__grid-cell" { "ERROR" }
                                             div class="main__grid-cell" { "ERROR" }
                                             div class="main__grid-cell" { "ERROR" }
+                                        }
+                                    }
+                                    div x-show="description_expanded" class="main__grid-full-width-cell" {
+                                        @match page.1.page_type() {
+                                            PageType::Struct(_) => "ERROR"
+                                            PageType::Task(t) => {
+                                                (t.description(false))
+                                            }
+                                            PageType::Workflow(w) => {
+                                                (w.description(false))
+                                            }
+                                            PageType::Index(_) => "ERROR"
                                         }
                                     }
                                 }

@@ -41,7 +41,9 @@ impl Struct {
                     (self.version.render())
                 }
                 div class="main__section" {
-                    sprocket-code language="wdl" { (self.definition.inner().to_string()) }
+                    sprocket-code language="wdl" {
+                        (self.definition.inner())
+                    }
                 }
             }
         };
