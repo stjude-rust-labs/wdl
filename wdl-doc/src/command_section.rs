@@ -1,5 +1,4 @@
-//! An extension of the [`CommandSection`] type that adds
-//! functionality for rendering the command section in a WDL document.
+//! A module containing an extension trait for the [`CommandSection`] AST type.
 
 use wdl_ast::AstNode;
 use wdl_ast::v1::CommandPart;
@@ -9,8 +8,11 @@ use wdl_ast::v1::StrippedCommandPart;
 /// An extension trait for the [`CommandSection`] type that provides
 /// functionality for rendering the command section as a script string.
 pub trait CommandSectionExt {
-    /// Returns the command section as a script string, which is a concatenation
-    /// of all text parts and placeholders with common whitespace stripped.
+    /// Returns the command section as a script string.
+    ///
+    /// This is a concatenation of all text parts and placeholders with common
+    /// whitespace stripped (including whitespace common to the placeholders,
+    /// which is typically ignored as semantically meaningless).
     fn script(&self) -> String;
 }
 

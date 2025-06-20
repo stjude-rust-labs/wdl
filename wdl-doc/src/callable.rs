@@ -17,7 +17,7 @@ use wdl_ast::v1::ParameterMetadataSection;
 
 use crate::VersionBadge;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::meta::MetaMap;
 use crate::meta::render_value;
 use crate::parameter::Group;
@@ -39,7 +39,7 @@ pub(crate) trait Callable {
     /// Get the outputs of the callable.
     fn outputs(&self) -> &[Parameter];
 
-    /// Get the WDL version of the callable.
+    /// Get the [`VersionBadge`] of the callable.
     fn version(&self) -> &VersionBadge;
 
     /// Get the description of the callable.
@@ -133,6 +133,9 @@ pub(crate) trait Callable {
     }
 
     /// Render the inputs with a group of the callable if present.
+    ///
+    /// This will render each group as a section with a header and a table
+    /// of parameters that are part of that group.
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
         let group_tables = self
             .input_groups()
@@ -174,9 +177,9 @@ pub(crate) trait Callable {
     }
 
     /// Render the inputs of the callable.
-    fn render_inputs(&self, assets: &Path) -> (Markup, PageHeaders) {
+    fn render_inputs(&self, assets: &Path) -> (Markup, PageSections) {
         let mut inner_markup = Vec::new();
-        let mut headers = PageHeaders::default();
+        let mut headers = PageSections::default();
         headers.push(Header::Header("Inputs".to_string(), "inputs".to_string()));
         if let Some(req) = self.render_required_inputs(assets) {
             inner_markup.push(req);

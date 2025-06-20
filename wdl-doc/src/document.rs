@@ -1,4 +1,12 @@
-//! Create HTML documentation (index pages) for WDL documents.
+//! Create HTML documentation for WDL documents.
+//!
+//! This module defines the [`Document`] struct, which represents an entire WDL
+//! document's HTML representation (i.e., an index page that links to other
+//! pages).
+//!
+//! See [`crate::task::Task`], [`crate::workflow::Workflow`], and
+//! [`crate::struct::Struct`] for how to render individual tasks, workflows, and
+//! structs.
 
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -16,7 +24,7 @@ use crate::Markdown;
 use crate::VersionBadge;
 use crate::callable::Callable;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::docs_tree::PageType;
 
 /// Parse the preamble comments of a document using the version statement.
@@ -44,11 +52,11 @@ pub fn parse_preamble_comments(version: VersionStatement) -> String {
 pub(crate) struct Document {
     /// The name of the document.
     name: String,
-    /// The version badge for the document.
+    /// The [`VersionBadge`] which displays the WDL version of the document.
     version: VersionBadge,
     /// The AST node for the version statement.
     ///
-    /// This is used to fetch to the preamble comments.
+    /// This is used to fetch to any preamble comments.
     version_statement: VersionStatement,
     /// The pages that this document should link to.
     local_pages: Vec<(PathBuf, Rc<HTMLPage>)>,
@@ -75,19 +83,19 @@ impl Document {
         &self.name
     }
 
-    /// Get the version of the document as text.
+    /// Get the [`VersionBadge`] of the document.
     pub fn version(&self) -> &VersionBadge {
         &self.version
     }
 
-    /// Get the preamble comments of the document.
-    pub fn preamble(&self) -> Markup {
+    /// Get the preamble comments of the document as HTML.
+    pub fn render_preamble(&self) -> Markup {
         let preamble = parse_preamble_comments(self.version_statement.clone());
         Markdown(&preamble).render()
     }
 
     /// Render the document as HTML.
-    pub fn render(&self) -> (Markup, PageHeaders) {
+    pub fn render(&self) -> (Markup, PageSections) {
         let markup = html! {
             div class="main__container" {
                 h1 id="title" class="main__title" { (self.name()) }
@@ -96,7 +104,7 @@ impl Document {
                 }
                 div id="preamble" class="main__section" {
                     div class="markdown-body" {
-                        (self.preamble())
+                        (self.render_preamble())
                     }
                 }
                 div class="main__section" {
@@ -153,7 +161,7 @@ impl Document {
             }
         };
 
-        let mut headers = PageHeaders::default();
+        let mut headers = PageSections::default();
         headers.push(Header::Header(
             "Preamble".to_string(),
             "preamble".to_string(),

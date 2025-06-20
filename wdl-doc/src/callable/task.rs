@@ -12,7 +12,7 @@ use wdl_ast::v1::TaskDefinition;
 use super::*;
 use crate::command_section::CommandSectionExt;
 use crate::docs_tree::Header;
-use crate::docs_tree::PageHeaders;
+use crate::docs_tree::PageSections;
 use crate::meta::render_meta_map;
 use crate::parameter::Parameter;
 use crate::parameter::shorten_expr_if_needed;
@@ -22,7 +22,7 @@ use crate::parameter::shorten_expr_if_needed;
 pub struct Task {
     /// The name of the task.
     name: String,
-    /// The version of WDL this task is defined in.
+    /// The [`VersionBadge`] which displays the WDL version of the task.
     version: VersionBadge,
     /// The meta of the task.
     meta: MetaMap,
@@ -113,7 +113,7 @@ impl Task {
         }
     }
 
-    /// Render the command section (Bash script) of the task as HTML.
+    /// Render the command section of the task as HTML.
     pub fn render_command_section(&self) -> Markup {
         match &self.command_section {
             Some(command_section) => {
@@ -133,8 +133,8 @@ impl Task {
     }
 
     /// Render the task as HTML.
-    pub fn render(&self, assets: &Path) -> (Markup, PageHeaders) {
-        let mut headers = PageHeaders::default();
+    pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
+        let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
             meta
         } else {
