@@ -195,7 +195,7 @@
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10 text-slate-50 text-sm flex items-center gap-1.5 [&>b]:font-semibold [&>b]:text-nowrap [&>b]:overflow-x-hidden [&>b]:text-ellipsis max-w-[max-content];
   }
   .main__toc-link {
-    /* TODO */
+    @apply hover:underline;
   }
   .metadata__warning {
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
