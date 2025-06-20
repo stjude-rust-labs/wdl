@@ -195,7 +195,7 @@
     @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10 text-slate-50 text-sm flex items-center gap-1.5 [&>b]:font-semibold [&>b]:text-nowrap [&>b]:overflow-x-hidden [&>b]:text-ellipsis max-w-[max-content];
   }
   .main__toc-link {
-    /* TODO */
+    @apply hover:underline;
   }
   .metadata__warning {
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
@@ -235,16 +235,16 @@
    * Left sidebar
    */
   .left-sidebar__indent {
-    @apply w-px h-6 border rounded-none border-gray-700 mr-2;
+    @apply w-px h-full border rounded-none border-gray-700 ml-1.5 mr-1;
   }
   .left-sidebar__workflow-indent-hidden {
-    @apply w-px h-6 mr-2 flex-none;
+    @apply w-px h-full mr-2 flex-none;
   }
   .left-sidebar__workflow-indent {
-    @apply w-px h-6 mr-2 flex-none border rounded-none border-gray-700;
+    @apply w-px h-full mr-2 flex-none border rounded-none border-gray-700;
   }
   .left-sidebar__container {
-    @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400;
+    @apply flex flex-col size-full gap-y-3 text-nowrap pt-4 pl-4 bg-[#111420] text-slate-400;
   }
   .left-sidebar__searchbar-form {
     @apply flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4;
@@ -259,10 +259,10 @@
     @apply flex size-6 hover:cursor-pointer ml-2 pr-2;
   }
   .left-sidebar__tabs-container {
-    @apply flex items-center gap-x-1 pr-4;
+    @apply flex items-center pr-4;
   }
   .left-sidebar__tabs {
-    @apply flex grow items-center gap-x-1 border-b hover:cursor-pointer;
+    @apply flex grow items-center gap-x-1 border-b hover:cursor-pointer border-b-slate-700;
   }
   .left-sidebar__icon {
     @apply size-4;
@@ -271,10 +271,10 @@
     @apply size-full rounded-md pl-2 overflow-x-clip overflow-y-scroll;
   }
   .left-sidebar__content {
-    @apply w-max pr-3;
+    @apply w-full pr-3;
   }
   .left-sidebar__content-item {
-    @apply flex flex-row items-center gap-x-1 mt-2;
+    @apply flex flex-row items-center gap-x-1 h-8;
   }
   .left-sidebar__content-item-container {
     @apply flex flex-row items-center gap-x-1;
@@ -289,7 +289,7 @@
     @apply flex items-center gap-x-1 h-6 text-slate-50 mt-2;
   }
   .left-sidebar__workflow {
-    @apply flex flex-row items-center gap-x-1 mt-2;
+    @apply flex flex-row items-center gap-x-1 h-8;
   }
   .left-sidebar__workflow-container {
     @apply flex flex-row items-center gap-x-1;
@@ -350,6 +350,10 @@
 
 .markdown-body a:hover {
   @apply text-slate-400;
+}
+
+.markdown-body code {
+  @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
 }
 
 .main__container .markdown-body {
