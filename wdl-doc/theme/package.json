@@ -1,12 +1,22 @@
 {
-  "name": "theme",
+  "name": "wdl-doc",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "author": "",
+  "description": "A bundled wdl-doc theme and web components.",
   "license": "ISC",
+  "main": "dist/bundle.js",
+  "module": "dist/bundle.js",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild web-components/index.js --bundle --outfile=dist/index.js --format=esm --minify --loader:.json=json --metafile=dist/meta.json"
+  },
   "dependencies": {
+    "@floating-ui/dom": "^1.5.3",
     "@tailwindcss/cli": "^4.0.0",
-    "tailwindcss": "^4.0.0"
+    "shiki": "^1.0.0",
+    "tailwindcss": "^4.0.0",
+    "tippy.js": "^6.3.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.5"
   }
 }

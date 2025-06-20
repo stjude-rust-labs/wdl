@@ -2,21 +2,24 @@
 
 use maud::Markup;
 use wdl_ast::AstToken;
-use wdl_ast::v1::InputSection;
-use wdl_ast::v1::MetadataSection;
+use wdl_ast::SupportedVersion;
 use wdl_ast::v1::MetadataValue;
-use wdl_ast::v1::OutputSection;
-use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::WorkflowDefinition;
 
 use super::*;
+use crate::docs_tree::Header;
+use crate::docs_tree::PageSections;
+use crate::meta::render_meta_map;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A workflow in a WDL document.
 #[derive(Debug)]
-pub struct Workflow {
+pub(crate) struct Workflow {
     /// The name of the workflow.
     name: String,
+    /// The [`VersionBadge`] which displays the WDL version of the workflow.
+    version: VersionBadge,
     /// The meta of the workflow.
     meta: MetaMap,
     /// The inputs of the workflow.
@@ -27,32 +30,27 @@ pub struct Workflow {
 
 impl Workflow {
     /// Create a new workflow.
-    pub fn new(
-        name: String,
-        meta_section: Option<MetadataSection>,
-        parameter_meta: Option<ParameterMetadataSection>,
-        input_section: Option<InputSection>,
-        output_section: Option<OutputSection>,
-    ) -> Self {
-        let meta = match meta_section {
+    pub fn new(name: String, version: SupportedVersion, definition: WorkflowDefinition) -> Self {
+        let meta = match definition.metadata() {
             Some(mds) => parse_meta(&mds),
             _ => MetaMap::default(),
         };
-        let parameter_meta = match parameter_meta {
+        let parameter_meta = match definition.parameter_metadata() {
             Some(pmds) => parse_parameter_meta(&pmds),
             _ => MetaMap::default(),
         };
-        let inputs = match input_section {
+        let inputs = match definition.input() {
             Some(is) => parse_inputs(&is, &parameter_meta),
             _ => Vec::new(),
         };
-        let outputs = match output_section {
+        let outputs = match definition.output() {
             Some(os) => parse_outputs(&os, &meta, &parameter_meta),
             _ => Vec::new(),
         };
 
         Self {
             name,
+            version: VersionBadge::new(version),
             meta,
             inputs,
             outputs,
@@ -72,50 +70,122 @@ impl Workflow {
         })
     }
 
+    /// Returns the name of the workflow as HTML.
+    ///
+    /// If the `name` entry exists in the meta section, it will be used
+    /// instead of the `name` field.
+    pub fn render_name(&self) -> Markup {
+        if let Some(name) = self.name_override() {
+            name
+        } else {
+            html! { (self.name) }
+        }
+    }
+
     /// Renders the meta section of the workflow as HTML.
     ///
     /// This will render all metadata key-value pairs except for `name`,
-    /// `category`, `description`, and `outputs`.
-    pub fn render_meta(&self) -> Markup {
-        let mut kv = self
+    /// `category`, `description`, `allowNestedInputs`/`allow_nested_inputs`,
+    /// and `outputs`.
+    pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
+        render_meta_map(
+            self.meta(),
+            &[
+                "name",
+                "category",
+                "outputs",
+                "description",
+                "allowNestedInputs",
+                "allow_nested_inputs",
+            ],
+            assets,
+        )
+    }
+
+    /// Render the `allowNestedInputs`/`allow_nested_inputs` meta entry as HTML.
+    pub fn render_allow_nested_inputs(&self) -> Markup {
+        if let Some(MetadataValue::Boolean(b)) = self
             .meta
-            .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
-            .peekable();
-        html! {
-            @if kv.peek().is_some() {
-                div {
-                    h2 { "Meta" }
-                    @for (key, value) in kv {
-                        p {
-                            b { (key) ":" } " " (render_value(value))
+            .get("allowNestedInputs")
+            .or(self.meta.get("allow_nested_inputs"))
+        {
+            if b.value() {
+                return html! {
+                    div class="main__badge main__badge--success" {
+                        span class="main__badge-text" {
+                            "Nested Inputs Allowed"
                         }
                     }
+                };
+            }
+        }
+        html! {
+            div class="main__badge main__badge--disabled" {
+                span class="main__badge-text" {
+                    "Nested Inputs Not Allowed"
                 }
             }
         }
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self) -> Markup {
-        html! {
-            div class="table-auto border-collapse" {
-                h1 { @if let Some(name) = self.name_override() { (name) } @else { (self.name) } }
-                @if let Some(category) = self.category() {
-                    h2 { "Category: " (category) }
+    pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
+        let mut headers = PageSections::default();
+        let meta_markup = if let Some(meta) = self.render_meta(assets) {
+            meta
+        } else {
+            html! {}
+        };
+
+        let (input_markup, inner_headers) = self.render_inputs(assets);
+
+        headers.extend(inner_headers);
+
+        let markup = html! {
+            div class="main__container" {
+                span class="text-emerald-400" { "Workflow" }
+                h1 id="title" class="main__title" { (self.render_name()) }
+                div class="main__badge-container" {
+                    (self.version().render())
+                    @if let Some(category) = self.category() {
+                        div class="main__badge" {
+                            span class="main__badge-text" {
+                                "Category"
+                            }
+                            div class="main__badge-inner" {
+                                span class="main__badge-inner-text" {
+                                    (category)
+                                }
+                            }
+                        }
+                    }
+                    (self.render_allow_nested_inputs())
                 }
-                (self.description())
-                (self.render_meta())
-                (self.render_inputs())
-                (self.render_outputs())
+                div class="markdown-body" {
+                    @match self.description() {
+                        MaybeTruncatedDescription::No(desc) => (desc),
+                        MaybeTruncatedDescription::Yes(_summary, full) => (full),
+                    }
+                }
+                (meta_markup)
+                (input_markup)
+                (self.render_outputs(assets))
             }
-        }
+        };
+
+        headers.push(Header::Header("Outputs".to_string(), "outputs".to_string()));
+
+        (markup, headers)
     }
 }
 
 impl Callable for Workflow {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn version(&self) -> &VersionBadge {
+        &self.version
     }
 
     fn meta(&self) -> &MetaMap {
@@ -134,6 +204,7 @@ impl Callable for Workflow {
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document;
+    use wdl_ast::version::V1;
 
     use super::*;
 
@@ -158,10 +229,8 @@ mod tests {
 
         let workflow = Workflow::new(
             ast_workflow.name().text().to_string(),
-            ast_workflow.metadata(),
-            ast_workflow.parameter_metadata(),
-            ast_workflow.input(),
-            ast_workflow.output(),
+            SupportedVersion::V1(V1::Zero),
+            ast_workflow,
         );
 
         assert_eq!(workflow.name(), "test");
