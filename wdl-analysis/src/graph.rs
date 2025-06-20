@@ -29,6 +29,8 @@ use tracing::info;
 use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
+use wdl_ast::ParserConfig;
+use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 
 use crate::IncrementalChange;
@@ -344,7 +346,14 @@ impl DocumentGraphNode {
 
         // Reparse from the source
         let start = Instant::now();
-        let (document, diagnostics) = wdl_ast::Document::parse(&source);
+        let wdl_ast::ParseResult {
+            document,
+            effective_version,
+            diagnostics,
+        } = wdl_ast::Document::parse_with_config(
+            ParserConfig::default().with_fallback_version(SupportedVersion::default()),
+            &source,
+        );
         info!(
             "parsing of `{uri}` completed in {elapsed:?}",
             uri = self.uri,

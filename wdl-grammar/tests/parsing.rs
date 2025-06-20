@@ -8,6 +8,8 @@
 //! * `source.tree` - the expected CST representation of the source.
 //! * `source.errors` - the expected set of parser errors encountered during the
 //!   parse.
+//! * `config.toml` (optional) - a TOML-serialized `ParserConfig` struct to be
+//!   used instead of `ParserConfig::default()` when executing the test.
 //!
 //! Both `source.tree` and `source.errors` may be automatically generated or
 //! updated by setting the `BLESS` environment variable when running this test.
@@ -22,6 +24,7 @@ use std::process::exit;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 
+use anyhow::Context as _;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term;
 use codespan_reporting::term::Config;
@@ -30,6 +33,7 @@ use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_grammar::Diagnostic;
+use wdl_grammar::ParserConfig;
 use wdl_grammar::SyntaxTree;
 
 /// Finds tests for this package.
@@ -89,12 +93,12 @@ fn format_diagnostics(diagnostics: &[Diagnostic], path: &Path, source: &str) -> 
 }
 
 /// Compares a test result.
-fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), String> {
+fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), anyhow::Error> {
     let result = normalize(result, is_error);
     if env::var_os("BLESS").is_some() {
-        fs::write(path, &result).map_err(|e| {
+        fs::write(path, &result).with_context(|| {
             format!(
-                "failed to write result file `{path}`: {e}",
+                "failed to write result file `{path}`",
                 path = path.display()
             )
         })?;
@@ -102,37 +106,37 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), Strin
     }
 
     let expected = fs::read_to_string(path)
-        .map_err(|e| {
-            format!(
-                "failed to read result file `{path}`: {e}",
-                path = path.display()
-            )
-        })?
+        .with_context(|| format!("failed to read result file `{path}`", path = path.display()))?
         .replace("\r\n", "\n");
 
     if expected != result {
-        return Err(format!(
+        anyhow::bail!(
             "result from `{path}` is not as expected:\n{diff}",
             path = path.display(),
             diff = StrComparison::new(&expected, &result),
-        ));
+        );
     }
 
     Ok(())
 }
 
 /// Runs a test.
-fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
+fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), anyhow::Error> {
     let path = test.join("source.wdl");
     let source = std::fs::read_to_string(&path)
-        .map_err(|e| {
-            format!(
-                "failed to read source file `{path}`: {e}",
-                path = path.display()
-            )
-        })?
+        .with_context(|| format!("failed to read source file `{path}`", path = path.display()))?
         .replace("\r\n", "\n");
-    let (tree, diagnostics) = SyntaxTree::parse(&source);
+    let config_path = test.join("config.toml");
+    let config = if std::fs::exists(&config_path)? {
+        std::fs::read_to_string(&config_path)
+            .context("failed to read test-specific config")
+            .and_then(|config_str| {
+                toml::from_str(&config_str).context("failed to parse test-specific config")
+            })?
+    } else {
+        ParserConfig::default()
+    };
+    let (tree, diagnostics) = SyntaxTree::parse_with_config(config, &source);
     compare_result(&path.with_extension("tree"), &format!("{:#?}", tree), false)?;
     compare_result(
         &path.with_extension("errors"),
@@ -154,7 +158,9 @@ fn main() {
             let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
             match std::panic::catch_unwind(|| {
                 match run_test(test, &ntests)
-                    .map_err(|e| format!("failed to run test `{path}`: {e}", path = test.display()))
+                    .map_err(|e| {
+                        format!("failed to run test `{path}`: {e:#}", path = test.display())
+                    })
                     .err()
                 {
                     Some(e) => {
