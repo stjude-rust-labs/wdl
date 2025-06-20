@@ -115,7 +115,7 @@ impl Document {
                                             @match page.1.page_type() {
                                                 PageType::Struct(_) => {
                                                     td {
-                                                        a class="text-pink-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                        a class="text-pink-400 hover:text-pink-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
                                                             (page.1.name())
                                                         }
                                                     }
@@ -124,7 +124,7 @@ impl Document {
                                                 }
                                                 PageType::Task(t) => {
                                                     td {
-                                                        a class="text-violet-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                        a class="text-violet-400 hover:text-violet-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
                                                             (page.1.name())
                                                         }
                                                     }
@@ -133,7 +133,7 @@ impl Document {
                                                 }
                                                 PageType::Workflow(w) => {
                                                     td {
-                                                        a class="text-emerald-400 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                        a class="text-emerald-400 hover:text-emerald-300 hover:underline main__toc-link" href=(page.0.to_string_lossy()) {
                                                             (page.1.name())
                                                         }
                                                     }
