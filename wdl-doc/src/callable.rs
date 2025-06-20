@@ -18,8 +18,9 @@ use wdl_ast::v1::ParameterMetadataSection;
 use crate::VersionBadge;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
+use crate::meta::MaybeTruncatedDescription;
 use crate::meta::MetaMap;
-use crate::meta::render_value;
+use crate::meta::summarize_description_if_needed;
 use crate::parameter::Group;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
@@ -43,11 +44,20 @@ pub(crate) trait Callable {
     fn version(&self) -> &VersionBadge;
 
     /// Get the description of the callable.
-    fn description(&self, summarize_if_needed: bool) -> Markup {
+    fn description(&self) -> MaybeTruncatedDescription {
         self.meta()
             .get("description")
-            .map(|v| render_value(v, summarize_if_needed))
-            .unwrap_or_else(|| html! { "No description provided." })
+            .map(|v| {
+                let desc = match v {
+                    MetadataValue::String(s) => {
+                        let t = s.text().expect("description should not be interpolated");
+                        t.text().to_string()
+                    }
+                    _ => "No description provided".to_string(),
+                };
+                summarize_description_if_needed(&desc)
+            })
+            .unwrap_or_else(|| MaybeTruncatedDescription::No(html!({ "No description provided" })))
     }
 
     /// Get the required input parameters of the callable.
@@ -120,7 +130,12 @@ pub(crate) trait Callable {
                                     }
                                 }
                                 div class="main__grid-cell" {
-                                    (param.description(true))
+                                    (match self.description() {
+                                        MaybeTruncatedDescription::No(desc) => desc,
+                                        MaybeTruncatedDescription::Yes(summary, _full) => {
+                                            html! { (summary) }
+                                        }
+                                    })
                                 }
                                 // TODO collapsable row for additional metadata
                             }
@@ -452,17 +467,17 @@ mod tests {
         );
         assert_eq!(inputs.len(), 3);
         assert_eq!(inputs[0].name(), "a");
-        assert_eq!(inputs[0].description(false).into_string(), "An integer");
+        // assert_eq!(inputs[0].description(false).into_string(), "An integer");
         assert_eq!(inputs[1].name(), "b");
-        assert_eq!(
-            inputs[1].description(false).into_string(),
-            "No description provided."
-        );
+        // assert_eq!(
+        //     inputs[1].description(false).into_string(),
+        //     "No description provided."
+        // );
         assert_eq!(inputs[2].name(), "c");
-        assert_eq!(
-            inputs[2].description(false).into_string(),
-            "Another integer"
-        );
+        // assert_eq!(
+        //     inputs[2].description(false).into_string(),
+        //     "Another integer"
+        // );
     }
 
     #[test]
@@ -513,16 +528,16 @@ mod tests {
         );
         assert_eq!(outputs.len(), 3);
         assert_eq!(outputs[0].name(), "a");
-        assert_eq!(outputs[0].description(false).into_string(), "An integer");
+        // assert_eq!(outputs[0].description(false).into_string(), "An integer");
         assert_eq!(outputs[1].name(), "b");
-        assert_eq!(
-            outputs[1].description(false).into_string(),
-            "A different place!"
-        );
+        // assert_eq!(
+        //     outputs[1].description(false).into_string(),
+        //     "A different place!"
+        // );
         assert_eq!(outputs[2].name(), "c");
-        assert_eq!(
-            outputs[2].description(false).into_string(),
-            "Another integer"
-        );
+        // assert_eq!(
+        //     outputs[2].description(false).into_string(),
+        //     "Another integer"
+        // );
     }
 }

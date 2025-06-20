@@ -59,7 +59,7 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(|v| render_value(v, false))
+        self.meta.get("name").map(render_value)
     }
 
     /// Returns the `category` entry from the meta section, if it exists.
@@ -98,7 +98,6 @@ impl Workflow {
                 "allowNestedInputs",
                 "allow_nested_inputs",
             ],
-            false,
             assets,
         )
     }
@@ -163,7 +162,12 @@ impl Workflow {
                     (self.render_allow_nested_inputs())
                 }
                 div class="markdown-body" {
-                    (self.description(false))
+                    (match self.description() {
+                        MaybeTruncatedDescription::No(desc) => desc,
+                        MaybeTruncatedDescription::Yes(_summary, full) => {
+                            html! { (full) }
+                        }
+                    })
                 }
                 (meta_markup)
                 (input_markup)

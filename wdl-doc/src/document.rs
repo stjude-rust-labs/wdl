@@ -26,6 +26,7 @@ use crate::callable::Callable;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
 use crate::docs_tree::PageType;
+use crate::meta::MaybeTruncatedDescription;
 
 /// Parse the preamble comments of a document using the version statement.
 pub fn parse_preamble_comments(version: VersionStatement) -> String {
@@ -116,7 +117,7 @@ impl Document {
                             div class="main__grid-header-cell" { "Description" }
                             div class="main__grid-header-separator" {}
                             @for page in &self.local_pages {
-                                div class="main__grid-row" {
+                                div class="main__grid-row" x-data="{ expanded: false }" {
                                     @match page.1.page_type() {
                                         PageType::Struct(_) => {
                                             div class="main__grid-cell" {
@@ -134,7 +135,17 @@ impl Document {
                                                 }
                                             }
                                             div class="main__grid-cell" { code { "task" } }
-                                            div class="main__grid-cell" { (t.description(true)) }
+                                            div class="main__grid-cell" {
+                                                (match t.description() {
+                                                    MaybeTruncatedDescription::No(desc) => desc,
+                                                    MaybeTruncatedDescription::Yes(summary, _full) => {
+                                                        html! {
+                                                            (summary)
+                                                            button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
+                                                        }
+                                                    }
+                                                })
+                                            }
                                         }
                                         PageType::Workflow(w) => {
                                             div class="main__grid-cell" {
@@ -143,7 +154,18 @@ impl Document {
                                                 }
                                             }
                                             div class="main__grid-cell" { code { "workflow" } }
-                                            div class="main__grid-cell" { (w.description(true)) }
+                                            div class="main__grid-cell" {
+                                                // TODO duplicate code
+                                                (match w.description() {
+                                                    MaybeTruncatedDescription::No(desc) => desc,
+                                                    MaybeTruncatedDescription::Yes(summary, _full) => {
+                                                        html! {
+                                                            (summary)
+                                                            button type="button" class="main__button" x-on:click="expanded = !expanded" x-text="expanded ? 'Show less' : 'Show full description'" {}
+                                                        }
+                                                    }
+                                                })
+                                            }
                                         }
                                         // Index pages should not link to other index pages.
                                         PageType::Index(_) => {
@@ -151,6 +173,33 @@ impl Document {
                                             div class="main__grid-cell" { "ERROR" }
                                             div class="main__grid-cell" { "ERROR" }
                                             div class="main__grid-cell" { "ERROR" }
+                                        }
+                                    }
+                                    div x-show="expanded" class="main__grid-full-width-cell" {
+                                        // TODO inefficient. Redundantly allocates the description
+                                        @match page.1.page_type() {
+                                            PageType::Struct(_) => {
+                                               "ERROR"
+                                            }
+                                            PageType::Task(t) => {
+                                                (match t.description() {
+                                                    MaybeTruncatedDescription::No(_) => html! { "ERROR" },
+                                                    MaybeTruncatedDescription::Yes(_summary, full) => {
+                                                        full
+                                                    }
+                                                })
+                                            }
+                                            PageType::Workflow(w) => {
+                                                (match w.description() {
+                                                    MaybeTruncatedDescription::No(_) => html! { "ERROR" },
+                                                    MaybeTruncatedDescription::Yes(_summary, full) => {
+                                                        full
+                                                    }
+                                                })
+                                            }
+                                            PageType::Index(_) => {
+                                               "ERROR"
+                                            }
                                         }
                                     }
                                 }

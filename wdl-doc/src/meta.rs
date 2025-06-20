@@ -13,91 +13,51 @@ use crate::Markdown;
 use crate::Render;
 
 /// A map of metadata key-value pairs, sorted by key.
-pub type MetaMap = BTreeMap<String, MetadataValue>;
+pub(crate) type MetaMap = BTreeMap<String, MetadataValue>;
 
-/// Render a [`MetadataValue`] as HTML.
-pub(crate) fn render_value(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
-    fn render_value_inner(value: &MetadataValue, summarize_if_needed: bool) -> Markup {
-        match value {
-            MetadataValue::String(s) => {
-                let inner_text = s
-                    .text()
-                    .map(|t| t.text().to_string())
-                    .expect("meta string should not be interpolated");
-                if summarize_if_needed {
-                    return html! { (summarize_markdown_if_needed(inner_text)) };
-                }
-                Markdown(inner_text).render()
-            }
-            MetadataValue::Boolean(b) => html! { code { (b.text().to_string()) } },
-            MetadataValue::Integer(i) => html! { code { (i.text().to_string()) } },
-            MetadataValue::Float(f) => html! { code { (f.text().to_string()) } },
-            MetadataValue::Null(n) => html! { code { (n.text().to_string()) } },
-            MetadataValue::Array(a) => {
-                html! {
-                    div x-data="{ expanded: false }" {
-                        div x-show="!expanded" {
-                            p { (format!("Array with {} elements... ", a.elements().collect::<Vec<_>>().len())) }
-                            button type="button" class="main__button" x-on:click="expanded = true" {
-                                b { "Expand" }
-                            }
+/// Recursively render a [`MetadataValue`] as HTML.
+fn render_value_inner(value: &MetadataValue) -> Markup {
+    match value {
+        MetadataValue::String(s) => {
+            let inner_text = s
+                .text()
+                .map(|t| t.text().to_string())
+                .expect("meta string should not be interpolated");
+            Markdown(inner_text).render()
+        }
+        MetadataValue::Boolean(b) => html! { code { (b.text().to_string()) } },
+        MetadataValue::Integer(i) => html! { code { (i.text().to_string()) } },
+        MetadataValue::Float(f) => html! { code { (f.text().to_string()) } },
+        MetadataValue::Null(n) => html! { code { (n.text().to_string()) } },
+        MetadataValue::Array(a) => {
+            html! {
+                @for item in a.elements() {
+                    @match item {
+                        MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                            (render_value_inner(&item))
                         }
-                        div x-show="expanded" {
-                            code { "[" }
-                            ul {
-                                @for item in a.elements() {
-                                    li {
-                                        @match item {
-                                            MetadataValue::Array(_) | MetadataValue::Object(_) => {
-                                                (render_value_inner(&item, false)) ","
-                                            }
-                                            _ => {
-                                                code { (item.text().to_string()) } ","
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            code { "]" }
-                            br;
-                            button type="button" class="main__button" x-on:click="expanded = false" {
-                                b { "Collapse" }
-                            }
-                        }
-                    }
-                }
-            }
-            MetadataValue::Object(o) => {
-                html! {
-                    div x-data="{ expanded: false }" {
-                        div x-show="!expanded" {
-                            p { (format!("Object with {} items... ", o.items().collect::<Vec<_>>().len())) }
-                            button type="button" class="main__button" x-on:click="expanded = true" {
-                                b { "Expand" }
-                            }
-                        }
-                        div x-show="expanded" {
-                            code { "{" }
-                            ul {
-                                @for item in o.items() {
-                                    li {
-                                        b { (item.name().text()) ":" } " " (render_value_inner(&item.value(), false)) ","
-                                    }
-                                }
-                            }
-                            code { "}" }
-                            br;
-                            button type="button" class="main__button" x-on:click="expanded = false" {
-                                b { "Collapse" }
-                            }
+                        _ => {
+                            // TODO
+                            code { (item.text().to_string()) }
                         }
                     }
                 }
             }
         }
+        MetadataValue::Object(o) => {
+            html! {
+                @for item in o.items() {
+                    // TODO
+                    b { (item.name().text()) ":" } " " (render_value_inner(&item.value())) ","
+                }
+            }
+        }
     }
+}
 
-    render_value_inner(value, summarize_if_needed)
+/// Render a [`MetadataValue`] as HTML.
+pub(crate) fn render_value(value: &MetadataValue) -> Markup {
+    render_value_inner(value)
 }
 
 /// Help key for custom rendering.
@@ -112,7 +72,6 @@ const WARNING_KEY: &str = "warning";
 pub(crate) fn render_meta_map(
     map: &MetaMap,
     filter_keys: &[&str],
-    summarize_if_needed: bool,
     assets: &Path,
 ) -> Option<Markup> {
     let custom_keys = &[HELP_KEY, EXTERNAL_HELP_KEY, WARNING_KEY];
@@ -150,7 +109,7 @@ pub(crate) fn render_meta_map(
     Some(html! {
         @if let Some(help) = help_item {
             div class="markdown-body" {
-                (render_value(help, summarize_if_needed))
+                (render_value(help))
             }
         }
         @if let Some(on_click) = external_link_on_click {
@@ -162,10 +121,11 @@ pub(crate) fn render_meta_map(
         @if let Some(warning) = warning_item {
             div class="metadata__warning" {
                 img src=(assets.join("information-circle.svg").to_string_lossy()) alt="Warning Icon" class="size-5";
-                p { (render_value(warning, summarize_if_needed)) }
+                p { (render_value(warning)) }
             }
         }
         @if any_additional_items {
+            // TODO revisit this layout
             div class="main__table-outer-container main__metadata-table" {
                 div class="main__table-inner-container" {
                     table class="main__table" {
@@ -176,7 +136,7 @@ pub(crate) fn render_meta_map(
                                         (k)
                                     } }
                                     td {
-                                        (render_value(v, summarize_if_needed))
+                                        (render_value(v))
                                     }
                                 }
                             }
@@ -193,31 +153,24 @@ const MAX_MD_LENGTH: usize = 140;
 /// The amount of characters to show in the clipped markdown.
 const MD_CLIP_LENGTH: usize = 120;
 
-/// Summarize a long string if it exceeds the threshold.
-fn summarize_markdown_if_needed(content: String) -> Markup {
-    if content.len() <= MAX_MD_LENGTH {
-        return Markdown(content).render();
-    }
+/// A description that may be truncated.
+#[derive(Debug)]
+pub(crate) enum MaybeTruncatedDescription {
+    /// The description was truncated, providing a summary and the full
+    /// markdown.
+    Yes(Markup, Markup),
+    /// The description was not truncated, providing the full markdown.
+    No(Markup),
+}
 
-    let markup = Markdown(content.clone()).render();
-
-    let summary_text = format!("{}... ", &content[..MD_CLIP_LENGTH].trim());
-
-    html! {
-        div x-data="{ expanded: false }" {
-            div x-show="!expanded" {
-                p { (summary_text) }
-                button type="button" class="main__button" x-on:click="expanded = true" {
-                    b { "Read more" }
-                }
-            }
-            div x-show="expanded" {
-                (markup)
-                br;
-                button type="button" class="main__button" x-on:click="expanded = false" {
-                    b { "Read less" }
-                }
-            }
-        }
+/// Render a markdown string, summarizing it if it exceeds the maximum length.
+pub(crate) fn summarize_description_if_needed(description: &str) -> MaybeTruncatedDescription {
+    if description.len() > MAX_MD_LENGTH {
+        MaybeTruncatedDescription::Yes(
+            html! { (format!("{}...", description[..MD_CLIP_LENGTH].trim_end())) },
+            Markdown(description.to_string()).render(),
+        )
+    } else {
+        MaybeTruncatedDescription::No(Markdown(description.to_string()).render())
     }
 }

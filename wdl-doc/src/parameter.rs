@@ -9,9 +9,10 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::meta::MaybeTruncatedDescription;
 use crate::meta::MetaMap;
 use crate::meta::render_meta_map;
-use crate::meta::render_value;
+use crate::meta::summarize_description_if_needed;
 
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
@@ -147,18 +148,27 @@ impl Parameter {
     }
 
     /// Get the description of the parameter.
-    pub fn description(&self, summarize_if_needed: bool) -> Markup {
+    pub fn description(&self) -> MaybeTruncatedDescription {
         self.meta()
             .get("description")
-            .map(|v| render_value(v, summarize_if_needed))
-            .unwrap_or_else(|| html! { "No description provided." })
+            .map(|v| {
+                let desc = match v {
+                    MetadataValue::String(s) => {
+                        let t = s.text().expect("description should not be interpolated");
+                        t.text().to_string()
+                    }
+                    _ => "No description provided".to_string(),
+                };
+                summarize_description_if_needed(&desc)
+            })
+            .unwrap_or_else(|| MaybeTruncatedDescription::No(html!({ "No description provided" })))
     }
 
     /// Render any remaining metadata as HTML.
     ///
     /// This will render any metadata that is not rendered elsewhere if present.
     pub fn _render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
-        render_meta_map(self.meta(), &["description", "group"], true, assets)
+        render_meta_map(self.meta(), &["description", "group"], assets)
     }
 
     /// Render the parameter as HTML.
@@ -175,7 +185,12 @@ impl Parameter {
                     div class="main__grid-cell" { (shorten_expr_if_needed(self.expr())) }
                 }
                 div class="main__grid-cell" {
-                    (self.description(true))
+                    (match self.description() {
+                        MaybeTruncatedDescription::No(desc) => desc,
+                        MaybeTruncatedDescription::Yes(summary, _full) => {
+                            html! { (summary) }
+                        }
+                    })
                 }
                 // TODO collapsable row for additional metadata
             }

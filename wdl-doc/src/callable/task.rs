@@ -72,7 +72,7 @@ impl Task {
     /// This will render all metadata key-value pairs except for `outputs` and
     /// `description`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
-        let content = render_meta_map(self.meta(), &["outputs", "description"], false, assets)?;
+        let content = render_meta_map(self.meta(), &["outputs", "description"], assets)?;
         Some(html! {
             div class="main__section" {
                 (content)
@@ -152,7 +152,12 @@ impl Task {
                     (self.version().render())
                 }
                 div class="markdown-body" {
-                    (self.description(false))
+                    (match self.description() {
+                        MaybeTruncatedDescription::No(desc) => desc,
+                        MaybeTruncatedDescription::Yes(_summary, full) => {
+                            html! { (full) }
+                        }
+                    })
                 }
                 (meta_markup)
                 (input_markup)
