@@ -34,17 +34,16 @@ impl CommandSectionExt for CommandSection {
                                 if line.starts_with(&" ".repeat(common_whitespace))
                                     || line.starts_with(&"\t".repeat(common_whitespace))
                                 {
-                                    line[common_whitespace..].to_string()
+                                    &line[common_whitespace..]
                                 } else {
-                                    line.to_string()
+                                    line
                                 }
                             })
                             .collect::<Vec<_>>()
                             .join("\n")
                     }
                 })
-                .collect::<Vec<_>>()
-                .join(""),
+                .collect(),
             None => self
                 .parts()
                 .map(|p| match p {
@@ -55,8 +54,7 @@ impl CommandSectionExt for CommandSection {
                     }
                     CommandPart::Placeholder(placehoder) => placehoder.text().to_string(),
                 })
-                .collect::<Vec<_>>()
-                .join(""),
+                .collect(),
         }
     }
 }

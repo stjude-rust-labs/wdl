@@ -887,7 +887,7 @@ impl DocsTree {
                 return html! {};
             }
             _ => {
-                // Last crumb should not be clickable
+                // Last crumb, i.e. the current page, should not be clickable
                 breadcrumbs.push((cur_page.name(), None));
             }
         }
@@ -967,6 +967,7 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
+                // TODO the mobile menu button code is duplicated in `write_page`
                 div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
                     div class="layout__sidebar-left" {
                         (left_sidebar)
@@ -1013,6 +1014,7 @@ impl DocsTree {
         let html = full_page(
             page.name(),
             html! {
+                // TODO the mobile menu button code is duplicated in `write_homepage`
                 div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
                     div class="layout__sidebar-left" {
                         (left_sidebar)

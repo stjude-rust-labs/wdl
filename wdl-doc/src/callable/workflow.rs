@@ -68,7 +68,7 @@ impl Workflow {
         })
     }
 
-    /// Returns the `category` meta entry, if it exists.
+    /// Returns the `category` meta entry, if it exists and is a String.
     pub fn category(&self) -> Option<String> {
         self.meta.get("category").and_then(|v| match v {
             MetadataValue::String(s) => Some(s.text().unwrap().text().to_string()),
@@ -78,7 +78,7 @@ impl Workflow {
 
     /// Returns the name of the workflow as HTML.
     ///
-    /// If the `name` meta entry exists and is a string, it will be used instead
+    /// If the `name` meta entry exists and is a String, it will be used instead
     /// of the `name` struct member.
     pub fn render_name(&self) -> Markup {
         if let Some(name) = self.name_override() {
@@ -90,8 +90,8 @@ impl Workflow {
 
     /// Renders the meta section of the workflow as HTML.
     ///
-    /// This will render all metadata key-value pairs except for `name`,
-    /// `category`, `description`, `allowNestedInputs`/`allow_nested_inputs`,
+    /// This will render all metadata key-value pairs except for `description`,
+    /// `name`, `category`, `allowNestedInputs`/`allow_nested_inputs`,
     /// and `outputs`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
         self.meta().render_remaining(
@@ -99,9 +99,9 @@ impl Workflow {
                 "description",
                 "name",
                 "category",
-                "outputs",
                 "allowNestedInputs",
                 "allow_nested_inputs",
+                "outputs",
             ],
             assets,
         )
@@ -109,6 +109,9 @@ impl Workflow {
 
     /// Render the `allowNestedInputs`/`allow_nested_inputs` meta entry as a
     /// badge.
+    ///
+    /// If the value is `true`, it renders an "allowed badge", in all other
+    /// cases it renders a "disabled badge".
     pub fn render_allow_nested_inputs(&self) -> Markup {
         if let Some(MetadataValue::Boolean(b)) = self
             .meta
@@ -134,7 +137,8 @@ impl Workflow {
         }
     }
 
-    /// Render the `category` meta entry as a badge, if it exists.
+    /// Render the `category` meta entry as a badge, if it exists and is a
+    /// String.
     pub fn render_category(&self) -> Option<Markup> {
         self.category().map(|category| {
             html! {
