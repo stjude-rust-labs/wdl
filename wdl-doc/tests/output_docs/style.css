@@ -1675,6 +1675,11 @@
     grid-template-columns: 1fr 1fr 2fr 3fr;
     gap: calc(var(--spacing) * 4);
   }
+  .main__grid-addl-meta-container {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    gap: calc(var(--spacing) * 4);
+  }
   .left-sidebar__indent {
     margin-right: calc(var(--spacing) * 1);
     margin-left: calc(var(--spacing) * 1.5);

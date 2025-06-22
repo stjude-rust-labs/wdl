@@ -42,11 +42,6 @@ pub(crate) trait Callable {
     /// Get the [`VersionBadge`] of the callable.
     fn version(&self) -> &VersionBadge;
 
-    /// Render the description of the callable as HTML.
-    fn description(&self, summarize: bool) -> Markup {
-        self.meta().render_description(summarize)
-    }
-
     /// Get the required input parameters of the callable.
     fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
         self.inputs().iter().filter(|param| {
@@ -92,31 +87,39 @@ pub(crate) trait Callable {
         })
     }
 
+    /// Render the version of the callable as a badge.
+    fn render_version(&self) -> Markup {
+        self.version().render()
+    }
+
+    /// Render the description of the callable as HTML.
+    fn render_description(&self, summarize: bool) -> Markup {
+        self.meta().render_description(summarize)
+    }
+
     /// Render the required inputs of the callable if present.
     fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
-        if iter.peek().is_some() {
-            return Some(html! {
-                h3 id="required-inputs" class="main__section-subheader" { "Required Inputs" }
-                div class="main__grid-container" {
-                    div class="main__grid-req-inputs-container" {
-                        div class="main__grid-header-cell" { "Name" }
-                        div class="main__grid-header-cell" { "Type" }
-                        div class="main__grid-header-cell" { "Description" }
-                        div class="main__grid-header-separator" {}
-                        @for param in iter {
-                            (param.render(assets))
-                        }
+        iter.peek()?;
+        Some(html! {
+            h3 id="required-inputs" class="main__section-subheader" { "Required Inputs" }
+            div class="main__grid-container" {
+                div class="main__grid-req-inputs-container" {
+                    div class="main__grid-header-cell" { "Name" }
+                    div class="main__grid-header-cell" { "Type" }
+                    div class="main__grid-header-cell" { "Description" }
+                    div class="main__grid-header-separator" {}
+                    @for param in iter {
+                        (param.render(assets))
                     }
                 }
-            });
-        };
-        None
+            }
+        })
     }
 
     /// Render the inputs with a group of the callable if present.
     ///
-    /// This will render each group as a section with a header and a table
+    /// This will render each group with a subheader and a table
     /// of parameters that are part of that group.
     fn render_group_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut group_tables = self
@@ -142,13 +145,12 @@ pub(crate) trait Callable {
     /// present.
     fn render_other_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.other_inputs().peekable();
-        if iter.peek().is_some() {
-            return Some(html! {
-                h3 id="other-inputs" class="main__section-subheader" { "Other Inputs" }
-                (render_non_required_parameters_table(iter, assets))
-            });
-        };
-        None
+        iter.peek()?;
+
+        Some(html! {
+            h3 id="other-inputs" class="main__section-subheader" { "Other Inputs" }
+            (render_non_required_parameters_table(iter, assets))
+        })
     }
 
     /// Render the inputs of the callable.

@@ -128,7 +128,8 @@ pub fn build_stylesheet(theme_dir: &Path) -> Result<()> {
 /// This will create an `assets` directory in the given path and write all
 /// necessary assets to it. It will also write the default `style.css` and
 /// `index.js` files to the root of the directory unless a custom theme is
-/// provided.
+/// provided, in which case it will copy the `style.css` and `index.js` files
+/// from the custom theme's `dist` directory.
 fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
     let dir = dir.as_ref();
     let custom_theme = custom_theme.as_ref().map(|p| p.as_ref());
@@ -300,8 +301,8 @@ impl Render for Css<'_> {
 /// An HTML header with a `page_title` and all the link/script dependencies
 /// expected by `wdl-doc`.
 ///
-/// Requires a relative path to the root (where `style.css` and `index.js` files
-/// are expected).
+/// Requires a relative path to the root where `style.css` and `index.js` files
+/// are expected.
 pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P) -> Markup {
     let root = root.as_ref();
     html! {
@@ -320,7 +321,8 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P) -> Markup {
     }
 }
 
-/// A full HTML page.
+/// Returns a full HTML page, including the `DOCTYPE`, `html`, `head`, and
+/// `body` tags,
 pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, root: P) -> Markup {
     html! {
         (DOCTYPE)
@@ -622,7 +624,7 @@ mod tests {
             ast_workflow,
         );
 
-        let description = workflow.description(false);
+        let description = workflow.render_description(false);
         assert_eq!(
             description.into_string(),
             "A simple description should not render with p tags"

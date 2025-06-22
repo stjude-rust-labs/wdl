@@ -42,7 +42,7 @@ impl MetaMapExt for MetaMap {
                     let t = s.text().expect("description should not be interpolated");
                     t.text().to_string()
                 }
-                _ => "No description provided".to_string(),
+                _ => "ERROR: description not of type String".to_string(),
             })
             .unwrap_or_else(|| "No description provided".to_string());
 
@@ -52,8 +52,7 @@ impl MetaMapExt for MetaMap {
 
         match summarize_if_needed(&desc) {
             MaybeSummarized::No(desc) => Markdown(desc).render(),
-            MaybeSummarized::Yes(summary, _full) => {
-                // TODO return full?
+            MaybeSummarized::Yes(summary) => {
                 html! {
                     (summary)
                     button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" x-text="description_expanded ? 'Show less' : 'Show full description'" {}
@@ -159,7 +158,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
                             (render_value_inner(&item))
                         }
                         _ => {
-                            // TODO not sure about this
+                            // TODO revisit this
                             code { (item.text()) }
                         }
                     }
@@ -169,7 +168,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             html! {
                 div class="main__grid-container" {
-                    // TODO need a diff container?
+                    // TODO revisit this
                     div class="main__grid-addl-meta-container" {
                         @for item in o.items() {
                             div class="main__grid-row" {
@@ -199,12 +198,11 @@ const MAX_LENGTH: usize = 80;
 const CLIP_LENGTH: usize = 60;
 
 /// A string that may be summarized.
+// TODO return reference to the original string?
 #[derive(Debug)]
 pub(crate) enum MaybeSummarized {
-    /// The string was truncated, providing a summary and the full
-    /// thing.
-    /// TODO only return the summary?
-    Yes(String, String),
+    /// The string was truncated, providing a summary.
+    Yes(String),
     /// The string was not truncated, providing the full thing.
     No(String),
 }
@@ -212,10 +210,7 @@ pub(crate) enum MaybeSummarized {
 /// Summarize a string if it exceeds a maximum length.
 pub(crate) fn summarize_if_needed(in_str: &str) -> MaybeSummarized {
     if in_str.len() > MAX_LENGTH {
-        MaybeSummarized::Yes(
-            format!("{}...", in_str[..CLIP_LENGTH].trim_end()),
-            in_str.to_string(),
-        )
+        MaybeSummarized::Yes(format!("{}...", in_str[..CLIP_LENGTH].trim_end()))
     } else {
         MaybeSummarized::No(in_str.to_string())
     }

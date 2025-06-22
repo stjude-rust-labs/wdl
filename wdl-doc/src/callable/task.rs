@@ -147,10 +147,10 @@ impl Task {
                 span class="text-violet-400" { "Task" }
                 h1 id="title" class="main__title main__title-code" { code { (self.name()) } }
                 div class="main__badge-container" {
-                    (self.version().render())
+                    (self.render_version())
                 }
                 div class="markdown-body" {
-                    (self.description(false))
+                    (self.render_description(false))
                 }
                 (meta_markup)
                 (input_markup)

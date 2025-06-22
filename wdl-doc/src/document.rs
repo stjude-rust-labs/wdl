@@ -83,15 +83,20 @@ impl Document {
         &self.name
     }
 
-    /// Get the [`VersionBadge`] of the document.
-    pub fn version(&self) -> &VersionBadge {
-        &self.version
+    /// Render the version of the document as a badge.
+    pub fn render_version(&self) -> Markup {
+        self.version.render()
     }
 
     /// Get the preamble comments of the document as HTML.
     pub fn render_preamble(&self) -> Markup {
         let preamble = parse_preamble_comments(self.version_statement.clone());
-        Markdown(&preamble).render()
+        let md = Markdown(&preamble).render();
+        html! {
+            div class="markdown-body" {
+                (md)
+            }
+        }
     }
 
     /// Render the document as HTML.
@@ -100,12 +105,11 @@ impl Document {
             div class="main__container" {
                 h1 id="title" class="main__title" { (self.name()) }
                 div class="main__badge-container" {
-                    (self.version().render())
+                    (self.render_version())
                 }
+                // TODO should this have an id?
                 div id="preamble" class="main__section" {
-                    div class="markdown-body" {
-                        (self.render_preamble())
-                    }
+                    (self.render_preamble())
                 }
                 div class="main__section" {
                     h2 id="toc" class="main__section-header" { "Table of Contents" }
@@ -135,7 +139,7 @@ impl Document {
                                             }
                                             div class="main__grid-cell" { code { "task" } }
                                             div class="main__grid-cell" {
-                                                (t.description(true))
+                                                (t.render_description(true))
                                             }
                                         }
                                         PageType::Workflow(w) => {
@@ -146,7 +150,7 @@ impl Document {
                                             }
                                             div class="main__grid-cell" { code { "workflow" } }
                                             div class="main__grid-cell" {
-                                                (w.description(true))
+                                                (w.render_description(true))
                                             }
                                         }
                                         // Index pages should not link to other index pages.
@@ -161,10 +165,10 @@ impl Document {
                                         @match page.1.page_type() {
                                             PageType::Struct(_) => "ERROR"
                                             PageType::Task(t) => {
-                                                (t.description(false))
+                                                (t.render_description(false))
                                             }
                                             PageType::Workflow(w) => {
-                                                (w.description(false))
+                                                (w.render_description(false))
                                             }
                                             PageType::Index(_) => "ERROR"
                                         }

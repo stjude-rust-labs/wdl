@@ -7,7 +7,7 @@
   "module": "dist/bundle.js",
   "type": "module",
   "scripts": {
-    "build": "esbuild web-components/index.js --bundle --outfile=dist/index.js --format=esm --minify --loader:.json=json --metafile=dist/meta.json"
+    "build": "esbuild web-components/index.js --bundle --outfile=dist/index.js --format=esm --minify --loader:.json=json"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.5.3",
