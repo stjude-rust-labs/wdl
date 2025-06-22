@@ -80,7 +80,7 @@ pub(crate) enum Header {
 /// order it was added.
 #[derive(Debug, Default)]
 pub(crate) struct PageSections {
-    /// The headers found in the page.
+    /// The headers in the page.
     pub headers: Vec<Header>,
 }
 
@@ -353,7 +353,7 @@ impl DocsTree {
         current_node.page = Some(page);
     }
 
-    /// Get the Node associated with a path.
+    /// Get the [`Node`] associated with a path.
     ///
     /// Path can be an absolute path or a path relative to the root.
     fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
@@ -380,7 +380,7 @@ impl DocsTree {
         Some(current_node)
     }
 
-    /// Get the page associated with a path.
+    /// Get the [`HTMLPage`] associated with a path.
     ///
     /// Can be an abolute path or a path relative to the root.
     pub(crate) fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {

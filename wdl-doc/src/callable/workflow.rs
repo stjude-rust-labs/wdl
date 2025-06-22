@@ -9,7 +9,6 @@ use wdl_ast::v1::WorkflowDefinition;
 use super::*;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
-use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A workflow in a WDL document.
@@ -56,12 +55,20 @@ impl Workflow {
         }
     }
 
-    /// Returns the `name` entry from the meta section, if it exists.
-    pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(render_value)
+    /// Returns the `name` meta entry, if it exists and is a String.
+    pub fn name_override(&self) -> Option<String> {
+        self.meta.get("name").and_then(|v| match v {
+            MetadataValue::String(s) => Some(
+                s.text()
+                    .expect("meta string should not be interpolated")
+                    .text()
+                    .to_string(),
+            ),
+            _ => None,
+        })
     }
 
-    /// Returns the `category` entry from the meta section, if it exists.
+    /// Returns the `category` meta entry, if it exists.
     pub fn category(&self) -> Option<String> {
         self.meta.get("category").and_then(|v| match v {
             MetadataValue::String(s) => Some(s.text().unwrap().text().to_string()),
@@ -71,11 +78,11 @@ impl Workflow {
 
     /// Returns the name of the workflow as HTML.
     ///
-    /// If the `name` entry exists in the meta section, it will be used
-    /// instead of the `name` field.
+    /// If the `name` meta entry exists and is a string, it will be used instead
+    /// of the `name` struct member.
     pub fn render_name(&self) -> Markup {
         if let Some(name) = self.name_override() {
-            name
+            html! { (name) }
         } else {
             html! { (self.name) }
         }
@@ -100,7 +107,8 @@ impl Workflow {
         )
     }
 
-    /// Render the `allowNestedInputs`/`allow_nested_inputs` meta entry as HTML.
+    /// Render the `allowNestedInputs`/`allow_nested_inputs` meta entry as a
+    /// badge.
     pub fn render_allow_nested_inputs(&self) -> Markup {
         if let Some(MetadataValue::Boolean(b)) = self
             .meta
@@ -126,6 +134,24 @@ impl Workflow {
         }
     }
 
+    /// Render the `category` meta entry as a badge, if it exists.
+    pub fn render_category(&self) -> Option<Markup> {
+        self.category().map(|category| {
+            html! {
+                div class="main__badge" {
+                    span class="main__badge-text" {
+                        "Category"
+                    }
+                    div class="main__badge-inner" {
+                        span class="main__badge-inner-text" {
+                            (category)
+                        }
+                    }
+                }
+            }
+        })
+    }
+
     /// Render the workflow as HTML.
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
@@ -148,23 +174,14 @@ impl Workflow {
                 span class="text-emerald-400" { "Workflow" }
                 h1 id="title" class="main__title" { (self.render_name()) }
                 div class="main__badge-container" {
-                    (self.version().render())
-                    @if let Some(category) = self.category() {
-                        div class="main__badge" {
-                            span class="main__badge-text" {
-                                "Category"
-                            }
-                            div class="main__badge-inner" {
-                                span class="main__badge-inner-text" {
-                                    (category)
-                                }
-                            }
-                        }
+                    (self.render_version())
+                    @if let Some(badge) = self.render_category() {
+                        (badge)
                     }
                     (self.render_allow_nested_inputs())
                 }
                 div class="markdown-body" {
-                    (self.description(false))
+                    (self.render_description(false))
                 }
                 (meta_markup)
                 (input_markup)

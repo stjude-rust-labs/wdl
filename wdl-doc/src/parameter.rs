@@ -129,8 +129,7 @@ impl Parameter {
             MaybeSummarized::No(expr) => {
                 html! { code { (expr) } }
             }
-            MaybeSummarized::Yes(summary, _full) => {
-                // TODO return full?
+            MaybeSummarized::Yes(summary) => {
                 html! {
                     code { (summary) }
                     button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
@@ -174,7 +173,8 @@ impl Parameter {
 
     /// Render any remaining metadata as HTML.
     ///
-    /// TODO write better
+    /// This will render all metadata key-value pairs except for `description`
+    /// and `group`.
     pub fn render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
         self.meta()
             .render_remaining(&["description", "group"], assets)
@@ -230,8 +230,11 @@ impl Parameter {
 /// straightforward way to handle the different shape grids.
 ///
 /// The distinction between inputs and outputs is made by checking if the
-/// `required` field is `None` for all parameters. If any parameter has
-/// `required` set to `Some(_)`, then all parameters are considered inputs.
+/// `required` method returns `None` for any of the provided parameters. If it
+/// does, the parameter is an output (and all other parameters will also be
+/// treated as outputs), and the third column will be labeled "Expression". If
+/// it returns `Some(true)` or `Some(false)` for every parameter, they are all
+/// inputs and the third column will be labeled "Default".
 pub(crate) fn render_non_required_parameters_table<'a, I>(params: I, assets: &Path) -> Markup
 where
     I: Iterator<Item = &'a Parameter>,
