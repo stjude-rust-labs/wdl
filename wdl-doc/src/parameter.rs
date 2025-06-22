@@ -151,7 +151,8 @@ impl Parameter {
         }
     }
 
-    /// Get the "group" of the parameter.
+    /// Get the `group` meta entry of the parameter as a [`Group`], if the meta
+    /// entry exists and is a String.
     pub fn group(&self) -> Option<Group> {
         self.meta().get("group").and_then(|value| {
             if let MetadataValue::String(s) = value {
