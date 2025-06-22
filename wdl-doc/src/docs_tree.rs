@@ -788,6 +788,7 @@ impl DocsTree {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
+                        // TODO clicking this should scroll the active page into view
                         div x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
