@@ -165,11 +165,7 @@ impl Workflow {
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            html! {
-                div class="main__section" {
-                    (meta)
-                }
-            }
+            html! { (meta) }
         } else {
             html! {}
         };
@@ -189,10 +185,12 @@ impl Workflow {
                     }
                     (self.render_allow_nested_inputs())
                 }
-                div class="markdown-body" {
-                    (self.render_description(false))
+                div class="main__section" {
+                    div class="markdown-body" {
+                        (self.render_description(false))
+                    }
+                    (meta_markup)
                 }
-                (meta_markup)
                 (input_markup)
                 (self.render_outputs(assets))
             }

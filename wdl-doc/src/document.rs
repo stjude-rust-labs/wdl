@@ -88,15 +88,18 @@ impl Document {
         self.version.render()
     }
 
-    /// Get the preamble comments of the document as HTML.
-    pub fn render_preamble(&self) -> Markup {
+    /// Get the preamble comments of the document as HTML if there are any.
+    pub fn render_preamble(&self) -> Option<Markup> {
         let preamble = parse_preamble_comments(self.version_statement.clone());
+        if preamble.is_empty() {
+            return None;
+        }
         let md = Markdown(&preamble).render();
-        html! {
+        Some(html! {
             div class="markdown-body" {
                 (md)
             }
-        }
+        })
     }
 
     /// Render the document as HTML.
@@ -107,8 +110,10 @@ impl Document {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
-                div id="preamble" class="main__section" {
-                    (self.render_preamble())
+                @if let Some(preamble) = self.render_preamble() {
+                    div id="preamble" class="main__section" {
+                        (preamble)
+                    }
                 }
                 div class="main__section" {
                     h2 id="toc" class="main__section-header" { "Table of Contents" }
