@@ -161,6 +161,9 @@
   .main__container a {
     @apply hover:underline;
   }
+  .main__code-container {
+    @apply mt-3;
+  }
   /**
    * Badges & Buttons
    */
@@ -388,8 +391,4 @@
 
 .main__container .markdown-body {
   @apply max-w-4xl;
-}
-
-.main__container sprocket-code {
-  @apply mt-3;
 }
