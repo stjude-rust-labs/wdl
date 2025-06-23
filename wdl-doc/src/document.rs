@@ -107,7 +107,6 @@ impl Document {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
-                // TODO should this have an id?
                 div id="preamble" class="main__section" {
                     (self.render_preamble())
                 }

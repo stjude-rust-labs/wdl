@@ -67,8 +67,8 @@ impl Task {
 
     /// Render the meta section of the task as HTML.
     ///
-    /// This will render all metadata key-value pairs except for `outputs` and
-    /// `description`.
+    /// This will render all metadata key-value pairs except for `description`
+    /// and `outputs`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
         self.meta()
             .render_remaining(&["description", "outputs"], assets)
