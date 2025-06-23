@@ -71,7 +71,12 @@ impl Workflow {
     /// Returns the `category` meta entry, if it exists and is a String.
     pub fn category(&self) -> Option<String> {
         self.meta.get("category").and_then(|v| match v {
-            MetadataValue::String(s) => Some(s.text().unwrap().text().to_string()),
+            MetadataValue::String(s) => Some(
+                s.text()
+                    .expect("meta string should not be interpolated")
+                    .text()
+                    .to_string(),
+            ),
             _ => None,
         })
     }

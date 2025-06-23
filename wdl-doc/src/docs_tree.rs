@@ -208,7 +208,7 @@ pub struct DocsTreeBuilder {
 impl DocsTreeBuilder {
     /// Create a new docs tree builder.
     pub fn new(root: impl AsRef<Path>) -> Self {
-        let root = path_clean::clean(absolute(root.as_ref()).unwrap());
+        let root = path_clean::clean(absolute(root.as_ref()).expect("should get absolute path"));
         Self {
             root,
             homepage: None,
@@ -287,7 +287,7 @@ impl DocsTree {
     /// Get the path to the root directory relative to a given path.
     pub fn root_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(self.root_abs_path(), path).unwrap()
+        diff_paths(self.root_abs_path(), path).expect("should diff paths")
     }
 
     /// Get the absolute path to the stylesheet.
@@ -303,7 +303,7 @@ impl DocsTree {
     /// Get a relative path to the assets directory.
     fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(self.assets(), path).unwrap()
+        diff_paths(self.assets(), path).expect("should diff paths")
     }
 
     /// Get a relative path to an asset in the assets directory (converted to a
@@ -318,7 +318,7 @@ impl DocsTree {
     /// Get a relative path to the root index page.
     fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
-        diff_paths(self.root_abs_path().join("index.html"), path).unwrap()
+        diff_paths(self.root_abs_path().join("index.html"), path).expect("should diff paths")
     }
 
     /// Add a page to the tree.
@@ -333,17 +333,23 @@ impl DocsTree {
 
         let mut components = rel_path.components().peekable();
         while let Some(component) = components.next() {
-            let cur_name = component.as_os_str().to_str().unwrap();
-            if current_node.children.contains_key(cur_name) {
-                current_node = current_node.children.get_mut(cur_name).unwrap();
+            let cur_name = component.as_os_str().to_string_lossy();
+            if current_node.children.contains_key(cur_name.as_ref()) {
+                current_node = current_node
+                    .children
+                    .get_mut(cur_name.as_ref())
+                    .expect("node should exist");
             } else {
                 let new_path = current_node.path().join(component);
                 let new_node = Node::new(cur_name.to_string(), new_path);
                 current_node.children.insert(cur_name.to_string(), new_node);
-                current_node = current_node.children.get_mut(cur_name).unwrap();
+                current_node = current_node
+                    .children
+                    .get_mut(cur_name.as_ref())
+                    .expect("node should exist");
             }
             if let Some(next_component) = components.peek() {
-                if next_component.as_os_str().to_str().unwrap() == "index.html" {
+                if next_component.as_os_str().to_string_lossy() == "index.html" {
                     current_node.path = current_node.path().join("index.html");
                     break;
                 }
@@ -365,13 +371,16 @@ impl DocsTree {
 
         for component in rel_path
             .components()
-            .map(|c| c.as_os_str().to_str().unwrap())
+            .map(|c| c.as_os_str().to_string_lossy())
         {
             if component == "index.html" {
                 return Some(current_node);
             }
-            if current_node.children.contains_key(component) {
-                current_node = current_node.children.get(component).unwrap();
+            if current_node.children.contains_key(component.as_ref()) {
+                current_node = current_node
+                    .children
+                    .get(component.as_ref())
+                    .expect("node should exist");
             } else {
                 return None;
             }
@@ -420,7 +429,10 @@ impl DocsTree {
             let workflows = nodes
                 .iter()
                 .filter(|node| {
-                    let page = node.page().map(|p| p.page_type()).unwrap();
+                    let page = node
+                        .page()
+                        .map(|p| p.page_type())
+                        .expect("node should have a page");
                     if let PageType::Workflow(workflow) = page {
                         if node
                             .path()
@@ -437,7 +449,7 @@ impl DocsTree {
                             return category == "Other";
                         }
                     }
-                    unreachable!("Expected a workflow page");
+                    unreachable!("expected a workflow page");
                 })
                 .cloned()
                 .collect::<Vec<_>>();
@@ -452,7 +464,9 @@ impl DocsTree {
     ///
     /// Destination is expected to be an absolute path.
     fn sidebar_workflows_view(&self, destination: &Path) -> Markup {
-        let base = destination.parent().unwrap();
+        let base = destination
+            .parent()
+            .expect("destination should have a parent");
         let workflows_by_category = self.get_workflows_by_category();
         html! {
             @for (category, workflows) in workflows_by_category {
@@ -485,7 +499,7 @@ impl DocsTree {
                                             div class="left-sidebar__workflow-container" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
                                                 img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
                                                 sprocket-tooltip content=(wf.render_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
-                                                    a href=(diff_paths(self.root_abs_path().join(node.path()), base).unwrap().to_string_lossy()) {
+                                                    a href=(diff_paths(self.root_abs_path().join(node.path()), base).expect("should diff paths").to_string_lossy()) {
                                                         (wf.render_name())
                                                     }
                                                 }
@@ -511,13 +525,13 @@ impl DocsTree {
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
-        let base = path.parent().unwrap();
+        let base = path.parent().expect("path should have a parent");
 
         let make_key = |path: &Path| -> String {
-            let path = if path.file_name().unwrap() == "index.html" {
+            let path = if path.file_name().expect("path should have a file name") == "index.html" {
                 // Remove unnecessary index.html from the path.
                 // Not needed for the key.
-                path.parent().unwrap()
+                path.parent().expect("path should have a parent")
             } else {
                 path
             };
@@ -613,7 +627,7 @@ impl DocsTree {
                 let href = if node.page().is_some() {
                     Some(
                         diff_paths(self.root_abs_path().join(node.path()), base)
-                            .unwrap()
+                            .expect("should diff paths")
                             .to_string_lossy()
                             .to_string(),
                     )
@@ -662,7 +676,7 @@ impl DocsTree {
                 let nest_level = node
                     .path()
                     .components()
-                    .filter(|c| c.as_os_str().to_str().unwrap() != "index.html")
+                    .filter(|c| c.as_os_str().to_string_lossy() != "index.html")
                     .count();
                 let children = node
                     .children()
@@ -898,7 +912,10 @@ impl DocsTree {
             if let Some(page) = cur_node.page() {
                 breadcrumbs.push((
                     page.name(),
-                    Some(diff_paths(self.root_abs_path().join(cur_node.path()), base).unwrap()),
+                    Some(
+                        diff_paths(self.root_abs_path().join(cur_node.path()), base)
+                            .expect("should diff paths"),
+                    ),
                 ));
             } else if cur_node.name() == self.root().name() {
                 breadcrumbs.push((cur_node.name(), Some(self.root_index_relative_to(base))))

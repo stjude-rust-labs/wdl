@@ -39,7 +39,7 @@ impl MetaMapExt for MetaMap {
             .get("description")
             .map(|v| match v {
                 MetadataValue::String(s) => {
-                    let t = s.text().expect("description should not be interpolated");
+                    let t = s.text().expect("meta string should not be interpolated");
                     t.text().to_string()
                 }
                 _ => "ERROR: description not of type String".to_string(),

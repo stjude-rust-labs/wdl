@@ -159,7 +159,7 @@ impl Parameter {
                 Some(Group(
                     s.text()
                         .map(|t| t.text().to_string())
-                        .expect("group should not be interpolated"),
+                        .expect("meta string should not be interpolated"),
                 ))
             } else {
                 None

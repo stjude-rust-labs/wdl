@@ -521,7 +521,8 @@ pub async fn document_workspace(
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
+                    local_pages
+                        .push((diff_paths(path, &cur_dir).expect("should diff paths"), page));
                 }
                 DocumentItem::Task(t) => {
                     let name = t.name().text().to_owned();
@@ -531,7 +532,8 @@ pub async fn document_workspace(
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
+                    local_pages
+                        .push((diff_paths(path, &cur_dir).expect("should diff paths"), page));
                 }
                 DocumentItem::Workflow(w) => {
                     let name = w.name().text().to_owned();
@@ -541,12 +543,16 @@ pub async fn document_workspace(
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Workflow(workflow)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
+                    local_pages
+                        .push((diff_paths(path, &cur_dir).expect("should diff paths"), page));
                 }
                 DocumentItem::Import(_) => {}
             }
         }
-        let name = rel_wdl_path.file_stem().unwrap().to_str().unwrap();
+        let name = rel_wdl_path
+            .file_stem()
+            .expect("WDL file should have stem")
+            .to_string_lossy();
         let document = Document::new(name.to_string(), version, version_statement, local_pages);
 
         let index_path = cur_dir.join("index.html");
