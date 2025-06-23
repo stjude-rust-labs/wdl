@@ -123,7 +123,7 @@ impl Document {
                                     @match page.1.page_type() {
                                         PageType::Struct(_) => {
                                             div class="main__grid-cell" {
-                                                a class="text-pink-400 hover:text-pink-300 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                a class="text-pink-400 hover:text-pink-300" href=(page.0.to_string_lossy()) {
                                                     (page.1.name())
                                                 }
                                             }
@@ -132,7 +132,7 @@ impl Document {
                                         }
                                         PageType::Task(t) => {
                                             div class="main__grid-cell" {
-                                                a class="text-violet-400 hover:text-violet-300 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                a class="text-violet-400 hover:text-violet-300" href=(page.0.to_string_lossy()) {
                                                     (page.1.name())
                                                 }
                                             }
@@ -143,7 +143,7 @@ impl Document {
                                         }
                                         PageType::Workflow(w) => {
                                             div class="main__grid-cell" {
-                                                a class="text-emerald-400 hover:text-emerald-300 main__toc-link" href=(page.0.to_string_lossy()) {
+                                                a class="text-emerald-400 hover:text-emerald-300" href=(page.0.to_string_lossy()) {
                                                     (page.1.name())
                                                 }
                                             }

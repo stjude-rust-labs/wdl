@@ -140,9 +140,6 @@
   .main__title {
     @apply text-5xl text-slate-50 mt-8 mb-4;
   }
-  .main__title-code {
-    @apply border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono max-w-fit p-[0.2em];
-  }
   .main__section {
     @apply flex flex-col;
   }
@@ -157,6 +154,12 @@
   }
   .main__section-text {
     @apply mt-3 text-slate-300 text-sm;
+  }
+  .main__container code {
+    @apply inline border border-slate-700 bg-slate-800 text-slate-200 rounded-md font-mono text-[0.8em] p-[0.2em];
+  }
+  .main__container a {
+    @apply hover:underline;
   }
   /**
    * Badges & Buttons
@@ -192,10 +195,7 @@
     @apply text-[10px] font-bold rounded-full w-[10px] h-[10px] bg-red-400 text-red-950 flex items-center justify-center;
   }
   .main__button {
-    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10 text-slate-50 text-sm flex items-center gap-1.5 [&>b]:font-semibold [&>b]:text-nowrap [&>b]:overflow-x-hidden [&>b]:text-ellipsis max-w-[max-content];
-  }
-  .main__toc-link {
-    @apply hover:underline;
+    @apply px-2 py-1 rounded hover:cursor-pointer hover:bg-slate-100/10 text-slate-50 text-sm flex items-center gap-1.5 [&>b]:font-bold [&>b]:text-nowrap [&>b]:overflow-x-hidden [&>b]:text-ellipsis max-w-[max-content];
   }
   .metadata__warning {
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
@@ -205,7 +205,7 @@
    * Main Grids
    */
   .main__grid-container {
-    @apply max-w-4xl rounded p-8;
+    @apply max-w-4xl rounded py-8;
   }
   .main__grid-header-separator {
     @apply col-span-full border-b mb-4;
@@ -222,6 +222,9 @@
   .main__grid-full-width-cell {
     @apply col-span-full p-4 my-2 text-sm text-slate-300 bg-slate-800 rounded-md;
   }
+  .main__grid-full-width-cell--collapsible {
+    @apply col-span-full my-2 text-sm;
+  }
   .main__grid-toc-container {
     @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
   }
@@ -234,8 +237,32 @@
   .main__grid-non-req-param-container {
     @apply grid grid-cols-[1fr_1fr_2fr_3fr] gap-4;
   }
+  /**
+   * Metadata
+   */
+  .main__grid-nested-container {
+    @apply grid grid-cols-[1fr_1fr] gap-4;
+  }
   .main__grid-addl-meta-container {
     @apply grid grid-cols-[1fr_4fr] gap-4;
+  }
+  .main__grid-meta-object-container {
+    @apply grid grid-cols-[1fr_1fr] gap-4;
+  }
+  .main__grid-nested-row {
+    @apply contents;
+  }
+  .main__grid-nested-cell {
+    @apply text-sm;
+  }
+  .main__grid-meta-array-container {
+    @apply flex flex-row gap-2;
+  }
+  .main__grid-meta-array-item {
+    @apply flex;
+  }
+  .main__summary-container {
+    @apply inline;
   }
   /**
    * Left sidebar

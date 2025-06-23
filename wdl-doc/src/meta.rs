@@ -7,6 +7,7 @@ use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
+use wdl_ast::SyntaxKind;
 use wdl_ast::v1::MetadataValue;
 
 use crate::Markdown;
@@ -54,8 +55,10 @@ impl MetaMapExt for MetaMap {
             MaybeSummarized::No(desc) => Markdown(desc).render(),
             MaybeSummarized::Yes(summary) => {
                 html! {
-                    (summary)
-                    button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" x-text="description_expanded ? 'Show less' : 'Show full description'" {}
+                    div class="main__summary-container" {
+                        (summary)
+                        button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" x-text="description_expanded ? 'Show less' : 'Show full description'" {}
+                    }
                 }
             }
         }
@@ -115,18 +118,11 @@ impl MetaMapExt for MetaMap {
                 }
             }
             @if any_additional_items {
-                div class="main__grid-container" {
+                div class="main__grid-nested-container" {
                     div class="main__grid-addl-meta-container" {
                         // No header row, just the items
                         @for (key, value) in filtered_items {
-                            div class="main__grid-row" {
-                                div class="main__grid-cell" {
-                                    code { (key) }
-                                }
-                                div class="main__grid-cell" {
-                                    (render_value(value))
-                                }
-                            }
+                            (render_key_value(key, value))
                         }
                     }
                 }
@@ -167,18 +163,11 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
         }
         MetadataValue::Object(o) => {
             html! {
-                div class="main__grid-container" {
+                div class="main__grid-nested-container" {
                     // TODO revisit this
-                    div class="main__grid-addl-meta-container" {
+                    div class="main__grid-meta-object-container" {
                         @for item in o.items() {
-                            div class="main__grid-row" {
-                                div class="main__grid-cell" {
-                                    code { (item.name().text()) }
-                                }
-                                div class="main__grid-cell" {
-                                    (render_value(&item.value()))
-                                }
-                            }
+                            (render_key_value(item.name().text(), &item.value()))
                         }
                     }
                 }
@@ -190,6 +179,76 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
 /// Render a [`MetadataValue`] as HTML.
 pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     render_value_inner(value)
+}
+
+/// Render a key-value pair from metadata as HTML.
+///
+/// This function assumes that it is called for rendering within a grid layout,
+/// where the key is displayed in the left cell and the value in the right cell.
+pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
+    let (ty, rhs_markup) = match value {
+        MetadataValue::String(s) => (
+            s.inner().kind(),
+            html! { code { (s.text().expect("meta string should not be interpolated").text()) } },
+        ),
+        MetadataValue::Boolean(b) => (b.inner().kind(), html! { code { (b.text()) } }),
+        MetadataValue::Integer(i) => (i.inner().kind(), html! { code { (i.text()) } }),
+        MetadataValue::Float(f) => (f.inner().kind(), html! { code { (f.text()) } }),
+        MetadataValue::Null(n) => (n.inner().kind(), html! { code { (n.text()) } }),
+        MetadataValue::Array(a) => {
+            let markup = html! {
+                div class="main__grid-meta-array-container" {
+                    @for item in a.elements() {
+                        @match item {
+                            MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                                (render_value_inner(&item))
+                            }
+                            _ => {
+                                div class="main__grid-meta-array-item" {
+                                    code { (item.text()) }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            (a.inner().kind(), markup)
+        }
+        MetadataValue::Object(o) => {
+            let markup = html! {
+                div class="main__grid-nested-container" {
+                    div class="main__grid-meta-object-container" {
+                        @for item in o.items() {
+                            (render_key_value(item.name().text(), &item.value()))
+                        }
+                    }
+                }
+            };
+            (o.inner().kind(), markup)
+        }
+    };
+
+    let lhs_markup = match ty {
+        SyntaxKind::MetadataArrayNode | SyntaxKind::MetadataObjectNode => {
+            // TODO special handling for arrays and objects
+            html! { code { (key) } }
+        }
+        _ => {
+            // For other types, just render the key as code
+            html! { code { (key) } }
+        }
+    };
+
+    html! {
+        div class="main__grid-nested-row" {
+            div class="main__grid-nested-cell" {
+                (lhs_markup)
+            }
+            div class="main__grid-nested-cell" {
+                (rhs_markup)
+            }
+        }
+    }
 }
 
 /// The maximum length of a string before it is clipped.
