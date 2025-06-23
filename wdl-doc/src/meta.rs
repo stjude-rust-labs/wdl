@@ -119,11 +119,9 @@ impl MetaMapExt for MetaMap {
             }
             @if any_additional_items {
                 div class="main__grid-nested-container" {
-                    div class="main__grid-addl-meta-container" {
-                        // No header row, just the items
-                        @for (key, value) in filtered_items {
-                            (render_key_value(key, value))
-                        }
+                    // No header row, just the items
+                    @for (key, value) in filtered_items {
+                        (render_key_value(key, value))
                     }
                 }
             }

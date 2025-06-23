@@ -141,13 +141,13 @@
     @apply text-5xl text-slate-50 mt-8 mb-4;
   }
   .main__section {
-    @apply flex flex-col;
+    @apply flex flex-col mt-8;
   }
   .main__section--empty {
     @apply flex flex-col flex-grow items-center justify-center size-full gap-y-2 pt-8;
   }
   .main__section-header {
-    @apply text-2xl text-slate-50 mt-8;
+    @apply text-2xl text-slate-50;
   }
   .main__section-subheader {
     @apply text-lg text-slate-50 mt-8;
@@ -220,9 +220,6 @@
     @apply text-sm;
   }
   .main__grid-full-width-cell {
-    @apply col-span-full p-4 my-2 text-sm text-slate-300 bg-slate-800 rounded-md;
-  }
-  .main__grid-full-width-cell--collapsible {
     @apply col-span-full my-2 text-sm;
   }
   .main__grid-toc-container {
@@ -243,8 +240,8 @@
   .main__grid-nested-container {
     @apply grid grid-cols-[1fr_1fr] gap-4;
   }
-  .main__grid-addl-meta-container {
-    @apply grid grid-cols-[1fr_4fr] gap-4;
+  .main__addl-meta-container {
+    @apply text-slate-300 bg-slate-800 rounded-md p-4;
   }
   .main__grid-meta-object-container {
     @apply grid grid-cols-[1fr_1fr] gap-4;
@@ -390,7 +387,7 @@
 }
 
 .main__container .markdown-body {
-  @apply mt-6 max-w-4xl;
+  @apply max-w-4xl;
 }
 
 .main__container sprocket-code {
