@@ -114,6 +114,9 @@ impl Parameter {
     }
 
     /// Get the expr of the parameter as HTML.
+    ///
+    /// If `summarize` is `false`, the full expression is rendered in a code
+    /// block with WDL syntax highlighting.
     pub fn render_expr(&self, summarize: bool) -> Markup {
         let expr = self
             .decl
@@ -122,7 +125,14 @@ impl Parameter {
             .unwrap_or("None".to_string());
 
         if !summarize {
-            return html! { code { (expr) } };
+            return html! {
+                // Note: we do not wrap this in a `main__code-container` div
+                // because that has a margin at the top and we want this
+                // to be flush with the top of the grid.
+                sprocket-code language="wdl" {
+                    (expr)
+                }
+            };
         }
 
         match summarize_if_needed(&expr) {

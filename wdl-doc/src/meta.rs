@@ -145,15 +145,21 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
         MetadataValue::Null(n) => html! { code { (n.text()) } },
         MetadataValue::Array(a) => {
             html! {
-                @for item in a.elements() {
-                    @match item {
-                        MetadataValue::Array(_) | MetadataValue::Object(_) => {
-                            // TODO better handling of recursive structures
-                            (render_value_inner(&item))
-                        }
-                        _ => {
-                            // TODO revisit this
-                            code { (item.text()) }
+                div class="main__grid-meta-array-container" {
+                    @for item in a.elements() {
+                        @match item {
+                            MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                                // This is going to render weirdly. I (a-frantz)
+                                // don't have a real example case for this,
+                                // so I'm leaving it as is for now. This would be a very
+                                // odd structure in WDL metadata, but it is valid.
+                                (render_value_inner(&item))
+                            }
+                            _ => {
+                                div class="main__grid-meta-array-item" {
+                                    code { (item.text()) }
+                                }
+                            }
                         }
                     }
                 }
@@ -183,6 +189,12 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
 ///
 /// This function assumes that it is called for rendering within a grid layout,
 /// where the key is displayed in the left cell and the value in the right cell.
+///
+/// A notable difference from [`render_value`] is that this function will _not_
+/// render WDL Strings as Markdown, but rather as code snippets. The reason
+/// for this is that the key-value pairs are typically used to display metadata
+/// in a grid format, where the value is expected to be a simple code snippet
+/// rather than full Markdown-rendered text.
 pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
     let (ty, rhs_markup) = match value {
         MetadataValue::String(s) => (

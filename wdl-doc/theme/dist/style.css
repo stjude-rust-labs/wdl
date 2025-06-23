@@ -1493,6 +1493,9 @@
       }
     }
   }
+  .main__code-container {
+    margin-top: calc(var(--spacing) * 3);
+  }
   .main__badge-container {
     display: flex;
     flex-direction: row;
@@ -2020,9 +2023,6 @@
 }
 .main__container .markdown-body {
   max-width: var(--container-4xl);
-}
-.main__container sprocket-code {
-  margin-top: calc(var(--spacing) * 3);
 }
 @property --tw-translate-x {
   syntax: "*";
