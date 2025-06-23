@@ -114,7 +114,7 @@ impl Parameter {
     }
 
     /// Get the expr of the parameter as HTML.
-    pub fn expr(&self, summarize: bool) -> Markup {
+    pub fn render_expr(&self, summarize: bool) -> Markup {
         let expr = self
             .decl
             .expr()
@@ -131,8 +131,10 @@ impl Parameter {
             }
             MaybeSummarized::Yes(summary) => {
                 html! {
-                    code { (summary) }
-                    button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                    div class="main__summary-container" {
+                        code { (summary) }
+                        button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                    }
                 }
             }
         }
@@ -195,17 +197,17 @@ impl Parameter {
                     code { (self.ty()) }
                 }
                 @if show_expr {
-                    div class="main__grid-cell" { (self.expr(true)) }
+                    div class="main__grid-cell" { (self.render_expr(true)) }
                 }
                 div class="main__grid-cell" {
                     (self.description(true))
                 }
-                div x-show="description_expanded" class="main__grid-full-width-cell" {
+                div x-show="description_expanded" class="main__grid-full-width-cell--collapsible" {
                     (self.description(false))
                 }
                 @if show_expr {
-                    div x-show="expr_expanded" class="main__grid-full-width-cell" {
-                        (self.expr(false))
+                    div x-show="expr_expanded" class="main__grid-full-width-cell--collapsible" {
+                        (self.render_expr(false))
                     }
                 }
             }
