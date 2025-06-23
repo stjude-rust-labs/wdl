@@ -380,10 +380,10 @@ impl<'a> CommandContext<'a> {
 
 /// Detect embedded quotes surrounding an expression in a string.
 ///
-/// This is a utility function called by `evaluates_to_literal`. Only `expr`
-/// that are addition or strings with potentially embedded placeholders are
-/// valid input. For a given expression, it checks through all descendants to
-/// see if there are any name references (variables) that are surrounded by
+/// This is a utility function called by `evaluates_to_bash_literal`. Only
+/// `expr` that are addition or strings with potentially embedded placeholders
+/// are valid input. For a given expression, it checks through all descendants
+/// to see if there are any name references (variables) that are surrounded by
 /// escaped quotes. In WDL, the parent expression is either an addition
 /// (concatenation, e.g. `~{"foo " + bar + " baz"}`) operation or a string with
 /// an embedded placeholder (e.g. `~{"foo ~{bar} baz"`). So the escaped quotes
@@ -430,7 +430,7 @@ fn is_quoted(expr: &Expr) -> bool {
 }
 
 /// Evaluate an expression to determine if it can be simplified to a literal.
-fn evaluates_to_literal(expr: &Expr) -> bool {
+fn evaluates_to_bash_literal(expr: &Expr) -> bool {
     match expr {
         Expr::Literal(LiteralExpr::String(s)) => {
             if s.text().is_some() {
@@ -440,23 +440,29 @@ fn evaluates_to_literal(expr: &Expr) -> bool {
         }
         Expr::Literal(_) => true,
         Expr::Call(c) => match c.target().text() {
-            "sep" => evaluates_to_literal(
+            // `sep` contatenates its arguments with a separator.
+            // `prefix` and `suffix` add a prefix or suffix to the argument.
+            // So we check the array argument to see if it evaluates to a
+            // bash literal.
+            "sep" | "prefix" | "suffix" => evaluates_to_bash_literal(
                 &c.arguments()
                     .nth(1)
-                    .expect("`sep` call should have two arguments"),
+                    .expect("`sep`/`prefix`/`suffix` call should have two arguments"),
             ),
+            // `quote` and `squote` both return quoted strings, so they can be treated as bash
+            // literals.
             "quote" | "squote" => true,
             _ => false,
         },
-        Expr::Parenthesized(p) => evaluates_to_literal(&p.expr()),
+        Expr::Parenthesized(p) => evaluates_to_bash_literal(&p.expr()),
         Expr::If(i) => {
             let (_, if_expr, else_expr) = i.exprs();
-            evaluates_to_literal(&if_expr) && evaluates_to_literal(&else_expr)
+            evaluates_to_bash_literal(&if_expr) && evaluates_to_bash_literal(&else_expr)
         }
         Expr::Addition(a) => {
             let balanced = is_quoted(expr);
             let (left, right) = a.operands();
-            (evaluates_to_literal(&left) && evaluates_to_literal(&right)) || balanced
+            (evaluates_to_bash_literal(&left) && evaluates_to_bash_literal(&right)) || balanced
         }
         _ => false,
     }
@@ -485,7 +491,7 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
                 );
             }
             PrimitiveType::String => {
-                if evaluates_to_literal(&placeholder.expr()) {
+                if evaluates_to_bash_literal(&placeholder.expr()) {
                     return ("a".repeat(placeholder_len), true);
                 }
             }
@@ -493,7 +499,7 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
         }
     };
 
-    // Don't start variable with numbers. this is lowercase to avoid triggering
+    // Don't start variable with numbers. This is lowercase to avoid triggering
     // Shellcheck's misspelling rule: https://www.shellcheck.net/wiki/SC2153
     let mut bash_var = String::from("wdl");
     bash_var
@@ -735,6 +741,7 @@ mod tests {
     use ftree::FenwickTree;
     use pretty_assertions::assert_eq;
     use wdl_ast::Document;
+    use wdl_ast::v1::Expr;
 
     use super::ShellCheckReplacement;
     use super::normalize_replacements;
@@ -799,119 +806,116 @@ mod tests {
         assert_eq!(fixer.value(), expected);
     }
 
-    #[test]
-    fn test_is_quoted() {
-        let (document, _diagnostics) = Document::parse(
+    /// Parse a string containing a placeholder expression in the context of a
+    /// `command` with a handful of inputs in scope.
+    fn parse_placeholder_as_expr(command: &str) -> Expr {
+        let source = format!(
             r#"
 version 1.2
 
-task test {
-    input {
+task test {{
+    input {{
         String foo = "bar"
         Int baz = 42
         Array[File] arr = ["a", "b", "c"]
-    }
-    command {
-        # Both sides of the addition are literals
-        echo ~{"hello" + " world"}
-        # This contains an unquoted variable.
-        echo ~{"hello " + foo + " world"}
-        # This contains a quoted variable.
-        echo ~{"hello '" + foo + "' world"}
-        # This contains a hanging quote.
-        echo ~{"hello '" + foo + " world"}
-    }
-}
+    }}
+    command {{
+        {}
+    }}
+}}
 "#,
+            command
         );
-
-        let ast = document.ast();
-        let ast = ast.as_v1().expect("should be a V1 AST");
-        let tasks: Vec<_> = ast.tasks().collect();
-        let command = tasks[0].command().expect("should have a command section");
-        let parts = command.parts().collect::<Vec<_>>();
-
-        assert!(super::is_quoted(
-            &parts[1].clone().unwrap_placeholder().expr()
-        ));
-        assert_eq!(
-            super::is_quoted(&parts[3].clone().unwrap_placeholder().expr()),
-            false
-        );
-        assert!(super::is_quoted(
-            &parts[5].clone().unwrap_placeholder().expr()
-        ));
-        assert_eq!(
-            super::is_quoted(&parts[7].clone().unwrap_placeholder().expr()),
-            false
-        );
+        let (document, _diagnostics) = Document::parse(&source);
+        document
+            .ast()
+            .as_v1()
+            .expect("should be a v1 AST")
+            .tasks()
+            .next()
+            .expect("has a task")
+            .command()
+            .expect("has a command")
+            .parts()
+            // 0th element is the text preceding the start of the spliced command
+            .nth(1)
+            .expect("has a command part")
+            .unwrap_placeholder()
+            .expr()
     }
 
     #[test]
-    fn test_evaluates_to_literal() {
-        let (document, _diagnostics) = Document::parse(
-            r#"
-version 1.2
-
-task test {
-    input {
-        String foo = "bar"
-        Int baz = 42
-        Array[File] arr = ["a", "b", "c"]
-    }
-    command {
-        # Both sides of the addition are literals
-        echo ~{"hello" + " world"}
-        # Non-string literals are handled upstream
-        echo ~{baz}
-        # This is not a literal because of the unquoted
-        # placeholder substitution.
-        echo ~{"hello " + foo + " world"}
-        # This is a literal because of the quoted
-        # placeholder substitution.
-        echo ~{"hello '" + foo + "' world"}
-        # This is a literal because all array elements are literals.
-        echo ~{sep(" ", ["a", "b", "c"])}
-        # This is not a literal because the array is not
-        # guaranteed to be all literals.
-        echo ~{sep(" ", arr)}
-        # Surrounding with quotes makes it a literal.
-        echo ~{sep(" ", quote(arr))}
-    }
-}
-"#,
-        );
-
-        let ast = document.ast();
-        let ast = ast.as_v1().expect("should be a V1 AST");
-        let tasks: Vec<_> = ast.tasks().collect();
-        let command = tasks[0].command().expect("should have a command section");
-        let parts = command.parts().collect::<Vec<_>>();
-
-        assert!(super::evaluates_to_literal(
-            &parts[1].clone().unwrap_placeholder().expr()
+    fn test_is_quoted() {
+        // Both sides of the addition are literals
+        assert!(super::is_quoted(
+            &parse_placeholder_as_expr(
+                r#"echo ~{"hello" + " world"}"#
+            )
         ));
-
+        // This contains an unquoted variable.
         assert_eq!(
-            super::evaluates_to_literal(&parts[5].clone().unwrap_placeholder().expr()),
+            super::is_quoted(&parse_placeholder_as_expr(
+                r#"echo ~{"hello " + foo + " world"}"#
+            )),
             false
         );
-
-        assert!(super::evaluates_to_literal(
-            &parts[7].clone().unwrap_placeholder().expr()
+        // This contains a quoted variable.
+        assert!(super::is_quoted(
+            &parse_placeholder_as_expr(
+                r#"echo ~{"hello '" + foo + "' world"}"#
+            )
         ));
-
-        assert!(super::evaluates_to_literal(
-            &parts[9].clone().unwrap_placeholder().expr()
-        ));
-
+        // This contains a hanging quote.
         assert_eq!(
-            super::evaluates_to_literal(&parts[11].clone().unwrap_placeholder().expr()),
+            super::is_quoted(&parse_placeholder_as_expr(
+                r#"echo ~{"hello '" + foo + " world"}"#
+            )),
             false
         );
+    }
 
-        assert!(super::evaluates_to_literal(
-            &parts[13].clone().unwrap_placeholder().expr()
+    #[test]
+    fn test_evaluates_to_bash_literal() {
+        // Both sides of the addition are literals
+        assert!(super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(
+                r#"echo ~{"hello" + " world"}"#
+            )
+        ));
+        // This is not a literal because of the unquoted
+        // placeholder substitution.
+        assert_eq!(super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(
+                r#"echo ~{"hello " + foo + " world"}"#
+            )),
+            false
+        );
+        // This is a literal because of the quoted
+        // placeholder substitution.
+        assert!(super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(
+                r#"echo ~{"hello '" + foo + "' world"}"#
+            )
+        ));
+        // This is a literal because all array elements are literals.
+        assert!(
+            super::evaluates_to_bash_literal(&parse_placeholder_as_expr(
+                r#"echo ~{sep(" ", ["a", "b", "c"])}"#
+            ))
+        );
+        // This is not a literal because the array is not
+        // guaranteed to be all literals.
+        assert_eq!(super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(
+                r#"echo ~{sep(" ", arr)}"#
+            )),
+            false
+        );
+        // Surrounding with quotes makes it a literal.
+        assert!(super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(
+                r#"echo ~{sep(" ", quote(arr))}"#
+            )
         ));
     }
 }
