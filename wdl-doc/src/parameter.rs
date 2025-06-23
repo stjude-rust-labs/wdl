@@ -125,12 +125,33 @@ impl Parameter {
             .unwrap_or("None".to_string());
 
         if !summarize {
+            // find common leading whitespace in the expression,
+            // skipping the first line which is probably part way through a line
+            let common_indent = expr
+                .lines()
+                .skip(1)
+                .map(|line| line.chars().take_while(|c| c.is_whitespace()).count())
+                .min()
+                .unwrap_or(0);
+            let first_line = expr.lines().next().unwrap_or("");
+            let remaining_expr = expr
+                .lines()
+                .skip(1)
+                .map(|line| line.chars().skip(common_indent).collect::<String>())
+                .collect::<Vec<_>>()
+                .join("\n");
+            let full_expr = if remaining_expr.is_empty() {
+                first_line
+            } else {
+                &format!("{}\n{}", first_line, remaining_expr)
+            };
+
             return html! {
                 // Note: we do not wrap this in a `main__code-container` div
                 // because that has a margin at the top and we want this
                 // to be flush with the top of the grid.
                 sprocket-code language="wdl" {
-                    (expr)
+                    (full_expr)
                 }
             };
         }
