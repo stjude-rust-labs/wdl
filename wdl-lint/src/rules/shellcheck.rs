@@ -845,11 +845,14 @@ task test {{
     }
 
     #[test]
-    fn test_is_quoted() {
+    fn test_is_quoted1() {
         // Both sides of the addition are literals
         assert!(super::is_quoted(&parse_placeholder_as_expr(
             r#"echo ~{"hello" + " world"}"#
         )));
+    }
+    #[test]
+    fn test_is_quoted2() {
         // This contains an unquoted variable.
         assert_eq!(
             super::is_quoted(&parse_placeholder_as_expr(
@@ -857,10 +860,16 @@ task test {{
             )),
             false
         );
+    }
+    #[test]
+    fn test_is_quoted3() {
         // This contains a quoted variable.
         assert!(super::is_quoted(&parse_placeholder_as_expr(
             r#"echo ~{"hello '" + foo + "' world"}"#
         )));
+    }
+    #[test]
+    fn test_is_quoted4() {
         // This contains a hanging quote.
         assert_eq!(
             super::is_quoted(&parse_placeholder_as_expr(
@@ -871,11 +880,14 @@ task test {{
     }
 
     #[test]
-    fn test_evaluates_to_bash_literal() {
+    fn test_evaluates_to_bash_literal1() {
         // Both sides of the addition are literals
         assert!(super::evaluates_to_bash_literal(
             &parse_placeholder_as_expr(r#"echo ~{"hello" + " world"}"#)
         ));
+    }
+    #[test]
+    fn test_evaluates_to_bash_literal2() {
         // This is not a literal because of the unquoted
         // placeholder substitution.
         assert_eq!(
@@ -884,15 +896,24 @@ task test {{
             )),
             false
         );
+    }
+    #[test]
+    fn test_evaluates_to_bash_literal3() {
         // This is a literal because of the quoted
         // placeholder substitution.
         assert!(super::evaluates_to_bash_literal(
             &parse_placeholder_as_expr(r#"echo ~{"hello '" + foo + "' world"}"#)
         ));
+    }
+    #[test]
+    fn test_evaluates_to_bash_literal4() {
         // This is a literal because all array elements are literals.
         assert!(super::evaluates_to_bash_literal(
             &parse_placeholder_as_expr(r#"echo ~{sep(" ", ["a", "b", "c"])}"#)
         ));
+    }
+    #[test]
+    fn test_evaluates_to_bash_literal5() {
         // This is not a literal because the array is not
         // guaranteed to be all literals.
         assert_eq!(
@@ -901,6 +922,9 @@ task test {{
             )),
             false
         );
+    }
+    #[test]
+    fn test_evaluates_to_bash_literal6() {
         // Surrounding with quotes makes it a literal.
         assert!(super::evaluates_to_bash_literal(
             &parse_placeholder_as_expr(r#"echo ~{sep(" ", quote(arr))}"#)
