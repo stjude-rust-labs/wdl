@@ -440,7 +440,7 @@ fn evaluates_to_bash_literal(expr: &Expr) -> bool {
         }
         Expr::Literal(_) => true,
         Expr::Call(c) => match c.target().text() {
-            // `sep` contatenates its arguments with a separator.
+            // `sep` concatenates its arguments with a separator.
             // `prefix` and `suffix` add a prefix or suffix to the argument.
             // So we check the array argument to see if it evaluates to a
             // bash literal.
