@@ -21,12 +21,14 @@ class SprocketTooltip extends HTMLElement {
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.2s;
+        transition-delay: 0ms;
         z-index: 100;
         top: 0;
         left: 0;
       }
       .tooltip.visible {
         opacity: 1;
+        transition-delay: 300ms;
       }
     `;
   }
