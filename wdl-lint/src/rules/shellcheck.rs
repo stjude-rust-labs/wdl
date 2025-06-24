@@ -430,6 +430,12 @@ fn is_quoted(expr: &Expr) -> bool {
 }
 
 /// Evaluate an expression to determine if it can be simplified to a literal.
+///
+/// Many WDL expressions can be simplified to a bash literal. For example
+/// concatenation of strings (e.g. `"foo" + "bar"`) is a WDL expression, but can
+/// be represented as a string for shellcheck. This function checks for various
+/// WDL functions and their arguments to evaluate if the WDL expression
+/// ultimately evaluates to a literal in the bash script.
 fn evaluates_to_bash_literal(expr: &Expr) -> bool {
     match expr {
         Expr::Literal(LiteralExpr::String(s)) => {
