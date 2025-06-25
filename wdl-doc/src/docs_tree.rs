@@ -471,7 +471,7 @@ impl DocsTree {
         html! {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
-                    div class="left-sidebar__content-item w-full" {
+                    div class="left-sidebar__content-item" {
                         img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
                         p class="" { (category) }
                     }
@@ -489,7 +489,7 @@ impl DocsTree {
                                     } else {
                                         "workflow-unselected.svg"
                                     },
-                            ))) class="left-sidebar__content-item w-full rounded-md group" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
+                            ))) class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
@@ -519,7 +519,7 @@ impl DocsTree {
     /// Render a left sidebar component given a path.
     ///
     /// Path is expected to be an absolute path.
-    // TODO: lots here can be improved
+    // TODO lots here can be improved
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
@@ -806,10 +806,13 @@ impl DocsTree {
                         }
                     }
                 }
+                // Main content
                 div x-cloak class="left-sidebar__content-container pt-4" {
+                    // Full directory view
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
+                        // Root node for the directory tree
                         sprocket-tooltip content=(root.name()) class="block" {
-                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item w-full group rounded-md" {
+                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item hover:bg-slate-800/50" {
                                 div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
                                     div class="relative" {
                                         img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
@@ -818,23 +821,22 @@ impl DocsTree {
                                 }
                             }
                         }
+                        // Nodes in the directory tree
                         template x-for="node in shownNodes" {
                             sprocket-tooltip x-bind:content="node.display_name" class="block" {
-                                a x-bind:href="node.href" x-bind:aria-label="node.display_name" class="left-sidebar__content-item w-full group rounded-md" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : node.href ? 'hover:bg-slate-800/50' : 'cursor-default'" {
+                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__content-item hover:cursor-pointer" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
-                                        div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
+                                        div class="left-sidebar__indent" {}
                                     }
-                                    div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" x-show="showSelfCache[node.key]" {
-                                        div class="relative" {
-                                            img x-show="showSelfCache[node.key]" x-bind:src="node.icon || dirOpen" class="left-sidebar__icon shrink-0" alt="Node icon";
-                                            img x-show="showSelfCache[node.key] && (children(node.key).length > 0)" "x-on:click.stop.prevent"="toggleChildren(node.key)" x-bind:src="chevron" class="left-sidebar__icon absolute left-0 top-0 opacity-0 transition-all hover:opacity-100 transition-all hover:scale-125 cursor-pointer" alt="Node icon";
-                                        }
-                                        div x-show="showSelfCache[node.key]" x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" x-text="node.display_name" {
+                                    div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
+                                        img x-bind:src="node.icon || dirOpen" class="left-sidebar__icon shrink-0" alt="Node icon";
+                                        div x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" x-text="node.display_name" {
                                         }
                                     }
                                 }
                             }
                         }
+                        // Search results
                         template x-for="node in searchedNodes" {
                             li class="left-sidebar__search-result-item" {
                                 p class="text-xs text-slate-500 crop-ellipsis" x-text="node.parent" {}
@@ -846,14 +848,17 @@ impl DocsTree {
                                 }
                             }
                         }
-                        li class="flex place-content-center" {
-                            img x-show="search !== '' && searchedNodes.length === 0" src=(self.get_asset(base, "search.svg")) class="size-8" alt="Search icon";
+                        // No results found icon
+                        li x-show="search !== '' && searchedNodes.length === 0" class="flex place-content-center" {
+                            img src=(self.get_asset(base, "search.svg")) class="size-8" alt="Search icon";
                         }
+                        // No results found message
                         li x-show="search !== '' && searchedNodes.length === 0" class="flex gap-1 place-content-center text-center break-words whitespace-normal text-sm text-slate-500" {
                             span x-text="'No results found for'" {}
                             span x-text="`\"${search}\"`" class="text-slate-50" {}
                         }
                     }
+                    // Workflows view
                     ul x-show="showWorkflows && search === ''" class="left-sidebar__content" {
                         (self.sidebar_workflows_view(path))
                     }
@@ -871,7 +876,7 @@ impl DocsTree {
                 }
                 (headers.render())
                 div class="right-sidebar__back-to-top-container" {
-                    // TODO: this should be a link to the top of the page, not just a link to the title
+                    // TODO this should be a link to the top of the page, not just a link to the title
                     a href="#title" class="right-sidebar__back-to-top" {
                         span class="right-sidebar__back-to-top-icon" {
                             "↑"
@@ -901,8 +906,7 @@ impl DocsTree {
         let cur_page = self.get_page(path).expect("path should have a page");
         match cur_page.page_type() {
             PageType::Index(_) => {
-                // Index pages should not have breadcrumbs.
-                return html! {};
+                // Index pages are handled by the below while loop
             }
             _ => {
                 // Last crumb, i.e. the current page, should not be clickable
@@ -912,17 +916,24 @@ impl DocsTree {
 
         while let Some(parent) = current_path.parent() {
             let cur_node = self.get_node(parent).expect("path should have a node");
-            // Only nodes with pages should be included in the breadcrumbs.
             if let Some(page) = cur_node.page() {
                 breadcrumbs.push((
                     page.name(),
-                    Some(
-                        diff_paths(self.root_abs_path().join(cur_node.path()), base)
-                            .expect("should diff paths"),
-                    ),
+                    if self.root_abs_path().join(cur_node.path()) == path {
+                        // Don't insert a link to the current page.
+                        // This happens on index pages.
+                        None
+                    } else {
+                        Some(
+                            diff_paths(self.root_abs_path().join(cur_node.path()), base)
+                                .expect("should diff paths"),
+                        )
+                    },
                 ));
             } else if cur_node.name() == self.root().name() {
                 breadcrumbs.push((cur_node.name(), Some(self.root_index_relative_to(base))))
+            } else {
+                breadcrumbs.push((cur_node.name(), None));
             }
             current_path = parent;
         }

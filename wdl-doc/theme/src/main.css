@@ -307,7 +307,7 @@
     @apply w-full;
   }
   .left-sidebar__content-item {
-    @apply flex flex-row items-center gap-x-1 h-8;
+    @apply flex flex-row items-center gap-x-1 h-8 w-full rounded-md;
   }
   .left-sidebar__content-item-container {
     @apply flex flex-row items-center gap-x-1;
