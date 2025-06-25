@@ -161,3 +161,65 @@ async fn should_goto_import_namespace_definition() {
         Range::new(Position::new(2, 20), Position::new(2, 23)) // `as lib` in import statement
     );
 }
+
+#[tokio::test]
+async fn should_goto_struct_member_definition_for_struct_literal() {
+    let mut ctx = setup().await;
+
+    // Position of `name:` in `Person p = Person { name: ... }`
+    let response1 = goto_definition_request(&mut ctx, "source.wdl", Position::new(28, 8)).await;
+    let Some(GotoDefinitionResponse::Scalar(location1)) = response1 else {
+        panic!("expected a single location response, got {:?}", response1);
+    };
+    // Position of `age:` in `Person p = Person { name: ... , age: ...}`
+    let response2 = goto_definition_request(&mut ctx, "source.wdl", Position::new(29, 8)).await;
+    let Some(GotoDefinitionResponse::Scalar(location2)) = response2 else {
+        panic!("expected a single location response, got {:?}", response2);
+    };
+
+    assert_eq!(location1.uri, ctx.doc_uri("lib.wdl"));
+    assert_eq!(
+        location1.range,
+        Range::new(Position::new(18, 11), Position::new(18, 15)) // `name` in String name
+    );
+
+    assert_eq!(location2.uri, ctx.doc_uri("lib.wdl"));
+    assert_eq!(
+        location2.range,
+        Range::new(Position::new(19, 8), Position::new(19, 11)) // `age` in Int age
+    );
+}
+
+#[tokio::test]
+async fn should_goto_call_task_input_definition() {
+    let mut ctx = setup().await;
+
+    // Position of `a`  in `a = 1,`
+    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(23, 8)).await;
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("lib.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(4, 12), Position::new(4, 13)) // `a` in Int a
+    );
+}
+
+#[tokio::test]
+async fn should_goto_call_workflow_input_definition() {
+    let mut ctx = setup().await;
+
+    // Position of `person`  in `call lib.process { input: person = p }`
+    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(32, 30)).await;
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("lib.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(24, 15), Position::new(24, 21)) // `person` in Person person
+    );
+}
