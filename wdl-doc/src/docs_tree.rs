@@ -808,10 +808,14 @@ impl DocsTree {
                 }
                 div x-cloak class="left-sidebar__content-container pt-4" {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
-                        li class="left-sidebar__content-item text-slate-50" {
-                            img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
-                            sprocket-tooltip content=(root.name()) x-show="search === ''" {
-                                a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) }
+                        sprocket-tooltip content=(root.name()) class="block" {
+                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item w-full group rounded-md" {
+                                div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
+                                    div class="relative" {
+                                        img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
+                                    }
+                                    div class="text-slate-50 crop-ellipsis" { (root.name()) }
+                                }
                             }
                         }
                         template x-for="node in shownNodes" {
