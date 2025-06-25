@@ -30,6 +30,8 @@ workflow main {
         age: 1,
     }
 
+    call lib.process { input: person = p }
+
     #@ except: UnusedDeclaration
     String p_name = p.name
 

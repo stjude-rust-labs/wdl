@@ -19,3 +19,13 @@ struct Person {
     String name
     Int age
 }
+
+workflow process {
+    input {
+        Person person
+    }
+
+    output {
+        String name = person.name
+    }
+}
