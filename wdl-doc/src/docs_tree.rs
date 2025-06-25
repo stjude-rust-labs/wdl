@@ -471,14 +471,13 @@ impl DocsTree {
         html! {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
-                    div class="left-sidebar__category" {
+                    div class="left-sidebar__content-item w-full" {
                         img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
                         p class="" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
-                            li x-data=(format!(r#"{{
-                                    hover: false,
+                            a href=(diff_paths(self.root_abs_path().join(node.path()), base).expect("should diff paths").to_string_lossy()) x-data=(format!(r#"{{
                                     node: {{
                                         current: {},
                                         icon: '{}',
@@ -490,16 +489,15 @@ impl DocsTree {
                                     } else {
                                         "workflow-unselected.svg"
                                     },
-                            ))) class="left-sidebar__workflow" x-bind:class="node.current ? 'bg-slate-800' : hover ? 'bg-slate-700' : ''" {
+                            ))) class="left-sidebar__content-item w-full rounded-md group" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
-                                            div class="left-sidebar__workflow-indent-hidden" {}
-                                            div class="left-sidebar__workflow-indent" {}
-                                            div class="left-sidebar__workflow-container" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" {
+                                            div class="left-sidebar__indent" {}
+                                            div class="left-sidebar__content-item-container crop-ellipsis"{
                                                 img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
-                                                sprocket-tooltip content=(wf.render_name()) class="" x-bind:class="node.current ? 'text-slate-50' : 'hover:text-slate-50'" {
-                                                    a href=(diff_paths(self.root_abs_path().join(node.path()), base).expect("should diff paths").to_string_lossy()) {
+                                                sprocket-tooltip content=(wf.render_name()) class="crop-ellipsis" x-bind:class="node.current ? 'text-slate-50' : 'group-hover:text-slate-50'" {
+                                                    span {
                                                         (wf.render_name())
                                                     }
                                                 }
@@ -788,28 +786,27 @@ impl DocsTree {
 
         html! {
             div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); })" class="left-sidebar__container" {
-                div class="sticky" {
+                // top navbar
+                div class="sticky px-4" {
                     img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
-                    form id="searchbar" class="left-sidebar__searchbar-form" {
-                        div class="left-sidebar__searchbar group relative w-full h-10" {
-                            img src=(self.get_asset(base, "search.svg")) class="absolute left-2 top-1/2 -translate-y-1/2 size-6 pointer-events-none" alt="Search icon";
-                            input id="searchbox" x-model="search" type="text" placeholder="Search..." class="left-sidebar__searchbox w-full h-full px-8 outline-none bg-transparent";
-                            img src=(self.get_asset(base, "x-mark.svg")) class="absolute right-2 top-1/2 -translate-y-1/2 size-6 hover:cursor-pointer" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
-                        }
+                    div class="relative w-full h-10" {
+                        input id="searchbox" "x-model.debounce"="search" type="text" placeholder="Search..." class="left-sidebar__searchbox";
+                        img src=(self.get_asset(base, "search.svg")) class="absolute left-2 top-1/2 -translate-y-1/2 size-6 pointer-events-none" alt="Search icon";
+                        img src=(self.get_asset(base, "x-mark.svg")) class="absolute right-2 top-1/2 -translate-y-1/2 size-6 hover:cursor-pointer" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                     }
-                    div class="left-sidebar__tabs-container" {
-                        div x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                    div class="left-sidebar__tabs-container mt-4" {
+                        button x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        // TODO clicking this should scroll the active page into view
-                        div x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                        // TODO: clicking this should scroll the active page into view
+                        button x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
                         }
                     }
                 }
-                div x-cloak class="left-sidebar__content-container" {
+                div x-cloak class="left-sidebar__content-container pt-4" {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
                         li class="left-sidebar__content-item text-slate-50" {
                             img x-show="search === ''" src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
@@ -818,26 +815,28 @@ impl DocsTree {
                             }
                         }
                         template x-for="node in shownNodes" {
-                            // @a-frantz: we need to ensure all nodes are using top level `a` tags for accessibility reasons to increase the clickable surface area of each node. I'll let you refactor the other nodes (`.left-sidebar__content-item`). Also, we should not be relying on JS to handle any sort of hover behavior when tailwind `hover:*` classes exist.
-                            a x-bind:href="node.href" x-bind:aria-label="node.display_name" x-data="{ hover: false }" class="left-sidebar__content-item w-full group" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700/50 transition-all'" {
-                                template x-for="i in Array.from({ length: node.nest_level })" {
-                                    div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
-                                }
-                                div class="left-sidebar__content-item-container crop-ellipsis" x-show="showSelfCache[node.key]" x-on:mouseenter="hover = (node.href !== null)" x-on:mouseleave="hover = false" {
-                                    // @a-frantz: the clickable surface area size that triggers this expand/collapse behavior is incredibly tiny and probably fails to meet accessibility requirements. Let's consult with @ira to find a better solution
-                                    img x-show="showSelfCache[node.key]" x-data="{ showChevron: false }" x-on:click="toggleChildren(node.key)" x-on:mouseenter="showChevron = true" x-on:mouseleave="showChevron = false" x-bind:src="showChevron && (children(node.key).length > 0) ? chevron : (node.icon !== null) ? node.icon : (showChildrenCache[node.key]) ? dirOpen : dirClosed" x-bind:class="(children(node.key).length > 0) ? 'hover:cursor-pointer' : ''" class="left-sidebar__icon" alt="Node icon";
-                                    sprocket-tooltip x-bind:content="node.display_name" x-show="showSelfCache[node.key]" class="" x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" {
-                                        span x-text="node.display_name" {}
+                            sprocket-tooltip x-bind:content="node.display_name" class="block" {
+                                a x-bind:href="node.href" x-bind:aria-label="node.display_name" class="left-sidebar__content-item w-full group rounded-md" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : node.href ? 'hover:bg-slate-800/50' : 'cursor-default'" {
+                                    template x-for="i in Array.from({ length: node.nest_level })" {
+                                        div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
+                                    }
+                                    div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" x-show="showSelfCache[node.key]" {
+                                        div class="relative" {
+                                            img x-show="showSelfCache[node.key]" x-bind:src="node.icon || dirOpen" class="left-sidebar__icon shrink-0" alt="Node icon";
+                                            img x-show="showSelfCache[node.key] && (children(node.key).length > 0)" "x-on:click.stop.prevent"="toggleChildren(node.key)" x-bind:src="chevron" class="left-sidebar__icon absolute left-0 top-0 opacity-0 transition-all hover:opacity-100 transition-all hover:scale-125 cursor-pointer" alt="Node icon";
+                                        }
+                                        div x-show="showSelfCache[node.key]" x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" x-text="node.display_name" {
+                                        }
                                     }
                                 }
                             }
                         }
                         template x-for="node in searchedNodes" {
                             li class="left-sidebar__search-result-item" {
-                                p class="text-xs" x-text="node.parent" {}
+                                p class="text-xs text-slate-500 crop-ellipsis" x-text="node.parent" {}
                                 div class="left-sidebar__search-result-item-container" {
                                     img x-bind:src="node.icon" class="left-sidebar__icon" alt="Node icon";
-                                    sprocket-tooltip class="" x-bind:content="node.display_name" {
+                                    sprocket-tooltip class="crop-ellipsis" x-bind:content="node.display_name" {
                                         a x-bind:href="node.href" x-text="node.display_name" {}
                                     }
                                 }
@@ -846,8 +845,9 @@ impl DocsTree {
                         li class="flex place-content-center" {
                             img x-show="search !== '' && searchedNodes.length === 0" src=(self.get_asset(base, "search.svg")) class="size-8" alt="Search icon";
                         }
-                        li class="flex place-content-center" {
-                            p x-show="search !== '' && searchedNodes.length === 0" class="" x-text="'No results found for \"' + search + '\"'" {}
+                        li x-show="search !== '' && searchedNodes.length === 0" class="flex gap-1 place-content-center text-center break-words whitespace-normal text-sm text-slate-500" {
+                            span x-text="'No results found for'" {}
+                            span x-text="`\"${search}\"`" class="text-slate-50" {}
                         }
                     }
                     ul x-show="showWorkflows && search === ''" class="left-sidebar__content" {
