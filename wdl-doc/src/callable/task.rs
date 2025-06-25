@@ -129,11 +129,6 @@ impl Task {
     /// Render the task as HTML.
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
-        let meta_markup = if let Some(meta) = self.render_meta(assets) {
-            html! { (meta) }
-        } else {
-            html! {}
-        };
 
         let (input_markup, inner_headers) = self.render_inputs(assets);
         headers.extend(inner_headers);
@@ -148,8 +143,10 @@ impl Task {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
-                div class="main__section" {
-                    (meta_markup)
+                @if let Some(meta) = self.render_meta(assets) {
+                    div class="main__section" {
+                        (meta)
+                    }
                 }
                 (input_markup)
                 (self.render_outputs(assets))
