@@ -114,10 +114,8 @@ impl Task {
                 html! {
                     div class="main__section" {
                         h2 id="command" class="main__section-header" { "Command" }
-                        div class="main__code-container" {
-                            sprocket-code language="wdl" {
-                                (command_section.script())
-                            }
+                        sprocket-code language="wdl" {
+                            (command_section.script())
                         }
                     }
                 }
@@ -143,14 +141,14 @@ impl Task {
         let markup = html! {
             div class="main__container" {
                 span class="text-violet-400" { "Task" }
-                h1 id="title" class="main__title main__title-code" { code { (self.name()) } }
+                h1 id="title" class="main__title" { code { (self.name()) } }
+                div class="markdown-body mb-4" {
+                    (self.render_description(false))
+                }
                 div class="main__badge-container" {
                     (self.render_version())
                 }
                 div class="main__section" {
-                    div class="markdown-body" {
-                        (self.render_description(false))
-                    }
                     (meta_markup)
                 }
                 (input_markup)

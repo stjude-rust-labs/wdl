@@ -93,6 +93,9 @@ pub(crate) trait Callable {
     }
 
     /// Render the description of the callable as HTML.
+    ///
+    /// This will always return some text; in the absence of a `description`
+    /// key, it will return a default message ("No description provided").
     fn render_description(&self, summarize: bool) -> Markup {
         self.meta().render_description(summarize)
     }

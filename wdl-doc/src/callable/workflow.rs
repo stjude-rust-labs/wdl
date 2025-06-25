@@ -164,6 +164,7 @@ impl Workflow {
     /// Render the workflow as HTML.
     pub fn render(&self, assets: &Path) -> (Markup, PageSections) {
         let mut headers = PageSections::default();
+
         let meta_markup = if let Some(meta) = self.render_meta(assets) {
             html! { (meta) }
         } else {
@@ -178,6 +179,9 @@ impl Workflow {
             div class="main__container" {
                 span class="text-emerald-400" { "Workflow" }
                 h1 id="title" class="main__title" { (self.render_name()) }
+                div class="markdown-body mb-4" {
+                    (self.render_description(false))
+                }
                 div class="main__badge-container" {
                     (self.render_version())
                     @if let Some(badge) = self.render_category() {
@@ -186,9 +190,6 @@ impl Workflow {
                     (self.render_allow_nested_inputs())
                 }
                 div class="main__section" {
-                    div class="markdown-body" {
-                        (self.render_description(false))
-                    }
                     (meta_markup)
                 }
                 (input_markup)

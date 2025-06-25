@@ -74,6 +74,11 @@ pub(crate) struct Parameter {
     io: InputOutput,
 }
 
+/// The maximum length of an expression before it is summarized.
+const EXPR_MAX_LENGTH: usize = 80;
+/// The length of an expression when summarized.
+const EXPR_CLIP_LENGTH: usize = 50;
+
 impl Parameter {
     /// Create a new parameter.
     pub fn new(decl: Decl, meta: Option<MetadataValue>, io: InputOutput) -> Self {
@@ -123,23 +128,24 @@ impl Parameter {
             .expr()
             .map(|expr| expr.text().to_string())
             .unwrap_or("None".to_string());
-
         if !summarize {
-            // find common leading whitespace in the expression,
-            // skipping the first line which is probably part way through a line
-            let common_indent = expr
-                .lines()
-                .skip(1)
+            // If we are not summarizing, we need to remove the first
+            // line from the leading whitespace calculation as the first line never
+            // leads with whitespace.
+            let mut lines = expr.lines();
+            let first_line = lines.next().expect("expr should have at least one line");
+
+            let common_indent = lines
+                .clone()
                 .map(|line| line.chars().take_while(|c| c.is_whitespace()).count())
                 .min()
                 .unwrap_or(0);
-            let first_line = expr.lines().next().unwrap_or("");
-            let remaining_expr = expr
-                .lines()
-                .skip(1)
+
+            let remaining_expr = lines
                 .map(|line| line.chars().skip(common_indent).collect::<String>())
                 .collect::<Vec<_>>()
                 .join("\n");
+
             let full_expr = if remaining_expr.is_empty() {
                 first_line
             } else {
@@ -147,16 +153,13 @@ impl Parameter {
             };
 
             return html! {
-                // Note: we do not wrap this in a `main__code-container` div
-                // because that has a margin at the top and we want this
-                // to be flush with the top of the grid.
                 sprocket-code language="wdl" {
                     (full_expr)
                 }
             };
         }
 
-        match summarize_if_needed(&expr) {
+        match summarize_if_needed(&expr, EXPR_MAX_LENGTH, EXPR_CLIP_LENGTH) {
             MaybeSummarized::No(expr) => {
                 html! { code { (expr) } }
             }
@@ -164,6 +167,7 @@ impl Parameter {
                 html! {
                     div class="main__summary-container" {
                         code { (summary) }
+                        "..."
                         button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
                     }
                 }

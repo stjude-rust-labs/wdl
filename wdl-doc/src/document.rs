@@ -28,7 +28,7 @@ use crate::docs_tree::PageSections;
 use crate::docs_tree::PageType;
 
 /// Parse the preamble comments of a document using the version statement.
-pub fn parse_preamble_comments(version: VersionStatement) -> String {
+pub fn parse_preamble_comments(version: &VersionStatement) -> String {
     let comments = version
         .keyword()
         .inner()
@@ -90,14 +90,13 @@ impl Document {
 
     /// Get the preamble comments of the document as HTML if there are any.
     pub fn render_preamble(&self) -> Option<Markup> {
-        let preamble = parse_preamble_comments(self.version_statement.clone());
+        let preamble = parse_preamble_comments(&self.version_statement);
         if preamble.is_empty() {
             return None;
         }
-        let md = Markdown(&preamble).render();
         Some(html! {
             div class="markdown-body" {
-                (md)
+                (Markdown(&preamble).render())
             }
         })
     }

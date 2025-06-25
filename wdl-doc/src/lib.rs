@@ -380,12 +380,12 @@ pub(crate) struct VersionBadge {
 
 impl VersionBadge {
     /// Create a new version badge.
-    pub(crate) fn new(version: SupportedVersion) -> Self {
+    fn new(version: SupportedVersion) -> Self {
         Self { version }
     }
 
     /// Render the version badge as HTML.
-    pub(crate) fn render(&self) -> Markup {
+    fn render(&self) -> Markup {
         let latest = match &self.version {
             SupportedVersion::V1(v) => matches!(v, V1::Two),
             _ => unreachable!("Only V1 is supported"),
@@ -541,7 +541,10 @@ pub async fn document_workspace(
 
                     let workflow = workflow::Workflow::new(name.clone(), version, w);
 
-                    let page = Rc::new(HTMLPage::new(name, PageType::Workflow(workflow)));
+                    let page = Rc::new(HTMLPage::new(
+                        workflow.name_override().unwrap_or(name),
+                        PageType::Workflow(workflow),
+                    ));
                     docs_tree.add_page(path.clone(), page.clone());
                     local_pages
                         .push((diff_paths(path, &cur_dir).expect("should diff paths"), page));
@@ -595,7 +598,7 @@ mod tests {
         }
         "#;
         let (document, _) = AstDocument::parse(source);
-        let preamble = parse_preamble_comments(document.version_statement().unwrap());
+        let preamble = parse_preamble_comments(&document.version_statement().unwrap());
         assert_eq!(preamble, "This is a comment\nThis is also a comment");
     }
 
@@ -614,7 +617,7 @@ mod tests {
         }
         "#;
         let (document, _) = AstDocument::parse(source);
-        let preamble = parse_preamble_comments(document.version_statement().unwrap());
+        let preamble = parse_preamble_comments(&document.version_statement().unwrap());
         let markdown = Markdown(&preamble).render();
         assert_eq!(
             markdown.into_string(),

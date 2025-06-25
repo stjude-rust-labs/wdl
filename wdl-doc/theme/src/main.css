@@ -41,6 +41,9 @@
     @apply text-2xl; /* 24px */
   }
 
+  h5 {
+    @apply text-xl;
+  }
 }
 
 @utility dark-scrollbar {
@@ -123,7 +126,7 @@
    * Layout - Breadcrumbs
    */
   .layout__breadcrumb-container {
-    @apply mb-4;
+    @apply mb-8 text-xs;
   }
   .layout__breadcrumb-clickable {
     @apply text-slate-50 hover:text-slate-300 hover:underline;
@@ -138,7 +141,7 @@
     @apply flex flex-col;
   }
   .main__title {
-    @apply text-5xl text-slate-50 mt-8 mb-4;
+    @apply text-5xl text-slate-50 mt-4 mb-6;
   }
   .main__section {
     @apply flex flex-col mt-8;
@@ -160,9 +163,6 @@
   }
   .main__container a {
     @apply hover:underline;
-  }
-  .main__code-container {
-    @apply mt-3;
   }
   /**
    * Badges & Buttons

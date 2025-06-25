@@ -41,10 +41,8 @@ impl Struct {
                     (self.version.render())
                 }
                 div class="main__section" {
-                    div class="main__code-container" {
-                        sprocket-code language="wdl" {
-                            (self.definition.inner())
-                        }
+                    sprocket-code language="wdl" {
+                        (self.definition.inner())
                     }
                 }
             }

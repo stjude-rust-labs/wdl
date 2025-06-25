@@ -1,8 +1,10 @@
+/* This file originates from the gtihub repo here - https://github.com/sindresorhus/github-markdown-css
+ * which is MIT licensed - https://github.com/sindresorhus/github-markdown-css/blob/v5.8.1/license
+ */
 .markdown-body {
   color-scheme: dark;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  margin: 0;
   color: #f0f6fc;
   background-color: transparent;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";

@@ -50,7 +50,7 @@ impl HTMLPage {
     }
 
     /// Get the name of the page.
-    pub fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &str {
         &self.name
     }
 
@@ -392,7 +392,7 @@ impl DocsTree {
     /// Get the [`HTMLPage`] associated with a path.
     ///
     /// Can be an abolute path or a path relative to the root.
-    pub(crate) fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {
+    fn get_page<P: AsRef<Path>>(&self, path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(path).and_then(|node| node.page())
     }
 
@@ -799,7 +799,7 @@ impl DocsTree {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        // TODO: clicking this should scroll the active page into view
+                        // TODO clicking this should scroll the active page into view
                         button x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
@@ -996,6 +996,9 @@ impl DocsTree {
                                 rect y="35" width="100" height="15" {}
                                 rect y="70" width="100" height="15" {}
                             }
+                        }
+                        h5 class="main__homepage-header" {
+                            "Home"
                         }
                         (content)
                     }

@@ -20,6 +20,11 @@ const EXTERNAL_HELP_KEY: &str = "external_help";
 /// Warning key for custom rendering.
 const WARNING_KEY: &str = "warning";
 
+/// The maximum length of a description before it is summarized.
+const DESCRIPTION_MAX_LENGTH: usize = 140;
+/// The length of a description when summarized.
+const DESCRIPTION_CLIP_LENGTH: usize = 80;
+
 /// A map of metadata key-value pairs, sorted by key.
 pub(crate) type MetaMap = BTreeMap<String, MetadataValue>;
 
@@ -28,6 +33,9 @@ pub(crate) type MetaMap = BTreeMap<String, MetadataValue>;
 pub(crate) trait MetaMapExt {
     /// Returns the rendered [`Markup`] of the `description` key, optionally
     /// summarizing it.
+    ///
+    /// This will always return some text; in the absence of a `description`
+    /// key, it will return a default message ("No description provided").
     fn render_description(&self, summarize: bool) -> Markup;
     /// Returns the rendered [`Markup`] of the remaining metadata keys,
     /// excluding the keys specified in `filter_keys`.
@@ -51,12 +59,13 @@ impl MetaMapExt for MetaMap {
             return Markdown(desc).render();
         }
 
-        match summarize_if_needed(&desc) {
+        match summarize_if_needed(&desc, DESCRIPTION_MAX_LENGTH, DESCRIPTION_CLIP_LENGTH) {
             MaybeSummarized::No(desc) => Markdown(desc).render(),
             MaybeSummarized::Yes(summary) => {
                 html! {
                     div class="main__summary-container" {
                         (summary)
+                        "..."
                         button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" x-text="description_expanded ? 'Show less' : 'Show full description'" {}
                     }
                 }
@@ -80,21 +89,18 @@ impl MetaMapExt for MetaMap {
         let any_additional_items = !filtered_items.is_empty();
         let custom_key_present =
             help_item.is_some() || external_help_item.is_some() || warning_item.is_some();
-        if !any_additional_items && !custom_key_present {
+
+        if !(any_additional_items || custom_key_present) {
             return None;
         }
 
-        let external_link = external_help_item.map(|v| match v {
-            MetadataValue::String(s) => {
-                let text = s.text().expect("meta string should not be interpolated");
-                let mut buffer = String::new();
-                text.unescape_to(&mut buffer);
-                Some(buffer)
-            }
-            _ => None,
-        });
-        let external_link_on_click = if let Some(Some(link)) = external_link {
-            Some(format!("window.open('{}', '_blank')", link))
+        let external_link_on_click = if let Some(MetadataValue::String(s)) = external_help_item {
+            Some(format!(
+                "window.open('{}', '_blank')",
+                s.text()
+                    .expect("meta string should not be interpolated")
+                    .text()
+            ))
         } else {
             None
         };
@@ -181,7 +187,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
 }
 
 /// Render a [`MetadataValue`] as HTML.
-pub(crate) fn render_value(value: &MetadataValue) -> Markup {
+fn render_value(value: &MetadataValue) -> Markup {
     render_value_inner(value)
 }
 
@@ -195,7 +201,7 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
 /// for this is that the key-value pairs are typically used to display metadata
 /// in a grid format, where the value is expected to be a simple code snippet
 /// rather than full Markdown-rendered text.
-pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
+fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
     let (ty, rhs_markup) = match value {
         MetadataValue::String(s) => (
             s.inner().kind(),
@@ -211,6 +217,7 @@ pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
                     @for item in a.elements() {
                         @match item {
                             MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                                // TODO revisit this
                                 (render_value_inner(&item))
                             }
                             _ => {
@@ -227,6 +234,7 @@ pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             let markup = html! {
                 div class="main__grid-nested-container" {
+                    // TODO revisit this
                     div class="main__grid-meta-object-container" {
                         @for item in o.items() {
                             (render_key_value(item.name().text(), &item.value()))
@@ -240,7 +248,7 @@ pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
 
     let lhs_markup = match ty {
         SyntaxKind::MetadataArrayNode | SyntaxKind::MetadataObjectNode => {
-            // TODO special handling for arrays and objects
+            // TODO special icon for arrays and objects
             html! { code { (key) } }
         }
         _ => {
@@ -261,13 +269,8 @@ pub(crate) fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
     }
 }
 
-/// The maximum length of a string before it is clipped.
-const MAX_LENGTH: usize = 80;
-/// The amount of characters to show in the summary.
-const CLIP_LENGTH: usize = 60;
-
 /// A string that may be summarized.
-// TODO return reference to the original string?
+// TODO capture reference to the original string?
 #[derive(Debug)]
 pub(crate) enum MaybeSummarized {
     /// The string was truncated, providing a summary.
@@ -277,9 +280,13 @@ pub(crate) enum MaybeSummarized {
 }
 
 /// Summarize a string if it exceeds a maximum length.
-pub(crate) fn summarize_if_needed(in_str: &str) -> MaybeSummarized {
-    if in_str.len() > MAX_LENGTH {
-        MaybeSummarized::Yes(format!("{}...", in_str[..CLIP_LENGTH].trim_end()))
+pub(crate) fn summarize_if_needed(
+    in_str: &str,
+    max_length: usize,
+    clip_length: usize,
+) -> MaybeSummarized {
+    if in_str.len() > max_length {
+        MaybeSummarized::Yes(in_str[..clip_length].trim_end().to_string())
     } else {
         MaybeSummarized::No(in_str.to_string())
     }
