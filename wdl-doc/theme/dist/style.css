@@ -1225,13 +1225,10 @@
       }
     }
   }
-  .hover\:bg-slate-800\/50 {
+  .hover\:bg-slate-700 {
     &:hover {
       @media (hover: hover) {
-        background-color: color-mix(in srgb, oklch(27.9% 0.041 260.031) 50%, transparent);
-        @supports (color: color-mix(in lab, red, red)) {
-          background-color: color-mix(in oklab, var(--color-slate-800) 50%, transparent);
-        }
+        background-color: var(--color-slate-700);
       }
     }
   }
@@ -1886,11 +1883,6 @@
     padding-top: calc(var(--spacing) * 2);
     padding-left: calc(var(--spacing) * 2);
     color: var(--color-slate-50);
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-slate-800);
-      }
-    }
   }
   .left-sidebar__search-result-item-container {
     margin-bottom: calc(var(--spacing) * 2);

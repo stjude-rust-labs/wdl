@@ -313,7 +313,7 @@
     @apply flex flex-row items-center gap-x-1;
   }
   .left-sidebar__search-result-item {
-    @apply flex flex-col hover:bg-slate-800 border-b border-gray-700 text-slate-50 pl-2 pt-2;
+    @apply flex flex-col border-b border-gray-700 text-slate-50 pl-2 pt-2;
   }
   .left-sidebar__search-result-item-container {
     @apply flex flex-row items-center gap-x-1 mb-2;

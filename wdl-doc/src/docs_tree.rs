@@ -489,7 +489,7 @@ impl DocsTree {
                                     } else {
                                         "workflow-unselected.svg"
                                     },
-                            ))) class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
+                            ))) class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
@@ -813,7 +813,7 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
                         // Root node for the directory tree
                         sprocket-tooltip content=(root.name()) class="block" {
-                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item hover:bg-slate-800/50" {
+                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item hover:bg-slate-700" {
                                 div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
                                     div class="relative" {
                                         img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
@@ -825,7 +825,7 @@ impl DocsTree {
                         // Nodes in the directory tree
                         template x-for="node in shownNodes" {
                             sprocket-tooltip x-bind:content="node.display_name" class="block" {
-                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__content-item hover:cursor-pointer" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-800/50'" {
+                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__content-item hover:cursor-pointer" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
                                         div class="left-sidebar__indent" {}
                                     }
