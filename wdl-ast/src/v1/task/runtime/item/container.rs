@@ -54,10 +54,14 @@ impl<N: TreeNode> TryFrom<RuntimeItem<N>> for Container<N> {
 #[cfg(test)]
 mod tests {
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn simple_example() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -86,7 +90,10 @@ task hello {
 
     #[test]
     fn missing_container_item() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -115,7 +122,10 @@ task hello {
 
     #[test]
     fn docker_alias() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {

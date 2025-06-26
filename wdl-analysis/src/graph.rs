@@ -344,7 +344,10 @@ impl DocumentGraphNode {
 
         // Reparse from the source
         let start = Instant::now();
-        let (document, diagnostics) = wdl_ast::Document::parse(&source);
+        let wdl_ast::ParseResult {
+            document,
+            diagnostics,
+        } = wdl_ast::Document::parse(&source);
         info!(
             "parsing of `{uri}` completed in {elapsed:?}",
             uri = self.uri,

@@ -30,6 +30,7 @@ use rayon::prelude::*;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::Node;
+use wdl_ast::ParseResult;
 use wdl_format::Formatter;
 use wdl_format::element::FormatElement;
 use wdl_format::element::node::AstNodeFormatExt;
@@ -120,7 +121,10 @@ fn compare_result(path: &Path, result: &str) -> Result<(), String> {
 
 /// Parses source string into a document FormatElement
 fn prepare_document(source: &str, path: &Path) -> Result<FormatElement, String> {
-    let (document, diagnostics) = Document::parse(source);
+    let ParseResult {
+        document,
+        diagnostics,
+    } = Document::parse(source);
 
     if !diagnostics.is_empty() {
         return Err(format!(

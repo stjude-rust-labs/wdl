@@ -134,13 +134,17 @@ fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
 mod tests {
     use wdl_ast::Document;
     use wdl_ast::Node;
+    use wdl_ast::ParseResult;
     use wdl_ast::SyntaxKind;
 
     use crate::element::node::AstNodeFormatExt;
 
     #[test]
     fn smoke() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             "## WDL
 version 1.2  # This is a comment attached to the version.
 
@@ -251,7 +255,10 @@ workflow bar # This is an inline comment on the workflow ident.
     #[test]
     #[should_panic]
     fn unconsumed_children_nodes_panic() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             "## WDL
 version 1.2  # This is a comment attached to the version.
 

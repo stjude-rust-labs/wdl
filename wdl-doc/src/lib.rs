@@ -365,6 +365,7 @@ pub async fn document_workspace(
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document as AstDocument;
+    use wdl_ast::ParseResult as AstParseResult;
 
     use super::*;
 
@@ -387,7 +388,7 @@ mod tests {
             }
         }
         "#;
-        let (document, _) = AstDocument::parse(source);
+        let AstParseResult { document, .. } = AstDocument::parse(source);
         let preamble = parse_preamble_comments(document.version_statement().unwrap());
         assert_eq!(preamble, "This is a comment\nThis is also a comment");
     }
@@ -406,7 +407,7 @@ mod tests {
             }
         }
         "#;
-        let (document, _) = AstDocument::parse(source);
+        let AstParseResult { document, .. } = AstDocument::parse(source);
         let preamble = parse_preamble_comments(document.version_statement().unwrap());
         let markdown = Markdown(&preamble).render();
         assert_eq!(

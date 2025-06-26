@@ -206,10 +206,14 @@ mod test {
 
     use crate::AstToken;
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn struct_definitions() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 

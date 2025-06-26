@@ -399,7 +399,10 @@ workflow test {
 }
 "#;
 
-        let (document, diagnostics) = wdl_ast::Document::parse(source);
+        let wdl_ast::ParseResult {
+            document,
+            diagnostics,
+        } = wdl_ast::Document::parse(source);
         assert!(diagnostics.is_empty());
 
         let mut validator = Validator::default();

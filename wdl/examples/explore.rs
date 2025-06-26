@@ -29,6 +29,7 @@ use wdl::ast::v1::MetadataSection;
 use wdl::ast::v1::OutputSection;
 use wdl::ast::v1::TaskDefinition;
 use wdl::ast::v1::WorkflowDefinition;
+use wdl_ast::ParseResult;
 
 /// An example for exploring WDL source files.
 #[derive(Parser)]
@@ -69,7 +70,10 @@ pub fn main() -> Result<()> {
         )
     })?;
 
-    let (document, diagnostics) = Document::parse(&source);
+    let ParseResult {
+        document,
+        diagnostics,
+    } = Document::parse(&source);
     if !diagnostics.is_empty() {
         emit_diagnostics(&args.path, &source, &diagnostics)?;
     }

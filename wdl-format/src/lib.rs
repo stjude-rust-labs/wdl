@@ -224,13 +224,17 @@ impl Formatter {
 mod tests {
     use wdl_ast::Document;
     use wdl_ast::Node;
+    use wdl_ast::ParseResult;
 
     use crate::Formatter;
     use crate::element::node::AstNodeFormatExt as _;
 
     #[test]
     fn smoke() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             "## WDL
 version 1.2  # This is a comment attached to the version.
 

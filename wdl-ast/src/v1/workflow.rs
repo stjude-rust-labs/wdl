@@ -1219,10 +1219,14 @@ impl<N: TreeNode> AstNode<N> for WorkflowHintsArray<N> {
 mod test {
     use super::*;
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn workflows() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 

@@ -134,12 +134,13 @@ impl Callable for Workflow {
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document;
+    use wdl_ast::ParseResult;
 
     use super::*;
 
     #[test]
     fn test_workflow() {
-        let (doc, _) = Document::parse(
+        let ParseResult { document, .. } = Document::parse(
             r#"
             version 1.0
             workflow test {
@@ -153,7 +154,7 @@ mod tests {
             "#,
         );
 
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let ast_workflow = doc_item.into_workflow_definition().unwrap();
 
         let workflow = Workflow::new(

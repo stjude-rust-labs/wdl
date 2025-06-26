@@ -26,8 +26,12 @@
 //! ```rust
 //! # let source = "version 1.1\nworkflow test {}";
 //! use wdl_ast::Document;
+//! use wdl_ast::ParseResult;
 //!
-//! let (document, diagnostics) = Document::parse(source);
+//! let ParseResult {
+//!     document,
+//!     diagnostics,
+//! } = Document::parse(source);
 //! if !diagnostics.is_empty() {
 //!     // Handle the failure to parse
 //! }
@@ -467,6 +471,20 @@ impl<N: TreeNode> AstNode<N> for Document<N> {
     }
 }
 
+/// The result of calling [`Document::parse()`].
+///
+/// Since the parser is infallible, a result will always be returned. However,
+/// `diagnostics` may be non-empty for syntactically invalid inputs.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParseResult {
+    /// The parsed document.
+    pub document: Document,
+    /// The diagnostics encountered during the parse.
+    ///
+    /// If this is empty, the document is syntactically correct.
+    pub diagnostics: Vec<Diagnostic>,
+}
+
 impl Document {
     /// Parses a document from the given source.
     ///
@@ -475,8 +493,11 @@ impl Document {
     /// # Example
     ///
     /// ```rust
-    /// # use wdl_ast::{Document, AstToken, Ast};
-    /// let (document, diagnostics) = Document::parse("version 1.1");
+    /// # use wdl_ast::{Document, AstToken, Ast, ParseResult};
+    /// let ParseResult {
+    ///     document,
+    ///     diagnostics,
+    /// } = Document::parse("version 1.1");
     /// assert!(diagnostics.is_empty());
     ///
     /// assert_eq!(
@@ -495,12 +516,12 @@ impl Document {
     ///     Ast::Unsupported => panic!("should be a V1 AST"),
     /// }
     /// ```
-    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
+    pub fn parse(source: &str) -> ParseResult {
         let concrete::ParseResult { tree, diagnostics } = SyntaxTree::parse(source);
-        (
-            Document::cast(tree.into_syntax()).expect("document should cast"),
+        ParseResult {
+            document: Document::cast(tree.into_syntax()).expect("document should cast"),
             diagnostics,
-        )
+        }
     }
 }
 

@@ -50,10 +50,14 @@ impl<N: TreeNode> TryFrom<RequirementsItem<N>> for Container<N> {
 #[cfg(test)]
 mod tests {
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn simple_example() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -82,7 +86,10 @@ task hello {
 
     #[test]
     fn missing_container_item() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -113,7 +120,10 @@ task hello {
     fn docker_alias() {
         // NOTE: the `docker` key is only an alias of the `container` key within
         // `runtime` blocks—not `requirements` blocks.
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {

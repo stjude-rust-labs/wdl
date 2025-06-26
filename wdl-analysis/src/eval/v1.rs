@@ -1113,6 +1113,7 @@ impl<N: TreeNode> Default for CommonAncestorFinder<N> {
 #[cfg(test)]
 mod test {
     use wdl_ast::Document;
+    use wdl_ast::ParseResult;
 
     use super::*;
 
@@ -1144,7 +1145,10 @@ mod test {
         }
         "#;
 
-        let (document, diagnostics) = Document::parse(source);
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(source);
         assert!(
             diagnostics.is_empty(),
             "parsing should succeed without diagnostics"

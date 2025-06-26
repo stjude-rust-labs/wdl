@@ -965,10 +965,14 @@ impl<N: TreeNode> Decl<N> {
 mod test {
     use super::*;
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn decls() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 

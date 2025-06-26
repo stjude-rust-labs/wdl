@@ -270,7 +270,7 @@ impl<N: TreeNode> TryFrom<Expr<N>> for Value<N> {
 
 #[cfg(test)]
 mod tests {
-    use crate::Document;
+    use crate::{Document, ParseResult};
     use crate::v1::task::requirements::item::container::Container;
 
     fn get_container(document: Document) -> Container {
@@ -290,7 +290,10 @@ mod tests {
 
     #[test]
     fn it_parses_a_valid_single_uri_value() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -320,7 +323,10 @@ task hello {
 
     #[test]
     fn it_parses_a_valid_any_value() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {
@@ -345,7 +351,10 @@ task hello {
 
     #[test]
     fn it_fails_to_parse_an_any_within_an_array() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"version 1.2
 
 task hello {

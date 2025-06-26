@@ -150,12 +150,13 @@ impl Callable for Task {
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document;
+    use wdl_ast::ParseResult;
 
     use super::*;
 
     #[test]
     fn test_task() {
-        let (doc, _) = Document::parse(
+        let ParseResult { document, .. } = Document::parse(
             r#"
             version 1.0
 
@@ -176,7 +177,7 @@ mod tests {
             "#,
         );
 
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let ast_task = doc_item.into_task_definition().unwrap();
 
         let task = Task::new(

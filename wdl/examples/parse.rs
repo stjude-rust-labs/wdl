@@ -15,6 +15,7 @@ use codespan_reporting::term::termcolor::ColorChoice;
 use codespan_reporting::term::termcolor::StandardStream;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
+use wdl_ast::ParseResult;
 
 /// An example for parsing WDL source files.
 #[derive(Parser)]
@@ -55,7 +56,10 @@ pub fn main() -> Result<()> {
         )
     })?;
 
-    let (document, diagnostics) = Document::parse(&source);
+    let ParseResult {
+        document,
+        diagnostics,
+    } = Document::parse(&source);
     if !diagnostics.is_empty() {
         emit_diagnostics(&args.path, &source, &diagnostics)?;
         return Ok(());

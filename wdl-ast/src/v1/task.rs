@@ -1667,10 +1667,14 @@ mod test {
 
     use super::*;
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn tasks() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -1869,7 +1873,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_without_interpolation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -1907,7 +1914,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_with_interpolation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -1959,7 +1969,10 @@ then name
 
     #[test]
     fn whitespace_stripping_when_interpolation_starts_line() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2032,7 +2045,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_when_command_is_empty() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2056,7 +2072,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_when_command_is_one_line_of_whitespace() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2085,7 +2104,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_when_command_is_one_newline() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2115,7 +2137,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_when_command_is_a_blank_line() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2146,7 +2171,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_when_command_is_a_blank_line_with_spaces() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2177,7 +2205,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_with_mixed_indentation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2205,7 +2236,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_with_funky_indentation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2242,7 +2276,10 @@ task test {
     /// Regression test for issue [#268](https://github.com/stjude-rust-labs/wdl/issues/268).
     #[test]
     fn whitespace_stripping_with_content_on_first_line() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -2288,7 +2325,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_on_windows() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             "version 1.2\r\ntask test {\r\n    command <<<\r\n        echo \"hello\"\r\n    \
              >>>\r\n}\r\n",
         );

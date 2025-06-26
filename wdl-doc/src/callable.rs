@@ -297,6 +297,7 @@ fn parse_outputs(
 #[cfg(test)]
 mod tests {
     use wdl_ast::Document;
+    use wdl_ast::ParseResult;
 
     use super::*;
 
@@ -335,8 +336,8 @@ mod tests {
         }
         "#;
 
-        let (doc, _) = Document::parse(wdl);
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ParseResult { document, .. } = Document::parse(wdl);
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let meta_map = parse_meta(
             &doc_item
                 .as_workflow_definition()
@@ -386,8 +387,8 @@ mod tests {
         }
         "#;
 
-        let (doc, _) = Document::parse(wdl);
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ParseResult { document, .. } = Document::parse(wdl);
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let meta_map = parse_parameter_meta(
             &doc_item
                 .as_workflow_definition()
@@ -435,8 +436,8 @@ mod tests {
         }
         "#;
 
-        let (doc, _) = Document::parse(wdl);
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ParseResult { document, .. } = Document::parse(wdl);
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let meta_map = parse_parameter_meta(
             &doc_item
                 .as_workflow_definition()
@@ -482,8 +483,8 @@ mod tests {
         }
         "#;
 
-        let (doc, _) = Document::parse(wdl);
-        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ParseResult { document, .. } = Document::parse(wdl);
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
         let meta_map = parse_meta(
             &doc_item
                 .as_workflow_definition()

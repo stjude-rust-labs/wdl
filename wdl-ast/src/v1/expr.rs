@@ -3347,10 +3347,14 @@ mod test {
 
     use super::*;
     use crate::Document;
+    use crate::ParseResult;
 
     #[test]
     fn literal_booleans() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -3385,7 +3389,10 @@ task test {
 
     #[test]
     fn literal_integer() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -3518,7 +3525,10 @@ task test {
 
     #[test]
     fn literal_float() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -3652,7 +3662,10 @@ task test {
 
     #[test]
     fn literal_string() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -3754,7 +3767,10 @@ task test {
 
     #[test]
     fn literal_array() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -3960,7 +3976,10 @@ task test {
 
     #[test]
     fn literal_pair() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4100,7 +4119,10 @@ task test {
 
     #[test]
     fn literal_map() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4167,7 +4189,10 @@ task test {
 
     #[test]
     fn literal_object() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4251,7 +4276,10 @@ task test {
 
     #[test]
     fn literal_struct() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4337,7 +4365,10 @@ task test {
 
     #[test]
     fn literal_none() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4374,7 +4405,10 @@ task test {
 
     #[test]
     fn literal_hints() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -4504,7 +4538,10 @@ task test {
 
     #[test]
     fn literal_input() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -4598,7 +4635,10 @@ task test {
 
     #[test]
     fn literal_output() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -4692,7 +4732,10 @@ task test {
 
     #[test]
     fn name_ref() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4735,7 +4778,10 @@ task test {
 
     #[test]
     fn parenthesized() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4793,7 +4839,10 @@ task test {
 
     #[test]
     fn if_expr() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4842,7 +4891,10 @@ task test {
 
     #[test]
     fn logical_not() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4898,7 +4950,10 @@ task test {
 
     #[test]
     fn negation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4956,7 +5011,10 @@ task test {
 
     #[test]
     fn logical_or() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -4999,7 +5057,10 @@ task test {
 
     #[test]
     fn logical_and() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5042,7 +5103,10 @@ task test {
 
     #[test]
     fn equality() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5085,7 +5149,10 @@ task test {
 
     #[test]
     fn inequality() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5128,7 +5195,10 @@ task test {
 
     #[test]
     fn less() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5187,7 +5257,10 @@ task test {
 
     #[test]
     fn less_equal() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5246,7 +5319,10 @@ task test {
 
     #[test]
     fn greater() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5305,7 +5381,10 @@ task test {
 
     #[test]
     fn greater_equal() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5364,7 +5443,10 @@ task test {
 
     #[test]
     fn addition() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5423,7 +5505,10 @@ task test {
 
     #[test]
     fn subtraction() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5482,7 +5567,10 @@ task test {
 
     #[test]
     fn multiplication() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5541,7 +5629,10 @@ task test {
 
     #[test]
     fn division() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5600,7 +5691,10 @@ task test {
 
     #[test]
     fn modulo() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5659,7 +5753,10 @@ task test {
 
     #[test]
     fn exponentiation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -5718,7 +5815,10 @@ task test {
 
     #[test]
     fn call() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5800,7 +5900,10 @@ task test {
 
     #[test]
     fn index() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5870,7 +5973,10 @@ task test {
 
     #[test]
     fn access() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5924,7 +6030,10 @@ task test {
 
     #[test]
     fn strip_whitespace_on_single_line_string() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.1
 
@@ -5952,7 +6061,10 @@ task test {
 
     #[test]
     fn strip_whitespace_on_multi_line_string_no_interpolation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -6039,7 +6151,10 @@ task test {
 
     #[test]
     fn strip_whitespace_on_multi_line_string_with_interpolation() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -6104,7 +6219,10 @@ task test {
 
     #[test]
     fn remove_multiple_line_continuations() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -6141,7 +6259,10 @@ task test {
 
     #[test]
     fn strip_whitespace_with_content_on_first_line() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             r#"
 version 1.2
 
@@ -6175,7 +6296,10 @@ task test {
 
     #[test]
     fn whitespace_stripping_on_windows() {
-        let (document, diagnostics) = Document::parse(
+        let ParseResult {
+            document,
+            diagnostics,
+        } = Document::parse(
             "version 1.2\r\ntask test {\r\n    String s = <<<\r\n        hello\r\n    >>>\r\n}\r\n",
         );
 
