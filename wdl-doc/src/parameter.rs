@@ -149,7 +149,7 @@ impl Parameter {
             let full_expr = if remaining_expr.is_empty() {
                 first_line
             } else {
-                &format!("{}\n{}", first_line, remaining_expr)
+                &format!("{first_line}\n{remaining_expr}")
             };
 
             return html! {

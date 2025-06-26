@@ -592,12 +592,12 @@ impl DocsTree {
                     self.parent,
                     self.search_name,
                     if let Some(icon) = &self.icon {
-                        format!("'{}'", icon)
+                        format!("'{icon}'")
                     } else {
                         "null".to_string()
                     },
                     if let Some(href) = &self.href {
-                        format!("'{}'", href)
+                        format!("'{href}'")
                     } else {
                         "null".to_string()
                     },
@@ -710,7 +710,7 @@ impl DocsTree {
                 let children = node
                     .children
                     .iter()
-                    .map(|child| format!("'{}'", child))
+                    .map(|child| format!("'{child}'"))
                     .collect::<Vec<String>>()
                     .join(", ");
                 format!("'{}': [{}]", node.key, children)
