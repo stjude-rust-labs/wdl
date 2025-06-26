@@ -270,12 +270,6 @@
   .left-sidebar__indent {
     @apply w-px h-full border rounded-none border-gray-800 ml-1.5 mr-1;
   }
-  .left-sidebar__workflow-indent-hidden {
-    @apply w-px h-full mr-2 flex-none;
-  }
-  .left-sidebar__workflow-indent {
-    @apply w-px h-full mr-2 flex-none border rounded-none border-gray-700;
-  }
   .left-sidebar__container {
     @apply flex flex-col size-full text-nowrap pt-4 bg-[#111420] text-slate-400;
   }

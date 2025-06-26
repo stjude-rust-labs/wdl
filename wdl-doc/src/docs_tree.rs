@@ -473,7 +473,7 @@ impl DocsTree {
                 li class="" {
                     div class="left-sidebar__content-item" {
                         img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
-                        p class="" { (category) }
+                        p class="text-slate-50" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
