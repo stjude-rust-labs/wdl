@@ -22,10 +22,10 @@ use wdl_ast::VersionStatement;
 use crate::HTMLPage;
 use crate::Markdown;
 use crate::VersionBadge;
-use crate::callable::Callable;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
 use crate::docs_tree::PageType;
+use crate::runnable::Runnable;
 
 /// Parse the preamble comments of a document using the version statement.
 pub fn parse_preamble_comments(version: &VersionStatement) -> String {

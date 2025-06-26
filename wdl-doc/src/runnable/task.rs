@@ -162,7 +162,7 @@ impl Task {
     }
 }
 
-impl Callable for Task {
+impl Runnable for Task {
     fn name(&self) -> &str {
         &self.name
     }

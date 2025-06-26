@@ -1,4 +1,4 @@
-//! HTML generation for WDL callables (workflows and tasks).
+//! HTML generation for WDL runnables (workflows and tasks).
 
 pub mod task;
 pub mod workflow;
@@ -25,24 +25,24 @@ use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
 use crate::parameter::render_non_required_parameters_table;
 
-/// A callable (workflow or task) in a WDL document.
-pub(crate) trait Callable {
-    /// Get the name of the callable.
+/// A runnable (workflow or task) in a WDL document.
+pub(crate) trait Runnable {
+    /// Get the name of the runnable.
     fn name(&self) -> &str;
 
-    /// Get the [`MetaMap`] of the callable.
+    /// Get the [`MetaMap`] of the runnable.
     fn meta(&self) -> &MetaMap;
 
-    /// Get the inputs of the callable.
+    /// Get the inputs of the runnable.
     fn inputs(&self) -> &[Parameter];
 
-    /// Get the outputs of the callable.
+    /// Get the outputs of the runnable.
     fn outputs(&self) -> &[Parameter];
 
-    /// Get the [`VersionBadge`] of the callable.
+    /// Get the [`VersionBadge`] of the runnable.
     fn version(&self) -> &VersionBadge;
 
-    /// Get the required input parameters of the callable.
+    /// Get the required input parameters of the runnable.
     fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
         self.inputs().iter().filter(|param| {
             param
@@ -64,7 +64,7 @@ pub(crate) trait Callable {
             .collect()
     }
 
-    /// Get the inputs of the callable that are part of `group`.
+    /// Get the inputs of the runnable that are part of `group`.
     fn inputs_in_group<'a>(&'a self, group: &'a Group) -> impl Iterator<Item = &'a Parameter> {
         self.inputs().iter().filter(move |param| {
             if let Some(param_group) = param.group() {
@@ -76,7 +76,7 @@ pub(crate) trait Callable {
         })
     }
 
-    /// Get the inputs of the callable that are neither required nor part of a
+    /// Get the inputs of the runnable that are neither required nor part of a
     /// group.
     fn other_inputs(&self) -> impl Iterator<Item = &Parameter> {
         self.inputs().iter().filter(|param| {
@@ -87,12 +87,12 @@ pub(crate) trait Callable {
         })
     }
 
-    /// Render the version of the callable as a badge.
+    /// Render the version of the runnable as a badge.
     fn render_version(&self) -> Markup {
         self.version().render()
     }
 
-    /// Render the description of the callable as HTML.
+    /// Render the description of the runnable as HTML.
     ///
     /// This will always return some text; in the absence of a `description`
     /// key, it will return a default message ("No description provided").
@@ -100,7 +100,7 @@ pub(crate) trait Callable {
         self.meta().render_description(summarize)
     }
 
-    /// Render the required inputs of the callable if present.
+    /// Render the required inputs of the runnable if present.
     fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         iter.peek()?;
@@ -120,7 +120,7 @@ pub(crate) trait Callable {
         })
     }
 
-    /// Render the inputs with a group of the callable if present.
+    /// Render the inputs with a group of the runnable if present.
     ///
     /// This will render each group with a subheader and a table
     /// of parameters that are part of that group.
@@ -156,7 +156,7 @@ pub(crate) trait Callable {
         })
     }
 
-    /// Render the inputs of the callable.
+    /// Render the inputs of the runnable.
     fn render_inputs(&self, assets: &Path) -> (Markup, PageSections) {
         let mut inner_markup = Vec::new();
         let mut headers = PageSections::default();
@@ -196,7 +196,7 @@ pub(crate) trait Callable {
         (markup, headers)
     }
 
-    /// Render the outputs of the callable.
+    /// Render the outputs of the runnable.
     fn render_outputs(&self, assets: &Path) -> Markup {
         html! {
             div class="main__section" {

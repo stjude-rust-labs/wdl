@@ -7,12 +7,12 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-mod callable;
 mod command_section;
 mod docs_tree;
 mod document;
 mod meta;
 mod parameter;
+mod runnable;
 mod r#struct;
 
 use std::path::Path;
@@ -24,8 +24,6 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
-use callable::task;
-use callable::workflow;
 pub use command_section::CommandSectionExt;
 pub use docs_tree::DocsTree;
 pub use docs_tree::DocsTreeBuilder;
@@ -42,6 +40,8 @@ use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
+use runnable::task;
+use runnable::workflow;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
@@ -576,7 +576,7 @@ mod tests {
     use wdl_ast::Document as AstDocument;
 
     use super::*;
-    use crate::callable::Callable;
+    use crate::runnable::Runnable;
 
     #[test]
     fn test_parse_preamble_comments() {

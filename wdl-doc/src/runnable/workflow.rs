@@ -203,7 +203,7 @@ impl Workflow {
     }
 }
 
-impl Callable for Workflow {
+impl Runnable for Workflow {
     fn name(&self) -> &str {
         &self.name
     }
