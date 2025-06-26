@@ -1745,22 +1745,6 @@
     border-width: 1px;
     border-color: var(--color-gray-800);
   }
-  .left-sidebar__workflow-indent-hidden {
-    margin-right: calc(var(--spacing) * 2);
-    height: 100%;
-    width: 1px;
-    flex: none;
-  }
-  .left-sidebar__workflow-indent {
-    margin-right: calc(var(--spacing) * 2);
-    height: 100%;
-    width: 1px;
-    flex: none;
-    border-radius: 0;
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-    border-color: var(--color-gray-700);
-  }
   .left-sidebar__container {
     display: flex;
     width: 100%;
