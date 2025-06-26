@@ -580,10 +580,9 @@ fn resolve_struct_member_definition(
     document_uri: &Url,
     lines: &Arc<LineIndex>,
 ) -> Result<Option<Location>> {
-    // SAFETY: we already checked `parent_node.kind()` is
-    // `SyntaxKind::UnboundDeclNode` in the `resolve_by_context` before
-    // calling this function.
-    let unbound_decl = wdl_ast::v1::UnboundDecl::cast(parent_node.clone()).unwrap();
+    let Some(unbound_decl) = wdl_ast::v1::UnboundDecl::cast(parent_node.clone()) else {
+        bail!("cannot cast to `UnboundDecl`");
+    };
     let ident = unbound_decl.name();
     if ident.span() == token.span() {
         return Ok(Some(location_from_span(document_uri, token.span(), lines)?));
@@ -604,12 +603,16 @@ fn resolve_struct_literal_item(
     lines: &Arc<LineIndex>,
     graph: &DocumentGraph,
 ) -> Result<Option<Location>> {
-    // SAFETY: we already checked `parent_node.kind()` is
-    // `SyntaxKind::LiteralStructItemNode` in the `resolve_by_context` before
-    // calling this function.
-    let struct_item = wdl_ast::v1::LiteralStructItem::cast(parent_node.clone()).unwrap();
+    let Some(struct_item) = wdl_ast::v1::LiteralStructItem::cast(parent_node.clone()) else {
+        bail!("cannot cast to `LiteralStructItem`");
+    };
     let (name, _expr) = struct_item.name_value();
 
+    // Verify that the user clicked on the specific identifier we're trying to
+    // resolve.
+    //
+    // e.g., in `name: some_variable`, both `name` and `some_variable` are
+    // identifiers.
     if name.span() != token.span() {
         return Ok(None);
     }
@@ -667,14 +670,12 @@ fn resolve_call_input_item(
     lines: &Arc<LineIndex>,
     graph: &DocumentGraph,
 ) -> Result<Option<Location>> {
-    // SAFETY: we already checked `parent_node.kind()` is
-    // `SyntaxKind::CallInputItemNode` in the `resolve_by_context` before
-    // calling this function.
-    let input_item = wdl_ast::v1::CallInputItem::cast(parent_node.clone()).unwrap();
+    let Some(input_item) = wdl_ast::v1::CallInputItem::cast(parent_node.clone()) else {
+        bail!("cannot cast to `CallInputItem`");
+    };
     let ident = input_item.name();
 
-    // Shorthand syntax like `call { i }`
-    if input_item.expr().is_none() {
+    if input_item.is_init_shorthand() {
         return Ok(None);
     }
 
@@ -685,6 +686,10 @@ fn resolve_call_input_item(
 
     // For LHS identifier, resolve to the target task/workflow's input parameter.
     let mut current = parent_node.parent();
+
+    // Walk up the CST to find the containing `CallStatement`.
+    // This traversal is necessary because call input parameters are not part of the
+    // local scope - they refer to the called task/workflow's parameter definitions.
     while let Some(node) = current {
         if node.kind() == SyntaxKind::CallStatementNode {
             let Some(call_stmt) = wdl_ast::v1::CallStatement::cast(node) else {
@@ -692,20 +697,17 @@ fn resolve_call_input_item(
             };
 
             let target = call_stmt.target();
-            let target_names: Vec<_> = target.names().collect();
-
-            let (target_name, target_namespace) = if target_names.len() == 2 {
+            let mut target_names = target.names();
+            let (target_name, target_namespace) = match (target_names.next(), target_names.next()) {
                 // Namespaced call
-                (target_names[1].text(), Some(target_names[0].text()))
-            } else if target_names.len() == 1 {
+                (Some(ns), Some(name)) => (name, Some(ns)),
                 // Local call
-                (target_names[0].text(), None)
-            } else {
-                return Ok(None);
+                (Some(name), None) => (name, None),
+                _ => return Ok(None),
             };
 
             if let Some(ns_str) = target_namespace {
-                let Some(ns) = analysis_doc.namespace(ns_str) else {
+                let Some(ns) = analysis_doc.namespace(ns_str.text()) else {
                     return Ok(None);
                 };
 
@@ -718,70 +720,56 @@ fn resolve_call_input_item(
                 };
                 let imported_lines = node.parse_state().lines().unwrap().clone();
 
-                // imported task inputs
-                if let Some(task) = imported_doc.task_by_name(target_name) {
-                    if task.inputs().contains_key(token.text()) {
-                        let scope = task.scope();
-                        if let Some(ident) = scope.lookup(token.text()) {
-                            return Ok(Some(location_from_span(
-                                ns.source(),
-                                ident.span(),
-                                &imported_lines,
-                            )?));
-                        }
-                    }
-                }
-
-                // imported workflow inputs
-                if let Some(workflow) = imported_doc.workflow() {
-                    if workflow.name() == target_name
-                        && workflow.inputs().contains_key(token.text())
-                    {
-                        let scope = workflow.scope();
-                        if let Some(ident) = scope.lookup(token.text()) {
-                            return Ok(Some(location_from_span(
-                                ns.source(),
-                                ident.span(),
-                                &imported_lines,
-                            )?));
-                        }
-                    }
-                }
+                // Imported tasks/workflow inputs
+                return find_target_input_parameter(
+                    imported_doc,
+                    target_name.text(),
+                    token,
+                    ns.source(),
+                    &imported_lines,
+                );
             } else {
-                // local task inputs
-                if let Some(task) = analysis_doc.task_by_name(target_name) {
-                    if task.inputs().contains_key(token.text()) {
-                        let scope = task.scope();
-                        if let Some(ident) = scope.lookup(token.text()) {
-                            return Ok(Some(location_from_span(
-                                document_uri,
-                                ident.span(),
-                                lines,
-                            )?));
-                        }
-                    }
-                }
-
-                // local workflow inputs
-                if let Some(workflow) = analysis_doc.workflow() {
-                    if workflow.name() == target_name
-                        && workflow.inputs().contains_key(token.text())
-                    {
-                        let scope = workflow.scope();
-                        if let Some(ident) = scope.lookup(token.text()) {
-                            return Ok(Some(location_from_span(
-                                document_uri,
-                                ident.span(),
-                                lines,
-                            )?));
-                        }
-                    }
-                }
+                // Local tasks/workflow inputs
+                return find_target_input_parameter(
+                    analysis_doc,
+                    target_name.text(),
+                    token,
+                    document_uri,
+                    lines,
+                );
             }
-            break;
         }
         current = node.parent();
     }
+    Ok(None)
+}
+
+/// Finds input parameter definitions in tasks and workflows.
+fn find_target_input_parameter(
+    doc: &Document,
+    target_name: &str,
+    token: &SyntaxToken,
+    uri: &Url,
+    lines: &Arc<LineIndex>,
+) -> Result<Option<Location>> {
+    if let Some(task) = doc.task_by_name(target_name) {
+        if task.inputs().contains_key(token.text()) {
+            let scope = task.scope();
+            if let Some(ident) = scope.lookup(token.text()) {
+                return Ok(Some(location_from_span(uri, ident.span(), lines)?));
+            }
+        }
+    }
+
+    if let Some(workflow) = doc.workflow() {
+        if workflow.name() == target_name && workflow.inputs().contains_key(token.text()) {
+            let scope = workflow.scope();
+            if let Some(ident) = scope.lookup(token.text()) {
+                return Ok(Some(location_from_span(uri, ident.span(), lines)?));
+            }
+        }
+    }
+
     Ok(None)
 }
 

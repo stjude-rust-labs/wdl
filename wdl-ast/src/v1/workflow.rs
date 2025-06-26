@@ -914,6 +914,12 @@ impl<N: TreeNode> CallInputItem<N> {
     pub fn parent(&self) -> CallStatement<N> {
         <Self as AstNode<N>>::parent(self).expect("should have parent")
     }
+
+    /// If this represents a shorthand syntax like `call { i }` instead of `call
+    /// { i = i }`
+    pub fn is_init_shorthand(&self) -> bool {
+        self.expr().is_none()
+    }
 }
 
 impl<N: TreeNode> AstNode<N> for CallInputItem<N> {
