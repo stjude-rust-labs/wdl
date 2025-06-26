@@ -445,7 +445,9 @@ impl<N: TreeNode> Ast<N> {
 /// See [Document::ast] for getting a version-specific Abstract
 /// Syntax Tree.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Document<N: TreeNode = SyntaxNode>(N);
+pub struct Document<N: TreeNode = SyntaxNode> {
+    inner: N,
+}
 
 impl<N: TreeNode> AstNode<N> for Document<N> {
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -454,14 +456,14 @@ impl<N: TreeNode> AstNode<N> for Document<N> {
 
     fn cast(inner: N) -> Option<Self> {
         if Self::can_cast(inner.kind()) {
-            Some(Self(inner))
+            Some(Self { inner })
         } else {
             None
         }
     }
 
     fn inner(&self) -> &N {
-        &self.0
+        &self.inner
     }
 }
 
@@ -519,7 +521,7 @@ impl<N: TreeNode> Document<N> {
             .as_ref()
             .and_then(|s| s.version().text().parse::<SupportedVersion>().ok())
             .map(|v| match v {
-                SupportedVersion::V1(_) => Ast::V1(v1::Ast(self.0.clone())),
+                SupportedVersion::V1(_) => Ast::V1(v1::Ast(self.inner.clone())),
             })
             .unwrap_or(Ast::Unsupported)
     }
@@ -527,13 +529,15 @@ impl<N: TreeNode> Document<N> {
     /// Morphs a document of one node type to a document of a different node
     /// type.
     pub fn morph<U: TreeNode + NewRoot<N>>(self) -> Document<U> {
-        Document(U::new_root(self.0))
+        Document {
+            inner: U::new_root(self.inner),
+        }
     }
 }
 
 impl fmt::Debug for Document {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
+        self.inner.fmt(f)
     }
 }
 
