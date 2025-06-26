@@ -212,12 +212,12 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         include_bytes!("../theme/assets/chevron-down.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-open.svg"),
-        include_bytes!("../theme/assets/dir-open.svg"),
+        assets_dir.join("chevron-up.svg"),
+        include_bytes!("../theme/assets/chevron-up.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-closed.svg"),
-        include_bytes!("../theme/assets/dir-closed.svg"),
+        assets_dir.join("dir-open.svg"),
+        include_bytes!("../theme/assets/dir-open.svg"),
     )?;
     std::fs::write(
         assets_dir.join("category-selected.svg"),

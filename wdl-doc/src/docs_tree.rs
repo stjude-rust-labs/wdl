@@ -150,7 +150,7 @@ impl Node {
 
     /// Determine if the node is part of a path.
     ///
-    /// Path can be an absolute path or a path relative to the root.
+    /// Path should be relative to the root or false positives may occur.
     pub fn part_of_path<P: AsRef<Path>>(&self, path: P) -> bool {
         let path = path.as_ref();
         self.path()
@@ -523,6 +523,9 @@ impl DocsTree {
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
+        let rel_path = path
+            .strip_prefix(self.root_abs_path())
+            .expect("path should be in root");
         let base = path.parent().expect("path should have a parent");
 
         let make_key = |path: &Path| -> String {
@@ -632,7 +635,7 @@ impl DocsTree {
                 } else {
                     None
                 };
-                let selected = node.part_of_path(path);
+                let selected = node.part_of_path(rel_path);
                 let current = path == self.root_abs_path().join(node.path());
                 let icon = match node.page() {
                     Some(page) => match page.page_type() {
@@ -720,7 +723,6 @@ impl DocsTree {
             r#"{{
                 showWorkflows: $persist(true).using(sessionStorage),
                 search: $persist('').using(sessionStorage),
-                chevron: '{}',
                 dirOpen: '{}',
                 dirClosed: '{}',
                 nodes: [{}],
@@ -771,9 +773,8 @@ impl DocsTree {
                     }});
                 }}
             }}"#,
+            self.get_asset(base, "chevron-up.svg"),
             self.get_asset(base, "chevron-down.svg"),
-            self.get_asset(base, "dir-open.svg"),
-            self.get_asset(base, "dir-closed.svg"),
             all_nodes
                 .iter()
                 .map(|node| node.to_js())
@@ -829,7 +830,10 @@ impl DocsTree {
                                         div class="left-sidebar__indent" {}
                                     }
                                     div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
-                                        img x-bind:src="node.icon || dirOpen" class="left-sidebar__icon shrink-0" alt="Node icon";
+                                        div class="relative left-sidebar__icon" {
+                                            img x-bind:src="node.icon || dirOpen" x-show="showChildrenCache[node.key]" class="left-sidebar__icon" alt="Node icon";
+                                            img x-bind:src="dirClosed" x-show="(node.icon === null) && !showChildrenCache[node.key]" class="left-sidebar__icon absolute left-0 top-0 cursor-pointer";
+                                        }
                                         div x-bind:class="node.selected ? 'text-slate-50 crop-ellipsis' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50 crop-ellipsis'" x-text="node.display_name" {
                                         }
                                     }
