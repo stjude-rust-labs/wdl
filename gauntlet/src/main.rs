@@ -2,8 +2,7 @@
 //! documents.
 //!
 //! **Note:** this tool is intended to be used as a utility to test and develop
-//! the [`wdl-grammar`](https://crates.io/crates/wdl-grammar) and
-//! [`wdl-ast`](https://crates.io/crates/wdl-ast) crates. It is not intended to
+//! [`wdl-ast`](https://crates.io/crates/wdl-ast). It is not intended to
 //! be used by a general audience.
 
 #![warn(missing_docs)]

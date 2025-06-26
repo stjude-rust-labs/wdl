@@ -258,7 +258,7 @@ mod tests {
 
     #[test]
     fn filter_parents() {
-        let (tree, _) = SyntaxTree::parse(
+        let wdl_ast::concrete::ParseResult { tree, .. } = SyntaxTree::parse(
             r#"version 1.2
 
 task foo {

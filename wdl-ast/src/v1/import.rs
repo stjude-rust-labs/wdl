@@ -5,8 +5,6 @@ use std::path::Path;
 
 use rowan::NodeOrToken;
 use url::Url;
-use crate::concrete::lexer::v1::Logos;
-use crate::concrete::lexer::v1::Token;
 
 use super::AliasKeyword;
 use super::AsKeyword;
@@ -19,6 +17,8 @@ use crate::Span;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
+use crate::concrete::lexer::v1::Logos;
+use crate::concrete::lexer::v1::Token;
 
 /// Represents an import statement.
 #[derive(Clone, Debug, PartialEq, Eq)]

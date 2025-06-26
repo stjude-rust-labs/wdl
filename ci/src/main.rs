@@ -22,8 +22,8 @@
 //!
 //! The binary will also automatically update the dependencies of crates to
 //! point to the new version of crates that we're bumping. This means that if
-//! `wdl-ast` depends on `wdl-grammar` and we're bumping `wdl-grammar` then
-//! `wdl-ast` will be updated to depend on the new version of `wdl-grammar`.
+//! `wdl-analysis` depends on `wdl-ast` and we're bumping `wdl-ast` then
+//! `wdl-analysis` will be updated to depend on the new version of `wdl-ast`.
 //!
 //! The binary will also automatically retry publishing crates that fail to
 //! publish. This is because crates.io can sometimes be rate-limited or have

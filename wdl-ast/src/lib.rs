@@ -12,8 +12,10 @@
 //!
 //! ## Relation to concrete syntax
 //!
-//! The AST implementation is a wrapper around concrete syntax trees (CST). To
-//! access the underlying CST, you can use methods from the [`AstNode`] trait,
+//! The AST implementation is a wrapper around concrete syntax trees (CST). Each
+//! AST representation internally holds a CST node or token, which allows cheap
+//! construction and cloning of ASTs at any level of the tree. To access the
+//! underlying CST, you can use methods from the [`AstNode`] trait,
 //! or build CSTs directly using [`SyntaxTree`] or the other types defined in
 //! the [`concrete`] module.
 //!
@@ -492,7 +494,7 @@ impl Document {
     /// }
     /// ```
     pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
-        let (tree, diagnostics) = SyntaxTree::parse(source);
+        let concrete::ParseResult { tree, diagnostics } = SyntaxTree::parse(source);
         (
             Document::cast(tree.into_syntax()).expect("document should cast"),
             diagnostics,

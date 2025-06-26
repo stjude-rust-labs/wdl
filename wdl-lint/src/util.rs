@@ -176,7 +176,7 @@ mod test {
 
     #[test]
     fn it_detects_inline() {
-        let (tree, _) = wdl_ast::SyntaxTree::parse(
+        let wdl_ast::concrete::ParseResult { tree, .. } = wdl_ast::SyntaxTree::parse(
             r#"      # not an in-line comment
 
 version 1.2

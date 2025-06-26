@@ -64,13 +64,13 @@ use wdl::grammar;
 You are free to include component crates directly. For example,
 
 ```bash
-cargo add wdl_grammar
+cargo add wdl_ast
 ```
 
 and then
 
 ```rust
-use wdl_grammar;
+use wdl_ast;
 ```
 
 Be aware, however, that versions between component crates are explicitly not

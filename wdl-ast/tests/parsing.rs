@@ -132,7 +132,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
             )
         })?
         .replace("\r\n", "\n");
-    let (tree, diagnostics) = SyntaxTree::parse(&source);
+    let wdl_ast::concrete::ParseResult { tree, diagnostics } = SyntaxTree::parse(&source);
     compare_result(&path.with_extension("tree"), &format!("{:#?}", tree), false)?;
     compare_result(
         &path.with_extension("errors"),

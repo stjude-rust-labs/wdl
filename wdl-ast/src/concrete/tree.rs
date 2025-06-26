@@ -652,6 +652,20 @@ pub fn construct_tree(source: &str, mut events: Vec<Event>) -> SyntaxNode {
     SyntaxNode::new_root(builder.finish())
 }
 
+/// The result of calling [`SyntaxTree::parse()`].
+///
+/// Since the parser is infallible, a result will always be returned. However,
+/// `diagnostics` may be non-empty for syntactically invalid inputs.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParseResult {
+    /// The parsed syntax tree.
+    pub tree: SyntaxTree,
+    /// The diagnostics encountered during the parse.
+    ///
+    /// If this is empty, the tree is syntactically correct.
+    pub diagnostics: Vec<Diagnostic>,
+}
+
 /// Represents an untyped concrete syntax tree.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct SyntaxTree(SyntaxNode);
@@ -670,16 +684,20 @@ impl SyntaxTree {
     /// # Example
     ///
     /// ```rust
+    /// # use wdl_ast::concrete::ParseResult;
     /// # use wdl_ast::concrete::SyntaxTree;
-    /// let (tree, diagnostics) = SyntaxTree::parse("version 1.1");
+    /// let ParseResult { tree, diagnostics } = SyntaxTree::parse("version 1.1");
     /// assert!(diagnostics.is_empty());
     /// println!("{tree:#?}");
     /// ```
-    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
+    pub fn parse(source: &str) -> ParseResult {
         let parser = Parser::new(Lexer::new(source));
         let (events, mut diagnostics) = grammar::document(source, parser);
         diagnostics.sort();
-        (Self(construct_tree(source, events)), diagnostics)
+        ParseResult {
+            tree: Self(construct_tree(source, events)),
+            diagnostics,
+        }
     }
 
     /// Gets the root syntax node of the tree.
@@ -817,7 +835,7 @@ mod tests {
 
     #[test]
     fn preceding_comments() {
-        let (tree, diagnostics) = SyntaxTree::parse(
+        let ParseResult { tree, diagnostics } = SyntaxTree::parse(
             "version 1.2
 
 # This comment should not be included
@@ -856,7 +874,7 @@ workflow foo {} # This should not be collected.
 
     #[test]
     fn succeeding_comments() {
-        let (tree, diagnostics) = SyntaxTree::parse(
+        let ParseResult { tree, diagnostics } = SyntaxTree::parse(
             "version 1.2
 
 # This comment should not be included
@@ -888,7 +906,7 @@ workflow foo {} # Here is a comment that should be collected.
 
     #[test]
     fn inline_comment() {
-        let (tree, diagnostics) = SyntaxTree::parse(
+        let ParseResult { tree, diagnostics } = SyntaxTree::parse(
             "version 1.2
 
 # This comment should not be included

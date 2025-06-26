@@ -159,7 +159,7 @@ mod tests {
 
         let green_node = GREEN_NODE
             .get_or_init(|| {
-                let (tree, diagnostics) = SyntaxTree::parse(
+                let crate::concrete::ParseResult { tree, diagnostics } = SyntaxTree::parse(
                     r#"version 1.2
 
 task hello {
