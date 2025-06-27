@@ -199,7 +199,7 @@ impl Workflow {
                     }
                     (self.render_allow_nested_inputs())
                 }
-                (self.render_runnable_with(assets))
+                (self.render_run_wiith(assets))
                 div class="main__section" {
                     (meta_markup)
                 }

@@ -107,8 +107,8 @@ pub(crate) trait Runnable {
         self.meta().render_description(summarize)
     }
 
-    /// Render the "runnable with" component of the runnable.
-    fn render_runnable_with(&self, _assets: &Path) -> Markup {
+    /// Render the "run with" component of the runnable.
+    fn render_run_wiith(&self, _assets: &Path) -> Markup {
         if let Some(wdl_path) = self.wdl_path() {
             html! {
                 div class="main__run-with-container" {

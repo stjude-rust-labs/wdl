@@ -37,14 +37,14 @@ pub struct Task {
     /// The path from the root of the WDL workspace to the WDL document which
     /// contains this task.
     ///
-    /// Used to render the "runnable with" component.
+    /// Used to render the "run with" component.
     wdl_path: Option<PathBuf>,
 }
 
 impl Task {
     /// Create a new task.
     ///
-    /// If `wdl_path` is ommitted, no "runnable with" component will be
+    /// If `wdl_path` is ommitted, no "run with" component will be
     /// rendered.
     pub fn new(
         name: String,
@@ -159,7 +159,7 @@ impl Task {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
-                (self.render_runnable_with(assets))
+                (self.render_run_wiith(assets))
                 @if let Some(meta) = self.render_meta(assets) {
                     div class="main__section" {
                         (meta)
