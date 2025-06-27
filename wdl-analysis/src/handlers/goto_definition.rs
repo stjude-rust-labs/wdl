@@ -206,14 +206,14 @@ fn resolve_type_reference(
                 .namespace(ns_name)
                 .expect("namespace should be present");
             let node = graph.get(graph.get_index(ns.source()).unwrap());
-            let imported_lines = node.parse_state().lines().unwrap().clone();
+            let imported_lines = node.parse_state().lines().unwrap();
             let imported_doc = node.document().expect("document should exist");
 
             if let Some(original_struct) = imported_doc.struct_by_name(ident_text) {
                 return Ok(Some(location_from_span(
                     ns.source(),
                     original_struct.name_span(),
-                    &imported_lines,
+                    imported_lines,
                 )?));
             }
         }
@@ -231,11 +231,11 @@ fn resolve_type_reference(
             continue;
         };
 
-        let imported_lines = node.parse_state().lines().unwrap().clone();
+        let imported_lines = node.parse_state().lines().unwrap();
         return Ok(Some(location_from_span(
             ns.source(),
             struct_info.name_span(),
-            &imported_lines,
+            imported_lines,
         )?));
     }
 
@@ -278,13 +278,13 @@ fn resolve_call_target(
             let Some(imported_doc) = node.document() else {
                 return Ok(None);
             };
-            let imported_lines = node.parse_state().lines().unwrap().clone();
+            let imported_lines = node.parse_state().lines().unwrap();
 
             if let Some(task_def) = imported_doc.task_by_name(callee_name_str) {
                 return Ok(Some(location_from_span(
                     ns_info.source(),
                     task_def.name_span(),
-                    &imported_lines,
+                    imported_lines,
                 )?));
             }
 
@@ -295,7 +295,7 @@ fn resolve_call_target(
                 return Ok(Some(location_from_span(
                     ns_info.source(),
                     wf_def.name_span(),
-                    &imported_lines,
+                    imported_lines,
                 )?));
             }
         } else if target_names.len() == 1 {
@@ -379,13 +379,13 @@ fn resolve_global_identifier(
 
         // SAFETY: we know `lines` will return Some as we only reach here when
         // `node.document` is fully parsed.
-        let imported_lines = node.parse_state().lines().unwrap().clone();
+        let imported_lines = node.parse_state().lines().unwrap();
 
         if let Some(location) = find_global_definition_in_doc(
             imported_doc,
             ident_text,
             ns.source().as_ref(),
-            &imported_lines,
+            imported_lines,
         )? {
             return Ok(Some(location));
         }
@@ -461,7 +461,7 @@ fn resolve_access_expression(
             // SAFETY: we know `lines` will return Some as we only reach here when
             // `node.document` is fully parsed and in `ParsedState::Parse`
             // state.
-            let imported_lines = node.parse_state().lines().unwrap().clone();
+            let imported_lines = node.parse_state().lines().unwrap();
 
             let struct_node =
                 v1::StructDefinition::cast(SyntaxNode::new_root(original_struct.node().clone()))
@@ -476,11 +476,7 @@ fn resolve_access_expression(
                     member_span.start() + original_struct.offset(),
                     member_span.len(),
                 );
-                return Ok(Some(location_from_span(
-                    ns.source(),
-                    span,
-                    &imported_lines,
-                )?));
+                return Ok(Some(location_from_span(ns.source(), span, imported_lines)?));
             }
         }
 
@@ -515,10 +511,10 @@ fn resolve_access_expression(
 
                 // SAFETY: we successfully got the document above, it's in
                 // `ParseState::Parsed` which always has a valid lines field.
-                let lines = imported_node.parse_state().lines().unwrap().clone();
+                let lines = imported_node.parse_state().lines().unwrap();
                 (ns.source().as_ref(), lines)
             }
-            None => (document_uri, lines.clone()),
+            None => (document_uri, lines),
         };
 
         let struct_node =
@@ -535,7 +531,7 @@ fn resolve_access_expression(
         let member_span = member.name().span();
         let span = Span::new(member_span.start() + struct_def.offset(), member_span.len());
         // Returns found struct member definition location.
-        return Ok(Some(location_from_span(uri, span, &def_lines)?));
+        return Ok(Some(location_from_span(uri, span, def_lines)?));
     }
 
     if let Some(call_ty) = target_type.as_call() {
@@ -556,17 +552,17 @@ fn resolve_access_expression(
 
                 // SAFETY: we successfully got the document above, it's in
                 // `ParseState::Parsed` which always has a valid lines field.
-                let lines = imported_node.parse_state().lines().unwrap().clone();
-                (ns.source().as_ref(), lines.clone())
+                let lines = imported_node.parse_state().lines().unwrap();
+                (ns.source().as_ref(), lines)
             }
-            None => (document_uri, lines.clone()),
+            None => (document_uri, lines),
         };
 
         // Returns found call output definition location.
         return Ok(Some(location_from_span(
             uri,
             output.name_span(),
-            &callee_lines,
+            callee_lines,
         )?));
     }
 
@@ -627,12 +623,21 @@ fn resolve_struct_literal_item(
     if let Some(struct_info) = analysis_doc.struct_by_name(struct_name.text()) {
         let (uri, def_lines) = match struct_info.namespace() {
             Some(ns_name) => {
+                // SAFETY: we just found a struct_info with this namespace name and the document
+                // guarantees that `analysis_doc.namespaces` contains a corresponding entry for
+                // `ns_name`.
                 let ns = analysis_doc.namespace(ns_name).unwrap();
+
+                // SAFETY: `ns.source` comes from a valid namespace entry which guarantees the
+                // document exists in the graph.
                 let imported_node = graph.get(graph.get_index(ns.source()).unwrap());
-                let lines = imported_node.parse_state().lines().unwrap().clone();
+
+                // SAFETY: we successfully got the document above, it's in
+                // `ParseState::Parsed` which always has a valid lines field.
+                let lines = imported_node.parse_state().lines().unwrap();
                 (ns.source().as_ref(), lines)
             }
-            None => (document_uri, lines.clone()),
+            None => (document_uri, lines),
         };
 
         let node =
@@ -645,7 +650,7 @@ fn resolve_struct_literal_item(
                 member_span.start() + struct_info.offset(),
                 member_span.len(),
             );
-            return Ok(Some(location_from_span(uri, span, &def_lines)?));
+            return Ok(Some(location_from_span(uri, span, def_lines)?));
         }
     }
 
@@ -718,7 +723,10 @@ fn resolve_call_input_item(
                 let Some(imported_doc) = node.document() else {
                     return Ok(None);
                 };
-                let imported_lines = node.parse_state().lines().unwrap().clone();
+
+                // SAFETY: we successfully got the document above, it's in
+                // `ParseState::Parsed` which always has a valid lines field.
+                let imported_lines = node.parse_state().lines().unwrap();
 
                 // Imported tasks/workflow inputs
                 return find_target_input_parameter(
@@ -726,7 +734,7 @@ fn resolve_call_input_item(
                     target_name.text(),
                     token,
                     ns.source(),
-                    &imported_lines,
+                    imported_lines,
                 );
             } else {
                 // Local tasks/workflow inputs
