@@ -74,7 +74,6 @@
   font-weight: 600;
   padding-bottom: .3em;
   font-size: 2em;
-  border-bottom: 1px solid #3d444db3;
 }
 
 .markdown-body mark {
@@ -279,7 +278,6 @@
   font-weight: 600;
   padding-bottom: .3em;
   font-size: 1.5em;
-  border-bottom: 1px solid #3d444db3;
 }
 
 .markdown-body h3 {
