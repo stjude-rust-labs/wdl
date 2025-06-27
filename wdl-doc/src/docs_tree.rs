@@ -785,7 +785,7 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); })" class="left-sidebar__container" {
+            div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__container" {
                 // top navbar
                 div class="sticky px-4" {
                     img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
@@ -795,12 +795,11 @@ impl DocsTree {
                         img src=(self.get_asset(base, "x-mark.svg")) class="absolute right-2 top-1/2 -translate-y-1/2 size-6 hover:cursor-pointer" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                     }
                     div class="left-sidebar__tabs-container mt-4" {
-                        button x-on:click="showWorkflows = true; search = ''" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                        button x-on:click="showWorkflows = true; search = ''; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        // TODO clicking this should scroll the active page into view
-                        button x-on:click="showWorkflows = false" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                        button x-on:click="showWorkflows = false; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -810,8 +809,8 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
                         sprocket-tooltip content=(root.name()) class="block" {
                             a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item w-full group rounded-md" {
-                                div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
-                                    div class="relative" {
+                                div class="left-sidebar__content-item-container crop-ellipsis" {
+                                    div class="relative shrink-0" {
                                         img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
                                     }
                                     div class="text-slate-50 crop-ellipsis" { (root.name()) }
@@ -824,8 +823,8 @@ impl DocsTree {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
                                         div x-show="showSelfCache[node.key]" class="left-sidebar__indent" {}
                                     }
-                                    div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" x-show="showSelfCache[node.key]" {
-                                        div class="relative" {
+                                    div class="left-sidebar__content-item-container crop-ellipsis" x-show="showSelfCache[node.key]" {
+                                        div class="relative shrink-0" {
                                             img x-show="showSelfCache[node.key]" x-bind:src="node.icon || dirOpen" class="left-sidebar__icon shrink-0" alt="Node icon";
                                             img x-show="showSelfCache[node.key] && (children(node.key).length > 0)" "x-on:click.stop.prevent"="toggleChildren(node.key)" x-bind:src="chevron" class="left-sidebar__icon absolute left-0 top-0 opacity-0 transition-all hover:opacity-100 transition-all hover:scale-125 cursor-pointer" alt="Node icon";
                                         }
@@ -985,36 +984,95 @@ impl DocsTree {
             }
         };
 
+        let homepage_content = html! {
+            h5 class="main__homepage-header" {
+                "Home"
+            }
+            (content)
+        };
+
         let html = full_page(
             "Home",
-            html! {
-                // TODO the mobile menu button code is duplicated in `write_page`
-                div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
-                    div class="layout__sidebar-left" {
-                        (left_sidebar)
-                    }
-                    div class="layout__main-center" {
-                        button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {
-                            svg viewBox="0 0 100 80" width="40" height="40" stroke="none" fill="currentColor" {
-                                rect width="100" height="15" {}
-                                rect y="35" width="100" height="15" {}
-                                rect y="70" width="100" height="15" {}
-                            }
-                        }
-                        h5 class="main__homepage-header" {
-                            "Home"
-                        }
-                        (content)
-                    }
-                    div class="layout__sidebar-right" {
-                        (self.render_right_sidebar(PageSections::default()))
-                    }
-                }
-            },
+            self.render_layout(
+                left_sidebar,
+                homepage_content,
+                self.render_right_sidebar(PageSections::default()),
+                None
+            ),
             self.root().path(),
         );
         std::fs::write(index_path, html.into_string())?;
         Ok(())
+    }
+
+    /// Render reusable sidebar control buttons
+    fn render_sidebar_control_buttons(&self) -> Markup {
+        html! {
+            button 
+                x-on:click="collapseSidebar()" 
+                x-bind:disabled="sidebarState === 'hidden'"
+                x-bind:class="getSidebarButtonClass('hidden')"
+                { "«" }
+            button
+                class="text-sm!"
+                x-on:click="restoreSidebar()" 
+                x-bind:disabled="sidebarState === 'normal'"
+                x-bind:class="getSidebarButtonClass('normal')"
+                { "☰" }
+            button 
+                x-on:click="expandSidebar()" 
+                x-bind:disabled="sidebarState === 'xl'"
+                x-bind:class="getSidebarButtonClass('xl')"
+                { "»" }
+        }
+    }
+
+    /// Render the main layout template with left sidebar, content, and right sidebar.
+    fn render_layout(&self, left_sidebar: Markup, content: Markup, right_sidebar: Markup, breadcrumbs: Option<Markup>) -> Markup {
+        html! {
+            div class="layout__container layout__container--alt-layout" x-data="{
+                sidebarState: window.innerWidth < 768 ? 'hidden' : 'normal',
+                get showSidebarButtons() { return this.sidebarState !== 'hidden'; },
+                get showCenterButtons() { return this.sidebarState === 'hidden'; },
+                get containerClasses() {
+                    const base = 'layout__container layout__container--alt-layout';
+                    switch(this.sidebarState) {
+                        case 'hidden': return base + ' layout__container--left-hidden';
+                        case 'xl': return base + ' layout__container--left-xl';
+                        default: return base;
+                    }
+                },
+                getSidebarButtonClass(state) {
+                    return 'left-sidebar__size-button ' + (this.sidebarState === state ? 'left-sidebar__size-button--disabled' : 'left-sidebar__size-button--active');
+                },
+                collapseSidebar() { this.sidebarState = 'hidden'; },
+                restoreSidebar() { this.sidebarState = 'normal'; },
+                expandSidebar() { this.sidebarState = 'xl'; }
+            }" x-bind:class="containerClasses" {
+                div class="layout__sidebar-left" {
+                    div class="absolute top-2 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
+                        (self.render_sidebar_control_buttons())
+                    }
+                    (left_sidebar)
+                }
+                div class="layout__main-center" {
+                    div class="absolute top-2 left-2 flex gap-1 z-10" x-show="showCenterButtons" {
+                        (self.render_sidebar_control_buttons())
+                    }
+                    @if let Some(breadcrumbs) = breadcrumbs {
+                        div class="layout__breadcrumbs" {
+                            (breadcrumbs)
+                        }
+                    }
+                    div class="layout__main-center-content" {
+                        (content)
+                    }
+                }
+                div class="layout__sidebar-right" {
+                    (right_sidebar)
+                }
+            }
+        }
     }
 
     /// Write a page to disk at the designated path.
@@ -1037,30 +1095,12 @@ impl DocsTree {
 
         let html = full_page(
             page.name(),
-            html! {
-                // TODO the mobile menu button code is duplicated in `write_homepage`
-                div class="layout__container layout__container--with-mobile-menu" x-data="{ open: false }" x-bind:class="open ? 'open' : ''" {
-                    div class="layout__sidebar-left" {
-                        (left_sidebar)
-                    }
-                    div class="layout__main-center" {
-                        div class="layout__breadcrumbs" {
-                            (breadcrumbs)
-                        }
-                        button type="button" class="layout__mobile-menu-button" x-on:click="open = !open" aria-label="Toggle menu" {
-                            svg viewBox="0 0 100 80" width="40" height="40" stroke="none" fill="currentColor" {
-                                rect width="100" height="15" {}
-                                rect y="35" width="100" height="15" {}
-                                rect y="70" width="100" height="15" {}
-                            }
-                        }
-                        (content)
-                    }
-                    div class="layout__sidebar-right" {
-                        (self.render_right_sidebar(headers))
-                    }
-                }
-            },
+            self.render_layout(
+                left_sidebar,
+                content,
+                self.render_right_sidebar(headers),
+                Some(breadcrumbs)
+            ),
             self.root_relative_to(base),
         );
         std::fs::write(path, html.into_string())?;
