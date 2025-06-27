@@ -476,7 +476,7 @@ impl DocsTree {
         html! {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
-                    div class="left-sidebar__content-item" {
+                    div class="left-sidebar__row" {
                         img src=(self.get_asset(base, "category-selected.svg")) class="left-sidebar__icon" alt="Category icon";
                         p class="text-slate-50" { (category) }
                     }
@@ -494,7 +494,7 @@ impl DocsTree {
                                     } else {
                                         "workflow-unselected.svg"
                                     },
-                            ))) class="left-sidebar__content-item" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
+                            ))) class="left-sidebar__row" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
@@ -562,8 +562,8 @@ impl DocsTree {
             icon: Option<String>,
             /// The href for the node.
             href: Option<String>,
-            /// Whether the node is selected.
-            selected: bool,
+            /// Whether the node is ancestor.
+            ancestor: bool,
             /// Whether the node is the current page.
             current: bool,
             /// The nest level of the node.
@@ -583,7 +583,7 @@ impl DocsTree {
                         search_name: '{}',
                         icon: {},
                         href: {},
-                        selected: {},
+                        ancestor: {},
                         current: {},
                         nest_level: {}
                     }}"#,
@@ -601,7 +601,7 @@ impl DocsTree {
                     } else {
                         "null".to_string()
                     },
-                    self.selected,
+                    self.ancestor,
                     self.current,
                     self.nest_level
                 )
@@ -640,13 +640,13 @@ impl DocsTree {
                 } else {
                     None
                 };
-                let selected = node.part_of_path(rel_path);
+                let ancestor = node.part_of_path(rel_path);
                 let current = path == self.root_abs_path().join(node.path());
                 let icon = match node.page() {
                     Some(page) => match page.page_type() {
                         PageType::Task(_) => Some(self.get_asset(
                             base,
-                            if selected {
+                            if ancestor {
                                 "task-selected.svg"
                             } else {
                                 "task-unselected.svg"
@@ -654,7 +654,7 @@ impl DocsTree {
                         )),
                         PageType::Struct(_) => Some(self.get_asset(
                             base,
-                            if selected {
+                            if ancestor {
                                 "struct-selected.svg"
                             } else {
                                 "struct-unselected.svg"
@@ -662,7 +662,7 @@ impl DocsTree {
                         )),
                         PageType::Workflow(_) => Some(self.get_asset(
                             base,
-                            if selected {
+                            if ancestor {
                                 "workflow-selected.svg"
                             } else {
                                 "workflow-unselected.svg"
@@ -670,7 +670,7 @@ impl DocsTree {
                         )),
                         PageType::Index(_) => Some(self.get_asset(
                             base,
-                            if selected {
+                            if ancestor {
                                 "wdl-dir-selected.svg"
                             } else {
                                 "wdl-dir-unselected.svg"
@@ -696,7 +696,7 @@ impl DocsTree {
                     search_name: search_name.clone(),
                     icon,
                     href,
-                    selected,
+                    ancestor,
                     current,
                     nest_level,
                     children,
@@ -817,28 +817,28 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
                         // Root node for the directory tree
                         sprocket-tooltip content=(root.name()) class="block" {
-                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item hover:bg-slate-700" {
+                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__row hover:bg-slate-700" {
                                 div class="left-sidebar__content-item-container crop-ellipsis" {
                                     div class="relative shrink-0" {
                                         img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
                                     }
-                                    div class="text-slate-50 crop-ellipsis" { (root.name()) }
+                                    div class="text-slate-50" { (root.name()) }
                                 }
                             }
                         }
                         // Nodes in the directory tree
                         template x-for="node in shownNodes" {
                             sprocket-tooltip x-bind:content="node.display_name" class="block" {
-                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__content-item hover:cursor-pointer" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
+                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__row" x-bind:class="node.current ? 'is-scrolled-to left-sidebar__row--active' : (node.href === null) ? showChildrenCache[node.key] ? 'left-sidebar__row-folder--open' : 'left-sidebar__row-folder--closed' : 'left-sidebar__row-page'" {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
                                         div class="left-sidebar__indent" {}
                                     }
-                                    div class="left-sidebar__content-item-container crop-ellipsis" {
+                                    div class="left-sidebar__content-item-container crop-ellipsis" x-bind:class="node.ancestor ? 'left-sidebar__content-item-container--ancestor' : ''" {
                                         div class="relative left-sidebar__icon" {
                                             img x-bind:src="node.icon || dirOpen" x-show="showChildrenCache[node.key]" class="left-sidebar__icon" alt="Node icon";
                                             img x-bind:src="dirClosed" x-show="(node.icon === null) && !showChildrenCache[node.key]" class="left-sidebar__icon absolute left-0 top-0 cursor-pointer";
                                         }
-                                        div x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'transition-all duration-150 group-hover:text-slate-50'" class="crop-ellipsis" x-text="node.display_name" {
+                                        div class="" x-text="node.display_name" {
                                         }
                                     }
                                 }

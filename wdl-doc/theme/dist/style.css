@@ -803,17 +803,22 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-400: oklch(70.4% 0.191 22.216);
+    --color-red-500: oklch(63.7% 0.237 25.331);
     --color-red-950: oklch(25.8% 0.092 26.042);
     --color-yellow-50: oklch(98.7% 0.026 102.212);
+    --color-yellow-600: oklch(68.1% 0.162 75.834);
     --color-yellow-900: oklch(42.1% 0.095 57.708);
     --color-green-200: oklch(92.5% 0.084 155.995);
     --color-green-400: oklch(79.2% 0.209 151.711);
+    --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-950: oklch(26.6% 0.065 152.934);
     --color-emerald-300: oklch(84.5% 0.143 164.978);
     --color-emerald-400: oklch(76.5% 0.177 163.223);
+    --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-violet-300: oklch(81.1% 0.111 293.571);
     --color-violet-400: oklch(70.2% 0.183 293.541);
+    --color-purple-600: oklch(55.8% 0.288 302.321);
     --color-pink-300: oklch(82.3% 0.12 346.018);
     --color-pink-400: oklch(71.8% 0.202 349.761);
     --color-slate-50: oklch(98.4% 0.003 247.858);
@@ -1209,15 +1214,6 @@
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, visibility, content-visibility, overlay, pointer-events;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
-  }
-  .transition-all {
-    transition-property: all;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
-  }
-  .duration-150 {
-    --tw-duration: 150ms;
-    transition-duration: 150ms;
   }
   .group-hover\:text-slate-50 {
     &:is(:where(.group):hover *) {
@@ -1864,7 +1860,7 @@
   .left-sidebar__content {
     width: 100%;
   }
-  .left-sidebar__content-item {
+  .left-sidebar__row {
     display: flex;
     height: calc(var(--spacing) * 8);
     width: 100%;
@@ -1873,11 +1869,31 @@
     column-gap: calc(var(--spacing) * 1);
     border-radius: var(--radius-md);
   }
+  .left-sidebar__row--active {
+    background-color: var(--color-red-500);
+    color: var(--color-slate-50);
+  }
+  .left-sidebar__row-page {
+    background-color: var(--color-blue-500);
+    color: var(--color-slate-400);
+  }
+  .left-sidebar__row-folder--open {
+    background-color: var(--color-green-500);
+    color: var(--color-slate-50);
+  }
+  .left-sidebar__row-folder--closed {
+    background-color: var(--color-yellow-600);
+    color: var(--color-slate-400);
+  }
   .left-sidebar__content-item-container {
     display: flex;
     flex-direction: row;
     align-items: center;
     column-gap: calc(var(--spacing) * 1);
+  }
+  .left-sidebar__content-item-container--ancestor {
+    background-color: var(--color-purple-600);
+    color: var(--color-slate-50);
   }
   .left-sidebar__search-result-item {
     display: flex;
@@ -2272,11 +2288,11 @@
   syntax: "*";
   inherits: false;
 }
-@property --tw-duration {
+@property --tw-leading {
   syntax: "*";
   inherits: false;
 }
-@property --tw-leading {
+@property --tw-duration {
   syntax: "*";
   inherits: false;
 }
@@ -2324,8 +2340,8 @@
       --tw-drop-shadow-color: initial;
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
-      --tw-duration: initial;
       --tw-leading: initial;
+      --tw-duration: initial;
       --tw-font-weight: initial;
     }
   }
