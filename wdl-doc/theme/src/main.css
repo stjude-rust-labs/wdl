@@ -204,6 +204,28 @@
     /* should render a grid with 2 columns, the first should shrink, and the second should take up the remaining space */
     @apply rounded-lg bg-[#291404] border border-yellow-900 p-3 grid grid-cols-[auto_1fr] text-yellow-50 items-center gap-2 text-sm mt-3;
   }
+  /* RUN WITH component */
+  .main__run-with-container {
+    @apply flex flex-col gap-2 text-sm rounded-md bg-slate-900 border border-slate-800 mt-4 p-4;
+  }
+  .main__run-with-label {
+    @apply flex flex-row shrink gap-2 text-slate-50 text-xs;
+  }
+  .main__run-with-toggle {
+    @apply flex items-center justify-center rounded-full border border-slate-700;
+  }
+  .main__run-with-toggle-label--active {
+    @apply bg-slate-50 text-slate-900 rounded-full px-2;
+  }
+  .main__run-with-toggle-label--inactive {
+    @apply bg-slate-900 text-slate-50 rounded-full px-2;
+  }
+  .main__run-with-content {
+    @apply flex flex-row gap-2 mt-2;
+  }
+  .main__run-with-content-text {
+    @apply text-sm;
+  }
   /**
    * Main Grids
    */

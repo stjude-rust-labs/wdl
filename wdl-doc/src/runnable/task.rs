@@ -1,5 +1,7 @@
 //! Create HTML documentation for WDL tasks.
 
+use std::path::PathBuf;
+
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
@@ -32,11 +34,24 @@ pub struct Task {
     runtime_section: Option<RuntimeSection>,
     /// The command section of the task.
     command_section: Option<CommandSection>,
+    /// The path from the root of the WDL workspace to the WDL document which
+    /// contains this task.
+    ///
+    /// Used to render the "runnable with" component.
+    wdl_path: Option<PathBuf>,
 }
 
 impl Task {
     /// Create a new task.
-    pub fn new(name: String, version: SupportedVersion, definition: TaskDefinition) -> Self {
+    ///
+    /// If `wdl_path` is ommitted, no "runnable with" component will be
+    /// rendered.
+    pub fn new(
+        name: String,
+        version: SupportedVersion,
+        definition: TaskDefinition,
+        wdl_path: Option<PathBuf>,
+    ) -> Self {
         let meta = match definition.metadata() {
             Some(mds) => parse_meta(&mds),
             _ => MetaMap::default(),
@@ -62,6 +77,7 @@ impl Task {
             outputs,
             runtime_section: definition.runtime(),
             command_section: definition.command(),
+            wdl_path,
         }
     }
 
@@ -143,6 +159,7 @@ impl Task {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
+                (self.render_runnable_with(assets))
                 @if let Some(meta) = self.render_meta(assets) {
                     div class="main__section" {
                         (meta)
@@ -181,6 +198,14 @@ impl Runnable for Task {
 
     fn outputs(&self) -> &[Parameter] {
         &self.outputs
+    }
+
+    fn is_workflow(&self) -> bool {
+        false
+    }
+
+    fn wdl_path(&self) -> Option<&Path> {
+        self.wdl_path.as_deref()
     }
 }
 
@@ -221,6 +246,7 @@ mod tests {
             ast_task.name().text().to_owned(),
             SupportedVersion::V1(V1::Zero),
             ast_task,
+            None,
         );
 
         assert_eq!(task.name(), "my_task");

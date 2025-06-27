@@ -42,6 +42,13 @@ pub(crate) trait Runnable {
     /// Get the [`VersionBadge`] of the runnable.
     fn version(&self) -> &VersionBadge;
 
+    /// Get the path from the root of the WDL workspace to the WDL document
+    /// which contains this runnable.
+    fn wdl_path(&self) -> Option<&Path>;
+
+    /// Is this runnable a workflow? Or is it a task?
+    fn is_workflow(&self) -> bool;
+
     /// Get the required input parameters of the runnable.
     fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
         self.inputs().iter().filter(|param| {
@@ -98,6 +105,41 @@ pub(crate) trait Runnable {
     /// key, it will return a default message ("No description provided").
     fn render_description(&self, summarize: bool) -> Markup {
         self.meta().render_description(summarize)
+    }
+
+    /// Render the "runnable with" component of the runnable.
+    fn render_runnable_with(&self, _assets: &Path) -> Markup {
+        if let Some(wdl_path) = self.wdl_path() {
+            html! {
+                div class="main__run-with-container" {
+                    div class="main__run-with-label" {
+                        "RUN WITH"
+                        button x-data="{ unix: true }" x-on:click="unix = !unix" class="main__run-with-toggle" {
+                            div x-bind:class="unix ? 'main__run-with-toggle-label--active' : 'main__run-with-toggle-label--inactive'" {
+                                "Unix"
+                            }
+                            div x-bind:class="!unix ? 'main__run-with-toggle-label--active' : 'main__run-with-toggle-label--inactive'" {
+                                "Windows"
+                            }
+                        }
+                    }
+                    div class="main__run-with-content" {
+                        p class="main__run-with-content-text" {
+                            "sprocket run "
+                            @if !self.is_workflow() {
+                                "--name "
+                                (self.name())
+                                " "
+                            }
+                            (wdl_path.display())
+                            " [INPUTS]..."
+                        }
+                    }
+                }
+            }
+        } else {
+            html! {}
+        }
     }
 
     /// Render the required inputs of the runnable if present.

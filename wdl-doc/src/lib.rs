@@ -528,7 +528,16 @@ pub async fn document_workspace(
                     let name = t.name().text().to_owned();
                     let path = cur_dir.join(format!("{name}-task.html"));
 
-                    let task = task::Task::new(name.clone(), version, t);
+                    let task = task::Task::new(
+                        name.clone(),
+                        version,
+                        t,
+                        if rel_wdl_path.starts_with("external") {
+                            None
+                        } else {
+                            Some(rel_wdl_path.clone())
+                        },
+                    );
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
                     docs_tree.add_page(path.clone(), page.clone());
@@ -539,7 +548,16 @@ pub async fn document_workspace(
                     let name = w.name().text().to_owned();
                     let path = cur_dir.join(format!("{name}-workflow.html"));
 
-                    let workflow = workflow::Workflow::new(name.clone(), version, w);
+                    let workflow = workflow::Workflow::new(
+                        name.clone(),
+                        version,
+                        w,
+                        if rel_wdl_path.starts_with("external") {
+                            None
+                        } else {
+                            Some(rel_wdl_path.clone())
+                        },
+                    );
 
                     let page = Rc::new(HTMLPage::new(
                         workflow.name_override().unwrap_or(name),
@@ -631,6 +649,7 @@ mod tests {
             ast_workflow.name().text().to_string(),
             SupportedVersion::V1(V1::Zero),
             ast_workflow,
+            None,
         );
 
         let description = workflow.render_description(false);
