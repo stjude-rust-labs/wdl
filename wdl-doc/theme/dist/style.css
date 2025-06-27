@@ -1164,14 +1164,8 @@
   .break-words {
     overflow-wrap: break-word;
   }
-  .overflow-ellipsis {
-    text-overflow: ellipsis;
-  }
   .whitespace-normal {
     white-space: normal;
-  }
-  .whitespace-nowrap {
-    white-space: nowrap;
   }
   .text-emerald-400 {
     color: var(--color-emerald-400);

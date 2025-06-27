@@ -833,7 +833,7 @@ impl DocsTree {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
                                         div class="left-sidebar__indent" {}
                                     }
-                                    div class="left-sidebar__content-item-container overflow-ellipsis whitespace-nowrap" {
+                                    div class="left-sidebar__content-item-container crop-ellipsis" {
                                         div class="relative left-sidebar__icon" {
                                             img x-bind:src="node.icon || dirOpen" x-show="showChildrenCache[node.key]" class="left-sidebar__icon" alt="Node icon";
                                             img x-bind:src="dirClosed" x-show="(node.icon === null) && !showChildrenCache[node.key]" class="left-sidebar__icon absolute left-0 top-0 cursor-pointer";
