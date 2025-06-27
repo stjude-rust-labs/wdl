@@ -28,7 +28,7 @@ class SprocketTooltip extends HTMLElement {
       }
       .tooltip.visible {
         opacity: 1;
-        transition-delay: 300ms;
+        transition-delay: 1000ms;
       }
     `;
   }
