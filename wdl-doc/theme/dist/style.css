@@ -1108,6 +1108,9 @@
   .flex-none {
     flex: none;
   }
+  .shrink-0 {
+    flex-shrink: 0;
+  }
   .-translate-y-1\/2 {
     --tw-translate-y: calc(calc(1/2 * 100%) * -1);
     translate: var(--tw-translate-x) var(--tw-translate-y);
@@ -1161,8 +1164,14 @@
   .break-words {
     overflow-wrap: break-word;
   }
+  .overflow-ellipsis {
+    text-overflow: ellipsis;
+  }
   .whitespace-normal {
     white-space: normal;
+  }
+  .whitespace-nowrap {
+    white-space: nowrap;
   }
   .text-emerald-400 {
     color: var(--color-emerald-400);

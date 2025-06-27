@@ -817,7 +817,7 @@ impl DocsTree {
                     ul x-show="! showWorkflows || search != ''" class="left-sidebar__content" {
                         // Root node for the directory tree
                         sprocket-tooltip content=(root.name()) class="block" {
-                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item w-full rounded-md hover:bg-slate-700" {
+                            a href=(self.root_index_relative_to(base).to_string_lossy()) x-show="search === ''" aria-label=(root.name()) class="left-sidebar__content-item hover:bg-slate-700" {
                                 div class="left-sidebar__content-item-container crop-ellipsis" {
                                     div class="relative shrink-0" {
                                         img src=(self.get_asset(base, "dir-open.svg")) class="left-sidebar__icon" alt="Directory icon";
@@ -1017,7 +1017,7 @@ impl DocsTree {
                 left_sidebar,
                 homepage_content,
                 self.render_right_sidebar(PageSections::default()),
-                None
+                None,
             ),
             self.root().path(),
         );
@@ -1028,27 +1028,34 @@ impl DocsTree {
     /// Render reusable sidebar control buttons
     fn render_sidebar_control_buttons(&self) -> Markup {
         html! {
-            button 
-                x-on:click="collapseSidebar()" 
+            button
+                x-on:click="collapseSidebar()"
                 x-bind:disabled="sidebarState === 'hidden'"
                 x-bind:class="getSidebarButtonClass('hidden')"
                 { "«" }
             button
                 class="text-sm!"
-                x-on:click="restoreSidebar()" 
+                x-on:click="restoreSidebar()"
                 x-bind:disabled="sidebarState === 'normal'"
                 x-bind:class="getSidebarButtonClass('normal')"
                 { "☰" }
-            button 
-                x-on:click="expandSidebar()" 
+            button
+                x-on:click="expandSidebar()"
                 x-bind:disabled="sidebarState === 'xl'"
                 x-bind:class="getSidebarButtonClass('xl')"
                 { "»" }
         }
     }
 
-    /// Render the main layout template with left sidebar, content, and right sidebar.
-    fn render_layout(&self, left_sidebar: Markup, content: Markup, right_sidebar: Markup, breadcrumbs: Option<Markup>) -> Markup {
+    /// Render the main layout template with left sidebar, content, and right
+    /// sidebar.
+    fn render_layout(
+        &self,
+        left_sidebar: Markup,
+        content: Markup,
+        right_sidebar: Markup,
+        breadcrumbs: Option<Markup>,
+    ) -> Markup {
         html! {
             div class="layout__container layout__container--alt-layout" x-data="{
                 sidebarState: window.innerWidth < 768 ? 'hidden' : 'normal',
@@ -1119,7 +1126,7 @@ impl DocsTree {
                 left_sidebar,
                 content,
                 self.render_right_sidebar(headers),
-                Some(breadcrumbs)
+                Some(breadcrumbs),
             ),
             self.root_relative_to(base),
         );
