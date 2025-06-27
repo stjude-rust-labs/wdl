@@ -1,4 +1,4 @@
-//! Handlers for "goto definition" requests.
+//! Handlers for `goto definition` requests.
 //!
 //! This module implements the LSP "textDocument/definition" functionality for
 //! WDL files. It handles various types of symbol resolution including:
