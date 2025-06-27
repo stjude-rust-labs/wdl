@@ -28,29 +28,49 @@ async function getWdlGrammar() {
   }
 }
 
+// Global singleton highlighter promise cache
+if (!window.sprocketHighlighterPromise) {
+  window.sprocketHighlighterPromise = null;
+}
+
 // Highlighter initialization logic
 export async function initializeHighlighter() {
-  console.log('sprocket-code-utils: Initializing highlighter');
-  try {
-    const wdlLangDefinition = await getWdlGrammar();
-    const languagesToLoad = []; // Don't load any languages by default
-
-    if (wdlLangDefinition) {
-      languagesToLoad.push(wdlLangDefinition);
-    } else {
-      // Log a warning if WDL grammar couldn't be loaded
-      console.warn('sprocket-code-utils: WDL grammar could not be loaded. WDL syntax highlighting will be unavailable.');
-    }
-
-    const highlighter = await createHighlighterCore({
-      themes: [materialThemeOcean],
-      langs: languagesToLoad,
-      engine: createOnigurumaEngine(wasm)
-    });
-    console.log('sprocket-code-utils: Highlighter initialized successfully');
-    return highlighter;
-  } catch (error) {
-    console.error('sprocket-code-utils: Failed to initialize highlighter core:', error);
-    return null; // Return null if core initialization fails
+  // If we already have a promise (ongoing or completed), return it
+  if (window.sprocketHighlighterPromise) {
+    console.log('sprocket-code-utils: Using cached/ongoing highlighter initialization');
+    return await window.sprocketHighlighterPromise;
   }
+
+  console.log('sprocket-code-utils: Starting highlighter initialization');
+  
+  // Create and cache the initialization promise
+  window.sprocketHighlighterPromise = (async () => {
+    try {
+      const wdlLangDefinition = await getWdlGrammar();
+      const languagesToLoad = []; // Don't load any languages by default
+
+      if (wdlLangDefinition) {
+        languagesToLoad.push(wdlLangDefinition);
+      } else {
+        // Log a warning if WDL grammar couldn't be loaded
+        console.warn('sprocket-code-utils: WDL grammar could not be loaded. WDL syntax highlighting will be unavailable.');
+      }
+
+      const highlighter = await createHighlighterCore({
+        themes: [materialThemeOcean],
+        langs: languagesToLoad,
+        engine: createOnigurumaEngine(wasm)
+      });
+      
+      console.log('sprocket-code-utils: Highlighter initialized successfully (singleton)');
+      return highlighter;
+    } catch (error) {
+      console.error('sprocket-code-utils: Failed to initialize highlighter core:', error);
+      // Reset the promise cache on error so retry is possible
+      window.sprocketHighlighterPromise = null;
+      return null;
+    }
+  })();
+
+  return await window.sprocketHighlighterPromise;
 }

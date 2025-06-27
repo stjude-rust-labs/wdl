@@ -59,17 +59,20 @@
    * Layout
    */
   .layout__container {
-    @apply h-screen w-screen flex pl-72 transition-all duration-150;
+    @apply h-screen w-screen flex pl-0 md:pl-72 transition-all duration-150 bg-slate-950;
   }
   .layout__sidebar-left {
-    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar;
+    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar z-40 transition-all duration-300;
   }
   .layout__main-center {
-    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar xl:max-w-5xl 2xl:max-w-[1300px] xl:grow-0;
+    @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
+  }
+  .layout__main-center-content {
+    @apply xl:max-w-5xl 2xl:max-w-[1300px] xl:mx-auto;
   }
   .layout__sidebar-right {
     /* should take up w-72 space and NOT grow or shrink */
-    @apply w-72 max-xl:hidden xl:flex-grow;
+    @apply w-72 max-xl:hidden;
   }
   /**
    * Layout - Alternative Layouts
@@ -80,7 +83,7 @@
    * .layout__container--right-hidden // right sidebar is hidden for larger center column (similar to mobile view)
    */
   .layout__container--alt-layout.layout__container--left-hidden .layout__sidebar-left {
-    @apply hidden;
+    @apply -translate-x-full;
   }
   .layout__container--alt-layout.layout__container--left-hidden {
     @apply pl-0;
@@ -90,14 +93,14 @@
     @apply w-96;
   }
   .layout__container--alt-layout.layout__container--left-lg {
-    @apply pl-96;
+    @apply pl-0 md:pl-96;
   }
   
   .layout__container--alt-layout.layout__container--left-xl .layout__sidebar-left {
-    @apply w-144;
+    @apply w-full md:w-144;
   }
   .layout__container--alt-layout.layout__container--left-xl {
-    @apply pl-144;
+    @apply pl-0 md:pl-144;
   }
 
   .layout__container--alt-layout.layout__container--right-hidden .layout__sidebar-right {
@@ -105,22 +108,6 @@
   }
   .layout__container--alt-layout.layout__container--right-hidden .layout__main-center {
     @apply max-w-full;
-  }
-  /**
-   * Layout - Mobile Menu
-   */
-  .layout__container--with-mobile-menu .layout__sidebar-left {
-    @apply max-md:pl-0 max-md:-translate-x-full transition-all;
-  }
-  .layout__container--with-mobile-menu.open .layout__sidebar-left {
-    @apply max-md:translate-x-0 max-md:shadow-2xl max-md:shadow-black; 
-  }
-  .layout__container--with-mobile-menu {
-    @apply max-md:pl-0;
-  }
-  .layout__mobile-menu-button {
-    /* small tab on the top right of the sidebar */
-    @apply absolute top-4 right-4 z-50 p-2 rounded-lg transition-all duration-150 bg-slate-700 text-slate-950 cursor-pointer md:hidden hover:bg-slate-600 select-none;
   }
   /**
    * Layout - Breadcrumbs
@@ -230,7 +217,7 @@
    * Main Grids
    */
   .main__grid-container {
-    @apply max-w-4xl rounded py-8;
+    @apply rounded py-8;
   }
   .main__grid-header-separator {
     @apply col-span-full border-b mb-4;
@@ -343,18 +330,27 @@
   .left-sidebar__workflow-container {
     @apply flex flex-row items-center gap-x-1;
   }
+  .left-sidebar__size-button {
+    @apply w-6 h-6 rounded flex items-center justify-center transition-all text-lg;
+  }
+  .left-sidebar__size-button--active {
+    @apply bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-slate-100 focus:ring-2 focus:ring-slate-500 cursor-pointer;
+  }
+  .left-sidebar__size-button--disabled {
+    @apply bg-slate-900 border border-slate-700 text-slate-400 opacity-70 cursor-not-allowed;
+  }
 
   /**
    * Right Sidebar
    */
   .right-sidebar__container {
-    @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col gap-1.5;
+    @apply p-4 size-full bg-slate-950 text-white isolate flex flex-col;
   }
   .right-sidebar__header {
     @apply text-xs text-slate-600;
   }
   .right-sidebar__section-header {
-    @apply max-w-xs h-7 px-2 flex items-center rounded-sm text-sm text-slate-400 hover:text-slate-300 hover:bg-slate-800 cursor-pointer;
+    @apply max-w-xs h-8 px-2 flex items-center rounded-sm text-sm text-slate-400 hover:text-slate-300 hover:bg-slate-800 cursor-pointer;
   }
   .right-sidebar__section-header--active {
     @apply bg-slate-700 text-white;
@@ -363,7 +359,7 @@
     @apply flex flex-col gap-1.5 ml-4 border-l border-slate-600;
   }
   .right-sidebar__section-item {
-    @apply max-w-xs h-7 px-4 flex items-center rounded-sm text-sm text-slate-400 -ml-2 hover:text-slate-300 hover:bg-slate-400/30 cursor-pointer;
+    @apply max-w-xs h-8 px-4 flex items-center rounded-sm text-sm text-slate-400 -ml-2 hover:text-slate-300 hover:bg-slate-400/30 cursor-pointer;
   }
   .right-sidebar__section-item--active {
     @apply bg-slate-400/20 text-white;
