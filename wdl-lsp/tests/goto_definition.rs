@@ -163,16 +163,86 @@ async fn should_goto_import_namespace_definition() {
 }
 
 #[tokio::test]
+async fn should_goto_correct_definitions_in_access_expression() {
+    let mut ctx = setup().await;
+
+    // Position of `foo` in `Int x = foo.bar.baz.qux.x`
+    let response = goto_definition_request(&mut ctx, "structs.wdl", Position::new(27, 16)).await;
+
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(20, 12), Position::new(20, 15)) // `foo` in Foo foo
+    );
+
+    // Position of `bar` in `Int x = foo.bar.baz.qux.x`
+    let response = goto_definition_request(&mut ctx, "structs.wdl", Position::new(27, 20)).await;
+
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(15, 8), Position::new(15, 11)) // `bar` in Bar bar
+    );
+
+    // Position of `baz` in `Int x = foo.bar.baz.qux.x`
+    let response = goto_definition_request(&mut ctx, "structs.wdl", Position::new(27, 24)).await;
+
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(11, 8), Position::new(11, 11)) // `baz` in Baz baz
+    );
+
+    // Position of `qux` in `Int x = foo.bar.baz.qux.x`
+    let response = goto_definition_request(&mut ctx, "structs.wdl", Position::new(27, 28)).await;
+
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(7, 8), Position::new(7, 11)) // `qux` in Qux qux
+    );
+
+    // Position of RHS `x` in `Int x = foo.bar.baz.qux.x`
+    let response = goto_definition_request(&mut ctx, "structs.wdl", Position::new(27, 32)).await;
+
+    let Some(GotoDefinitionResponse::Scalar(location)) = response else {
+        panic!("expected a single location response, got {:?}", response);
+    };
+
+    assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
+    assert_eq!(
+        location.range,
+        Range::new(Position::new(3, 8), Position::new(3, 9)) // `x` in Int x
+    );
+}
+
+#[tokio::test]
 async fn should_goto_struct_member_definition_for_struct_literal() {
     let mut ctx = setup().await;
 
     // Position of `name:` in `Person p = Person { name: ... }`
-    let response1 = goto_definition_request(&mut ctx, "source.wdl", Position::new(28, 8)).await;
+    let response1 = goto_definition_request(&mut ctx, "source.wdl", Position::new(30, 8)).await;
     let Some(GotoDefinitionResponse::Scalar(location1)) = response1 else {
         panic!("expected a single location response, got {:?}", response1);
     };
     // Position of `age:` in `Person p = Person { name: ... , age: ...}`
-    let response2 = goto_definition_request(&mut ctx, "source.wdl", Position::new(29, 8)).await;
+    let response2 = goto_definition_request(&mut ctx, "source.wdl", Position::new(31, 8)).await;
     let Some(GotoDefinitionResponse::Scalar(location2)) = response2 else {
         panic!("expected a single location response, got {:?}", response2);
     };
@@ -195,7 +265,7 @@ async fn should_goto_call_task_input_definition() {
     let mut ctx = setup().await;
 
     // Position of `a`  in `a = 1,`
-    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(23, 8)).await;
+    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(25, 8)).await;
     let Some(GotoDefinitionResponse::Scalar(location)) = response else {
         panic!("expected a single location response, got {:?}", response);
     };
@@ -212,7 +282,7 @@ async fn should_goto_call_workflow_input_definition() {
     let mut ctx = setup().await;
 
     // Position of `person`  in `call lib.process { input: person = p }`
-    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(32, 30)).await;
+    let response = goto_definition_request(&mut ctx, "source.wdl", Position::new(34, 30)).await;
     let Some(GotoDefinitionResponse::Scalar(location)) = response else {
         panic!("expected a single location response, got {:?}", response);
     };
