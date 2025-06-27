@@ -40,12 +40,14 @@ var rC=Object.defineProperty;var l=(B,A)=>()=>(B&&(A=B(B=0)),A);var pQ=(B,A)=>{f
         pointer-events: none;
         opacity: 0;
         transition: opacity 0.2s;
+        transition-delay: 0ms;
         z-index: 100;
         top: 0;
         left: 0;
       }
       .tooltip.visible {
         opacity: 1;
+        transition-delay: 300ms;
       }
     `}_updatePosition(){let A=this.shadowRoot.querySelector(".tooltip"),Q=this.getAttribute("position")||"top";cC(this,A,{placement:Q,middleware:[sC(8),nC(),iC({padding:5})]}).then(({x:g,y:E})=>{Object.assign(A.style,{left:`${g}px`,top:`${E}px`})})}connectedCallback(){let A=this.getAttribute("position")||"top",Q=this.getAttribute("content")||"";this.shadowRoot.innerHTML=`
       <style>${this._getStyles()}</style>

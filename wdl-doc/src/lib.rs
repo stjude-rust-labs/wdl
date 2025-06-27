@@ -7,12 +7,12 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-mod callable;
 mod command_section;
 mod docs_tree;
 mod document;
 mod meta;
 mod parameter;
+mod runnable;
 mod r#struct;
 
 use std::path::Path;
@@ -24,8 +24,6 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
-use callable::task;
-use callable::workflow;
 pub use command_section::CommandSectionExt;
 pub use docs_tree::DocsTree;
 pub use docs_tree::DocsTreeBuilder;
@@ -42,6 +40,8 @@ use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
+use runnable::task;
+use runnable::workflow;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
@@ -212,12 +212,12 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         include_bytes!("../theme/assets/chevron-down.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-open.svg"),
-        include_bytes!("../theme/assets/dir-open.svg"),
+        assets_dir.join("chevron-up.svg"),
+        include_bytes!("../theme/assets/chevron-up.svg"),
     )?;
     std::fs::write(
-        assets_dir.join("dir-closed.svg"),
-        include_bytes!("../theme/assets/dir-closed.svg"),
+        assets_dir.join("dir-open.svg"),
+        include_bytes!("../theme/assets/dir-open.svg"),
     )?;
     std::fs::write(
         assets_dir.join("category-selected.svg"),
@@ -528,7 +528,16 @@ pub async fn document_workspace(
                     let name = t.name().text().to_owned();
                     let path = cur_dir.join(format!("{name}-task.html"));
 
-                    let task = task::Task::new(name.clone(), version, t);
+                    let task = task::Task::new(
+                        name.clone(),
+                        version,
+                        t,
+                        if rel_wdl_path.starts_with("external") {
+                            None
+                        } else {
+                            Some(rel_wdl_path.clone())
+                        },
+                    );
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
                     docs_tree.add_page(path.clone(), page.clone());
@@ -539,7 +548,16 @@ pub async fn document_workspace(
                     let name = w.name().text().to_owned();
                     let path = cur_dir.join(format!("{name}-workflow.html"));
 
-                    let workflow = workflow::Workflow::new(name.clone(), version, w);
+                    let workflow = workflow::Workflow::new(
+                        name.clone(),
+                        version,
+                        w,
+                        if rel_wdl_path.starts_with("external") {
+                            None
+                        } else {
+                            Some(rel_wdl_path.clone())
+                        },
+                    );
 
                     let page = Rc::new(HTMLPage::new(
                         workflow.name_override().unwrap_or(name),
@@ -576,7 +594,7 @@ mod tests {
     use wdl_ast::Document as AstDocument;
 
     use super::*;
-    use crate::callable::Callable;
+    use crate::runnable::Runnable;
 
     #[test]
     fn test_parse_preamble_comments() {
@@ -631,6 +649,7 @@ mod tests {
             ast_workflow.name().text().to_string(),
             SupportedVersion::V1(V1::Zero),
             ast_workflow,
+            None,
         );
 
         let description = workflow.render_description(false);

@@ -1,5 +1,7 @@
 //! Create HTML documentation for WDL workflows.
 
+use std::path::PathBuf;
+
 use maud::Markup;
 use wdl_ast::AstToken;
 use wdl_ast::SupportedVersion;
@@ -24,11 +26,18 @@ pub(crate) struct Workflow {
     inputs: Vec<Parameter>,
     /// The outputs of the workflow.
     outputs: Vec<Parameter>,
+    /// The path to the WDL file.
+    wdl_path: Option<PathBuf>,
 }
 
 impl Workflow {
     /// Create a new workflow.
-    pub fn new(name: String, version: SupportedVersion, definition: WorkflowDefinition) -> Self {
+    pub fn new(
+        name: String,
+        version: SupportedVersion,
+        definition: WorkflowDefinition,
+        wdl_path: Option<PathBuf>,
+    ) -> Self {
         let meta = match definition.metadata() {
             Some(mds) => parse_meta(&mds),
             _ => MetaMap::default(),
@@ -52,6 +61,7 @@ impl Workflow {
             meta,
             inputs,
             outputs,
+            wdl_path,
         }
     }
 
@@ -189,6 +199,7 @@ impl Workflow {
                     }
                     (self.render_allow_nested_inputs())
                 }
+                (self.render_run_wiith(assets))
                 div class="main__section" {
                     (meta_markup)
                 }
@@ -203,7 +214,7 @@ impl Workflow {
     }
 }
 
-impl Callable for Workflow {
+impl Runnable for Workflow {
     fn name(&self) -> &str {
         &self.name
     }
@@ -222,6 +233,14 @@ impl Callable for Workflow {
 
     fn outputs(&self) -> &[Parameter] {
         &self.outputs
+    }
+
+    fn is_workflow(&self) -> bool {
+        true
+    }
+
+    fn wdl_path(&self) -> Option<&Path> {
+        self.wdl_path.as_deref()
     }
 }
 
@@ -255,6 +274,7 @@ mod tests {
             ast_workflow.name().text().to_string(),
             SupportedVersion::V1(V1::Zero),
             ast_workflow,
+            None,
         );
 
         assert_eq!(workflow.name(), "test");
