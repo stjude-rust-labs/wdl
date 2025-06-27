@@ -680,7 +680,7 @@ fn resolve_call_input_item(
     };
     let ident = input_item.name();
 
-    if input_item.is_init_shorthand() {
+    if input_item.is_implicit_bind() {
         return Ok(None);
     }
 
