@@ -309,11 +309,30 @@
   .left-sidebar__content {
     @apply w-full;
   }
-  .left-sidebar__content-item {
+  .left-sidebar__row {
     @apply flex flex-row items-center gap-x-1 h-8 w-full rounded-md;
+  }
+  .left-sidebar__row--active {
+    /* currently viewed page */
+    @apply bg-red-500 text-slate-50;
+  }
+  .left-sidebar__row-page {
+    /* page that is not currently viewed */
+    @apply bg-blue-500 text-slate-400;
+  }
+  .left-sidebar__row-folder--open {
+    /* folder that is open */
+    @apply bg-green-500 text-slate-50;
+  }
+  .left-sidebar__row-folder--closed {
+    /* folder that is closed */
+    @apply bg-yellow-600 text-slate-400;
   }
   .left-sidebar__content-item-container {
     @apply flex flex-row items-center gap-x-1;
+  }
+  .left-sidebar__content-item-container--ancestor {
+    @apply text-slate-50 bg-purple-600;
   }
   .left-sidebar__search-result-item {
     @apply flex flex-col border-b border-gray-700 text-slate-50 pl-2 pt-2;
