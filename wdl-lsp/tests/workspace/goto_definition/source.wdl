@@ -4,11 +4,11 @@ import "lib.wdl" as lib
 
 task greet {
     input {
-        String to
+        String name
     }
 
     command <<<
-        echo "Hello, ~{to}"
+        echo "Hello, ~{name}"
     >>>
 }
 
@@ -18,9 +18,11 @@ workflow main {
     }
 
     #@ except: UnusedCall
-    call greet { input: to = name }
+    call greet as t1 { input: name = name }
+    # abbreviated syntax
+    call greet as t2 { name }
 
-    call lib.add as t1 { input:
+    call lib.add as t3 { input:
         a = 1,
         b = 2,
     }
@@ -36,6 +38,6 @@ workflow main {
     String p_name = p.name
 
     output {
-        Int result = t1.result
+        Int result = t3.result
     }
 }
