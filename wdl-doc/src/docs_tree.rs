@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use std::path::absolute;
 use std::rc::Rc;
 
+use anyhow::Context;
 use anyhow::Result;
 use maud::Markup;
 use maud::html;
@@ -246,7 +247,12 @@ impl DocsTreeBuilder {
 
     /// Build the docs tree.
     pub fn build(self) -> Result<DocsTree> {
-        write_assets(&self.root, self.custom_theme.as_ref())?;
+        write_assets(&self.root, self.custom_theme.as_ref()).with_context(|| {
+            format!(
+                "failed to write assets to output directory: `{}`",
+                self.root.display()
+            )
+        })?;
         let node = Node::new(
             self.root
                 .file_name()
@@ -941,11 +947,15 @@ impl DocsTree {
 
         for node in root.depth_first_traversal() {
             if let Some(page) = node.page() {
-                self.write_page(page.as_ref(), self.root_abs_path().join(node.path()))?;
+                self.write_page(page.as_ref(), self.root_abs_path().join(node.path()))
+                    .with_context(|| {
+                        format!("failed to write page at `{}`", node.path().display())
+                    })?;
             }
         }
 
-        self.write_homepage()?;
+        self.write_homepage()
+            .with_context(|| "failed to write homepage".to_string())?;
         Ok(())
     }
 
@@ -958,7 +968,9 @@ impl DocsTree {
             @if let Some(homepage) = &self.homepage {
                 div class="main__section" {
                     div class="markdown-body" {
-                        (Markdown(std::fs::read_to_string(homepage)?).render())
+                        (Markdown(std::fs::read_to_string(homepage).with_context(|| {
+                            format!("failed to read provided homepage file: `{}`", homepage.display())
+                        })?).render())
                     }
                 }
             } @else {
@@ -987,7 +999,8 @@ impl DocsTree {
             ),
             self.root().path(),
         );
-        std::fs::write(index_path, html.into_string())?;
+        std::fs::write(&index_path, html.into_string())
+            .with_context(|| format!("failed to write homepage to `{}`", index_path.display()))?;
         Ok(())
     }
 
@@ -1096,7 +1109,8 @@ impl DocsTree {
             ),
             self.root_relative_to(base),
         );
-        std::fs::write(path, html.into_string())?;
+        std::fs::write(&path, html.into_string())
+            .with_context(|| format!("failed to write page at `{}`", path.display()))?;
         Ok(())
     }
 }
