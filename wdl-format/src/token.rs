@@ -109,8 +109,8 @@ pub enum TriviaBlankLineSpacingPolicy {
     /// Blank lines are allowed before and between comments, but not after.
     ///
     /// e.g. a comment, then a blank line, then code, followed by another blank
-    /// line, would have the trailing blank removed but the blank line
-    /// before the comment would be preserved.
+    /// line, would have the trailing blank (between the comment and the code)
+    /// removed but any blank line before the comment would be preserved.
     RemoveTrailingBlanks,
     /// Blank lines are always allowed.
     #[default]
