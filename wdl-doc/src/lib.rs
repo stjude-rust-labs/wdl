@@ -488,21 +488,33 @@ pub async fn document_workspace(
 
     for result in results {
         let uri = result.document().uri();
-        // TODO: revisit these error paths
-        let rel_wdl_path = match uri.to_file_path() {
+        let (root_to_wdl, external_wdl) = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
-                Ok(path) => path.to_path_buf(),
+                Ok(path) => {
+                    // The path is relative to the workspace
+                    (path.to_path_buf(), false)
+                }
                 Err(_) => {
-                    PathBuf::from("external").join(path.components().skip(1).collect::<PathBuf>())
+                    // URI was successfully converted to a file path, but it is not contained in the
+                    // workspace. This must be an imported WDL file and the
+                    // documentation will be generated in the `external/` directory.
+                    let external = PathBuf::from("external")
+                        .join(path.components().skip(1).collect::<PathBuf>());
+                    (external, true)
                 }
             },
-            Err(_) => PathBuf::from("external").join(
-                uri.path()
-                    .strip_prefix("/")
-                    .expect("URI path should start with /"),
+            Err(_) => (
+                // The URI could not be converted to a file path, so it must be a remote WDL file.
+                // In this case, we will generate documentation in the `external/` directory.
+                PathBuf::from("external").join(
+                    uri.path()
+                        .strip_prefix("/")
+                        .expect("URI path should start with /"),
+                ),
+                true,
             ),
         };
-        let cur_dir = docs_dir.join(rel_wdl_path.with_extension(""));
+        let cur_dir = docs_dir.join(root_to_wdl.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)
                 .with_context(|| format!("failed to create directory: `{}`", cur_dir.display()))?;
@@ -541,10 +553,10 @@ pub async fn document_workspace(
                         name.clone(),
                         version,
                         t,
-                        if rel_wdl_path.starts_with("external") {
+                        if root_to_wdl.starts_with("external") {
                             None
                         } else {
-                            Some(rel_wdl_path.clone())
+                            Some(root_to_wdl.clone())
                         },
                     );
 
@@ -561,10 +573,10 @@ pub async fn document_workspace(
                         name.clone(),
                         version,
                         w,
-                        if rel_wdl_path.starts_with("external") {
+                        if external_wdl {
                             None
                         } else {
-                            Some(rel_wdl_path.clone())
+                            Some(root_to_wdl.clone())
                         },
                     );
 
@@ -579,20 +591,28 @@ pub async fn document_workspace(
                 DocumentItem::Import(_) => {}
             }
         }
-        let name = rel_wdl_path
+        let document_name = root_to_wdl
             .file_stem()
             .ok_or(anyhow!(
                 "failed to get file stem for WDL file: `{}`",
-                rel_wdl_path.display()
+                root_to_wdl.display()
             ))?
             .to_string_lossy();
-        let document = Document::new(name.to_string(), version, version_statement, local_pages);
+        let document = Document::new(
+            document_name.to_string(),
+            version,
+            version_statement,
+            local_pages,
+        );
 
         let index_path = cur_dir.join("index.html");
 
         docs_tree.add_page(
             index_path,
-            Rc::new(HTMLPage::new(name.to_string(), PageType::Index(document))),
+            Rc::new(HTMLPage::new(
+                document_name.to_string(),
+                PageType::Index(document),
+            )),
         );
     }
 
