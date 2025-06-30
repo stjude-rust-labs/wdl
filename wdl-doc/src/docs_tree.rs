@@ -11,6 +11,7 @@ use anyhow::Result;
 use maud::Markup;
 use maud::html;
 use pathdiff::diff_paths;
+use serde::Serialize;
 
 use crate::Markdown;
 use crate::Render;
@@ -547,6 +548,7 @@ impl DocsTree {
                 .replace(std::path::MAIN_SEPARATOR_STR, "_")
         };
 
+        #[derive(Serialize)]
         struct JsNode {
             /// The key of the node.
             key: String,
@@ -570,42 +572,6 @@ impl DocsTree {
             nest_level: usize,
             /// The children of the node.
             children: Vec<String>,
-        }
-
-        impl JsNode {
-            /// Convert the node to a JavaScript object.
-            fn to_js(&self) -> String {
-                format!(
-                    r#"{{
-                        key: '{}',
-                        display_name: '{}',
-                        parent: '{}',
-                        search_name: '{}',
-                        icon: {},
-                        href: {},
-                        ancestor: {},
-                        current: {},
-                        nest_level: {}
-                    }}"#,
-                    self.key,
-                    self.display_name,
-                    self.parent,
-                    self.search_name,
-                    if let Some(icon) = &self.icon {
-                        format!("'{icon}'")
-                    } else {
-                        "null".to_string()
-                    },
-                    if let Some(href) = &self.href {
-                        format!("'{href}'")
-                    } else {
-                        "null".to_string()
-                    },
-                    self.ancestor,
-                    self.current,
-                    self.nest_level
-                )
-            }
         }
 
         let all_nodes = root
@@ -782,7 +748,7 @@ impl DocsTree {
             self.get_asset(base, "chevron-down.svg"),
             all_nodes
                 .iter()
-                .map(|node| node.to_js())
+                .map(|node| serde_json::to_string(node).expect("should serialize node"))
                 .collect::<Vec<String>>()
                 .join(", "),
             js_dag,
