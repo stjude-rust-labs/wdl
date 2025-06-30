@@ -238,6 +238,7 @@ impl Postprocessor {
         }
 
         // TODO: bug where trailing trivia is not processed
+        // https://github.com/stjude-rust-labs/wdl/issues/497
 
         output
     }
