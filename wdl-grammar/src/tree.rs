@@ -716,8 +716,7 @@ pub trait SyntaxTokenExt {
     fn preceding_trivia(&self) -> impl Iterator<Item = SyntaxToken>;
 
     /// Gets all of the substantial succeeding trivia for an element.
-    ///
-    /// DEPRECATED: this code is dead and might be removed in the future.
+    #[deprecated(since = "0.14.0")]
     fn succeeding_trivia(&self) -> impl Iterator<Item = SyntaxToken>;
 
     /// Get any inline comment directly following an element on the
