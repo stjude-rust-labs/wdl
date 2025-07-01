@@ -557,7 +557,7 @@ pub async fn document_workspace(
                         name.clone(),
                         version,
                         t,
-                        if root_to_wdl.starts_with("external") {
+                        if external_wdl {
                             None
                         } else {
                             Some(root_to_wdl.clone())
