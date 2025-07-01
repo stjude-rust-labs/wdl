@@ -176,7 +176,7 @@ async fn should_goto_correct_definitions_in_access_expression() {
     assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(20, 12), Position::new(20, 15)) // `foo` in Foo foo
+        Range::new(Position::new(20, 12), Position::new(20, 15)) // `foo` in `Foo foo`
     );
 
     // Position of `bar` in `Int x = foo.bar.baz.qux.x`
@@ -189,7 +189,7 @@ async fn should_goto_correct_definitions_in_access_expression() {
     assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(15, 8), Position::new(15, 11)) // `bar` in Bar bar
+        Range::new(Position::new(15, 8), Position::new(15, 11)) // `bar` in `Bar bar`
     );
 
     // Position of `baz` in `Int x = foo.bar.baz.qux.x`
@@ -202,7 +202,7 @@ async fn should_goto_correct_definitions_in_access_expression() {
     assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(11, 8), Position::new(11, 11)) // `baz` in Baz baz
+        Range::new(Position::new(11, 8), Position::new(11, 11)) // `baz` in `Baz baz`
     );
 
     // Position of `qux` in `Int x = foo.bar.baz.qux.x`
@@ -215,7 +215,7 @@ async fn should_goto_correct_definitions_in_access_expression() {
     assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(7, 8), Position::new(7, 11)) // `qux` in Qux qux
+        Range::new(Position::new(7, 8), Position::new(7, 11)) // `qux` in `Qux qux`
     );
 
     // Position of RHS `x` in `Int x = foo.bar.baz.qux.x`
@@ -228,7 +228,7 @@ async fn should_goto_correct_definitions_in_access_expression() {
     assert_eq!(location.uri, ctx.doc_uri("structs.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(3, 8), Position::new(3, 9)) // `x` in Int x
+        Range::new(Position::new(3, 8), Position::new(3, 9)) // `x` in `Int x`
     );
 }
 
@@ -250,13 +250,13 @@ async fn should_goto_struct_member_definition_for_struct_literal() {
     assert_eq!(location1.uri, ctx.doc_uri("lib.wdl"));
     assert_eq!(
         location1.range,
-        Range::new(Position::new(18, 11), Position::new(18, 15)) // `name` in String name
+        Range::new(Position::new(18, 11), Position::new(18, 15)) // `name` in `String name`
     );
 
     assert_eq!(location2.uri, ctx.doc_uri("lib.wdl"));
     assert_eq!(
         location2.range,
-        Range::new(Position::new(19, 8), Position::new(19, 11)) // `age` in Int age
+        Range::new(Position::new(19, 8), Position::new(19, 11)) // `age` in `Int age`
     );
 }
 
@@ -273,7 +273,7 @@ async fn should_goto_call_task_input_definition() {
     assert_eq!(location.uri, ctx.doc_uri("lib.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(4, 12), Position::new(4, 13)) // `a` in Int a
+        Range::new(Position::new(4, 12), Position::new(4, 13)) // `a` in `Int a`
     );
 }
 
@@ -290,7 +290,7 @@ async fn should_goto_call_workflow_input_definition() {
     assert_eq!(location.uri, ctx.doc_uri("lib.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(24, 15), Position::new(24, 21)) // `person` in Person person
+        Range::new(Position::new(24, 15), Position::new(24, 21)) // `person` in `Person person`
     );
 }
 
@@ -307,7 +307,7 @@ async fn should_goto_local_variable_for_abbreviated_call_input_syntax() {
     assert_eq!(location.uri, ctx.doc_uri("source.wdl"));
     assert_eq!(
         location.range,
-        Range::new(Position::new(16, 15), Position::new(16, 19)) // `name` in String name
+        Range::new(Position::new(16, 15), Position::new(16, 19)) // `name` in `String name`
     );
 }
 
@@ -330,12 +330,12 @@ async fn lhs_and_rhs_navigation_in_call_inputs_should_goto_correct_definintions(
     assert_eq!(location1.uri, ctx.doc_uri("source.wdl"));
     assert_eq!(
         location1.range,
-        Range::new(Position::new(6, 15), Position::new(6, 19)) // `name` in String name
+        Range::new(Position::new(6, 15), Position::new(6, 19)) // `name` in `String name`
     );
 
     assert_eq!(location2.uri, ctx.doc_uri("source.wdl"));
     assert_eq!(
         location2.range,
-        Range::new(Position::new(16, 15), Position::new(16, 19)) // `name` in String name
+        Range::new(Position::new(16, 15), Position::new(16, 19)) // `name` in `String name`
     );
 }

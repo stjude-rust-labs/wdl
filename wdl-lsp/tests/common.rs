@@ -1,4 +1,15 @@
 //! Common test suite for WDL LSP integration tests.
+//!
+//! This module implements a lightweight communication protocol for testing the
+//! WDL Language Server Protocol (LSP) implementation. It uses JSON-RPC
+//! message format and Content-Length headers (similar to LSP over stdio).
+//!
+//! The protocol works by:
+//! - Encoding JSON-RPC messages with a simple format
+//!
+//!  `Content-Length: <size>\r\n\r\n<payload>`
+//!
+//! - Using in-memory streams to simulate client-server communication
 
 use std::fmt::Debug;
 use std::fs;
@@ -152,7 +163,15 @@ impl TestContext {
 
     /// Receives and deserializes the next JSON-RPC response from the server.
     ///
-    /// This skips over any notifications or server-initiated requests.
+    /// This method waits for a response with the `expected_id`, filtering out:
+    /// - Server-initiated notifications (which don't need responses)
+    /// - Server-initiated requests that require client responses
+    ///
+    /// The server sends `window/workDoneProgress/create` requests during
+    /// long-running operations. Per LSP spec, clients must respond to these
+    /// requests to acknowledge progress token creation. We automatically
+    /// respond with `null` to keep the server's progress reporting
+    /// functional without blocking tests.
     pub async fn response<R>(&mut self, expected_id: jsonrpc::Id) -> R
     where
         R: Debug + serde::de::DeserializeOwned,
@@ -224,6 +243,7 @@ impl TestContext {
                     ..Default::default()
                 }),
                 definition: Some(Default::default()),
+                references: Some(Default::default()),
                 ..Default::default()
             }),
             workspace: Some(lsp_types::WorkspaceClientCapabilities {
