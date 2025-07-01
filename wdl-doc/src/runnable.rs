@@ -4,6 +4,7 @@ pub mod task;
 pub mod workflow;
 
 use std::collections::BTreeSet;
+use std::path::MAIN_SEPARATOR;
 use std::path::Path;
 
 use maud::Markup;
@@ -110,11 +111,13 @@ pub(crate) trait Runnable {
     /// Render the "run with" component of the runnable.
     fn render_run_wiith(&self, _assets: &Path) -> Markup {
         if let Some(wdl_path) = self.wdl_path() {
+            let unix_path = wdl_path.to_string_lossy().replace(MAIN_SEPARATOR, "/");
+            let windows_path = wdl_path.to_string_lossy().replace(MAIN_SEPARATOR, "\\");
             html! {
-                div class="main__run-with-container" {
+                div x-data="{ unix: true }" class="main__run-with-container" {
                     div class="main__run-with-label" {
                         "RUN WITH"
-                        button x-data="{ unix: true }" x-on:click="unix = !unix" class="main__run-with-toggle" {
+                        button x-on:click="unix = !unix" class="main__run-with-toggle" {
                             div x-bind:class="unix ? 'main__run-with-toggle-label--active' : 'main__run-with-toggle-label--inactive'" {
                                 "Unix"
                             }
@@ -131,7 +134,12 @@ pub(crate) trait Runnable {
                                 (self.name())
                                 " "
                             }
-                            (wdl_path.display())
+                            span x-show="unix" {
+                                (unix_path)
+                            }
+                            span x-show="!unix" {
+                                (windows_path)
+                            }
                             " [INPUTS]..."
                         }
                     }
