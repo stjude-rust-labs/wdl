@@ -421,6 +421,61 @@ impl VersionBadge {
     }
 }
 
+/// Analyze a workspace directory, ensure it is error-free, and return the
+/// results.
+async fn analyze_workspace(workspace: PathBuf) -> Result<Vec<wdl_analysis::AnalysisResult>> {
+    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
+    analyzer
+        .add_directory(workspace.clone())
+        .await
+        .with_context(|| {
+            format!(
+                "failed to add workspace directory to analyzer: `{}`",
+                workspace.display()
+            )
+        })?;
+    let results = analyzer.analyze(()).await.with_context(|| {
+        format!(
+            "failed to analyze workspace directory: `{}`",
+            workspace.display()
+        )
+    })?;
+
+    if results.is_empty() {
+        return Err(anyhow!(
+            "no WDL documents found in workspace directory: `{}`",
+            workspace.display()
+        ));
+    }
+    for r in &results {
+        if let Some(e) = r.error() {
+            return Err(anyhow!(
+                "failed to analyze WDL document `{}`: {}",
+                r.document().uri(),
+                e,
+            ));
+        }
+        if r.document().version().is_none() {
+            return Err(anyhow!(
+                "WDL document `{}` does not have a supported version",
+                r.document().uri()
+            ));
+        }
+        if r.document()
+            .diagnostics()
+            .iter()
+            .any(|d| d.severity() == wdl_ast::Severity::Error)
+        {
+            return Err(anyhow!(
+                "WDL document `{}` has analysis errors",
+                r.document().uri(),
+            ));
+        }
+    }
+
+    Ok(results)
+}
+
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
@@ -464,22 +519,14 @@ pub async fn document_workspace(
         })?;
     }
 
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
-    analyzer
-        .add_directory(workspace_abs_path.clone())
+    let results = analyze_workspace(workspace_abs_path.clone())
         .await
         .with_context(|| {
             format!(
-                "failed to add workspace directory to analyzer: `{}`",
+                "failed to analyze workspace directory: `{}`",
                 workspace_abs_path.display()
             )
         })?;
-    let results = analyzer.analyze(()).await.with_context(|| {
-        format!(
-            "failed to analyze workspace directory: `{}`",
-            workspace_abs_path.display()
-        )
-    })?;
 
     let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
         .maybe_homepage(homepage)
