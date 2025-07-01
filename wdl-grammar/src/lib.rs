@@ -31,7 +31,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-mod config;
 mod diagnostic;
 pub mod grammar;
 pub mod lexer;
@@ -39,7 +38,6 @@ pub mod parser;
 mod tree;
 pub mod version;
 
-pub use config::ParserConfig;
 pub use diagnostic::*;
 pub use tree::*;
 pub use version::SupportedVersion;

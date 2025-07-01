@@ -17,7 +17,6 @@ use super::Diagnostic;
 use super::grammar;
 use super::lexer::Lexer;
 use super::parser::Event;
-use crate::ParserConfig;
 use crate::parser::Parser;
 
 /// Represents the kind of syntax element (node or token) in a WDL concrete
@@ -679,32 +678,7 @@ impl SyntaxTree {
     /// println!("{tree:#?}");
     /// ```
     pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
-        Self::parse_with_config(ParserConfig::default(), source)
-    }
-
-    /// Parses WDL source to produce a syntax tree using the specified
-    /// configuration.
-    ///
-    /// A syntax tree is always returned, even for invalid WDL documents.
-    ///
-    /// Additionally, the list of diagnostics encountered during the parse is
-    /// returned; if the list is empty, the tree is syntactically correct.
-    ///
-    /// However, additional validation is required to ensure the source is
-    /// a valid WDL document.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use wdl_grammar::ParserConfig;
-    /// # use wdl_grammar::SyntaxTree;
-    /// let config = ParserConfig::default();
-    /// let (tree, diagnostics) = SyntaxTree::parse_with_config(config, "version 1.1");
-    /// assert!(diagnostics.is_empty());
-    /// println!("{tree:#?}");
-    /// ```
-    pub fn parse_with_config(config: ParserConfig, source: &str) -> (Self, Vec<Diagnostic>) {
-        let parser = Parser::new(config, Lexer::new(source));
+        let parser = Parser::new(Lexer::new(source));
         let (events, mut diagnostics) = grammar::document(source, parser);
         diagnostics.sort();
         (Self(construct_tree(source, events)), diagnostics)
@@ -951,7 +925,6 @@ impl SyntaxTokenExt for SyntaxToken {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::SupportedVersion;
     use crate::SyntaxTree;
 
     #[test]
@@ -1047,31 +1020,6 @@ workflow foo {} # Here is a comment that should be collected.
         assert_eq!(
             comment.text(),
             "# Here is a comment that should be collected."
-        );
-    }
-
-    #[test]
-    fn unrecognized_version() {
-        let (_, diagnostics) = SyntaxTree::parse("version devel");
-
-        assert!(
-            diagnostics
-                .iter()
-                .any(|diag| diag.severity() == crate::Severity::Error)
-        );
-    }
-
-    #[test]
-    fn unrecognized_version_fallback() {
-        let config = ParserConfig::default()
-            .with_fallback_version(SupportedVersion::V1(crate::version::V1::Two));
-        let (_, diagnostics) = SyntaxTree::parse_with_config(config, "version devel");
-
-        assert!(
-            diagnostics
-                .iter()
-                .any(|diag| diag.severity() == crate::Severity::Warning
-                    && diag.message().contains("devel"))
         );
     }
 }

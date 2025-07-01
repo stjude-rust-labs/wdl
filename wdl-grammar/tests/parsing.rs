@@ -8,8 +8,6 @@
 //! * `source.tree` - the expected CST representation of the source.
 //! * `source.errors` - the expected set of parser errors encountered during the
 //!   parse.
-//! * `config.toml` (optional) - a TOML-serialized `ParserConfig` struct to be
-//!   used instead of `ParserConfig::default()` when executing the test.
 //!
 //! Both `source.tree` and `source.errors` may be automatically generated or
 //! updated by setting the `BLESS` environment variable when running this test.
@@ -33,7 +31,6 @@ use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_grammar::Diagnostic;
-use wdl_grammar::ParserConfig;
 use wdl_grammar::SyntaxTree;
 
 /// Finds tests for this package.
@@ -126,17 +123,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), anyhow::Error> {
     let source = std::fs::read_to_string(&path)
         .with_context(|| format!("failed to read source file `{path}`", path = path.display()))?
         .replace("\r\n", "\n");
-    let config_path = test.join("config.toml");
-    let config = if std::fs::exists(&config_path)? {
-        std::fs::read_to_string(&config_path)
-            .context("failed to read test-specific config")
-            .and_then(|config_str| {
-                toml::from_str(&config_str).context("failed to parse test-specific config")
-            })?
-    } else {
-        ParserConfig::default()
-    };
-    let (tree, diagnostics) = SyntaxTree::parse_with_config(config, &source);
+    let (tree, diagnostics) = SyntaxTree::parse(&source);
     compare_result(&path.with_extension("tree"), &format!("{:#?}", tree), false)?;
     compare_result(
         &path.with_extension("errors"),

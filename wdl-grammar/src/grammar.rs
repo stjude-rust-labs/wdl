@@ -86,31 +86,13 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
                     // A version statement was successfully parsed, check to see if the
                     // version is supported by this implementation
                     let version = &source[span.start()..span.end()];
-                    let (effective_version, version_warning) = match (
-                        version.parse::<SupportedVersion>(),
-                        parser.config().fallback_version(),
-                    ) {
-                        (Ok(v), _) => (Some(v), None),
-                        (Err(_), Some(v)) => {
-                            let warning = Diagnostic::warning(format!(
-                                "unsupported WDL version `{version}`; interpreting document as \
-                                 version `{v}`"
-                            ))
-                            .with_label("this version of WDL is not supported", span);
-                            (Some(v), Some(warning))
-                        }
-                        _ => (None, None),
-                    };
 
-                    match effective_version {
-                        Some(_) => {
+                    match version.parse::<SupportedVersion>() {
+                        Ok(_) => {
                             let mut parser = parser.morph();
                             v1::items(&mut parser);
                             root.complete(&mut parser, SyntaxKind::RootNode);
-                            let mut output = parser.finish();
-                            if let Some(warning) = version_warning {
-                                output.diagnostics.push(warning);
-                            }
+                            let output = parser.finish();
                             return (output.events, output.diagnostics);
                         }
                         _ => (

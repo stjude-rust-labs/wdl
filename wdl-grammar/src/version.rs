@@ -26,21 +26,8 @@ impl std::fmt::Display for V1 {
 }
 
 /// Represents a supported WDL version.
-///
-/// The `Default` implementation of this type returns the most recent
-/// fully-supported ratified version of WDL.
 // NOTE: it is expected that this enumeration is in increasing order of WDL versions.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    serde_with::DeserializeFromStr,
-    serde_with::SerializeDisplay,
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum SupportedVersion {
     /// The document version is 1.x.
