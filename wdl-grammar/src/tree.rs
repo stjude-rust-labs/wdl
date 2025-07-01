@@ -18,7 +18,6 @@ use super::grammar;
 use super::lexer::Lexer;
 use super::parser::Event;
 use crate::ParserConfig;
-use crate::SupportedVersion;
 use crate::parser::Parser;
 
 /// Represents the kind of syntax element (node or token) in a WDL concrete
@@ -656,13 +655,6 @@ pub fn construct_tree(source: &str, mut events: Vec<Event>) -> SyntaxNode {
     SyntaxNode::new_root(builder.finish())
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ParseResult {
-    pub tree: SyntaxTree,
-    pub effective_version: Option<SupportedVersion>,
-    pub diagnostics: Vec<Diagnostic>,
-}
-
 /// Represents an untyped concrete syntax tree.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct SyntaxTree(SyntaxNode);
@@ -686,7 +678,7 @@ impl SyntaxTree {
     /// assert!(diagnostics.is_empty());
     /// println!("{tree:#?}");
     /// ```
-    pub fn parse(source: &str) -> ParseResult {
+    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
         Self::parse_with_config(ParserConfig::default(), source)
     }
 
@@ -711,15 +703,11 @@ impl SyntaxTree {
     /// assert!(diagnostics.is_empty());
     /// println!("{tree:#?}");
     /// ```
-    pub fn parse_with_config(config: ParserConfig, source: &str) -> ParseResult {
+    pub fn parse_with_config(config: ParserConfig, source: &str) -> (Self, Vec<Diagnostic>) {
         let parser = Parser::new(config, Lexer::new(source));
-        let (events, effective_version, mut diagnostics) = grammar::document(source, parser);
+        let (events, mut diagnostics) = grammar::document(source, parser);
         diagnostics.sort();
-        ParseResult {
-            tree: Self(construct_tree(source, events)),
-            effective_version,
-            diagnostics,
-        }
+        (Self(construct_tree(source, events)), diagnostics)
     }
 
     /// Gets the root syntax node of the tree.

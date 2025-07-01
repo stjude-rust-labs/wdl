@@ -72,10 +72,7 @@ type PreambleParser<'a> = Parser<'a, PreambleToken>;
 /// Parses a WDL document.
 ///
 /// Returns the parser events that result from parsing the document.
-pub(crate) fn document(
-    source: &str,
-    mut parser: PreambleParser<'_>,
-) -> (Vec<Event>, Option<SupportedVersion>, Vec<Diagnostic>) {
+pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>) {
     let root = parser.start();
     // Look for a starting `version` keyword token
     // If this fails, an error is emitted and we'll skip parsing the remainder of
@@ -106,7 +103,7 @@ pub(crate) fn document(
                     };
 
                     match effective_version {
-                        Some(v) => {
+                        Some(_) => {
                             let mut parser = parser.morph();
                             v1::items(&mut parser);
                             root.complete(&mut parser, SyntaxKind::RootNode);
@@ -114,7 +111,7 @@ pub(crate) fn document(
                             if let Some(warning) = version_warning {
                                 output.diagnostics.push(warning);
                             }
-                            return (output.events, Some(v), output.diagnostics);
+                            return (output.events, output.diagnostics);
                         }
                         _ => (
                             parser,
@@ -149,13 +146,13 @@ pub(crate) fn document(
     parser.consume_remainder();
     root.complete(&mut parser, SyntaxKind::RootNode);
     let output = parser.finish();
-    (output.events, None, output.diagnostics)
+    (output.events, output.diagnostics)
 }
 
 /// Parses the version statement of a WDL source file.
 ///
 /// Returns the source span of the version token if present.
-fn version_statement(
+pub fn version_statement(
     mut parser: Parser<'_, PreambleToken>,
     marker: Marker,
 ) -> (
