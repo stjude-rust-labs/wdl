@@ -523,7 +523,7 @@ pub async fn document_workspace(
         .await
         .with_context(|| {
             format!(
-                "failed to analyze workspace directory: `{}`",
+                "workspace `{}` has errors and cannot be documented",
                 workspace_abs_path.display()
             )
         })?;
