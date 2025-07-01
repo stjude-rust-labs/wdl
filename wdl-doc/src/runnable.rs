@@ -113,7 +113,9 @@ pub(crate) trait Runnable {
             html! {
                 div class="main__run-with-container" {
                     div class="main__run-with-label" {
-                        "RUN WITH"
+                        span class="main__run-with-label-text" {
+                            "RUN WITH"
+                        }
                         button x-data="{ unix: true }" x-on:click="unix = !unix" class="main__run-with-toggle" {
                             div x-bind:class="unix ? 'main__run-with-toggle-label--active' : 'main__run-with-toggle-label--inactive'" {
                                 "Unix"
@@ -153,8 +155,9 @@ pub(crate) trait Runnable {
                     div class="main__grid-header-cell" { "Name" }
                     div class="main__grid-header-cell" { "Type" }
                     div class="main__grid-header-cell" { "Description" }
-                    div class="main__grid-header-separator" {}
+                    // div class="main__grid-header-separator" {}
                     @for param in iter {
+                        div class="main__grid-row-separator" {}
                         (param.render(assets))
                     }
                 }
