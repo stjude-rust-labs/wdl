@@ -15,6 +15,7 @@ mod parameter;
 mod runnable;
 mod r#struct;
 
+use std::path::Component;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -495,11 +496,14 @@ pub async fn document_workspace(
                     (path.to_path_buf(), false)
                 }
                 Err(_) => {
-                    // URI was successfully converted to a file path, but it is not contained in the
+                    // URI was successfully converted to a file path, but it is not in the
                     // workspace. This must be an imported WDL file and the
                     // documentation will be generated in the `external/` directory.
-                    let external = PathBuf::from("external")
-                        .join(path.components().skip(1).collect::<PathBuf>());
+                    let external = PathBuf::from("external").join(
+                        path.components()
+                            .skip_while(|c| !matches!(c, Component::Normal(_)))
+                            .collect::<PathBuf>(),
+                    );
                     (external, true)
                 }
             },
