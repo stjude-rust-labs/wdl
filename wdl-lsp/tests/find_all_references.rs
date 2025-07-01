@@ -74,7 +74,10 @@ async fn should_have_references_across_files() {
         .await
         .unwrap();
 
-    let Some(location) = response.iter().find(|l| l.uri == ctx.doc_uri("structs.wdl")) else {
+    let Some(location) = response
+        .iter()
+        .find(|l| l.uri == ctx.doc_uri("structs.wdl"))
+    else {
         panic!("reference should exist");
     };
     assert_eq!(
