@@ -1017,6 +1017,7 @@ impl DocsTree {
                 homepage_content,
                 self.render_right_sidebar(PageSections::default()),
                 None,
+                &self.assets_relative_to(self.root_abs_path()),
             ),
             self.root().path(),
         );
@@ -1025,25 +1026,25 @@ impl DocsTree {
     }
 
     /// Render reusable sidebar control buttons
-    fn render_sidebar_control_buttons(&self) -> Markup {
+    fn render_sidebar_control_buttons(&self, assets: &Path) -> Markup {
         html! {
             button
                 x-on:click="collapseSidebar()"
                 x-bind:disabled="sidebarState === 'hidden'"
                 x-bind:class="getSidebarButtonClass('hidden')" {
-                img src=(self.assets().join("sidebar-icon-hide.svg").to_string_lossy()) alt="" {}
+                img src=(assets.join("sidebar-icon-hide.svg").to_string_lossy()) alt="" {}
             }
             button
                 x-on:click="restoreSidebar()"
                 x-bind:disabled="sidebarState === 'normal'"
                 x-bind:class="getSidebarButtonClass('normal')" {
-                img src=(self.assets().join("sidebar-icon-default.svg").to_string_lossy()) alt="" {}
+                img src=(assets.join("sidebar-icon-default.svg").to_string_lossy()) alt="" {}
             }
             button
                 x-on:click="expandSidebar()"
                 x-bind:disabled="sidebarState === 'xl'"
                 x-bind:class="getSidebarButtonClass('xl')" {
-                    img src=(self.assets().join("sidebar-icon-expand.svg").to_string_lossy()) alt="" {}
+                    img src=(assets.join("sidebar-icon-expand.svg").to_string_lossy()) alt="" {}
                 }
         }
     }
@@ -1056,6 +1057,7 @@ impl DocsTree {
         content: Markup,
         right_sidebar: Markup,
         breadcrumbs: Option<Markup>,
+        assets: &Path,
     ) -> Markup {
         html! {
             div class="layout__container layout__container--alt-layout" x-data="{
@@ -1079,7 +1081,7 @@ impl DocsTree {
             }" x-bind:class="containerClasses" {
                 div class="layout__sidebar-left" {
                     div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
-                        (self.render_sidebar_control_buttons())
+                        (self.render_sidebar_control_buttons(assets))
                     }
                     (left_sidebar)
                 }
@@ -1087,7 +1089,7 @@ impl DocsTree {
                     div class="layout__main-center-content" {
                         div {
                             div class="flex gap-1 mb-3" x-show="showCenterButtons" {
-                                (self.render_sidebar_control_buttons())
+                                (self.render_sidebar_control_buttons(assets))
                             }
                             @if let Some(breadcrumbs) = breadcrumbs {
                                 div class="layout__breadcrumbs" {
@@ -1130,6 +1132,7 @@ impl DocsTree {
                 content,
                 self.render_right_sidebar(headers),
                 Some(breadcrumbs),
+                &self.assets_relative_to(base),
             ),
             self.root_relative_to(base),
         );
