@@ -1722,8 +1722,6 @@
   }
   .main__grid-full-width-cell {
     grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
     gap: calc(var(--spacing) * 2);
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
@@ -1735,7 +1733,7 @@
   }
   .main__grid-runtime-container {
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: auto 1fr;
     gap: calc(var(--spacing) * 4);
   }
   .main__grid-req-inputs-container {
@@ -1750,10 +1748,16 @@
   }
   .main__grid-nested-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     gap: calc(var(--spacing) * 4);
   }
-  .main__addl-meta-container {
+  .main__addl-meta-outer-container {
+    margin-bottom: calc(var(--spacing) * 4);
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+  }
+  .main__addl-meta-inner-container {
     border-radius: var(--radius-md);
     background-color: var(--color-slate-900);
     padding: calc(var(--spacing) * 4);
@@ -1761,7 +1765,7 @@
   }
   .main__grid-meta-object-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     gap: calc(var(--spacing) * 4);
   }
   .main__grid-nested-row {

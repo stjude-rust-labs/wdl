@@ -249,9 +249,11 @@ impl Parameter {
             }
             @if let Some(addl_meta) = self.render_remaining_meta(assets) {
                 div class="main__grid-full-width-cell" x-data="{ addl_meta_expanded: false }" {
-                    button type="button" class="main__button" x-on:click="addl_meta_expanded = !addl_meta_expanded" x-text="addl_meta_expanded ? 'Hide Additional Meta' : 'Show Additional Metadata'" {}
-                    div x-show="addl_meta_expanded" class="main__addl-meta-container" {
-                        (addl_meta)
+                    div class="main__addl-meta-outer-container" {
+                        button type="button" class="main__button" x-on:click="addl_meta_expanded = !addl_meta_expanded" x-text="addl_meta_expanded ? 'Hide Additional Meta' : 'Show Additional Metadata'" {}
+                        div x-show="addl_meta_expanded" class="main__addl-meta-inner-container" {
+                            (addl_meta)
+                        }
                     }
                 }
             }
