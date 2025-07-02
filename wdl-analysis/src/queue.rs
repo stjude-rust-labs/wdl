@@ -36,11 +36,11 @@ use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
 use crate::AnalysisResult;
-use crate::DiagnosticsConfig;
 use crate::IncrementalChange;
 use crate::ProgressKind;
 use crate::SourcePosition;
 use crate::SourcePositionEncoding;
+use crate::config::Config;
 use crate::document::Document;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
@@ -167,8 +167,8 @@ enum Cancelable<T> {
 pub struct AnalysisQueue<Progress, Context, Return, Validator> {
     /// The document graph maintained by the analysis queue.
     graph: Arc<RwLock<DocumentGraph>>,
-    /// The diagnostics configuration to use.
-    config: DiagnosticsConfig,
+    /// The configuration to use.
+    config: Config,
     /// The handle to the tokio runtime for blocking on async tasks.
     tokio: Handle,
     /// The HTTP client to use for fetching documents.
@@ -189,14 +189,9 @@ where
     Validator: Fn() -> crate::Validator + Send + Sync + 'static,
 {
     /// Constructs a new analysis queue.
-    pub fn new(
-        config: DiagnosticsConfig,
-        tokio: Handle,
-        progress: Progress,
-        validator: Validator,
-    ) -> Self {
+    pub fn new(config: Config, tokio: Handle, progress: Progress, validator: Validator) -> Self {
         Self {
-            graph: Default::default(),
+            graph: Arc::new(RwLock::new(DocumentGraph::new(config.clone()))),
             config,
             tokio,
             progress: Arc::new(progress),
@@ -314,10 +309,7 @@ where
                                     // just silently return.
                                     ParseState::NotParsed | ParseState::Error(_) => None,
                                     ParseState::Parsed {
-                                        version: _,
-                                        root: _,
-                                        lines,
-                                        diagnostics,
+                                        lines, diagnostics, ..
                                     } => {
                                         // If there are any diagnostics that are
                                         // errors, we shouldn't attempt to format the
@@ -563,7 +555,7 @@ where
                         }
 
                         let graph = self.graph.clone();
-                        let config = self.config;
+                        let config = self.config.clone();
                         let validator = self.validator.clone();
                         Some(RayonHandle::spawn(move || {
                             thread_local! {
@@ -573,7 +565,7 @@ where
                             let result = panic::catch_unwind(AssertUnwindSafe(|| {
                                 VALIDATOR.with_borrow_mut(|v| {
                                     let validator = v.get_or_insert_with(|| validator());
-                                    Self::analyze_node(config, graph.clone(), index, validator)
+                                    Self::analyze_node(&config, graph.clone(), index, validator)
                                 })
                             }));
 
@@ -802,7 +794,7 @@ where
 
     /// Analyzes a node in the document graph.
     fn analyze_node(
-        config: DiagnosticsConfig,
+        config: &Config,
         graph: Arc<RwLock<DocumentGraph>>,
         index: NodeIndex,
         validator: &mut crate::Validator,

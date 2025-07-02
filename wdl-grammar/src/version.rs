@@ -34,6 +34,20 @@ pub enum SupportedVersion {
     V1(V1),
 }
 
+impl SupportedVersion {
+    pub fn has_same_major_version(self, other: SupportedVersion) -> bool {
+        match (self, other) {
+            (SupportedVersion::V1(_), SupportedVersion::V1(_)) => true,
+        }
+    }
+}
+
+impl Default for SupportedVersion {
+    fn default() -> Self {
+        Self::V1(V1::Two)
+    }
+}
+
 impl std::fmt::Display for SupportedVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -43,14 +57,14 @@ impl std::fmt::Display for SupportedVersion {
 }
 
 impl FromStr for SupportedVersion {
-    type Err = ();
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "1.0" => Ok(Self::V1(V1::Zero)),
             "1.1" => Ok(Self::V1(V1::One)),
             "1.2" => Ok(Self::V1(V1::Two)),
-            _ => Err(()),
+            _ => Err(s.to_string()),
         }
     }
 }

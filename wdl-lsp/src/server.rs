@@ -24,14 +24,12 @@ use tracing::error;
 use tracing::info;
 use uuid::Uuid;
 use wdl_analysis::Analyzer;
-use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::IncrementalChange;
 use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
 use wdl_analysis::SourcePositionEncoding;
 use wdl_analysis::Validator;
 use wdl_analysis::path_to_uri;
-use wdl_analysis::rules;
 use wdl_lint::Linter;
 
 use crate::proto;
@@ -253,7 +251,7 @@ impl Server {
                 client,
                 options,
                 analyzer: Analyzer::<ProgressToken>::new_with_validator(
-                    DiagnosticsConfig::new(rules()),
+                    Default::default(),
                     move |token, kind, current, total| {
                         let client = analyzer_client.clone();
                         async move {
