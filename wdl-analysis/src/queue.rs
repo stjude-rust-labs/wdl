@@ -15,6 +15,8 @@ use futures::Future;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
 use indexmap::IndexSet;
+use lsp_types::GotoDefinitionResponse;
+use lsp_types::Location;
 use parking_lot::RwLock;
 use petgraph::Direction;
 use petgraph::graph::NodeIndex;
@@ -36,11 +38,14 @@ use wdl_format::element::node::AstNodeFormatExt as _;
 use crate::AnalysisResult;
 use crate::IncrementalChange;
 use crate::ProgressKind;
+use crate::SourcePosition;
+use crate::SourcePositionEncoding;
 use crate::config::Config;
 use crate::document::Document;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
+use crate::handlers;
 use crate::rayon::RayonHandle;
 
 /// The minimum number of milliseconds between analysis progress reports.
@@ -60,6 +65,10 @@ pub enum Request<Context> {
     NotifyChange(NotifyChangeRequest),
     /// A request to format a document.
     Format(FormatRequest),
+    /// A request to goto definition of a symbol.
+    GotoDefinition(GotoDefinitionRequest),
+    /// A request to find all references of a symbol.
+    FindAllReferences(FindAllReferencesRequest),
 }
 
 /// Represents a request to add documents to the graph.
@@ -118,6 +127,32 @@ pub struct FormatRequest {
     /// * The column of the last character in the document, and
     /// * The formatted document to replace the entire file with.
     pub completed: oneshot::Sender<Option<(u32, u32, String)>>,
+}
+
+/// Represents a request to find the definition of a symbol at a given position.
+pub struct GotoDefinitionRequest {
+    /// The document to search for the symbol definition.
+    pub document: Url,
+    /// The position of the symbol in the document.
+    pub position: SourcePosition,
+    /// The encoding used for the position.
+    pub encoding: SourcePositionEncoding,
+    /// The sender for completing the request.
+    pub completed: oneshot::Sender<Option<GotoDefinitionResponse>>,
+}
+
+/// Represents a request to find all references to a symbol at a given position.
+pub struct FindAllReferencesRequest {
+    /// The document where the request was initiated.
+    pub document: Url,
+    /// The position of the symbol in the document.
+    pub position: SourcePosition,
+    /// The encoding used for the position.
+    pub encoding: SourcePositionEncoding,
+    /// Wether to include the declaration in the results.
+    pub include_declaration: bool,
+    /// The sender for completing the request.
+    pub completed: oneshot::Sender<Vec<Location>>,
 }
 
 /// A simple enumeration to signal a cancellation to the caller.
@@ -308,6 +343,77 @@ where
                         });
 
                     completed.send(result).ok();
+                }
+                Request::GotoDefinition(GotoDefinitionRequest {
+                    document,
+                    position,
+                    encoding,
+                    completed,
+                }) => {
+                    let start = Instant::now();
+                    debug!(
+                        "received request for goto definition at {document}: {line}:{char}",
+                        line = position.line,
+                        char = position.character
+                    );
+
+                    let graph = self.graph.read();
+                    match handlers::goto_definition(&graph, document, position, encoding) {
+                        Ok(result) => {
+                            debug!(
+                                "goto definition request completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+
+                            let location = result.map(GotoDefinitionResponse::Scalar);
+                            completed.send(location).ok();
+                        }
+                        Err(err) => {
+                            error!(
+                                "error occurred while completing the goto definition request: \
+                                 {err:?}"
+                            );
+                            completed.send(None).ok();
+                        }
+                    }
+                }
+                Request::FindAllReferences(FindAllReferencesRequest {
+                    document,
+                    position,
+                    encoding,
+                    include_declaration,
+                    completed,
+                }) => {
+                    let start = Instant::now();
+                    debug!(
+                        "received request for find all references at {document}: {line}:{char}",
+                        line = position.line,
+                        char = position.character
+                    );
+
+                    let graph = self.graph.read();
+                    match handlers::find_all_references(
+                        &graph,
+                        document,
+                        position,
+                        encoding,
+                        include_declaration,
+                    ) {
+                        Ok(result) => {
+                            debug!(
+                                "find all references request completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+
+                            completed.send(result).ok();
+                        }
+                        Err(err) => {
+                            debug!(
+                                "error occurred while completing the find all references: {err:?}"
+                            );
+                            completed.send(vec![]).ok();
+                        }
+                    }
                 }
             }
         }

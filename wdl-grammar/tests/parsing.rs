@@ -124,7 +124,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), anyhow::Error> {
         .with_context(|| format!("failed to read source file `{path}`", path = path.display()))?
         .replace("\r\n", "\n");
     let (tree, diagnostics) = SyntaxTree::parse(&source);
-    compare_result(&path.with_extension("tree"), &format!("{:#?}", tree), false)?;
+    compare_result(&path.with_extension("tree"), &format!("{tree:#?}"), false)?;
     compare_result(
         &path.with_extension("errors"),
         &format_diagnostics(&diagnostics, &path, &source),

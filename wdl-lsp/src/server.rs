@@ -329,13 +329,19 @@ impl LanguageServer for Server {
     async fn initialize(&self, params: InitializeParams) -> RpcResult<InitializeResult> {
         debug!("received `initialize` request: {params:#?}");
 
-        {
-            let mut folders = self.folders.write();
-            *folders = params
-                .workspace_folders
-                .unwrap_or_default()
-                .into_iter()
-                .collect();
+        if let Some(folders) = params.workspace_folders {
+            for mut folder in folders {
+                normalize_uri_path(&mut folder.uri);
+                self.folders.write().push(folder.clone());
+                if let Ok(path) = folder.uri.to_file_path() {
+                    if let Err(e) = self.analyzer.add_directory(path).await {
+                        error!(
+                            "failed to add initial workspace directory {uri}: {e}",
+                            uri = folder.uri
+                        );
+                    }
+                }
+            }
         }
 
         {
@@ -381,6 +387,8 @@ impl LanguageServer for Server {
                     },
                 )),
                 document_formatting_provider: Some(OneOf::Left(true)),
+                definition_provider: Some(OneOf::Left(true)),
+                references_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -395,34 +403,10 @@ impl LanguageServer for Server {
             self.register_watcher().await;
         }
 
-        // Process the initial workspace folders
-        let folders = {
-            let mut folders = self.folders.write();
-            mem::take(&mut *folders)
-        };
-
-        if !folders.is_empty() {
-            self.did_change_workspace_folders(DidChangeWorkspaceFoldersParams {
-                event: WorkspaceFoldersChangeEvent {
-                    added: folders,
-                    removed: Vec::new(),
-                },
-            })
-            .await;
-        }
-
         info!(
             "{name} (v{version}) server initialized",
-            name = self
-                .options
-                .name
-                .as_deref()
-                .unwrap_or(env!("CARGO_CRATE_NAME")),
-            version = self
-                .options
-                .version
-                .as_deref()
-                .unwrap_or(env!("CARGO_PKG_VERSION"))
+            name = self.name(),
+            version = self.version()
         );
     }
 
@@ -707,5 +691,63 @@ impl LanguageServer for Server {
             });
 
         Ok(result)
+    }
+
+    async fn goto_definition(
+        &self,
+        mut params: GotoDefinitionParams,
+    ) -> RpcResult<Option<GotoDefinitionResponse>> {
+        normalize_uri_path(&mut params.text_document_position_params.text_document.uri);
+
+        debug!("received `textDocument/gotoDefinition` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position_params.position.line,
+            params.text_document_position_params.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .goto_definition(
+                params.text_document_position_params.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
+    }
+
+    async fn references(&self, mut params: ReferenceParams) -> RpcResult<Option<Vec<Location>>> {
+        normalize_uri_path(&mut params.text_document_position.text_document.uri);
+
+        debug!("received `textDocument/references` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position.position.line,
+            params.text_document_position.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .find_all_references(
+                params.text_document_position.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+                params.context.include_declaration,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(Some(result))
     }
 }
