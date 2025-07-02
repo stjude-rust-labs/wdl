@@ -94,6 +94,26 @@ impl Task {
     pub fn render_runtime_section(&self) -> Markup {
         match &self.runtime_section {
             Some(runtime_section) => {
+                let rows = runtime_section
+                    .items()
+                    .map(|entry| {
+                        {
+                            html! {
+                                div class="main__grid-row" {
+                                    div class="main__grid-cell" {
+                                        code { (entry.name().text()) }
+                                    }
+                                    div class="main__grid-cell" {
+                                        code { ({let e = entry.expr(); e.text().to_string()}) }
+                                    }
+                                }
+                            }
+                        }
+                        .into_string()
+                    })
+                    .collect::<Vec<_>>()
+                    .join(&html! { div class="main__grid-row-separator" {} }.into_string());
+
                 html! {
                     div class="main__section" {
                         h2 id="runtime" class="main__section-header" { "Default Runtime Attributes" }
@@ -102,16 +122,7 @@ impl Task {
                                 div class="main__grid-header-cell" { "Attribute" }
                                 div class="main__grid-header-cell" { "Value" }
                                 div class="main__grid-header-separator" {}
-                                @for entry in runtime_section.items() {
-                                    div class="main__grid-row" {
-                                        div class="main__grid-cell" {
-                                            code { (entry.name().text()) }
-                                        }
-                                        div class="main__grid-cell" {
-                                            code { ({let e = entry.expr(); e.text().to_string()}) }
-                                        }
-                                    }
-                                }
+                                (PreEscaped(rows))
                             }
                         }
                     }

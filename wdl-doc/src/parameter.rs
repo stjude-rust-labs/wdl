@@ -3,6 +3,7 @@
 use std::path::Path;
 
 use maud::Markup;
+use maud::PreEscaped;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -288,6 +289,12 @@ where
         "Default"
     };
 
+    let rows = params
+        .iter()
+        .map(|param| param.render(assets).into_string())
+        .collect::<Vec<_>>()
+        .join(&html! { div class="main__grid-row-separator" {} }.into_string());
+
     html! {
         div class="main__grid-container" {
             div class="main__grid-non-req-param-container" {
@@ -296,9 +303,7 @@ where
                 div class="main__grid-header-cell" { (third_col) }
                 div class="main__grid-header-cell" { "Description" }
                 div class="main__grid-header-separator" {}
-                @for param in params {
-                    (param.render(assets))
-                }
+                (PreEscaped(rows))
             }
         }
     }

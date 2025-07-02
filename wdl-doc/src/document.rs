@@ -12,6 +12,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use maud::Markup;
+use maud::PreEscaped;
 use maud::Render;
 use maud::html;
 use wdl_ast::AstToken;
@@ -103,6 +104,65 @@ impl Document {
 
     /// Render the document as HTML.
     pub fn render(&self) -> (Markup, PageSections) {
+        let rows = self.local_pages.iter().map(|page| {
+            html! {
+                div class="main__grid-row" x-data="{ description_expanded: false }" {
+                    @match page.1.page_type() {
+                        PageType::Struct(_) => {
+                            div class="main__grid-cell" {
+                                a class="text-pink-400 hover:text-pink-300" href=(page.0.to_string_lossy()) {
+                                    (page.1.name())
+                                }
+                            }
+                            div class="main__grid-cell" { code { "struct" } }
+                            div class="main__grid-cell" { "N/A" }
+                        }
+                        PageType::Task(t) => {
+                            div class="main__grid-cell" {
+                                a class="text-violet-400 hover:text-violet-300" href=(page.0.to_string_lossy()) {
+                                    (page.1.name())
+                                }
+                            }
+                            div class="main__grid-cell" { code { "task" } }
+                            div class="main__grid-cell" {
+                                (t.render_description(true))
+                            }
+                        }
+                        PageType::Workflow(w) => {
+                            div class="main__grid-cell" {
+                                a class="text-emerald-400 hover:text-emerald-300" href=(page.0.to_string_lossy()) {
+                                    (page.1.name())
+                                }
+                            }
+                            div class="main__grid-cell" { code { "workflow" } }
+                            div class="main__grid-cell" {
+                                (w.render_description(true))
+                            }
+                        }
+                        // Index pages should not link to other index pages.
+                        PageType::Index(_) => {
+                            // This should be unreachable
+                            div class="main__grid-cell" { "ERROR" }
+                            div class="main__grid-cell" { "ERROR" }
+                            div class="main__grid-cell" { "ERROR" }
+                        }
+                    }
+                    div x-show="description_expanded" class="main__grid-full-width-cell" {
+                        @match page.1.page_type() {
+                            PageType::Struct(_) => "ERROR"
+                            PageType::Task(t) => {
+                                (t.render_description(false))
+                            }
+                            PageType::Workflow(w) => {
+                                (w.render_description(false))
+                            }
+                            PageType::Index(_) => "ERROR"
+                        }
+                    }
+                }
+            }
+        }.into_string()).collect::<Vec<_>>().join(&html! { div class="main__grid-row-separator" {} }.into_string());
+
         let markup = html! {
             div class="main__container" {
                 h1 id="title" class="main__title" { (self.name()) }
@@ -122,62 +182,7 @@ impl Document {
                             div class="main__grid-header-cell" { "Type" }
                             div class="main__grid-header-cell" { "Description" }
                             div class="main__grid-header-separator" {}
-                            @for page in &self.local_pages {
-                                div class="main__grid-row" x-data="{ description_expanded: false }" {
-                                    @match page.1.page_type() {
-                                        PageType::Struct(_) => {
-                                            div class="main__grid-cell" {
-                                                a class="text-pink-400 hover:text-pink-300" href=(page.0.to_string_lossy()) {
-                                                    (page.1.name())
-                                                }
-                                            }
-                                            div class="main__grid-cell" { code { "struct" } }
-                                            div class="main__grid-cell" { "N/A" }
-                                        }
-                                        PageType::Task(t) => {
-                                            div class="main__grid-cell" {
-                                                a class="text-violet-400 hover:text-violet-300" href=(page.0.to_string_lossy()) {
-                                                    (page.1.name())
-                                                }
-                                            }
-                                            div class="main__grid-cell" { code { "task" } }
-                                            div class="main__grid-cell" {
-                                                (t.render_description(true))
-                                            }
-                                        }
-                                        PageType::Workflow(w) => {
-                                            div class="main__grid-cell" {
-                                                a class="text-emerald-400 hover:text-emerald-300" href=(page.0.to_string_lossy()) {
-                                                    (page.1.name())
-                                                }
-                                            }
-                                            div class="main__grid-cell" { code { "workflow" } }
-                                            div class="main__grid-cell" {
-                                                (w.render_description(true))
-                                            }
-                                        }
-                                        // Index pages should not link to other index pages.
-                                        PageType::Index(_) => {
-                                            // This should be unreachable
-                                            div class="main__grid-cell" { "ERROR" }
-                                            div class="main__grid-cell" { "ERROR" }
-                                            div class="main__grid-cell" { "ERROR" }
-                                        }
-                                    }
-                                    div x-show="description_expanded" class="main__grid-full-width-cell" {
-                                        @match page.1.page_type() {
-                                            PageType::Struct(_) => "ERROR"
-                                            PageType::Task(t) => {
-                                                (t.render_description(false))
-                                            }
-                                            PageType::Workflow(w) => {
-                                                (w.render_description(false))
-                                            }
-                                            PageType::Index(_) => "ERROR"
-                                        }
-                                    }
-                                }
-                            }
+                            (PreEscaped(rows))
                         }
                     }
                 }

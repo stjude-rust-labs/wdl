@@ -7,6 +7,7 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use maud::Markup;
+use maud::PreEscaped;
 use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::InputSection;
@@ -148,6 +149,12 @@ pub(crate) trait Runnable {
     fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         iter.peek()?;
+
+        let rows = iter
+            .map(|param| param.render(assets).into_string())
+            .collect::<Vec<_>>()
+            .join(&html! { div class="main__grid-row-separator" {} }.into_string());
+
         Some(html! {
             h3 id="required-inputs" class="main__section-subheader" { "Required Inputs" }
             div class="main__grid-container" {
@@ -155,11 +162,8 @@ pub(crate) trait Runnable {
                     div class="main__grid-header-cell" { "Name" }
                     div class="main__grid-header-cell" { "Type" }
                     div class="main__grid-header-cell" { "Description" }
-                    // div class="main__grid-header-separator" {}
-                    @for param in iter {
-                        div class="main__grid-row-separator" {}
-                        (param.render(assets))
-                    }
+                    div class="main__grid-header-separator" {}
+                    (PreEscaped(rows))
                 }
             }
         })
