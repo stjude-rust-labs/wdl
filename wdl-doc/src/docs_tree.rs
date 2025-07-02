@@ -494,11 +494,11 @@ impl DocsTree {
                                     } else {
                                         "workflow-unselected.svg"
                                     },
-                            ))) class="left-sidebar__row" x-bind:class="node.current ? 'bg-slate-800 is-scrolled-to' : 'hover:bg-slate-700'" {
+                            ))) class="left-sidebar__row" x-bind:class="node.current ? 'bg-slate-700/50 is-scrolled-to' : 'hover:bg-slate-800'" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
-                                            div class="left-sidebar__indent" {}
+                                            div class="left-sidebar__indent -1" {}
                                             div class="left-sidebar__content-item-container crop-ellipsis"{
                                                 img x-bind:src="node.icon" class="left-sidebar__icon" alt="Workflow icon";
                                                 sprocket-tooltip content=(wf.render_name()) class="crop-ellipsis" x-bind:class="node.current ? 'text-slate-50' : 'group-hover:text-slate-50'" {
@@ -801,11 +801,11 @@ impl DocsTree {
                         img src=(self.get_asset(base, "x-mark.svg")) class="absolute right-2 top-1/2 -translate-y-1/2 size-6 hover:cursor-pointer" alt="Clear icon" x-show="search !== ''" x-on:click="search = ''";
                     }
                     div class="left-sidebar__tabs-container mt-4" {
-                        button x-on:click="showWorkflows = true; search = ''; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                        button x-on:click="showWorkflows = true; search = ''; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs text-slate-50 border-b-slate-50" x-bind:class="! showWorkflows ? 'opacity-40 hover:opacity-80' : ''" {
                             img src=(self.get_asset(base, "list-bullet-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Workflows" }
                         }
-                        button x-on:click="showWorkflows = false; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50 border-b-slate-50'" {
+                        button x-on:click="showWorkflows = false; $nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__tabs text-slate-50 border-b-slate-50" x-bind:class="showWorkflows ? 'opacity-40 hover:opacity-80' : ''" {
                             img src=(self.get_asset(base, "folder-selected.svg")) class="left-sidebar__icon" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -828,17 +828,16 @@ impl DocsTree {
                         }
                         // Nodes in the directory tree
                         template x-for="node in shownNodes" {
-                            sprocket-tooltip x-bind:content="node.display_name" class="block" {
-                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__row" x-bind:class="node.current ? 'is-scrolled-to left-sidebar__row--active' : (node.href === null) ? showChildrenCache[node.key] ? 'left-sidebar__row-folder--open' : 'left-sidebar__row-folder--closed' : 'left-sidebar__row-page'" {
+                            sprocket-tooltip x-bind:content="node.display_name" class="block isolate" {
+                                a x-bind:href="node.href" x-show="showSelfCache[node.key]" x-on:click="if (node.href === null) toggleChildren(node.key)" x-bind:aria-label="node.display_name" class="left-sidebar__row" x-bind:class="`${node.current ? 'is-scrolled-to left-sidebar__row--active' : (node.href === null) ? showChildrenCache[node.key] ? 'left-sidebar__row-folder left-sidebar__row-folder--open' : 'left-sidebar__row-folder left-sidebar__row-folder--closed' : 'left-sidebar__row-page'} ${node.ancestor ? 'left-sidebar__content-item-container--ancestor' : ''}`" {
                                     template x-for="i in Array.from({ length: node.nest_level })" {
-                                        div class="left-sidebar__indent" {}
+                                        div class="left-sidebar__indent -z-1" {}
                                     }
-                                    div class="left-sidebar__content-item-container crop-ellipsis" x-bind:class="node.ancestor ? 'left-sidebar__content-item-container--ancestor' : ''" {
-                                        div class="relative left-sidebar__icon" {
-                                            img x-bind:src="node.icon || dirOpen" x-show="showChildrenCache[node.key]" class="left-sidebar__icon" alt="Node icon";
-                                            img x-bind:src="dirClosed" x-show="(node.icon === null) && !showChildrenCache[node.key]" class="left-sidebar__icon absolute left-0 top-0 cursor-pointer";
+                                    div class="left-sidebar__content-item-container crop-ellipsis" {
+                                        div class="relative left-sidebar__icon shrink-0" {
+                                            img x-bind:src="node.icon || dirOpen" class="left-sidebar__icon" alt="Node icon" x-bind:class="`${(node.icon === null) && !showChildrenCache[node.key] ? 'rotate-180' : ''}`";
                                         }
-                                        div class="" x-text="node.display_name" {
+                                        div class="crop-ellipsis" x-text="node.display_name" {
                                         }
                                     }
                                 }
@@ -1018,6 +1017,7 @@ impl DocsTree {
                 homepage_content,
                 self.render_right_sidebar(PageSections::default()),
                 None,
+                &self.assets_relative_to(self.root_abs_path()),
             ),
             self.root().path(),
         );
@@ -1026,24 +1026,26 @@ impl DocsTree {
     }
 
     /// Render reusable sidebar control buttons
-    fn render_sidebar_control_buttons(&self) -> Markup {
+    fn render_sidebar_control_buttons(&self, assets: &Path) -> Markup {
         html! {
             button
                 x-on:click="collapseSidebar()"
                 x-bind:disabled="sidebarState === 'hidden'"
-                x-bind:class="getSidebarButtonClass('hidden')"
-                { "«" }
+                x-bind:class="getSidebarButtonClass('hidden')" {
+                img src=(assets.join("sidebar-icon-hide.svg").to_string_lossy()) alt="" {}
+            }
             button
-                class="text-sm!"
                 x-on:click="restoreSidebar()"
                 x-bind:disabled="sidebarState === 'normal'"
-                x-bind:class="getSidebarButtonClass('normal')"
-                { "☰" }
+                x-bind:class="getSidebarButtonClass('normal')" {
+                img src=(assets.join("sidebar-icon-default.svg").to_string_lossy()) alt="" {}
+            }
             button
                 x-on:click="expandSidebar()"
                 x-bind:disabled="sidebarState === 'xl'"
-                x-bind:class="getSidebarButtonClass('xl')"
-                { "»" }
+                x-bind:class="getSidebarButtonClass('xl')" {
+                    img src=(assets.join("sidebar-icon-expand.svg").to_string_lossy()) alt="" {}
+                }
         }
     }
 
@@ -1055,10 +1057,11 @@ impl DocsTree {
         content: Markup,
         right_sidebar: Markup,
         breadcrumbs: Option<Markup>,
+        assets: &Path,
     ) -> Markup {
         html! {
             div class="layout__container layout__container--alt-layout" x-data="{
-                sidebarState: window.innerWidth < 768 ? 'hidden' : 'normal',
+                sidebarState: $persist(window.innerWidth < 768 ? 'hidden' : window.innerWidth > 1300 ? 'xl' : 'normal').using(sessionStorage),
                 get showSidebarButtons() { return this.sidebarState !== 'hidden'; },
                 get showCenterButtons() { return this.sidebarState === 'hidden'; },
                 get containerClasses() {
@@ -1070,28 +1073,30 @@ impl DocsTree {
                     }
                 },
                 getSidebarButtonClass(state) {
-                    return 'left-sidebar__size-button ' + (this.sidebarState === state ? 'left-sidebar__size-button--disabled' : 'left-sidebar__size-button--active');
+                    return 'left-sidebar__size-button ' + (this.sidebarState === state ? 'left-sidebar__size-button--active' : '');
                 },
                 collapseSidebar() { this.sidebarState = 'hidden'; },
                 restoreSidebar() { this.sidebarState = 'normal'; },
                 expandSidebar() { this.sidebarState = 'xl'; }
             }" x-bind:class="containerClasses" {
                 div class="layout__sidebar-left" {
-                    div class="absolute top-2 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
-                        (self.render_sidebar_control_buttons())
+                    div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
+                        (self.render_sidebar_control_buttons(assets))
                     }
                     (left_sidebar)
                 }
                 div class="layout__main-center" {
-                    div class="absolute top-2 left-2 flex gap-1 z-10" x-show="showCenterButtons" {
-                        (self.render_sidebar_control_buttons())
-                    }
-                    @if let Some(breadcrumbs) = breadcrumbs {
-                        div class="layout__breadcrumbs" {
-                            (breadcrumbs)
-                        }
-                    }
                     div class="layout__main-center-content" {
+                        div {
+                            div class="flex gap-1 mb-3" x-show="showCenterButtons" {
+                                (self.render_sidebar_control_buttons(assets))
+                            }
+                            @if let Some(breadcrumbs) = breadcrumbs {
+                                div class="layout__breadcrumbs" {
+                                    (breadcrumbs)
+                                }
+                            }
+                        }
                         (content)
                     }
                 }
@@ -1127,6 +1132,7 @@ impl DocsTree {
                 content,
                 self.render_right_sidebar(headers),
                 Some(breadcrumbs),
+                &self.assets_relative_to(base),
             ),
             self.root_relative_to(base),
         );

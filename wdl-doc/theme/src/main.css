@@ -155,7 +155,7 @@
    * Badges & Buttons
    */
   .main__badge-container {
-    @apply flex flex-row items-center gap-2
+    @apply flex flex-row items-center gap-2 flex-wrap;
   }
   .main__badge {
     @apply flex flex-row max-w-fit gap-1 items-center border border-slate-700 p-1.5 rounded-md bg-slate-800 min-h-8;
@@ -193,25 +193,28 @@
   }
   /* RUN WITH component */
   .main__run-with-container {
-    @apply flex flex-col gap-2 text-sm rounded-md bg-slate-900 border border-slate-800 mt-4 p-4;
+    @apply flex flex-col gap-1.5 text-sm rounded-md bg-slate-900 border border-slate-800 mt-4 p-3;
   }
   .main__run-with-label {
-    @apply flex flex-row shrink gap-2 text-slate-50 text-xs;
+    @apply flex flex-row items-center shrink gap-2 text-slate-50 text-xs;
+  }
+  .main__run-with-label-text {
+    @apply text-slate-500 text-xs;
   }
   .main__run-with-toggle {
-    @apply flex items-center justify-center rounded-full border border-slate-700;
+    @apply flex items-center justify-center rounded-full border border-slate-700 p-[2px];
   }
   .main__run-with-toggle-label--active {
-    @apply bg-slate-50 text-slate-900 rounded-full px-2;
+    @apply bg-slate-50 text-slate-900 rounded-full px-1.5 py-0.5 transition-all cursor-pointer;
   }
   .main__run-with-toggle-label--inactive {
-    @apply bg-slate-900 text-slate-50 rounded-full px-2;
+    @apply bg-slate-900 text-slate-50 rounded-full px-1.5 py-0.5 transition-all cursor-pointer;
   }
   .main__run-with-content {
-    @apply flex flex-row gap-2 mt-2;
+    @apply flex flex-row gap-2;
   }
   .main__run-with-content-text {
-    @apply text-sm;
+    @apply text-sm text-slate-300;
   }
   /**
    * Main Grids
@@ -220,7 +223,10 @@
     @apply rounded py-8;
   }
   .main__grid-header-separator {
-    @apply col-span-full border-b mb-4;
+    @apply col-span-full border-b border-slate-700;
+  }
+  .main__grid-row-separator {
+    @apply col-span-full border-b border-slate-800;
   }
   .main__grid-row {
     @apply contents;
@@ -232,7 +238,7 @@
     @apply text-sm;
   }
   .main__grid-full-width-cell {
-    @apply col-span-full my-2 text-sm;
+    @apply col-span-full text-sm flex flex-col gap-2;
   }
   .main__grid-toc-container {
     @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
@@ -253,7 +259,7 @@
     @apply grid grid-cols-[1fr_1fr] gap-4;
   }
   .main__addl-meta-container {
-    @apply text-slate-300 bg-slate-800 rounded-md p-4;
+    @apply text-slate-300 bg-slate-900 rounded-md p-4;
   }
   .main__grid-meta-object-container {
     @apply grid grid-cols-[1fr_1fr] gap-4;
@@ -310,29 +316,32 @@
     @apply w-full;
   }
   .left-sidebar__row {
-    @apply flex flex-row items-center gap-x-1 h-8 w-full rounded-md;
+    @apply flex flex-row items-center gap-x-1 h-8 w-full rounded-md hover:bg-slate-700 hover:text-slate-50 cursor-pointer;
   }
   .left-sidebar__row--active {
     /* currently viewed page */
-    @apply bg-red-500 text-slate-50;
+    @apply bg-slate-700/40 text-slate-50;
   }
   .left-sidebar__row-page {
     /* page that is not currently viewed */
-    @apply bg-blue-500 text-slate-400;
+    /* @apply bg-blue-500 text-slate-400; */
+  }
+  .left-sidebar__row-folder {
+    @apply text-slate-400;
   }
   .left-sidebar__row-folder--open {
     /* folder that is open */
-    @apply bg-green-500 text-slate-50;
+    /* @apply text-slate-50; */
   }
   .left-sidebar__row-folder--closed {
     /* folder that is closed */
-    @apply bg-yellow-600 text-slate-400;
+    /* @apply bg-yellow-600 text-slate-400; */
   }
   .left-sidebar__content-item-container {
     @apply flex flex-row items-center gap-x-1;
   }
   .left-sidebar__content-item-container--ancestor {
-    @apply text-slate-50 bg-purple-600;
+    @apply text-slate-50;
   }
   .left-sidebar__search-result-item {
     @apply flex flex-col border-b border-gray-700 text-slate-50 pl-2 pt-2;
@@ -350,13 +359,10 @@
     @apply flex flex-row items-center gap-x-1;
   }
   .left-sidebar__size-button {
-    @apply w-6 h-6 rounded flex items-center justify-center transition-all text-lg;
+    @apply w-6 h-6 rounded flex items-center justify-center opacity-40 transition-all text-lg hover:bg-slate-700 text-slate-500 hover:text-slate-100 focus:ring-2 focus:outline-0 focus:ring-slate-500 hover:opacity-100 cursor-pointer;
   }
-  .left-sidebar__size-button--active {
-    @apply bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-slate-100 focus:ring-2 focus:ring-slate-500 cursor-pointer;
-  }
-  .left-sidebar__size-button--disabled {
-    @apply bg-slate-900 border border-slate-700 text-slate-400 opacity-70 cursor-not-allowed;
+  .left-sidebar__size-button.left-sidebar__size-button--active {
+    @apply text-slate-100 bg-slate-700 opacity-100;
   }
 
   /**

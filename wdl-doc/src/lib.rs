@@ -283,6 +283,18 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         assets_dir.join("information-circle.svg"),
         include_bytes!("../theme/assets/information-circle.svg"),
     )?;
+    std::fs::write(
+        assets_dir.join("sidebar-icon-hide.svg"),
+        include_bytes!("../theme/assets/sidebar-icon-hide.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("sidebar-icon-default.svg"),
+        include_bytes!("../theme/assets/sidebar-icon-default.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("sidebar-icon-expand.svg"),
+        include_bytes!("../theme/assets/sidebar-icon-expand.svg"),
+    )?;
 
     Ok(())
 }
