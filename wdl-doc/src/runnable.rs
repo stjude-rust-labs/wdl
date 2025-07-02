@@ -8,6 +8,7 @@ use std::path::MAIN_SEPARATOR;
 use std::path::Path;
 
 use maud::Markup;
+use maud::PreEscaped;
 use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::InputSection;
@@ -116,7 +117,9 @@ pub(crate) trait Runnable {
             html! {
                 div x-data="{ unix: true }" class="main__run-with-container" {
                     div class="main__run-with-label" {
-                        "RUN WITH"
+                        span class="main__run-with-label-text" {
+                            "RUN WITH"
+                        }
                         button x-on:click="unix = !unix" class="main__run-with-toggle" {
                             div x-bind:class="unix ? 'main__run-with-toggle-label--active' : 'main__run-with-toggle-label--inactive'" {
                                 "Unix"
@@ -154,6 +157,12 @@ pub(crate) trait Runnable {
     fn render_required_inputs(&self, assets: &Path) -> Option<Markup> {
         let mut iter = self.required_inputs().peekable();
         iter.peek()?;
+
+        let rows = iter
+            .map(|param| param.render(assets).into_string())
+            .collect::<Vec<_>>()
+            .join(&html! { div class="main__grid-row-separator" {} }.into_string());
+
         Some(html! {
             h3 id="required-inputs" class="main__section-subheader" { "Required Inputs" }
             div class="main__grid-container" {
@@ -162,9 +171,7 @@ pub(crate) trait Runnable {
                     div class="main__grid-header-cell" { "Type" }
                     div class="main__grid-header-cell" { "Description" }
                     div class="main__grid-header-separator" {}
-                    @for param in iter {
-                        (param.render(assets))
-                    }
+                    (PreEscaped(rows))
                 }
             }
         })
