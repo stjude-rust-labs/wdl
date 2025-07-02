@@ -15,6 +15,7 @@ mod parameter;
 mod runnable;
 mod r#struct;
 
+use std::path::Component;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -54,7 +55,7 @@ use wdl_ast::version::V1;
 pub fn install_theme(theme_dir: &Path) -> Result<()> {
     let theme_dir = absolute(theme_dir)?;
     if !theme_dir.exists() {
-        bail!("Theme directory does not exist: {}", theme_dir.display());
+        bail!("theme directory does not exist: {}", theme_dir.display());
     }
     let output = std::process::Command::new("npm")
         .arg("install")
@@ -62,13 +63,13 @@ pub fn install_theme(theme_dir: &Path) -> Result<()> {
         .output()
         .with_context(|| {
             format!(
-                "Failed to run npm install in theme directory: {}",
+                "failed to run `npm install` in the theme directory: `{}`",
                 theme_dir.display()
             )
         })?;
     if !output.status.success() {
         bail!(
-            "failed to install theme dependencies: {stderr}",
+            "failed to install theme dependencies using `npm install`: {stderr}",
             stderr = String::from_utf8_lossy(&output.stderr)
         );
     }
@@ -85,13 +86,13 @@ pub fn build_web_components(theme_dir: &Path) -> Result<()> {
         .output()
         .with_context(|| {
             format!(
-                "Failed to run npm build in theme directory: {}",
+                "failed to execute `npm run build` in the theme directory: `{}`",
                 theme_dir.display()
             )
         })?;
     if !output.status.success() {
         bail!(
-            "failed to build web components: {stderr}",
+            "failed to build web components using `npm run build`: {stderr}",
             stderr = String::from_utf8_lossy(&output.stderr)
         );
     }
@@ -111,13 +112,16 @@ pub fn build_stylesheet(theme_dir: &Path) -> Result<()> {
         .output()?;
     if !output.status.success() {
         bail!(
-            "failed to build stylesheet: {stderr}",
+            "failed to build stylesheet using `npx @tailwindcss/cli`: {stderr}",
             stderr = String::from_utf8_lossy(&output.stderr)
         );
     }
     let css_path = theme_dir.join("dist/style.css");
     if !css_path.exists() {
-        bail!("failed to build stylesheet: no output file found");
+        bail!(
+            "failed to build stylesheet using `npx @tailwindcss/cli`: no output file found at `{}`",
+            css_path.display()
+        );
     }
 
     Ok(())
@@ -132,25 +136,27 @@ pub fn build_stylesheet(theme_dir: &Path) -> Result<()> {
 /// from the custom theme's `dist` directory.
 fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
     let dir = dir.as_ref();
-    let custom_theme = custom_theme.as_ref().map(|p| p.as_ref());
+    let custom_theme = custom_theme.as_ref().map(|p| {
+        absolute(p.as_ref()).with_context(|| {
+            format!(
+                "failed to resolve absolute path for custom theme: `{}`",
+                p.as_ref().display()
+            )
+        })
+    });
+    let custom_theme = custom_theme.transpose()?;
     let assets_dir = dir.join("assets");
     std::fs::create_dir_all(&assets_dir).with_context(|| {
         format!(
-            "Failed to create assets directory: {}",
+            "failed to create assets directory: `{}`",
             assets_dir.display()
         )
     })?;
 
     if let Some(custom_theme) = custom_theme {
-        let custom_theme = absolute(custom_theme).with_context(|| {
-            format!(
-                "Failed to resolve absolute path for custom theme: {}",
-                custom_theme.display()
-            )
-        })?;
         if !custom_theme.exists() {
             bail!(
-                "Custom theme directory does not exist: {}",
+                "Custom theme directory does not exist: `{}`",
                 custom_theme.display()
             );
         }
@@ -160,7 +166,8 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         )
         .with_context(|| {
             format!(
-                "Failed to copy custom theme style.css to {}",
+                "failed to copy stylesheet from `{}` to `{}`",
+                custom_theme.join("dist").join("style.css").display(),
                 dir.join("style.css").display()
             )
         })?;
@@ -170,7 +177,8 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         )
         .with_context(|| {
             format!(
-                "Failed to copy custom theme index.js to {}",
+                "failed to copy web components from `{}` to `{}`",
+                custom_theme.join("dist").join("index.js").display(),
                 dir.join("index.js").display()
             )
         })?;
@@ -181,14 +189,14 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         )
         .with_context(|| {
             format!(
-                "Failed to write default style.css to {}",
+                "failed to write default stylesheet to `{}`",
                 dir.join("style.css").display()
             )
         })?;
         std::fs::write(dir.join("index.js"), include_str!("../theme/dist/index.js")).with_context(
             || {
                 format!(
-                    "Failed to write default index.js to {}",
+                    "failed to write default web components to `{}`",
                     dir.join("index.js").display()
                 )
             },
@@ -425,6 +433,61 @@ impl VersionBadge {
     }
 }
 
+/// Analyze a workspace directory, ensure it is error-free, and return the
+/// results.
+async fn analyze_workspace(workspace: PathBuf) -> Result<Vec<wdl_analysis::AnalysisResult>> {
+    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
+    analyzer
+        .add_directory(workspace.clone())
+        .await
+        .with_context(|| {
+            format!(
+                "failed to add workspace directory to analyzer: `{}`",
+                workspace.display()
+            )
+        })?;
+    let results = analyzer.analyze(()).await.with_context(|| {
+        format!(
+            "failed to analyze workspace directory: `{}`",
+            workspace.display()
+        )
+    })?;
+
+    if results.is_empty() {
+        return Err(anyhow!(
+            "no WDL documents found in workspace directory: `{}`",
+            workspace.display()
+        ));
+    }
+    for r in &results {
+        if let Some(e) = r.error() {
+            return Err(anyhow!(
+                "failed to analyze WDL document `{}`: {}",
+                r.document().uri(),
+                e,
+            ));
+        }
+        if r.document().version().is_none() {
+            return Err(anyhow!(
+                "WDL document `{}` does not have a supported version",
+                r.document().uri()
+            ));
+        }
+        if r.document()
+            .diagnostics()
+            .iter()
+            .any(|d| d.severity() == wdl_ast::Severity::Error)
+        {
+            return Err(anyhow!(
+                "WDL document `{}` has analysis errors",
+                r.document().uri(),
+            ));
+        }
+    }
+
+    Ok(results)
+}
+
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
@@ -439,7 +502,7 @@ pub async fn document_workspace(
 ) -> Result<()> {
     let workspace_abs_path = clean(absolute(workspace.as_ref()).with_context(|| {
         format!(
-            "Failed to resolve absolute path for workspace: {}",
+            "failed to resolve absolute path for workspace: `{}`",
             workspace.as_ref().display()
         )
     })?);
@@ -447,68 +510,77 @@ pub async fn document_workspace(
     let custom_theme = custom_theme.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
-        return Err(anyhow!("Workspace is not a directory"));
+        bail!(
+            "workspace path `{}` is not a directory",
+            workspace_abs_path.display()
+        );
     }
 
     let docs_dir = clean(absolute(output_dir.as_ref()).with_context(|| {
         format!(
-            "Failed to resolve absolute path for output directory: {}",
+            "failed to resolve absolute path for output directory: `{}`",
             output_dir.as_ref().display()
         )
     })?);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir).with_context(|| {
-            format!("Failed to create output directory: {}", docs_dir.display())
+            format!(
+                "failed to create output directory: `{}`",
+                docs_dir.display()
+            )
         })?;
     }
 
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
-    analyzer
-        .add_directory(workspace_abs_path.clone())
+    let results = analyze_workspace(workspace_abs_path.clone())
         .await
         .with_context(|| {
             format!(
-                "Failed to add workspace directory to analyzer: {}",
+                "workspace `{}` has errors and cannot be documented",
                 workspace_abs_path.display()
             )
         })?;
-    let results = analyzer.analyze(()).await.with_context(|| {
-        format!(
-            "Failed to analyze workspace directory: {}",
-            workspace_abs_path.display()
-        )
-    })?;
 
     let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
         .maybe_homepage(homepage)
         .maybe_custom_theme(custom_theme)
         .build()
-        .with_context(|| {
-            format!(
-                "Failed to build documentation tree for output directory: {}",
-                docs_dir.display()
-            )
-        })?;
+        .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
 
     for result in results {
         let uri = result.document().uri();
-        // TODO: revisit these error paths
-        let rel_wdl_path = match uri.to_file_path() {
+        let (root_to_wdl, external_wdl) = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
-                Ok(path) => path.to_path_buf(),
+                Ok(path) => {
+                    // The path is relative to the workspace
+                    (path.to_path_buf(), false)
+                }
                 Err(_) => {
-                    PathBuf::from("external").join(path.components().skip(1).collect::<PathBuf>())
+                    // URI was successfully converted to a file path, but it is not in the
+                    // workspace. This must be an imported WDL file and the
+                    // documentation will be generated in the `external/` directory.
+                    let external = PathBuf::from("external").join(
+                        path.components()
+                            .skip_while(|c| !matches!(c, Component::Normal(_)))
+                            .collect::<PathBuf>(),
+                    );
+                    (external, true)
                 }
             },
-            Err(_) => PathBuf::from("external").join(
-                uri.path()
-                    .strip_prefix("/")
-                    .expect("URI path should start with /"),
+            Err(_) => (
+                // The URI could not be converted to a file path, so it must be a remote WDL file.
+                // In this case, we will generate documentation in the `external/` directory.
+                PathBuf::from("external").join(
+                    uri.path()
+                        .strip_prefix("/")
+                        .expect("URI path should start with /"),
+                ),
+                true,
             ),
         };
-        let cur_dir = docs_dir.join(rel_wdl_path.with_extension(""));
+        let cur_dir = docs_dir.join(root_to_wdl.with_extension(""));
         if !cur_dir.exists() {
-            std::fs::create_dir_all(&cur_dir)?;
+            std::fs::create_dir_all(&cur_dir)
+                .with_context(|| format!("failed to create directory: `{}`", cur_dir.display()))?;
         }
         let version = result
             .document()
@@ -544,10 +616,10 @@ pub async fn document_workspace(
                         name.clone(),
                         version,
                         t,
-                        if rel_wdl_path.starts_with("external") {
+                        if external_wdl {
                             None
                         } else {
-                            Some(rel_wdl_path.clone())
+                            Some(root_to_wdl.clone())
                         },
                     );
 
@@ -564,10 +636,10 @@ pub async fn document_workspace(
                         name.clone(),
                         version,
                         w,
-                        if rel_wdl_path.starts_with("external") {
+                        if external_wdl {
                             None
                         } else {
-                            Some(rel_wdl_path.clone())
+                            Some(root_to_wdl.clone())
                         },
                     );
 
@@ -582,21 +654,37 @@ pub async fn document_workspace(
                 DocumentItem::Import(_) => {}
             }
         }
-        let name = rel_wdl_path
+        let document_name = root_to_wdl
             .file_stem()
-            .expect("WDL file should have stem")
+            .ok_or(anyhow!(
+                "failed to get file stem for WDL file: `{}`",
+                root_to_wdl.display()
+            ))?
             .to_string_lossy();
-        let document = Document::new(name.to_string(), version, version_statement, local_pages);
+        let document = Document::new(
+            document_name.to_string(),
+            version,
+            version_statement,
+            local_pages,
+        );
 
         let index_path = cur_dir.join("index.html");
 
         docs_tree.add_page(
             index_path,
-            Rc::new(HTMLPage::new(name.to_string(), PageType::Index(document))),
+            Rc::new(HTMLPage::new(
+                document_name.to_string(),
+                PageType::Index(document),
+            )),
         );
     }
 
-    docs_tree.render_all()?;
+    docs_tree.render_all().with_context(|| {
+        format!(
+            "failed to write documentation to output directory: `{}`",
+            docs_dir.display()
+        )
+    })?;
 
     Ok(())
 }

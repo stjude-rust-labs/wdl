@@ -7,10 +7,12 @@ use std::path::PathBuf;
 use std::path::absolute;
 use std::rc::Rc;
 
+use anyhow::Context;
 use anyhow::Result;
 use maud::Markup;
 use maud::html;
 use pathdiff::diff_paths;
+use serde::Serialize;
 
 use crate::Markdown;
 use crate::Render;
@@ -245,7 +247,12 @@ impl DocsTreeBuilder {
 
     /// Build the docs tree.
     pub fn build(self) -> Result<DocsTree> {
-        write_assets(&self.root, self.custom_theme.as_ref())?;
+        write_assets(&self.root, self.custom_theme.as_ref()).with_context(|| {
+            format!(
+                "failed to write assets to output directory: `{}`",
+                self.root.display()
+            )
+        })?;
         let node = Node::new(
             self.root
                 .file_name()
@@ -547,6 +554,7 @@ impl DocsTree {
                 .replace(std::path::MAIN_SEPARATOR_STR, "_")
         };
 
+        #[derive(Serialize)]
         struct JsNode {
             /// The key of the node.
             key: String,
@@ -570,42 +578,6 @@ impl DocsTree {
             nest_level: usize,
             /// The children of the node.
             children: Vec<String>,
-        }
-
-        impl JsNode {
-            /// Convert the node to a JavaScript object.
-            fn to_js(&self) -> String {
-                format!(
-                    r#"{{
-                        key: '{}',
-                        display_name: '{}',
-                        parent: '{}',
-                        search_name: '{}',
-                        icon: {},
-                        href: {},
-                        ancestor: {},
-                        current: {},
-                        nest_level: {}
-                    }}"#,
-                    self.key,
-                    self.display_name,
-                    self.parent,
-                    self.search_name,
-                    if let Some(icon) = &self.icon {
-                        format!("'{icon}'")
-                    } else {
-                        "null".to_string()
-                    },
-                    if let Some(href) = &self.href {
-                        format!("'{href}'")
-                    } else {
-                        "null".to_string()
-                    },
-                    self.ancestor,
-                    self.current,
-                    self.nest_level
-                )
-            }
         }
 
         let all_nodes = root
@@ -782,7 +754,7 @@ impl DocsTree {
             self.get_asset(base, "chevron-down.svg"),
             all_nodes
                 .iter()
-                .map(|node| node.to_js())
+                .map(|node| serde_json::to_string(node).expect("should serialize node"))
                 .collect::<Vec<String>>()
                 .join(", "),
             js_dag,
@@ -974,11 +946,15 @@ impl DocsTree {
 
         for node in root.depth_first_traversal() {
             if let Some(page) = node.page() {
-                self.write_page(page.as_ref(), self.root_abs_path().join(node.path()))?;
+                self.write_page(page.as_ref(), self.root_abs_path().join(node.path()))
+                    .with_context(|| {
+                        format!("failed to write page at `{}`", node.path().display())
+                    })?;
             }
         }
 
-        self.write_homepage()?;
+        self.write_homepage()
+            .with_context(|| "failed to write homepage".to_string())?;
         Ok(())
     }
 
@@ -991,7 +967,9 @@ impl DocsTree {
             @if let Some(homepage) = &self.homepage {
                 div class="main__section" {
                     div class="markdown-body" {
-                        (Markdown(std::fs::read_to_string(homepage)?).render())
+                        (Markdown(std::fs::read_to_string(homepage).with_context(|| {
+                            format!("failed to read provided homepage file: `{}`", homepage.display())
+                        })?).render())
                     }
                 }
             } @else {
@@ -1021,7 +999,8 @@ impl DocsTree {
             ),
             self.root().path(),
         );
-        std::fs::write(index_path, html.into_string())?;
+        std::fs::write(&index_path, html.into_string())
+            .with_context(|| format!("failed to write homepage to `{}`", index_path.display()))?;
         Ok(())
     }
 
@@ -1136,7 +1115,8 @@ impl DocsTree {
             ),
             self.root_relative_to(base),
         );
-        std::fs::write(path, html.into_string())?;
+        std::fs::write(&path, html.into_string())
+            .with_context(|| format!("failed to write page at `{}`", path.display()))?;
         Ok(())
     }
 }
