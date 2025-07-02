@@ -35,8 +35,6 @@ use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
 use wdl_analysis::Analyzer;
-use wdl_analysis::DiagnosticsConfig;
-use wdl_analysis::rules;
 use wdl_ast::AstToken;
 use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
@@ -261,7 +259,7 @@ pub async fn document_workspace(
         std::fs::create_dir(&docs_dir)?;
     }
 
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
+    let analyzer = Analyzer::default();
     analyzer.add_directory(workspace_abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 

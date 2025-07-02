@@ -20,13 +20,14 @@ use std::path::absolute;
 
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term;
-use codespan_reporting::term::Config;
+use codespan_reporting::term::Config as CodespanConfig;
 use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
 use tracing_subscriber::EnvFilter;
 use wdl_analysis::Analyzer;
+use wdl_analysis::Config;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -77,7 +78,7 @@ fn format_diagnostics(diagnostics: &[Diagnostic], path: &Path, source: &str) -> 
     for diagnostic in diagnostics {
         term::emit(
             &mut buffer,
-            &Config::default(),
+            &CodespanConfig::default(),
             &file,
             &diagnostic.to_codespan(()),
         )
@@ -130,7 +131,10 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     // Start with a single analysis pass over all the test files
-    let analyzer = Analyzer::new(DiagnosticsConfig::except_all(), |_, _, _, _| async {});
+    let analyzer = Analyzer::new(
+        Config::default().with_diagnostics(DiagnosticsConfig::except_all()),
+        |_, _, _, _| async {},
+    );
     for test in &tests {
         analyzer
             .add_directory(test.clone())

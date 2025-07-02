@@ -20,7 +20,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 
-use crate::DiagnosticsConfig;
+use crate::config::Config;
 use crate::diagnostics::unused_import;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
@@ -425,6 +425,8 @@ impl Workflow {
 /// Represents analysis data about a WDL document.
 #[derive(Debug)]
 struct DocumentData {
+    /// The configuration under which this document was analyzed.
+    config: Config,
     /// The root CST node of the document.
     ///
     /// This is `None` when the document could not be parsed.
@@ -452,12 +454,14 @@ struct DocumentData {
 impl DocumentData {
     /// Constructs a new analysis document data.
     fn new(
+        config: Config,
         uri: Arc<Url>,
         root: Option<GreenNode>,
         version: Option<SupportedVersion>,
         diagnostics: Vec<Diagnostic>,
     ) -> Self {
         Self {
+            config,
             root,
             id: Uuid::new_v4().to_string().into(),
             uri,
@@ -484,13 +488,19 @@ impl Document {
     /// Creates a new default document from a URI.
     pub(crate) fn default_from_uri(uri: Arc<Url>) -> Self {
         Self {
-            data: Arc::new(DocumentData::new(uri, None, None, Default::default())),
+            data: Arc::new(DocumentData::new(
+                Default::default(),
+                uri,
+                None,
+                None,
+                Default::default(),
+            )),
         }
     }
 
     /// Creates a new analyzed document from a document graph node.
     pub(crate) fn from_graph_node(
-        config: DiagnosticsConfig,
+        config: &Config,
         graph: &DocumentGraph,
         index: NodeIndex,
     ) -> Self {
@@ -504,11 +514,15 @@ impl Document {
 
         let root = node.root().expect("node should have been parsed");
         let (version, config) = match root.version_statement() {
-            Some(stmt) => (stmt.version(), config.excepted_for_node(stmt.inner())),
+            Some(stmt) => (
+                stmt.version(),
+                config.with_diagnostics(config.diagnostics().excepted_for_node(stmt.inner())),
+            ),
             None => {
                 // Don't process a document with a missing version
                 return Self {
                     data: Arc::new(DocumentData::new(
+                        config.clone(),
                         node.uri().clone(),
                         Some(root.inner().green().into()),
                         None,
@@ -519,6 +533,7 @@ impl Document {
         };
 
         let mut data = DocumentData::new(
+            config.clone(),
             node.uri().clone(),
             Some(root.inner().green().into()),
             SupportedVersion::from_str(version.text()).ok(),
@@ -526,11 +541,11 @@ impl Document {
         );
         match root.ast() {
             Ast::Unsupported => {}
-            Ast::V1(ast) => v1::populate_document(&mut data, config, graph, index, &ast, &version),
+            Ast::V1(ast) => v1::populate_document(&mut data, &config, graph, index, &ast, &version),
         }
 
         // Check for unused imports
-        if let Some(severity) = config.unused_import {
+        if let Some(severity) = config.diagnostics().unused_import {
             let DocumentData {
                 namespaces,
                 diagnostics,

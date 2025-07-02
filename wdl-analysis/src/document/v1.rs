@@ -45,12 +45,13 @@ use super::Struct;
 use super::TASK_VAR_NAME;
 use super::Task;
 use super::Workflow;
-use crate::DiagnosticsConfig;
 use crate::SyntaxNodeExt;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
+use crate::config::Config;
+use crate::config::DiagnosticsConfig;
 use crate::diagnostics::Context;
 use crate::diagnostics::Io;
 use crate::diagnostics::call_input_type_mismatch;
@@ -190,7 +191,7 @@ fn sort_scopes(scopes: &mut Vec<Scope>) {
 /// Creates a new document for a V1 AST.
 pub(crate) fn populate_document(
     document: &mut DocumentData,
-    config: DiagnosticsConfig,
+    config: &Config,
     graph: &DocumentGraph,
     index: NodeIndex,
     ast: &Ast,
@@ -511,7 +512,7 @@ fn create_output_type_map(
 }
 
 /// Adds a task to the document.
-fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: &TaskDefinition) {
+fn add_task(config: &Config, document: &mut DocumentData, definition: &TaskDefinition) {
     /// Helper function for creating a scope for a task section.
     fn create_section_scope(
         version: Option<SupportedVersion>,
@@ -601,7 +602,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.unused_input {
+                if let Some(severity) = config.diagnostics().unused_input {
                     if decl.env().is_none() {
                         // For any input that isn't an environment variable, check to see if there's
                         // a single implicit dependency edge; if so, it might be unused
@@ -637,7 +638,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.unused_declaration {
+                if let Some(severity) = config.diagnostics().unused_declaration {
                     let name = decl.name();
                     // Don't warn for environment variables as they are always implicitly used
                     if decl.env().is_none()
@@ -693,7 +694,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 let mut context = EvaluationContext::new(
                     document,
                     ScopeRef::new(&task.scopes, scope_index),
-                    config,
+                    config.clone(),
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for part in section.parts() {
@@ -707,7 +708,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 let mut context = EvaluationContext::new(
                     document,
                     ScopeRef::new(&task.scopes, ScopeIndex(0)),
-                    config,
+                    config.clone(),
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
@@ -719,7 +720,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 let mut context = EvaluationContext::new(
                     document,
                     ScopeRef::new(&task.scopes, ScopeIndex(0)),
-                    config,
+                    config.clone(),
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
@@ -731,7 +732,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                 let mut context = EvaluationContext::new_for_task(
                     document,
                     ScopeRef::new(&task.scopes, ScopeIndex(0)),
-                    config,
+                    config.clone(),
                     &task,
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
@@ -749,7 +750,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
 
 /// Adds a declaration to a scope.
 fn add_decl(
-    config: DiagnosticsConfig,
+    config: &Config,
     document: &mut DocumentData,
     mut scope: ScopeRefMut<'_>,
     decl: &Decl,
@@ -825,11 +826,7 @@ fn add_workflow(document: &mut DocumentData, workflow: &WorkflowDefinition) -> b
 }
 
 /// Finishes populating a workflow.
-fn populate_workflow(
-    config: DiagnosticsConfig,
-    document: &mut DocumentData,
-    workflow: &WorkflowDefinition,
-) {
+fn populate_workflow(config: &Config, document: &mut DocumentData, workflow: &WorkflowDefinition) {
     // Populate type maps for the workflow's inputs and outputs
     let inputs = match workflow.input() {
         Some(section) => create_input_type_map(document, section.declarations()),
@@ -870,7 +867,7 @@ fn populate_workflow(
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.unused_input {
+                if let Some(severity) = config.diagnostics().unused_input {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -907,7 +904,7 @@ fn populate_workflow(
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.unused_declaration {
+                if let Some(severity) = config.diagnostics().unused_declaration {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -990,7 +987,7 @@ fn populate_workflow(
                 );
 
                 // Check for unused call
-                if let Some(severity) = config.unused_call {
+                if let Some(severity) = config.diagnostics().unused_call {
                     if graph
                         .edges_directed(index, Direction::Outgoing)
                         .next()
@@ -1049,7 +1046,7 @@ fn populate_workflow(
 
 /// Adds a conditional statement to the current scope.
 fn add_conditional_statement(
-    config: DiagnosticsConfig,
+    config: &Config,
     document: &mut DocumentData,
     scopes: &mut Vec<Scope>,
     parent: ScopeIndex,
@@ -1069,7 +1066,8 @@ fn add_conditional_statement(
 
     // Evaluate the statement's expression; it is expected to be a boolean
     let expr = statement.expr();
-    let mut context = EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config);
+    let mut context =
+        EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config.clone());
     let mut evaluator = ExprTypeEvaluator::new(&mut context);
     let ty = evaluator.evaluate_expr(&expr).unwrap_or(Type::Union);
 
@@ -1082,7 +1080,7 @@ fn add_conditional_statement(
 
 /// Adds a scatter statement to the current scope.
 fn add_scatter_statement(
-    config: DiagnosticsConfig,
+    config: &Config,
     document: &mut DocumentData,
     scopes: &mut Vec<Scope>,
     parent: ScopeIndex,
@@ -1102,7 +1100,8 @@ fn add_scatter_statement(
 
     // Evaluate the statement expression; it is expected to be an array
     let expr = statement.expr();
-    let mut context = EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config);
+    let mut context =
+        EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config.clone());
     let mut evaluator = ExprTypeEvaluator::new(&mut context);
     let ty = evaluator.evaluate_expr(&expr).unwrap_or(Type::Union);
     let element_ty = match ty {
@@ -1123,7 +1122,7 @@ fn add_scatter_statement(
 
 /// Adds a call statement to the current scope.
 fn add_call_statement(
-    config: DiagnosticsConfig,
+    config: &Config,
     document: &mut DocumentData,
     workflow_name: &str,
     mut scope: ScopeRefMut<'_>,
@@ -1506,8 +1505,8 @@ struct EvaluationContext<'a> {
     document: &'a mut DocumentData,
     /// The current evaluation scope.
     scope: ScopeRef<'a>,
-    /// The diagnostics configuration to use for expression evaluation.
-    config: DiagnosticsConfig,
+    /// The configuration to use for expression evaluation.
+    config: Config,
     /// The context of the task being evaluated.
     ///
     /// This is only `Some` when evaluating a task's `hints` section.`
@@ -1516,11 +1515,7 @@ struct EvaluationContext<'a> {
 
 impl<'a> EvaluationContext<'a> {
     /// Constructs a new expression type evaluation context.
-    pub fn new(
-        document: &'a mut DocumentData,
-        scope: ScopeRef<'a>,
-        config: DiagnosticsConfig,
-    ) -> Self {
+    pub fn new(document: &'a mut DocumentData, scope: ScopeRef<'a>, config: Config) -> Self {
         Self {
             document,
             scope,
@@ -1536,7 +1531,7 @@ impl<'a> EvaluationContext<'a> {
     pub fn new_for_task(
         document: &'a mut DocumentData,
         scope: ScopeRef<'a>,
-        config: DiagnosticsConfig,
+        config: Config,
         task: &'a Task,
     ) -> Self {
         Self {
@@ -1579,7 +1574,7 @@ impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
     }
 
     fn diagnostics_config(&self) -> DiagnosticsConfig {
-        self.config
+        *self.config.diagnostics()
     }
 
     fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
@@ -1589,14 +1584,14 @@ impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
 
 /// Performs a type check of an expression.
 fn type_check_expr(
-    config: DiagnosticsConfig,
+    config: &Config,
     document: &mut DocumentData,
     scope: ScopeRef<'_>,
     expr: &Expr,
     expected: &Type,
     expected_span: Span,
 ) {
-    let mut context = EvaluationContext::new(document, scope, config);
+    let mut context = EvaluationContext::new(document, scope, config.clone());
     let mut evaluator = ExprTypeEvaluator::new(&mut context);
     let actual = evaluator.evaluate_expr(expr).unwrap_or(Type::Union);
 

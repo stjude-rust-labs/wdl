@@ -7,7 +7,6 @@ use super::parser::Event;
 use super::parser::Marker;
 use super::parser::Parser;
 use super::tree::SyntaxKind;
-use crate::SupportedVersion;
 use crate::lexer::VersionStatementToken;
 
 pub mod v1;
@@ -72,7 +71,7 @@ type PreambleParser<'a> = Parser<'a, PreambleToken>;
 /// Parses a WDL document.
 ///
 /// Returns the parser events that result from parsing the document.
-pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>) {
+pub fn document(mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>) {
     let root = parser.start();
     // Look for a starting `version` keyword token
     // If this fails, an error is emitted and we'll skip parsing the remainder of
@@ -82,7 +81,7 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
             let marker = parser.start();
             let (mut parser, res) = version_statement(parser, marker);
             match res {
-                Ok(span) => {
+                Ok(_span) => {
                     // A version statement was successfully parsed; continue on with parsing the
                     // rest of the document.
                     let mut parser = parser.morph();

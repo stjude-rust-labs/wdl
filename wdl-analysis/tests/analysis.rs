@@ -26,16 +26,14 @@ use anyhow::Result;
 use anyhow::bail;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term;
-use codespan_reporting::term::Config;
+use codespan_reporting::term::Config as CodespanConfig;
 use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
-use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::path_to_uri;
-use wdl_analysis::rules;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 
@@ -135,7 +133,7 @@ fn compare_results(test: &Path, results: Vec<AnalysisResult>) -> Result<()> {
             for diagnostic in diagnostics.as_ref() {
                 term::emit(
                     &mut buffer,
-                    &Config::default(),
+                    &CodespanConfig::default(),
                     &file,
                     &diagnostic.to_codespan(()),
                 )
@@ -163,7 +161,7 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     // Start with a single analysis pass over all the test files
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_, _, _, _| async {});
+    let analyzer = Analyzer::default();
     for test in &tests {
         analyzer
             .add_directory(test.clone())
@@ -214,7 +212,7 @@ async fn main() {
     // Some tests are sensitive to the order in which files are parsed (e.g.
     // detecting cycles) For those, use a new analyzer and analyze the
     // `source.wdl` directly
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_, _, _, _| async {});
+    let analyzer = Analyzer::default();
     for test_name in single_file {
         let test = Path::new("tests/analysis").join(test_name);
         let document = test.join("source.wdl");

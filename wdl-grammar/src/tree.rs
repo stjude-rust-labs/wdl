@@ -679,7 +679,7 @@ impl SyntaxTree {
     /// ```
     pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
         let parser = Parser::new(Lexer::new(source));
-        let (events, mut diagnostics) = grammar::document(source, parser);
+        let (events, mut diagnostics) = grammar::document(parser);
         diagnostics.sort();
         (Self(construct_tree(source, events)), diagnostics)
     }

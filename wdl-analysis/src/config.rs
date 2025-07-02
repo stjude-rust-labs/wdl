@@ -1,0 +1,182 @@
+use std::sync::Arc;
+
+use tracing::warn;
+use wdl_ast::Severity;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxNode;
+
+use crate::Rule;
+use crate::SyntaxNodeExt as _;
+use crate::UNNECESSARY_FUNCTION_CALL;
+use crate::UNUSED_CALL_RULE_ID;
+use crate::UNUSED_DECL_RULE_ID;
+use crate::UNUSED_IMPORT_RULE_ID;
+use crate::UNUSED_INPUT_RULE_ID;
+use crate::rules;
+
+/// Configuration for `wdl-analysis`.
+///
+/// This type is a wrapper around an `Arc`, and so can be cheaply cloned and sent between threads.
+#[derive(Clone, PartialEq, Eq)]
+pub struct Config {
+    inner: Arc<ConfigInner>,
+}
+
+// Custom `Debug` impl for the `Config` wrapper type that simplifies away the
+// arc and the private inner struct
+impl std::fmt::Debug for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Config")
+            .field("diagnostics", &self.inner.diagnostics)
+            .field("fallback_version", &self.inner.fallback_version)
+            .finish()
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            inner: Arc::new(ConfigInner {
+                diagnostics: Default::default(),
+                fallback_version: None,
+            }),
+        }
+    }
+}
+
+impl Config {
+    /// Get this configuration's [`DiagnosticsConfig`].
+    pub fn diagnostics(&self) -> &DiagnosticsConfig {
+        &self.inner.diagnostics
+    }
+
+    /// Get this configuration's fallback version.
+    ///
+    /// `None` means no version fallback behavior is enabled.
+    pub fn fallback_version(&self) -> Option<&SupportedVersion> {
+        self.inner.fallback_version.as_ref()
+    }
+
+    /// Return a new configuration with the previous [`DiagnosticsConfig`] replaced by the argument.
+    pub fn with_diagnostics(&self, diagnostics: DiagnosticsConfig) -> Self {
+        let mut inner = (*self.inner).clone();
+        inner.diagnostics = diagnostics;
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ConfigInner {
+    diagnostics: DiagnosticsConfig,
+    fallback_version: Option<SupportedVersion>,
+}
+
+/// Configuration for analysis diagnostics.
+///
+/// Only the analysis diagnostics that aren't inherently treated as errors are
+/// represented here.
+///
+/// These diagnostics default to a warning severity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DiagnosticsConfig {
+    /// The severity for the "unused import" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_import: Option<Severity>,
+    /// The severity for the "unused input" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_input: Option<Severity>,
+    /// The severity for the "unused declaration" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_declaration: Option<Severity>,
+    /// The severity for the "unused call" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_call: Option<Severity>,
+    /// The severity for the "unnecessary function call" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unnecessary_function_call: Option<Severity>,
+}
+
+impl Default for DiagnosticsConfig {
+    fn default() -> Self {
+        Self::new(rules())
+    }
+}
+
+impl DiagnosticsConfig {
+    /// Creates a new diagnostics configuration from a rule set.
+    pub fn new<T: AsRef<dyn Rule>>(rules: impl IntoIterator<Item = T>) -> Self {
+        let mut unused_import = None;
+        let mut unused_input = None;
+        let mut unused_declaration = None;
+        let mut unused_call = None;
+        let mut unnecessary_function_call = None;
+
+        for rule in rules {
+            let rule = rule.as_ref();
+            match rule.id() {
+                UNUSED_IMPORT_RULE_ID => unused_import = Some(rule.severity()),
+                UNUSED_INPUT_RULE_ID => unused_input = Some(rule.severity()),
+                UNUSED_DECL_RULE_ID => unused_declaration = Some(rule.severity()),
+                UNUSED_CALL_RULE_ID => unused_call = Some(rule.severity()),
+                UNNECESSARY_FUNCTION_CALL => unnecessary_function_call = Some(rule.severity()),
+                unrecognized => {
+                    warn!(unrecognized, "unrecognized rule");
+                }
+            }
+        }
+
+        Self {
+            unused_import,
+            unused_input,
+            unused_declaration,
+            unused_call,
+            unnecessary_function_call,
+        }
+    }
+
+    /// Gets the excepted set of diagnostics based on any `#@ except` comments
+    /// that precede the given syntax node.
+    pub fn excepted_for_node(mut self, node: &SyntaxNode) -> Self {
+        let exceptions = node.rule_exceptions();
+
+        if exceptions.contains(UNUSED_IMPORT_RULE_ID) {
+            self.unused_import = None;
+        }
+
+        if exceptions.contains(UNUSED_INPUT_RULE_ID) {
+            self.unused_input = None;
+        }
+
+        if exceptions.contains(UNUSED_DECL_RULE_ID) {
+            self.unused_declaration = None;
+        }
+
+        if exceptions.contains(UNUSED_CALL_RULE_ID) {
+            self.unused_call = None;
+        }
+
+        if exceptions.contains(UNNECESSARY_FUNCTION_CALL) {
+            self.unnecessary_function_call = None;
+        }
+
+        self
+    }
+
+    /// Excepts all of the diagnostics.
+    pub fn except_all() -> Self {
+        Self {
+            unused_import: None,
+            unused_input: None,
+            unused_declaration: None,
+            unused_call: None,
+            unnecessary_function_call: None,
+        }
+    }
+}
