@@ -157,6 +157,10 @@ async fn main() {
     /// The tests that require single document analysis.
     const SINGLE_DOCUMENT_TESTS: &[&str] = &["import-dependency-cycle"];
 
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
+
     let tests = find_tests();
     println!("\nrunning {} tests\n", tests.len());
 

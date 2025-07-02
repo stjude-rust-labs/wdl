@@ -594,6 +594,11 @@ impl Document {
         }
     }
 
+    /// Gets the analysis configuration.
+    pub fn config(&self) -> &Config {
+        &self.data.config
+    }
+
     /// Gets the root AST document node.
     ///
     /// # Panics

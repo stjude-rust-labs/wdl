@@ -22,7 +22,7 @@
 //! "shared" across different WDL versions.
 
 use rowan::WalkEvent;
-use wdl_ast::AstNode;
+use tracing::trace;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Document as AstDocument;
@@ -57,6 +57,7 @@ use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowHintsSection;
+use wdl_ast::{AstNode, Diagnostic};
 
 use crate::Diagnostics;
 use crate::document::Document as AnalysisDocument;
@@ -331,21 +332,53 @@ pub(crate) fn visit<V: Visitor>(
     diagnostics: &mut Diagnostics,
     visitor: &mut V,
 ) {
+    trace!(
+        uri = %document.uri(),
+        "beginning document traversal",
+    );
     for event in document.root().inner().preorder_with_tokens() {
         let (reason, element) = match event {
             WalkEvent::Enter(node) => (VisitReason::Enter, node),
             WalkEvent::Leave(node) => (VisitReason::Exit, node),
         };
-
+        trace!(uri = %document.uri(), ?reason, element = ?element.kind());
         match element.kind() {
             SyntaxKind::RootNode => {
                 let ast_document = AstDocument::cast(element.into_node().unwrap())
                     .expect("root node should be a document");
 
-                let version = ast_document
+                let version_token = ast_document
                     .version_statement()
-                    .and_then(|s| s.version().text().parse::<SupportedVersion>().ok())
-                    .expect("only WDL documents with supported versions can be visited");
+                    .expect("only WDL documents with version statements can be visited")
+                    .version();
+
+                // TODO ACF 2025-07-01: is this the right place to even care about the version, or
+                // should we change the signature of `Visitor::document()`?
+                //
+                // check implementations tomorrow
+                let version = match (
+                    version_token.text().parse::<SupportedVersion>(),
+                    document.config().fallback_version(),
+                ) {
+                    (Ok(version), _) => version,
+                    (Err(unrecognized), Some(fallback)) => {
+                        // TODO ACF 2025-07-01: make this diagnostic configurable
+                        diagnostics.add(
+                            Diagnostic::warning(format!(
+                                "unsupported WDL version `{unrecognized}`; interpreting document as \
+                                 version `{fallback}`"
+                            ))
+                            .with_label("this version of WDL is not supported", version_token.span()),
+                        );
+                        *fallback
+                    }
+                    (Err(unrecognized), None) => {
+                        panic!(
+                            "tried to visit analyzed document with unsupported WDL version \
+                             `{unrecognized}`, but no fallback was configured; this is a bug"
+                        )
+                    }
+                };
 
                 visitor.document(diagnostics, reason, document, version)
             }
