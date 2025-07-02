@@ -66,7 +66,9 @@ impl MetaMapExt for MetaMap {
                     div class="main__summary-container" {
                         (summary)
                         "..."
-                        button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" x-text="description_expanded ? 'Show less' : 'Show full description'" {}
+                        button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" {
+                            b x-text="description_expanded ? 'Show less' : 'Show full description'" {}
+                        }
                     }
                 }
             }
@@ -174,11 +176,8 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             html! {
                 div class="main__grid-nested-container" {
-                    // TODO revisit this
-                    div class="main__grid-meta-object-container" {
-                        @for item in o.items() {
-                            (render_key_value(item.name().text(), &item.value()))
-                        }
+                    @for item in o.items() {
+                        (render_key_value(item.name().text(), &item.value()))
                     }
                 }
             }
@@ -234,11 +233,8 @@ fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             let markup = html! {
                 div class="main__grid-nested-container" {
-                    // TODO revisit this
-                    div class="main__grid-meta-object-container" {
-                        @for item in o.items() {
-                            (render_key_value(item.name().text(), &item.value()))
-                        }
+                    @for item in o.items() {
+                        (render_key_value(item.name().text(), &item.value()))
                     }
                 }
             };

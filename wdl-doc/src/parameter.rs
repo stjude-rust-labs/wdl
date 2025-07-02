@@ -169,7 +169,9 @@ impl Parameter {
                     div class="main__summary-container" {
                         code { (summary) }
                         "..."
-                        button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                        button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" {
+                            b x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                        }
                     }
                 }
             }
@@ -250,7 +252,9 @@ impl Parameter {
             @if let Some(addl_meta) = self.render_remaining_meta(assets) {
                 div class="main__grid-full-width-cell" x-data="{ addl_meta_expanded: false }" {
                     div class="main__addl-meta-outer-container" {
-                        button type="button" class="main__button" x-on:click="addl_meta_expanded = !addl_meta_expanded" x-text="addl_meta_expanded ? 'Hide Additional Meta' : 'Show Additional Metadata'" {}
+                        button type="button" class="main__button" x-on:click="addl_meta_expanded = !addl_meta_expanded" {
+                            b x-text="addl_meta_expanded ? 'Hide Additional Meta' : 'Show Additional Metadata'" {}
+                        }
                         div x-show="addl_meta_expanded" class="main__addl-meta-inner-container" {
                             (addl_meta)
                         }

@@ -214,7 +214,7 @@
     @apply flex flex-row gap-2;
   }
   .main__run-with-content-text {
-    @apply text-sm text-slate-300;
+    @apply text-sm border-slate-700 bg-black text-slate-300 rounded-md font-mono py-[0.2em] px-[0.4em];
   }
   /**
    * Main Grids
@@ -244,7 +244,7 @@
     @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
   }
   .main__grid-runtime-container {
-    @apply grid grid-cols-[auto_1fr] gap-4;
+    @apply grid grid-cols-[20%_1fr] gap-4;
   }
   .main__grid-req-inputs-container {
     @apply grid grid-cols-[1fr_1fr_3fr] gap-4;
@@ -256,16 +256,16 @@
    * Metadata
    */
   .main__grid-nested-container {
-    @apply grid grid-cols-[auto_1fr] gap-4;
+    @apply grid grid-cols-[20%_1fr] gap-4;
   }
   .main__addl-meta-outer-container {
     @apply flex flex-col gap-2 mb-4;
   }
   .main__addl-meta-inner-container {
-    @apply text-slate-300 bg-slate-900 rounded-md p-4;
+    @apply flex flex-col gap-4 text-slate-300 bg-slate-900 rounded-md p-4;
   }
   .main__grid-meta-object-container {
-    @apply grid grid-cols-[auto_1fr] gap-4;
+    @apply grid grid-cols-[20%_1fr] gap-4;
   }
   .main__grid-nested-row {
     @apply contents;
@@ -274,7 +274,7 @@
     @apply text-sm;
   }
   .main__grid-meta-array-container {
-    @apply flex flex-row gap-2;
+    @apply flex flex-row gap-2 flex-wrap;
   }
   .main__grid-meta-array-item {
     @apply flex;
