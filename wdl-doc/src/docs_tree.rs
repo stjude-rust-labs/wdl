@@ -1040,7 +1040,7 @@ impl DocsTree {
     ) -> Markup {
         html! {
             div class="layout__container layout__container--alt-layout" x-transition x-data="{
-                sidebarState: $persist(window.innerWidth < 768 ? 'hidden' : window.innerWidth > 1300 ? 'xl' : 'normal').using(sessionStorage),
+                sidebarState: $persist(window.innerWidth < 768 ? 'hidden' : window.innerWidth > 1920 ? 'xl' : 'normal').using(sessionStorage),
                 get showSidebarButtons() { return this.sidebarState !== 'hidden'; },
                 get showCenterButtons() { return this.sidebarState === 'hidden'; },
                 get containerClasses() {
