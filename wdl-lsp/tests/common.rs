@@ -157,18 +157,19 @@ impl TestContext {
             self.response_rx.read_exact(&mut content).await.unwrap();
             Some(String::from_utf8(content).unwrap())
         } else {
-            None
+            Some(String::new())
         }
     }
 
     /// Receives and deserializes the next JSON-RPC response from the server.
     ///
     /// This method waits for a response with the `expected_id`, filtering out:
+    ///
     /// - Server-initiated notifications (which don't need responses)
     /// - Server-initiated requests that require client responses
     ///
     /// The server sends `window/workDoneProgress/create` requests during
-    /// long-running operations. Per LSP spec, clients must respond to these
+    /// long-running operations. Per the LSP spec, clients must respond to these
     /// requests to acknowledge progress token creation. We automatically
     /// respond with `null` to keep the server's progress reporting
     /// functional without blocking tests.
