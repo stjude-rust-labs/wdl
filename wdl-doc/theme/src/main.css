@@ -59,10 +59,10 @@
    * Layout
    */
   .layout__container {
-    @apply h-screen w-screen flex pl-0 md:pl-72 transition-all duration-150 bg-slate-950;
+    @apply h-screen w-screen flex pl-0 md:pl-72 bg-slate-950;
   }
   .layout__sidebar-left {
-    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar z-40 transition-all duration-300;
+    @apply fixed left-0 top-0 h-screen w-72 dark-scrollbar z-40;
   }
   .layout__main-center {
     @apply flex-grow bg-slate-950 text-slate-300 h-screen w-screen overflow-y-auto p-10 dark-scrollbar;
@@ -325,20 +325,8 @@
     /* currently viewed page */
     @apply bg-slate-700/40 text-slate-50;
   }
-  .left-sidebar__row-page {
-    /* page that is not currently viewed */
-    /* @apply bg-blue-500 text-slate-400; */
-  }
   .left-sidebar__row-folder {
     @apply text-slate-400;
-  }
-  .left-sidebar__row-folder--open {
-    /* folder that is open */
-    /* @apply text-slate-50; */
-  }
-  .left-sidebar__row-folder--closed {
-    /* folder that is closed */
-    /* @apply bg-yellow-600 text-slate-400; */
   }
   .left-sidebar__content-item-container {
     @apply flex flex-row items-center gap-x-1;
@@ -362,7 +350,7 @@
     @apply flex flex-row items-center gap-x-1;
   }
   .left-sidebar__size-button {
-    @apply w-6 h-6 rounded flex items-center justify-center opacity-40 transition-all text-lg hover:bg-slate-700 text-slate-500 hover:text-slate-100 focus:ring-2 focus:outline-0 focus:ring-slate-500 hover:opacity-100 cursor-pointer;
+    @apply w-6 h-6 rounded flex items-center justify-center opacity-40 text-lg hover:bg-slate-700 text-slate-500 hover:text-slate-100 focus:ring-2 focus:outline-0 focus:ring-slate-500 hover:opacity-100 cursor-pointer;
   }
   .left-sidebar__size-button.left-sidebar__size-button--active {
     @apply text-slate-100 bg-slate-700 opacity-100;

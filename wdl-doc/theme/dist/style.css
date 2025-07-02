@@ -1319,11 +1319,6 @@
     width: 100vw;
     background-color: var(--color-slate-950);
     padding-left: calc(var(--spacing) * 0);
-    transition-property: all;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
-    --tw-duration: 150ms;
-    transition-duration: 150ms;
     @media (width >= 48rem) {
       padding-left: calc(var(--spacing) * 72);
     }
@@ -1335,11 +1330,6 @@
     z-index: 40;
     height: 100vh;
     width: calc(var(--spacing) * 72);
-    transition-property: all;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
-    --tw-duration: 300ms;
-    transition-duration: 300ms;
     scrollbar-width: thin;
     scrollbar-color: #4b5563 #1f2937;
   }
@@ -1994,9 +1984,6 @@
     line-height: var(--tw-leading, var(--text-lg--line-height));
     color: var(--color-slate-500);
     opacity: 40%;
-    transition-property: all;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-slate-700);
@@ -2341,10 +2328,6 @@
   syntax: "*";
   inherits: false;
 }
-@property --tw-duration {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-font-weight {
   syntax: "*";
   inherits: false;
@@ -2390,7 +2373,6 @@
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
       --tw-leading: initial;
-      --tw-duration: initial;
       --tw-font-weight: initial;
     }
   }

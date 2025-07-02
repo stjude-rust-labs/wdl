@@ -1039,7 +1039,7 @@ impl DocsTree {
         assets: &Path,
     ) -> Markup {
         html! {
-            div class="layout__container layout__container--alt-layout" x-data="{
+            div class="layout__container layout__container--alt-layout" x-transition x-data="{
                 sidebarState: $persist(window.innerWidth < 768 ? 'hidden' : window.innerWidth > 1300 ? 'xl' : 'normal').using(sessionStorage),
                 get showSidebarButtons() { return this.sidebarState !== 'hidden'; },
                 get showCenterButtons() { return this.sidebarState === 'hidden'; },
@@ -1058,7 +1058,7 @@ impl DocsTree {
                 restoreSidebar() { this.sidebarState = 'normal'; },
                 expandSidebar() { this.sidebarState = 'xl'; }
             }" x-bind:class="containerClasses" {
-                div class="layout__sidebar-left" {
+                div class="layout__sidebar-left" x-transition {
                     div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
                         (self.render_sidebar_control_buttons(assets))
                     }
