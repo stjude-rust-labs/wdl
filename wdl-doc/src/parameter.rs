@@ -170,7 +170,7 @@ impl Parameter {
                         code { (summary) }
                         "..."
                         button type="button" class="main__button" x-on:click="expr_expanded = !expr_expanded" {
-                            b x-text="expr_expanded ? 'Show less' : 'Show full expression'" {}
+                            b x-text="expr_expanded ? 'Hide full expression' : 'Show full expression'" {}
                         }
                     }
                 }

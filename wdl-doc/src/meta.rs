@@ -67,7 +67,7 @@ impl MetaMapExt for MetaMap {
                         (summary)
                         "..."
                         button type="button" class="main__button" x-on:click="description_expanded = !description_expanded" {
-                            b x-text="description_expanded ? 'Show less' : 'Show full description'" {}
+                            b x-text="description_expanded ? 'Hide full description' : 'Show full description'" {}
                         }
                     }
                 }
