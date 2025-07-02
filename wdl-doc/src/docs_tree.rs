@@ -1028,8 +1028,8 @@ impl DocsTree {
     fn render_sidebar_control_buttons(&self) -> Markup {
         html! {
             button
-                x-on:click="collapseSidebar()" 
-                x-bind:disabled="sidebarState === 'hidden'" 
+                x-on:click="collapseSidebar()"
+                x-bind:disabled="sidebarState === 'hidden'"
                 x-bind:class="getSidebarButtonClass('hidden')" {
                 img src=(self.assets().join("sidebar-icon-hide.svg").to_string_lossy()) alt="" {}
             }
@@ -1093,7 +1093,7 @@ impl DocsTree {
                                 div class="layout__breadcrumbs" {
                                     (breadcrumbs)
                                 }
-                            }       
+                            }
                         }
                         (content)
                     }
