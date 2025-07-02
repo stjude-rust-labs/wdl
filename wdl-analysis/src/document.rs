@@ -3,7 +3,6 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::Path;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -13,7 +12,6 @@ use url::Url;
 use uuid::Uuid;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
-use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Severity;
 use wdl_ast::Span;
@@ -535,20 +533,25 @@ impl Document {
     ) -> Self {
         let node = graph.get(index);
 
-        let diagnostics = match node.parse_state() {
+        let (wdl_version, diagnostics) = match node.parse_state() {
             ParseState::NotParsed => panic!("node should have been parsed"),
             ParseState::Error(_) => return Self::default_from_uri(node.uri().clone()),
-            ParseState::Parsed { diagnostics, .. } => diagnostics,
+            ParseState::Parsed {
+                wdl_version,
+                diagnostics,
+                ..
+            } => (wdl_version, diagnostics),
         };
 
         let root = node.root().expect("node should have been parsed");
-        let (version, config) = match root.version_statement() {
-            Some(stmt) => (
-                stmt.version(),
+        let (config, wdl_version) = match (root.version_statement(), wdl_version) {
+            (Some(stmt), Some(wdl_version)) => (
                 config.with_diagnostics(config.diagnostics().excepted_for_node(stmt.inner())),
+                *wdl_version,
             ),
-            None => {
-                // Don't process a document with a missing version
+            _ => {
+                // Don't process a document with a missing version statement or an unsupported
+                // version unless a fallback version is configured
                 return Self {
                     data: Arc::new(DocumentData::new(
                         config.clone(),
@@ -565,12 +568,12 @@ impl Document {
             config.clone(),
             node.uri().clone(),
             Some(root.inner().green().into()),
-            SupportedVersion::from_str(version.text()).ok(),
+            Some(wdl_version),
             diagnostics.to_vec(),
         );
         match root.ast() {
             Ast::Unsupported => {}
-            Ast::V1(ast) => v1::populate_document(&mut data, &config, graph, index, &ast, &version),
+            Ast::V1(ast) => v1::populate_document(&mut data, &config, graph, index, &ast),
         }
 
         // Check for unused imports

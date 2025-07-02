@@ -34,6 +34,14 @@ pub enum SupportedVersion {
     V1(V1),
 }
 
+impl SupportedVersion {
+    pub fn has_same_major_version(self, other: SupportedVersion) -> bool {
+        match (self, other) {
+            (SupportedVersion::V1(_), SupportedVersion::V1(_)) => true,
+        }
+    }
+}
+
 impl Default for SupportedVersion {
     fn default() -> Self {
         Self::V1(V1::Two)

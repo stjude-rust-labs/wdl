@@ -16,7 +16,8 @@ use crate::rules;
 
 /// Configuration for `wdl-analysis`.
 ///
-/// This type is a wrapper around an `Arc`, and so can be cheaply cloned and sent between threads.
+/// This type is a wrapper around an `Arc`, and so can be cheaply cloned and
+/// sent between threads.
 #[derive(Clone, PartialEq, Eq)]
 pub struct Config {
     inner: Arc<ConfigInner>,
@@ -57,7 +58,8 @@ impl Config {
         self.inner.fallback_version.as_ref()
     }
 
-    /// Return a new configuration with the previous [`DiagnosticsConfig`] replaced by the argument.
+    /// Return a new configuration with the previous [`DiagnosticsConfig`]
+    /// replaced by the argument.
     pub fn with_diagnostics(&self, diagnostics: DiagnosticsConfig) -> Self {
         let mut inner = (*self.inner).clone();
         inner.diagnostics = diagnostics;

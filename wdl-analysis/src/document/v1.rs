@@ -18,7 +18,6 @@ use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
-use wdl_ast::Version;
 use wdl_ast::v1::Ast;
 use wdl_ast::v1::CallStatement;
 use wdl_ast::v1::CommandPart;
@@ -196,7 +195,6 @@ pub(crate) fn populate_document(
     graph: &DocumentGraph,
     index: NodeIndex,
     ast: &Ast,
-    version: &wdl_ast::Version,
 ) {
     assert!(
         matches!(
@@ -212,7 +210,7 @@ pub(crate) fn populate_document(
     for item in ast.items() {
         match item {
             DocumentItem::Import(import) => {
-                add_namespace(document, graph, &import, index, version);
+                add_namespace(document, graph, &import, index);
             }
             DocumentItem::Struct(s) => {
                 add_struct(document, &s);
@@ -257,10 +255,9 @@ fn add_namespace(
     graph: &DocumentGraph,
     import: &ImportStatement,
     importer_index: NodeIndex,
-    importer_version: &Version,
 ) {
     // Start by resolving the import to its document
-    let (uri, imported) = match resolve_import(graph, import, importer_index, importer_version) {
+    let (uri, imported) = match resolve_import(graph, import, importer_index) {
         Ok(resolved) => resolved,
         Err(Some(diagnostic)) => {
             document.diagnostics.push(diagnostic);
@@ -1342,7 +1339,6 @@ fn resolve_import(
     graph: &DocumentGraph,
     stmt: &ImportStatement,
     importer_index: NodeIndex,
-    importer_version: &Version,
 ) -> Result<(Arc<Url>, Document), Option<Diagnostic>> {
     let uri = stmt.uri();
     let span = uri.span();
@@ -1355,7 +1351,8 @@ fn resolve_import(
         }
     };
 
-    let uri = match graph.get(importer_index).uri().join(text.text()) {
+    let importer_node = graph.get(importer_index);
+    let uri = match importer_node.uri().join(text.text()) {
         Ok(uri) => uri,
         Err(e) => return Err(Some(invalid_relative_import(&e, span))),
     };
@@ -1379,28 +1376,47 @@ fn resolve_import(
     }
 
     // Ensure the import has a matching WDL version
-    let import_root = import_node.root().expect("import should have parsed");
     let import_document = import_node
         .document()
         .cloned()
         .expect("import should have been analyzed");
 
-    // Check for compatible imports
-    match import_root.version_statement() {
-        Some(stmt) => {
-            let our_version = stmt.version();
-            if matches!((our_version.text().split('.').next(), importer_version.text().split('.').next()), (Some(our_major), Some(their_major)) if our_major != their_major)
-            {
+    let Some(our_version) = import_document.version() else {
+        match import_document.root().version_statement() {
+            // The import's version statement is flat-out missing
+            None => return Err(Some(import_missing_version(span))),
+            // The import has a version statement, but it's not a supported version and no fallback
+            // is configured
+            Some(our_version_stmt) => {
                 return Err(Some(incompatible_import(
-                    our_version.text(),
+                    our_version_stmt.version().text(),
                     span,
-                    importer_version,
+                    &importer_node
+                        .root()
+                        .and_then(|root| root.version_statement())
+                        .expect("importer should have a version statement")
+                        .version(),
                 )));
             }
         }
-        None => {
-            return Err(Some(import_missing_version(span)));
-        }
+    };
+    let ParseState::Parsed {
+        wdl_version: Some(importer_version),
+        ..
+    } = importer_node.parse_state()
+    else {
+        panic!("importer should have a parsed version");
+    };
+    if !our_version.has_same_major_version(*importer_version) {
+        return Err(Some(incompatible_import(
+            &our_version.to_string(),
+            span,
+            &importer_node
+                .root()
+                .and_then(|root| root.version_statement())
+                .expect("importer should have a version statement")
+                .version(),
+        )));
     }
 
     Ok((import_node.uri().clone(), import_document))

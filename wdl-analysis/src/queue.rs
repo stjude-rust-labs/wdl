@@ -191,7 +191,7 @@ where
     /// Constructs a new analysis queue.
     pub fn new(config: Config, tokio: Handle, progress: Progress, validator: Validator) -> Self {
         Self {
-            graph: Default::default(),
+            graph: Arc::new(RwLock::new(DocumentGraph::new(config.clone()))),
             config,
             tokio,
             progress: Arc::new(progress),
@@ -309,10 +309,7 @@ where
                                     // just silently return.
                                     ParseState::NotParsed | ParseState::Error(_) => None,
                                     ParseState::Parsed {
-                                        version: _,
-                                        root: _,
-                                        lines,
-                                        diagnostics,
+                                        lines, diagnostics, ..
                                     } => {
                                         // If there are any diagnostics that are
                                         // errors, we shouldn't attempt to format the
