@@ -141,7 +141,7 @@ impl Task {
                 html! {
                     div class="main__section" {
                         h2 id="command" class="main__section-header" { "Command" }
-                        sprocket-code language="wdl" {
+                        sprocket-code language="wdl" class="pt-8" {
                             (command_section.script())
                         }
                     }
