@@ -9,27 +9,13 @@
 
 use std::env;
 use std::fs;
-use std::io;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::exit;
 
+use fs_extra::dir::CopyOptions;
+use fs_extra::dir::copy;
 use wdl_doc::document_workspace;
-
-/// Copied from https://stackoverflow.com/a/65192210
-fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
-    fs::create_dir_all(&dst)?;
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-        let ty = entry.file_type()?;
-        if ty.is_dir() {
-            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
-        } else {
-            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
-        }
-    }
-    Ok(())
-}
 
 /// Recursively read every file in a directory
 fn read_dir_recursively(path: &Path) -> io::Result<Vec<PathBuf>> {
@@ -80,7 +66,9 @@ async fn main() {
             fs::remove_dir_all(&docs_dir).unwrap();
         }
         fs::create_dir_all(&docs_dir).unwrap();
-        copy_dir_all(test_dir.join("docs"), &docs_dir).unwrap();
+
+        let options = CopyOptions::new().content_only(true);
+        copy(test_dir.join("docs"), &docs_dir, &options).unwrap();
 
         exit(0);
     }
