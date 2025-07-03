@@ -10,6 +10,7 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::meta::DESCRIPTION_KEY;
 use crate::meta::MaybeSummarized;
 use crate::meta::MetaMap;
 use crate::meta::MetaMapExt;
@@ -91,7 +92,7 @@ impl Parameter {
                         .map(|item| (item.name().text().to_string(), item.value().clone()))
                         .collect(),
                     MetadataValue::String(_s) => {
-                        MetaMap::from([("description".to_string(), m.clone())])
+                        MetaMap::from([(DESCRIPTION_KEY.to_string(), m.clone())])
                     }
                     _ => {
                         // If it's not an object or string, we don't know how to handle it.
@@ -160,7 +161,7 @@ impl Parameter {
             };
         }
 
-        match summarize_if_needed(&expr, EXPR_MAX_LENGTH, EXPR_CLIP_LENGTH) {
+        match summarize_if_needed(expr, EXPR_MAX_LENGTH, EXPR_CLIP_LENGTH) {
             MaybeSummarized::No(expr) => {
                 html! { code { (expr) } }
             }
@@ -218,7 +219,7 @@ impl Parameter {
     /// and `group`.
     pub fn render_remaining_meta(&self, assets: &Path) -> Option<Markup> {
         self.meta()
-            .render_remaining(&["description", "group"], assets)
+            .render_remaining(&[DESCRIPTION_KEY, "group"], assets)
     }
 
     /// Render the parameter as HTML.

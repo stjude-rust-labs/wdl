@@ -13,6 +13,8 @@ use wdl_ast::v1::MetadataValue;
 use crate::Markdown;
 use crate::Render;
 
+/// The key used to specify the description in a meta entry.
+pub(crate) const DESCRIPTION_KEY: &str = "description";
 /// Help key for custom rendering.
 const HELP_KEY: &str = "help";
 /// External help key for custom rendering.
@@ -45,7 +47,7 @@ pub(crate) trait MetaMapExt {
 impl MetaMapExt for MetaMap {
     fn render_description(&self, summarize: bool) -> Markup {
         let desc = self
-            .get("description")
+            .get(DESCRIPTION_KEY)
             .map(|v| match v {
                 MetadataValue::String(s) => {
                     let t = s.text().expect("meta string should not be interpolated");
@@ -59,7 +61,7 @@ impl MetaMapExt for MetaMap {
             return Markdown(desc).render();
         }
 
-        match summarize_if_needed(&desc, DESCRIPTION_MAX_LENGTH, DESCRIPTION_CLIP_LENGTH) {
+        match summarize_if_needed(desc, DESCRIPTION_MAX_LENGTH, DESCRIPTION_CLIP_LENGTH) {
             MaybeSummarized::No(desc) => Markdown(desc).render(),
             MaybeSummarized::Yes(summary) => {
                 html! {
@@ -261,7 +263,6 @@ fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
 }
 
 /// A string that may be summarized.
-// TODO: capture reference to the original string?
 #[derive(Debug)]
 pub(crate) enum MaybeSummarized {
     /// The string was truncated, providing a summary.
@@ -272,13 +273,13 @@ pub(crate) enum MaybeSummarized {
 
 /// Summarize a string if it exceeds a maximum length.
 pub(crate) fn summarize_if_needed(
-    in_str: &str,
+    in_string: String,
     max_length: usize,
     clip_length: usize,
 ) -> MaybeSummarized {
-    if in_str.len() > max_length {
-        MaybeSummarized::Yes(in_str[..clip_length].trim_end().to_string())
+    if in_string.len() > max_length {
+        MaybeSummarized::Yes(in_string[..clip_length].trim_end().to_string())
     } else {
-        MaybeSummarized::No(in_str.to_string())
+        MaybeSummarized::No(in_string)
     }
 }

@@ -15,6 +15,7 @@ use super::*;
 use crate::command_section::CommandSectionExt;
 use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
+use crate::meta::DESCRIPTION_KEY;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -87,7 +88,7 @@ impl Task {
     /// and `outputs`.
     pub fn render_meta(&self, assets: &Path) -> Option<Markup> {
         self.meta()
-            .render_remaining(&["description", "outputs"], assets)
+            .render_remaining(&[DESCRIPTION_KEY, "outputs"], assets)
     }
 
     /// Render the runtime section of the task as HTML.
