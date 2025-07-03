@@ -122,7 +122,7 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), Strin
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .init();
@@ -140,8 +140,13 @@ async fn main() {
         let base = clean(absolute(test).expect("should be made absolute"));
         let source_path = base.join("source.wdl");
         let errors_path = base.join("source.errors");
+        let config_path = base.join("config.toml");
 
-        let config = Config::default().with_diagnostics(DiagnosticsConfig::except_all());
+        let config = if config_path.exists() {
+            toml::from_str(&std::fs::read_to_string(config_path)?)?
+        } else {
+            Config::default().with_diagnostics(DiagnosticsConfig::except_all())
+        };
         let analyzer = Analyzer::new(config, |_, _, _, _| async {});
         analyzer
             .add_directory(base)
@@ -196,4 +201,6 @@ async fn main() {
     }
 
     println!("\ntest result: ok. {count} passed\n", count = tests.len());
+
+    Ok(())
 }

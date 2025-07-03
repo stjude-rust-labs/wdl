@@ -5,7 +5,6 @@ use wdl_ast::Severity;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 
-use crate::Rule;
 use crate::SyntaxNodeExt as _;
 use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
@@ -13,6 +12,7 @@ use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
 use crate::rules;
+use crate::{Rule, UNSUPPORTED_VERSION_FALLBACK};
 
 /// Configuration for `wdl-analysis`.
 ///
@@ -116,6 +116,10 @@ pub struct DiagnosticsConfig {
     ///
     /// A value of `None` disables the diagnostic.
     pub unnecessary_function_call: Option<Severity>,
+    /// The severity for the unsupported version fallback diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unsupported_version_fallback: Option<Severity>,
 }
 
 impl Default for DiagnosticsConfig {
@@ -132,6 +136,7 @@ impl DiagnosticsConfig {
         let mut unused_declaration = None;
         let mut unused_call = None;
         let mut unnecessary_function_call = None;
+        let mut unsupported_version_fallback = None;
 
         for rule in rules {
             let rule = rule.as_ref();
@@ -141,6 +146,9 @@ impl DiagnosticsConfig {
                 UNUSED_DECL_RULE_ID => unused_declaration = Some(rule.severity()),
                 UNUSED_CALL_RULE_ID => unused_call = Some(rule.severity()),
                 UNNECESSARY_FUNCTION_CALL => unnecessary_function_call = Some(rule.severity()),
+                UNSUPPORTED_VERSION_FALLBACK => {
+                    unsupported_version_fallback = Some(rule.severity())
+                }
                 unrecognized => {
                     warn!(unrecognized, "unrecognized rule");
                 }
@@ -153,6 +161,7 @@ impl DiagnosticsConfig {
             unused_declaration,
             unused_call,
             unnecessary_function_call,
+            unsupported_version_fallback,
         }
     }
 
@@ -181,6 +190,10 @@ impl DiagnosticsConfig {
             self.unnecessary_function_call = None;
         }
 
+        if exceptions.contains(UNSUPPORTED_VERSION_FALLBACK) {
+            self.unsupported_version_fallback = None;
+        }
+
         self
     }
 
@@ -192,6 +205,7 @@ impl DiagnosticsConfig {
             unused_declaration: None,
             unused_call: None,
             unnecessary_function_call: None,
+            unsupported_version_fallback: None,
         }
     }
 }
