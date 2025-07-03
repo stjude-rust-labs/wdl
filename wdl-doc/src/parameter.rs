@@ -15,6 +15,11 @@ use crate::meta::MetaMap;
 use crate::meta::MetaMapExt;
 use crate::meta::summarize_if_needed;
 
+/// The maximum length of an expression before it is summarized.
+const EXPR_MAX_LENGTH: usize = 80;
+/// The length of an expression when summarized.
+const EXPR_CLIP_LENGTH: usize = 50;
+
 /// A group of inputs.
 #[derive(Debug, Eq, PartialEq)]
 pub(crate) struct Group(pub String);
@@ -74,11 +79,6 @@ pub(crate) struct Parameter {
     /// Whether the parameter is an input or output.
     io: InputOutput,
 }
-
-/// The maximum length of an expression before it is summarized.
-const EXPR_MAX_LENGTH: usize = 80;
-/// The length of an expression when summarized.
-const EXPR_CLIP_LENGTH: usize = 50;
 
 impl Parameter {
     /// Create a new parameter.

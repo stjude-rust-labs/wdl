@@ -13,6 +13,11 @@ use crate::docs_tree::Header;
 use crate::docs_tree::PageSections;
 use crate::parameter::Parameter;
 
+/// The key used to override the name of the workflow in the meta section.
+const NAME_KEY: &str = "name";
+/// The key used to specify the category of the workflow in the meta section.
+const CATEGORY_KEY: &str = "category";
+
 /// A workflow in a WDL document.
 #[derive(Debug)]
 pub(crate) struct Workflow {
@@ -65,9 +70,9 @@ impl Workflow {
         }
     }
 
-    /// Returns the `name` meta entry, if it exists and is a String.
+    /// Returns the [`NAME_KEY`] meta entry, if it exists and is a String.
     pub fn name_override(&self) -> Option<String> {
-        self.meta.get("name").and_then(|v| match v {
+        self.meta.get(NAME_KEY).and_then(|v| match v {
             MetadataValue::String(s) => Some(
                 s.text()
                     .expect("meta string should not be interpolated")
@@ -78,9 +83,9 @@ impl Workflow {
         })
     }
 
-    /// Returns the `category` meta entry, if it exists and is a String.
+    /// Returns the [`CATEGORY_KEY`] meta entry, if it exists and is a String.
     pub fn category(&self) -> Option<String> {
-        self.meta.get("category").and_then(|v| match v {
+        self.meta.get(CATEGORY_KEY).and_then(|v| match v {
             MetadataValue::String(s) => Some(
                 s.text()
                     .expect("meta string should not be interpolated")
@@ -112,8 +117,8 @@ impl Workflow {
         self.meta().render_remaining(
             &[
                 "description",
-                "name",
-                "category",
+                NAME_KEY,
+                CATEGORY_KEY,
                 "allowNestedInputs",
                 "allow_nested_inputs",
                 "outputs",
