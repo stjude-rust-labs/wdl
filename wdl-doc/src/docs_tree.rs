@@ -532,6 +532,8 @@ impl DocsTree {
     ///
     /// Path is expected to be an absolute path.
     // TODO: lots here can be improved
+    // e.g. it could be broken into smaller functions, the JS could be
+    // generated in a more structured way, etc.
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
