@@ -18,8 +18,9 @@ use crate::rules;
 ///
 /// This type is a wrapper around an `Arc`, and so can be cheaply cloned and
 /// sent between threads.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Config {
+    #[serde(flatten)]
     inner: Arc<ConfigInner>,
 }
 
@@ -67,11 +68,23 @@ impl Config {
             inner: Arc::new(inner),
         }
     }
+
+    /// Return a new configuration with the previous version fallback option
+    /// replaced by the argument.
+    pub fn with_fallback_version(&self, fallback_version: Option<SupportedVersion>) -> Self {
+        let mut inner = (*self.inner).clone();
+        inner.fallback_version = fallback_version;
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 struct ConfigInner {
+    #[serde(default)]
     diagnostics: DiagnosticsConfig,
+    #[serde(default)]
     fallback_version: Option<SupportedVersion>,
 }
 
@@ -81,7 +94,7 @@ struct ConfigInner {
 /// represented here.
 ///
 /// These diagnostics default to a warning severity.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct DiagnosticsConfig {
     /// The severity for the "unused import" diagnostic.
     ///

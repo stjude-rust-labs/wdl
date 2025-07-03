@@ -95,7 +95,9 @@ impl From<TextRange> for Span {
 }
 
 /// Represents the severity of a diagnostic.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd, serde::Deserialize, serde::Serialize,
+)]
 pub enum Severity {
     /// The diagnostic is displayed as an error.
     Error,

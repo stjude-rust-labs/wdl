@@ -131,20 +131,6 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     // Start with a single analysis pass over all the test files
-    let analyzer = Analyzer::new(
-        Config::default().with_diagnostics(DiagnosticsConfig::except_all()),
-        |_, _, _, _| async {},
-    );
-    for test in &tests {
-        analyzer
-            .add_directory(test.clone())
-            .await
-            .expect("should add directory");
-    }
-    let results = analyzer
-        .analyze(())
-        .await
-        .expect("failed to analyze documents");
 
     let mut errors = Vec::new();
     for test in &tests {
@@ -154,6 +140,17 @@ async fn main() {
         let base = clean(absolute(test).expect("should be made absolute"));
         let source_path = base.join("source.wdl");
         let errors_path = base.join("source.errors");
+
+        let config = Config::default().with_diagnostics(DiagnosticsConfig::except_all());
+        let analyzer = Analyzer::new(config, |_, _, _, _| async {});
+        analyzer
+            .add_directory(base)
+            .await
+            .expect("should add directory");
+        let results = analyzer
+            .analyze(())
+            .await
+            .expect("failed to analyze documents");
 
         let result = results
             .iter()
