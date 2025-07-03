@@ -9,9 +9,9 @@
     "build": "esbuild web-components/index.js --bundle --outfile=dist/index.js --format=esm --minify --loader:.json=json"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.5.3",
-    "@tailwindcss/cli": "^4.0.0",
-    "shiki": "^1.0.0",
+    "@floating-ui/dom": "^1.7.2",
+    "@tailwindcss/cli": "^4.1.11",
+    "shiki": "^3.7.0",
     "tippy.js": "^6.3.7"
   },
   "devDependencies": {
