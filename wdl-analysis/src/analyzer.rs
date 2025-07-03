@@ -6,7 +6,6 @@ use std::future::Future;
 use std::mem::ManuallyDrop;
 use std::ops::Range;
 use std::path::Path;
-use std::path::PathBuf;
 use std::path::absolute;
 use std::sync::Arc;
 use std::thread::JoinHandle;
@@ -387,7 +386,8 @@ where
     ///
     /// Returns an error if there was a problem discovering documents for the
     /// specified path.
-    pub async fn add_directory(&self, path: PathBuf) -> Result<()> {
+    pub async fn add_directory(&self, path: impl AsRef<Path>) -> Result<()> {
+        let path = path.as_ref().to_path_buf();
         // Start by searching for documents
         let documents = RayonHandle::spawn(move || -> Result<IndexSet<Url>> {
             let mut documents = IndexSet::new();

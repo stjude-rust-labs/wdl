@@ -5,14 +5,15 @@ use wdl_ast::Severity;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 
+use crate::Rule;
 use crate::SyntaxNodeExt as _;
 use crate::UNNECESSARY_FUNCTION_CALL;
+use crate::UNSUPPORTED_VERSION_FALLBACK;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
 use crate::rules;
-use crate::{Rule, UNSUPPORTED_VERSION_FALLBACK};
 
 /// Configuration for `wdl-analysis`.
 ///

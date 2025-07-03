@@ -130,13 +130,12 @@ async fn main() -> anyhow::Result<()> {
     let tests = find_tests();
     println!("\nrunning {} tests\n", tests.len());
 
-    // Start with a single analysis pass over all the test files
-
     let mut errors = Vec::new();
     for test in &tests {
         let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
 
-        // Discover the results that are relevant only to this test
+        // Add this test's directory to a new analyzer, reading in a custom config if
+        // present.
         let base = clean(absolute(test).expect("should be made absolute"));
         let source_path = base.join("source.wdl");
         let errors_path = base.join("source.errors");
@@ -157,6 +156,7 @@ async fn main() -> anyhow::Result<()> {
             .await
             .expect("failed to analyze documents");
 
+        // Discover the results that are relevant only to this test
         let result = results
             .iter()
             .find_map(|result| {
