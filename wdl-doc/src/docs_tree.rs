@@ -768,7 +768,9 @@ impl DocsTree {
             div x-data=(data) x-init="$nextTick(() => { document.querySelector('.is-scrolled-to')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); })" class="left-sidebar__container" {
                 // top navbar
                 div class="sticky px-4" {
-                    img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
+                    a href=(self.root_index_relative_to(base).to_string_lossy()) {
+                        img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
+                    }
                     div class="relative w-full h-10" {
                         input id="searchbox" "x-model.debounce"="search" type="text" placeholder="Search..." class="left-sidebar__searchbox";
                         img src=(self.get_asset(base, "search.svg")) class="absolute left-2 top-1/2 -translate-y-1/2 size-6 pointer-events-none" alt="Search icon";
