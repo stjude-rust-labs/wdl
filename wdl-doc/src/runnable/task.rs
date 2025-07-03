@@ -44,7 +44,7 @@ pub struct Task {
 impl Task {
     /// Create a new task.
     ///
-    /// If `wdl_path` is ommitted, no "run with" component will be
+    /// If `wdl_path` is omitted, no "run with" component will be
     /// rendered.
     pub fn new(
         name: String,
@@ -170,7 +170,7 @@ impl Task {
                 div class="main__badge-container" {
                     (self.render_version())
                 }
-                (self.render_run_wiith(assets))
+                (self.render_run_with(assets))
                 @if let Some(meta) = self.render_meta(assets) {
                     div class="main__section" {
                         (meta)

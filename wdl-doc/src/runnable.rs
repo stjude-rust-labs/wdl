@@ -110,7 +110,7 @@ pub(crate) trait Runnable {
     }
 
     /// Render the "run with" component of the runnable.
-    fn render_run_wiith(&self, _assets: &Path) -> Markup {
+    fn render_run_with(&self, _assets: &Path) -> Markup {
         if let Some(wdl_path) = self.wdl_path() {
             let unix_path = wdl_path.to_string_lossy().replace(MAIN_SEPARATOR, "/");
             let windows_path = wdl_path.to_string_lossy().replace(MAIN_SEPARATOR, "\\");

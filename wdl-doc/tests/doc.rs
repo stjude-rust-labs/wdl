@@ -65,10 +65,9 @@ async fn main() {
     .await
     {
         Ok(_) => {
-            println!("Successfully generated docs");
         }
         Err(e) => {
-            eprintln!("Failed to generate docs: {e}");
+            eprintln!("failed to generate docs: {e}");
             exit(1);
         }
     }
@@ -83,7 +82,6 @@ async fn main() {
         fs::create_dir_all(&docs_dir).unwrap();
         copy_dir_all(test_dir.join("docs"), &docs_dir).unwrap();
 
-        println!("Blessed docs");
         exit(0);
     }
 
@@ -96,7 +94,7 @@ async fn main() {
     for file_name in read_dir_recursively(&test_dir.join("docs")).unwrap() {
         let expected_file = docs_dir.join(file_name.strip_prefix(test_dir.join("docs")).unwrap());
         if !expected_file.exists() {
-            println!("Missing file: {}", expected_file.display());
+            println!("missing file: {}", expected_file.display());
             success = false;
             continue;
         }
@@ -130,7 +128,6 @@ async fn main() {
     }
 
     if success {
-        println!("Docs are as expected");
         exit(0);
     } else {
         exit(1);

@@ -65,8 +65,8 @@ impl HTMLPage {
 /// A page header or page sub header.
 ///
 /// This is used to represent the headers in the right sidebar of the
-/// documentation pages. Each header has a name (first String) and an ID (second
-/// String), which is used to link to the header in the page.
+/// documentation pages. Each header has a name (first `String`) and an ID (second
+/// `String`), which is used to link to the header in the page.
 #[derive(Debug)]
 pub(crate) enum Header {
     /// A header in the page.
@@ -531,7 +531,7 @@ impl DocsTree {
     /// Render a left sidebar component given a path.
     ///
     /// Path is expected to be an absolute path.
-    // TODO lots here can be improved
+    // TODO: lots here can be improved
     fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let path = path.as_ref();
@@ -855,7 +855,7 @@ impl DocsTree {
                 }
                 (headers.render())
                 div class="right-sidebar__back-to-top-container" {
-                    // TODO this should be a link to the top of the page, not just a link to the title
+                    // TODO: this should be a link to the top of the page, not just a link to the title
                     a href="#title" class="right-sidebar__back-to-top" {
                         span class="right-sidebar__back-to-top-icon" {
                             "↑"

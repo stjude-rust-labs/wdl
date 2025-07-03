@@ -2,7 +2,6 @@
   "name": "wdl-doc",
   "version": "1.0.0",
   "description": "A bundled wdl-doc theme and web components.",
-  "license": "ISC",
   "main": "dist/bundle.js",
   "module": "dist/bundle.js",
   "type": "module",

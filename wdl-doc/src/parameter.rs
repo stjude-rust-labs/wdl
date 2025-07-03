@@ -114,7 +114,7 @@ impl Parameter {
         &self.meta
     }
 
-    /// Get the type of the parameter as a String.
+    /// Get the type of the parameter as a string.
     pub fn ty(&self) -> String {
         self.decl.ty().to_string()
     }

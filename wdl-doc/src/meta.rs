@@ -138,7 +138,7 @@ impl MetaMapExt for MetaMap {
 }
 
 /// Recursively render a [`MetadataValue`] as HTML.
-fn render_value_inner(value: &MetadataValue) -> Markup {
+fn render_value(value: &MetadataValue) -> Markup {
     match value {
         MetadataValue::String(s) => {
             let inner_text = s
@@ -161,7 +161,7 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
                                 // don't have a real example case for this,
                                 // so I'm leaving it as is for now. This would be a very
                                 // odd structure in WDL metadata, but it is valid.
-                                (render_value_inner(&item))
+                                (render_value(&item))
                             }
                             _ => {
                                 div class="main__grid-meta-array-item" {
@@ -183,11 +183,6 @@ fn render_value_inner(value: &MetadataValue) -> Markup {
             }
         }
     }
-}
-
-/// Render a [`MetadataValue`] as HTML.
-fn render_value(value: &MetadataValue) -> Markup {
-    render_value_inner(value)
 }
 
 /// Render a key-value pair from metadata as HTML.
@@ -216,8 +211,8 @@ fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
                     @for item in a.elements() {
                         @match item {
                             MetadataValue::Array(_) | MetadataValue::Object(_) => {
-                                // TODO revisit this
-                                (render_value_inner(&item))
+                                // TODO: revisit this
+                                (render_value(&item))
                             }
                             _ => {
                                 div class="main__grid-meta-array-item" {
@@ -244,7 +239,7 @@ fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
 
     let lhs_markup = match ty {
         SyntaxKind::MetadataArrayNode | SyntaxKind::MetadataObjectNode => {
-            // TODO special icon for arrays and objects
+            // TODO: special icon for arrays and objects
             html! { code { (key) } }
         }
         _ => {
@@ -266,7 +261,7 @@ fn render_key_value(key: &str, value: &MetadataValue) -> Markup {
 }
 
 /// A string that may be summarized.
-// TODO capture reference to the original string?
+// TODO: capture reference to the original string?
 #[derive(Debug)]
 pub(crate) enum MaybeSummarized {
     /// The string was truncated, providing a summary.

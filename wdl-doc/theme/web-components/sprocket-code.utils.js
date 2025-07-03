@@ -9,11 +9,11 @@ const WDL_GRAMMAR_URL = 'https://raw.githubusercontent.com/stjude-rust-labs/spro
 
 async function getWdlGrammar() {
   if (wdlGrammarCache) {
-    console.log('sprocket-code-utils: Using cached WDL grammar');
+    console.log('sprocket-code-utils: using cached WDL grammar');
     return wdlGrammarCache;
   }
   try {
-    console.log('sprocket-code-utils: Fetching WDL grammar from', WDL_GRAMMAR_URL);
+    console.log('sprocket-code-utils: fetching WDL grammar from', WDL_GRAMMAR_URL);
     const response = await fetch(WDL_GRAMMAR_URL);
     if (!response.ok) {
       throw new Error(`Failed to fetch WDL grammar: ${response.status} ${response.statusText}`);
@@ -23,7 +23,7 @@ async function getWdlGrammar() {
     console.log('sprocket-code-utils: WDL grammar fetched and cached');
     return wdlGrammarCache;
   } catch (error) {
-    console.error('sprocket-code-utils: Failed to fetch or parse WDL grammar:', error);
+    console.error('sprocket-code-utils: failed to fetch or parse WDL grammar:', error);
     return null; // Gracefully degrade; WDL highlighting won't work for WDL
   }
 }
@@ -37,11 +37,11 @@ if (!window.sprocketHighlighterPromise) {
 export async function initializeHighlighter() {
   // If we already have a promise (ongoing or completed), return it
   if (window.sprocketHighlighterPromise) {
-    console.log('sprocket-code-utils: Using cached/ongoing highlighter initialization');
+    console.log('sprocket-code-utils: using cached/ongoing highlighter initialization');
     return await window.sprocketHighlighterPromise;
   }
 
-  console.log('sprocket-code-utils: Starting highlighter initialization');
+  console.log('sprocket-code-utils: starting highlighter initialization');
   
   // Create and cache the initialization promise
   window.sprocketHighlighterPromise = (async () => {
@@ -62,10 +62,10 @@ export async function initializeHighlighter() {
         engine: createOnigurumaEngine(wasm)
       });
       
-      console.log('sprocket-code-utils: Highlighter initialized successfully (singleton)');
+      console.log('sprocket-code-utils: highlighter initialized successfully (singleton)');
       return highlighter;
     } catch (error) {
-      console.error('sprocket-code-utils: Failed to initialize highlighter core:', error);
+      console.error('sprocket-code-utils: failed to initialize highlighter core:', error);
       // Reset the promise cache on error so retry is possible
       window.sprocketHighlighterPromise = null;
       return null;

@@ -52,7 +52,7 @@ impl CommandSectionExt for CommandSection {
                         text.unescape_to(self.is_heredoc(), &mut buffer);
                         buffer
                     }
-                    CommandPart::Placeholder(placehoder) => placehoder.text().to_string(),
+                    CommandPart::Placeholder(placeholder) => placeholder.text().to_string(),
                 })
                 .collect(),
         }
