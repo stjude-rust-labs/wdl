@@ -1063,7 +1063,7 @@ impl DocsTree {
                 expandSidebar() { this.sidebarState = 'xl'; }
             }" x-bind:class="containerClasses" {
                 div class="layout__sidebar-left" x-transition {
-                    div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons" {
+                    div class="absolute top-5 right-2 flex gap-1 z-10" x-cloak x-show="showSidebarButtons" {
                         (self.render_sidebar_control_buttons(assets))
                     }
                     (left_sidebar)
