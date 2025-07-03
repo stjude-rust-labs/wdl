@@ -18,7 +18,7 @@ use fs_extra::dir::copy;
 use wdl_doc::document_workspace;
 
 /// Recursively read every file in a directory
-fn read_dir_recursively(path: &Path) -> io::Result<Vec<PathBuf>> {
+fn read_dir_recursively(path: &Path) -> std::io::Result<Vec<PathBuf>> {
     let mut files = Vec::new();
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -50,8 +50,7 @@ async fn main() {
     )
     .await
     {
-        Ok(_) => {
-        }
+        Ok(_) => {}
         Err(e) => {
             eprintln!("failed to generate docs: {e}");
             exit(1);

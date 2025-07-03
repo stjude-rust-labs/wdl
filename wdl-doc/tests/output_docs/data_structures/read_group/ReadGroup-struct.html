@@ -1,5 +1,5 @@
-<!DOCTYPE html><html class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ReadGroup</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"><script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script><script defer src="../../index.js"></script><link rel="stylesheet" type="text/css" href="../../style.css"></head><body class="body--base"><div class="layout__container layout__container--alt-layout" x-data="{
-                sidebarState: $persist(window.innerWidth &lt; 768 ? 'hidden' : window.innerWidth &gt; 1300 ? 'xl' : 'normal').using(sessionStorage),
+<!DOCTYPE html><html class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ReadGroup</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"><script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script><script defer src="../../index.js"></script><link rel="stylesheet" type="text/css" href="../../style.css"></head><body class="body--base"><div class="layout__container layout__container--alt-layout" x-transition x-data="{
+                sidebarState: $persist(window.innerWidth &lt; 768 ? 'hidden' : 'normal').using(sessionStorage),
                 get showSidebarButtons() { return this.sidebarState !== 'hidden'; },
                 get showCenterButtons() { return this.sidebarState === 'hidden'; },
                 get containerClasses() {
@@ -16,112 +16,12 @@
                 collapseSidebar() { this.sidebarState = 'hidden'; },
                 restoreSidebar() { this.sidebarState = 'normal'; },
                 expandSidebar() { this.sidebarState = 'xl'; }
-            }" x-bind:class="containerClasses"><div class="layout__sidebar-left"><div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons"><button x-on:click="collapseSidebar()" x-bind:disabled="sidebarState === 'hidden'" x-bind:class="getSidebarButtonClass('hidden')"><img src="../../assets/sidebar-icon-hide.svg" alt=""></img></button><button x-on:click="restoreSidebar()" x-bind:disabled="sidebarState === 'normal'" x-bind:class="getSidebarButtonClass('normal')"><img src="../../assets/sidebar-icon-default.svg" alt=""></img></button><button x-on:click="expandSidebar()" x-bind:disabled="sidebarState === 'xl'" x-bind:class="getSidebarButtonClass('xl')"><img src="../../assets/sidebar-icon-expand.svg" alt=""></img></button></div><div x-data="{
+            }" x-bind:class="containerClasses"><div class="layout__sidebar-left" x-transition><div class="absolute top-5 right-2 flex gap-1 z-10" x-show="showSidebarButtons"><button x-on:click="collapseSidebar()" x-bind:disabled="sidebarState === 'hidden'" x-bind:class="getSidebarButtonClass('hidden')"><img src="../../assets/sidebar-icon-hide.svg" alt=""></img></button><button x-on:click="restoreSidebar()" x-bind:disabled="sidebarState === 'normal'" x-bind:class="getSidebarButtonClass('normal')"><img src="../../assets/sidebar-icon-default.svg" alt=""></img></button><button x-on:click="expandSidebar()" x-bind:disabled="sidebarState === 'xl'" x-bind:class="getSidebarButtonClass('xl')"><img src="../../assets/sidebar-icon-expand.svg" alt=""></img></button></div><div x-data="{
                 showWorkflows: $persist(true).using(sessionStorage),
                 search: $persist('').using(sessionStorage),
                 dirOpen: '../../assets/chevron-up.svg',
                 dirClosed: '../../assets/chevron-down.svg',
-                nodes: [{
-                        key: 'data_structures',
-                        display_name: 'data_structures',
-                        parent: '',
-                        search_name: '',
-                        icon: null,
-                        href: null,
-                        ancestor: true,
-                        current: false,
-                        nest_level: 1
-                    }, {
-                        key: 'data_structures_flag_filter',
-                        display_name: 'flag_filter',
-                        parent: 'data_structures/flag_filter',
-                        search_name: 'data_structures/flag_filter/index.html',
-                        icon: '../../assets/wdl-dir-unselected.svg',
-                        href: '../flag_filter/index.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 2
-                    }, {
-                        key: 'data_structures_flag_filter_FlagFilter_struct_html',
-                        display_name: 'FlagFilter',
-                        parent: 'data_structures/flag_filter',
-                        search_name: 'data_structures/flag_filter/FlagFilter-struct.html',
-                        icon: '../../assets/struct-unselected.svg',
-                        href: '../flag_filter/FlagFilter-struct.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_flag_filter_validate_flag_filter_workflow_html',
-                        display_name: 'validate_flag_filter',
-                        parent: 'data_structures/flag_filter',
-                        search_name: 'data_structures/flag_filter/validate_flag_filter-workflow.html',
-                        icon: '../../assets/workflow-unselected.svg',
-                        href: '../flag_filter/validate_flag_filter-workflow.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_flag_filter_validate_string_is_12bit_oct_dec_or_hex_task_html',
-                        display_name: 'validate_string_is_12bit_oct_dec_or_hex',
-                        parent: 'data_structures/flag_filter',
-                        search_name: 'data_structures/flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html',
-                        icon: '../../assets/task-unselected.svg',
-                        href: '../flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_read_group',
-                        display_name: 'read_group',
-                        parent: 'data_structures/read_group',
-                        search_name: 'data_structures/read_group/index.html',
-                        icon: '../../assets/wdl-dir-selected.svg',
-                        href: 'index.html',
-                        ancestor: true,
-                        current: false,
-                        nest_level: 2
-                    }, {
-                        key: 'data_structures_read_group_ReadGroup_struct_html',
-                        display_name: 'ReadGroup',
-                        parent: 'data_structures/read_group',
-                        search_name: 'data_structures/read_group/ReadGroup-struct.html',
-                        icon: '../../assets/struct-selected.svg',
-                        href: 'ReadGroup-struct.html',
-                        ancestor: true,
-                        current: true,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_read_group_get_read_groups_task_html',
-                        display_name: 'get_read_groups',
-                        parent: 'data_structures/read_group',
-                        search_name: 'data_structures/read_group/get_read_groups-task.html',
-                        icon: '../../assets/task-unselected.svg',
-                        href: 'get_read_groups-task.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_read_group_read_group_to_string_task_html',
-                        display_name: 'read_group_to_string',
-                        parent: 'data_structures/read_group',
-                        search_name: 'data_structures/read_group/read_group_to_string-task.html',
-                        icon: '../../assets/task-unselected.svg',
-                        href: 'read_group_to_string-task.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }, {
-                        key: 'data_structures_read_group_validate_read_group_task_html',
-                        display_name: 'validate_read_group',
-                        parent: 'data_structures/read_group',
-                        search_name: 'data_structures/read_group/validate_read_group-task.html',
-                        icon: '../../assets/task-unselected.svg',
-                        href: 'validate_read_group-task.html',
-                        ancestor: false,
-                        current: false,
-                        nest_level: 3
-                    }],
+                nodes: [{&quot;key&quot;:&quot;data_structures&quot;,&quot;display_name&quot;:&quot;data_structures&quot;,&quot;parent&quot;:&quot;&quot;,&quot;search_name&quot;:&quot;&quot;,&quot;icon&quot;:null,&quot;href&quot;:null,&quot;ancestor&quot;:true,&quot;current&quot;:false,&quot;nest_level&quot;:1,&quot;children&quot;:[&quot;data_structures_flag_filter&quot;,&quot;data_structures_read_group&quot;]}, {&quot;key&quot;:&quot;data_structures_flag_filter&quot;,&quot;display_name&quot;:&quot;flag_filter&quot;,&quot;parent&quot;:&quot;data_structures/flag_filter&quot;,&quot;search_name&quot;:&quot;data_structures/flag_filter/index.html&quot;,&quot;icon&quot;:&quot;../../assets/wdl-dir-unselected.svg&quot;,&quot;href&quot;:&quot;../flag_filter/index.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:2,&quot;children&quot;:[&quot;data_structures_flag_filter_FlagFilter_struct_html&quot;,&quot;data_structures_flag_filter_validate_flag_filter_workflow_html&quot;,&quot;data_structures_flag_filter_validate_string_is_12bit_oct_dec_or_hex_task_html&quot;]}, {&quot;key&quot;:&quot;data_structures_flag_filter_FlagFilter_struct_html&quot;,&quot;display_name&quot;:&quot;FlagFilter&quot;,&quot;parent&quot;:&quot;data_structures/flag_filter&quot;,&quot;search_name&quot;:&quot;data_structures/flag_filter/FlagFilter-struct.html&quot;,&quot;icon&quot;:&quot;../../assets/struct-unselected.svg&quot;,&quot;href&quot;:&quot;../flag_filter/FlagFilter-struct.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_flag_filter_validate_flag_filter_workflow_html&quot;,&quot;display_name&quot;:&quot;validate_flag_filter&quot;,&quot;parent&quot;:&quot;data_structures/flag_filter&quot;,&quot;search_name&quot;:&quot;data_structures/flag_filter/validate_flag_filter-workflow.html&quot;,&quot;icon&quot;:&quot;../../assets/workflow-unselected.svg&quot;,&quot;href&quot;:&quot;../flag_filter/validate_flag_filter-workflow.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_flag_filter_validate_string_is_12bit_oct_dec_or_hex_task_html&quot;,&quot;display_name&quot;:&quot;validate_string_is_12bit_oct_dec_or_hex&quot;,&quot;parent&quot;:&quot;data_structures/flag_filter&quot;,&quot;search_name&quot;:&quot;data_structures/flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html&quot;,&quot;icon&quot;:&quot;../../assets/task-unselected.svg&quot;,&quot;href&quot;:&quot;../flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_read_group&quot;,&quot;display_name&quot;:&quot;read_group&quot;,&quot;parent&quot;:&quot;data_structures/read_group&quot;,&quot;search_name&quot;:&quot;data_structures/read_group/index.html&quot;,&quot;icon&quot;:&quot;../../assets/wdl-dir-selected.svg&quot;,&quot;href&quot;:&quot;index.html&quot;,&quot;ancestor&quot;:true,&quot;current&quot;:false,&quot;nest_level&quot;:2,&quot;children&quot;:[&quot;data_structures_read_group_ReadGroup_struct_html&quot;,&quot;data_structures_read_group_get_read_groups_task_html&quot;,&quot;data_structures_read_group_read_group_to_string_task_html&quot;,&quot;data_structures_read_group_validate_read_group_task_html&quot;]}, {&quot;key&quot;:&quot;data_structures_read_group_ReadGroup_struct_html&quot;,&quot;display_name&quot;:&quot;ReadGroup&quot;,&quot;parent&quot;:&quot;data_structures/read_group&quot;,&quot;search_name&quot;:&quot;data_structures/read_group/ReadGroup-struct.html&quot;,&quot;icon&quot;:&quot;../../assets/struct-selected.svg&quot;,&quot;href&quot;:&quot;ReadGroup-struct.html&quot;,&quot;ancestor&quot;:true,&quot;current&quot;:true,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_read_group_get_read_groups_task_html&quot;,&quot;display_name&quot;:&quot;get_read_groups&quot;,&quot;parent&quot;:&quot;data_structures/read_group&quot;,&quot;search_name&quot;:&quot;data_structures/read_group/get_read_groups-task.html&quot;,&quot;icon&quot;:&quot;../../assets/task-unselected.svg&quot;,&quot;href&quot;:&quot;get_read_groups-task.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_read_group_read_group_to_string_task_html&quot;,&quot;display_name&quot;:&quot;read_group_to_string&quot;,&quot;parent&quot;:&quot;data_structures/read_group&quot;,&quot;search_name&quot;:&quot;data_structures/read_group/read_group_to_string-task.html&quot;,&quot;icon&quot;:&quot;../../assets/task-unselected.svg&quot;,&quot;href&quot;:&quot;read_group_to_string-task.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}, {&quot;key&quot;:&quot;data_structures_read_group_validate_read_group_task_html&quot;,&quot;display_name&quot;:&quot;validate_read_group&quot;,&quot;parent&quot;:&quot;data_structures/read_group&quot;,&quot;search_name&quot;:&quot;data_structures/read_group/validate_read_group-task.html&quot;,&quot;icon&quot;:&quot;../../assets/task-unselected.svg&quot;,&quot;href&quot;:&quot;validate_read_group-task.html&quot;,&quot;ancestor&quot;:false,&quot;current&quot;:false,&quot;nest_level&quot;:3,&quot;children&quot;:[]}],
                 get searchedNodes() {
                     if (this.search === '') {
                         return [];

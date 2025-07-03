@@ -65,8 +65,8 @@ impl HTMLPage {
 /// A page header or page sub header.
 ///
 /// This is used to represent the headers in the right sidebar of the
-/// documentation pages. Each header has a name (first `String`) and an ID (second
-/// `String`), which is used to link to the header in the page.
+/// documentation pages. Each header has a name (first `String`) and an ID
+/// (second `String`), which is used to link to the header in the page.
 #[derive(Debug)]
 pub(crate) enum Header {
     /// A header in the page.
