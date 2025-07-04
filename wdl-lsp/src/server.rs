@@ -24,6 +24,7 @@ use tracing::error;
 use tracing::info;
 use uuid::Uuid;
 use wdl_analysis::Analyzer;
+use wdl_analysis::Config as AnalysisConfig;
 use wdl_analysis::IncrementalChange;
 use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
@@ -251,7 +252,9 @@ impl Server {
                 client,
                 options,
                 analyzer: Analyzer::<ProgressToken>::new_with_validator(
-                    Default::default(),
+                    // TODO ACF 2025-07-03: figure out what the right defaults are for this in the
+                    // LSP context. This configuration results in a fallback to 1.2 with a warning.
+                    AnalysisConfig::default().with_fallback_version(Some(Default::default())),
                     move |token, kind, current, total| {
                         let client = analyzer_client.clone();
                         async move {

@@ -571,7 +571,7 @@ impl Document {
             Some(wdl_version),
             diagnostics.to_vec(),
         );
-        match root.ast() {
+        match root.ast_with_version_fallback(config.fallback_version()) {
             Ast::Unsupported => {}
             Ast::V1(ast) => v1::populate_document(&mut data, &config, graph, index, &ast),
         }

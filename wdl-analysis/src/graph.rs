@@ -243,6 +243,21 @@ impl DocumentGraphNode {
         None
     }
 
+    /// Gets the WDL version of the document.
+    ///
+    /// Returns `None` if the document was not parsed or was missing a version statement.
+    pub fn wdl_version(&self) -> Option<SupportedVersion> {
+        if let ParseState::Parsed {
+            wdl_version: Some(v),
+            ..
+        } = &self.parse_state
+        {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
     /// Determines if the document needs to be parsed.
     pub fn needs_parse(&self) -> bool {
         self.change.is_some() || matches!(self.parse_state, ParseState::NotParsed)
@@ -392,7 +407,7 @@ impl DocumentGraphNode {
                             ),
                         );
                     }
-                    wdl_version = Some(*fallback);
+                    wdl_version = Some(fallback);
                 }
                 // Add an error diagnostic if the version is unsupported and don't overwrite
                 // `wdl_version`

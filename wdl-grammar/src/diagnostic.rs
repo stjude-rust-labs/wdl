@@ -107,6 +107,32 @@ pub enum Severity {
     Note,
 }
 
+impl Severity {
+    /// Returns `true` if the severity is [`Error`].
+    ///
+    /// [`Error`]: Severity::Error
+    #[must_use]
+    pub fn is_error(&self) -> bool {
+        matches!(self, Self::Error)
+    }
+
+    /// Returns `true` if the severity is [`Warning`].
+    ///
+    /// [`Warning`]: Severity::Warning
+    #[must_use]
+    pub fn is_warning(&self) -> bool {
+        matches!(self, Self::Warning)
+    }
+
+    /// Returns `true` if the severity is [`Note`].
+    ///
+    /// [`Note`]: Severity::Note
+    #[must_use]
+    pub fn is_note(&self) -> bool {
+        matches!(self, Self::Note)
+    }
+}
+
 /// Represents a diagnostic to display to the user.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Diagnostic {

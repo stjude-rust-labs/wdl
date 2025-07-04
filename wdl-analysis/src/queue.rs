@@ -328,15 +328,18 @@ where
                             })
                         })
                         .and_then(|(line, col, document)| {
-                            document.ast().into_v1().and_then(|ast| {
-                                let formatter = Formatter::default();
-                                let element = Node::Ast(ast).into_format_element();
+                            document
+                                .ast_with_version_fallback(self.config.fallback_version())
+                                .into_v1()
+                                .and_then(|ast| {
+                                    let formatter = Formatter::default();
+                                    let element = Node::Ast(ast).into_format_element();
 
-                                formatter
-                                    .format(&element)
-                                    .ok()
-                                    .map(|formatted| (line, col, formatted))
-                            })
+                                    formatter
+                                        .format(&element)
+                                        .ok()
+                                        .map(|formatted| (line, col, formatted))
+                                })
                         });
 
                     completed.send(result).ok();
@@ -734,7 +737,11 @@ where
             graph.remove_dependency_edges(index);
 
             // Add back dependency edges for the document's imports
-            match graph.get(index).root().map(|d| d.ast()) {
+            match graph
+                .get(index)
+                .root()
+                .map(|d| d.ast_with_version_fallback(self.config.fallback_version()))
+            {
                 None | Some(Ast::Unsupported) => {}
                 Some(Ast::V1(ast)) => {
                     for import in ast.imports() {
@@ -804,7 +811,9 @@ where
         let mut document = Document::from_graph_node(config, &graph, index);
 
         match &graph.get(index).parse_state() {
-            ParseState::Parsed { diagnostics, .. } if diagnostics.is_empty() => {
+            ParseState::Parsed { diagnostics, .. }
+                if !diagnostics.iter().any(|diag| diag.severity().is_error()) =>
+            {
                 if let Err(new_diagnostics) = validator.validate(&document) {
                     document.extend_diagnostics(new_diagnostics);
                 }

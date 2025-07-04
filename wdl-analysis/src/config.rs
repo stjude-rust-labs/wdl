@@ -56,8 +56,8 @@ impl Config {
     /// Get this configuration's fallback version.
     ///
     /// `None` means no version fallback behavior is enabled.
-    pub fn fallback_version(&self) -> Option<&SupportedVersion> {
-        self.inner.fallback_version.as_ref()
+    pub fn fallback_version(&self) -> Option<SupportedVersion> {
+        self.inner.fallback_version
     }
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
