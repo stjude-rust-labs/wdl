@@ -45,6 +45,9 @@ impl PartialOrd for Group {
 
 impl Ord for Group {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.0 == other.0 {
+            return std::cmp::Ordering::Equal;
+        }
         if self.0 == "Common" {
             return std::cmp::Ordering::Less;
         }

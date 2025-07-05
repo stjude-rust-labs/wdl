@@ -1129,7 +1129,9 @@ impl DocsTree {
 fn sort_workflow_categories(categories: HashSet<String>) -> Vec<String> {
     let mut sorted_categories: Vec<String> = categories.into_iter().collect();
     sorted_categories.sort_by(|a, b| {
-        if a == "External" {
+        if a == b {
+            std::cmp::Ordering::Equal
+        } else if a == "External" {
             std::cmp::Ordering::Greater
         } else if b == "External" {
             std::cmp::Ordering::Less

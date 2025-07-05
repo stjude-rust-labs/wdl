@@ -408,7 +408,7 @@ impl VersionBadge {
     fn render(&self) -> Markup {
         let latest = match &self.version {
             SupportedVersion::V1(v) => matches!(v, V1::Two),
-            _ => unreachable!("Only V1 is supported"),
+            _ => unreachable!("only V1 is supported"),
         };
         let text = self.version.to_string();
         html! {
