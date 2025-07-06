@@ -7,6 +7,8 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
+include!(concat!(env!("OUT_DIR"), "/assets.rs"));
+
 mod command_section;
 mod docs_tree;
 mod document;
@@ -203,106 +205,11 @@ fn write_assets<P: AsRef<Path>>(dir: P, custom_theme: Option<P>) -> Result<()> {
         )?;
     }
 
-    std::fs::write(
-        assets_dir.join("sprocket-logo.svg"),
-        include_bytes!("../theme/assets/sprocket-logo.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("search.svg"),
-        include_bytes!("../theme/assets/search.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("x-mark.svg"),
-        include_bytes!("../theme/assets/x-mark.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("chevron-down.svg"),
-        include_bytes!("../theme/assets/chevron-down.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("chevron-up.svg"),
-        include_bytes!("../theme/assets/chevron-up.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("dir-open.svg"),
-        include_bytes!("../theme/assets/dir-open.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("category-selected.svg"),
-        include_bytes!("../theme/assets/category-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("list-bullet-selected.svg"),
-        include_bytes!("../theme/assets/list-bullet-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("list-bullet-unselected.svg"),
-        include_bytes!("../theme/assets/list-bullet-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("folder-selected.svg"),
-        include_bytes!("../theme/assets/folder-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("folder-unselected.svg"),
-        include_bytes!("../theme/assets/folder-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("wdl-dir-selected.svg"),
-        include_bytes!("../theme/assets/wdl-dir-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("wdl-dir-unselected.svg"),
-        include_bytes!("../theme/assets/wdl-dir-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("struct-selected.svg"),
-        include_bytes!("../theme/assets/struct-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("struct-unselected.svg"),
-        include_bytes!("../theme/assets/struct-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("task-selected.svg"),
-        include_bytes!("../theme/assets/task-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("task-unselected.svg"),
-        include_bytes!("../theme/assets/task-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("workflow-selected.svg"),
-        include_bytes!("../theme/assets/workflow-selected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("workflow-unselected.svg"),
-        include_bytes!("../theme/assets/workflow-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("missing-home.svg"),
-        include_bytes!("../theme/assets/missing-home.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("link.svg"),
-        include_bytes!("../theme/assets/link.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("information-circle.svg"),
-        include_bytes!("../theme/assets/information-circle.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("sidebar-icon-hide.svg"),
-        include_bytes!("../theme/assets/sidebar-icon-hide.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("sidebar-icon-default.svg"),
-        include_bytes!("../theme/assets/sidebar-icon-default.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("sidebar-icon-expand.svg"),
-        include_bytes!("../theme/assets/sidebar-icon-expand.svg"),
-    )?;
+    for (file_name, bytes) in get_assets() {
+        let path = assets_dir.join(file_name);
+        std::fs::write(&path, bytes)
+            .with_context(|| format!("failed to write asset to `{}`", path.display()))?;
+    }
 
     Ok(())
 }
