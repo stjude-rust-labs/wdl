@@ -53,9 +53,7 @@ impl Config {
         &self.inner.diagnostics
     }
 
-    /// Get this configuration's fallback version.
-    ///
-    /// `None` means no version fallback behavior is enabled.
+    /// Get this configuration's fallback version; see [`Config::with_fallback_version()`].
     pub fn fallback_version(&self) -> Option<SupportedVersion> {
         self.inner.fallback_version
     }
@@ -72,6 +70,26 @@ impl Config {
 
     /// Return a new configuration with the previous version fallback option
     /// replaced by the argument.
+    ///
+    /// This option controls what happens when analyzing a WDL document with a syntactically valid
+    /// but unrecognized version in the version statement. The default value is `None`, with no
+    /// fallback behavior.
+    ///
+    /// Configured with `Some(fallback_version)`, analysis will proceed as normal if the version
+    /// statement contains a recognized version. If the version is unrecognized, analysis will
+    /// continue as if the version statement contained `fallback_version`, though the concrete
+    /// syntax of the version statement will remain unchanged.
+    ///
+    /// <div class="warning">
+    ///
+    /// # Warning
+    ///
+    /// This option is intended only for situations where unexpected behavior due to unsupported
+    /// syntax is acceptable, such as when providing best-effort editor hints via `wdl-lsp`. The
+    /// semantics of executing a WDL workflow with an unrecognized version is undefined and not
+    /// recommended.
+    ///
+    /// </div>
     pub fn with_fallback_version(&self, fallback_version: Option<SupportedVersion>) -> Self {
         let mut inner = (*self.inner).clone();
         inner.fallback_version = fallback_version;
@@ -97,23 +115,23 @@ struct ConfigInner {
 /// These diagnostics default to a warning severity.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct DiagnosticsConfig {
-    /// The severity for the "unused import" diagnostic.
+    /// The severity for the unused import diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
     pub unused_import: Option<Severity>,
-    /// The severity for the "unused input" diagnostic.
+    /// The severity for the unused input diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
     pub unused_input: Option<Severity>,
-    /// The severity for the "unused declaration" diagnostic.
+    /// The severity for the unused declaration diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
     pub unused_declaration: Option<Severity>,
-    /// The severity for the "unused call" diagnostic.
+    /// The severity for the unused call diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
     pub unused_call: Option<Severity>,
-    /// The severity for the "unnecessary function call" diagnostic.
+    /// The severity for the unnecessary function call diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
     pub unnecessary_function_call: Option<Severity>,
