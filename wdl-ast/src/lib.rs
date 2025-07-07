@@ -499,10 +499,15 @@ impl<N: TreeNode> Document<N> {
     /// A fallback version of `None` does not have any fallback behavior, and is
     /// equivalent to calling [`Document::ast()`].
     ///
-    /// It is the caller's responsibility to ensure that a mismatch does not
-    /// introduce unwanted behavior. For applications where correctness is
-    /// essential, the caller should only provide a version that is known to
-    /// be compatible with the version declared in the document.
+    /// <div class="warning">
+    ///
+    /// It is the caller's responsibility to ensure that falling back to the
+    /// given version does not introduce unwanted behavior. For applications
+    /// where correctness is essential, the caller should only provide a
+    /// version that is known to be compatible with the version declared in
+    /// the document.
+    ///
+    /// </div>
     pub fn ast_with_version_fallback(&self, fallback_version: Option<SupportedVersion>) -> Ast<N> {
         let Some(stmt) = self.version_statement() else {
             return Ast::Unsupported;
