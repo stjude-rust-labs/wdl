@@ -170,6 +170,9 @@ impl DiagnosticsConfig {
                 }
                 unrecognized => {
                     warn!(unrecognized, "unrecognized rule");
+                    if cfg!(test) {
+                        panic!("unrecognized rule: {unrecognized}");
+                    }
                 }
             }
         }
