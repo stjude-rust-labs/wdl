@@ -98,11 +98,15 @@ async fn main() {
 
         let expected_contents = fs::read_to_string(&expected_file)
             .unwrap()
-            .replace("\\", "/");
+            .replace("\\", "/")
+            // serde-json pre-escapes some of the HTML paths resulting in double
+            // slashes for some content during normalization.
+            .replace("//", "/");
         let generated_contents = fs::read_to_string(&file_name)
             .unwrap()
             .replace("\r\n", "\n")
-            .replace("\\", "/");
+            .replace("\\", "/")
+            .replace("//", "/");
 
         if expected_contents != generated_contents {
             println!("File contents differ: {}", expected_file.display());
