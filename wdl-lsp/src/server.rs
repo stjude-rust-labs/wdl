@@ -252,8 +252,8 @@ impl Server {
                 client,
                 options,
                 analyzer: Analyzer::<ProgressToken>::new_with_validator(
-                    // TODO ACF 2025-07-03: figure out what the right defaults are for this in the
-                    // LSP context. This configuration results in a fallback to 1.2 with a warning.
+                    // TODO ACF 2025-07-07: add configurability around the fallback behavior; see
+                    // https://github.com/stjude-rust-labs/wdl/issues/517
                     AnalysisConfig::default().with_fallback_version(Some(Default::default())),
                     move |token, kind, current, total| {
                         let client = analyzer_client.clone();
