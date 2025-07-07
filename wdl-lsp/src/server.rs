@@ -208,7 +208,7 @@ impl ProgressToken {
 }
 
 /// Represents options for running the LSP server.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ServerOptions {
     /// The name of the server.
     ///
@@ -240,44 +240,48 @@ pub struct Server {
 }
 
 impl Server {
+    /// Creates a new WDL language server.
+    pub fn new(client: Client, options: ServerOptions) -> Self {
+        let lint = options.lint;
+        let analyzer_client = client.clone();
+        // TODO ACF 2025-07-07: add configurability around the fallback behavior; see
+        // https://github.com/stjude-rust-labs/wdl/issues/517
+        let analyzer_config =
+            AnalysisConfig::default().with_fallback_version(Some(Default::default()));
+        Self {
+            client,
+            options,
+            analyzer: Analyzer::<ProgressToken>::new_with_validator(
+                analyzer_config,
+                move |token, kind, current, total| {
+                    let client = analyzer_client.clone();
+                    async move {
+                        let message = format!(
+                            "{kind} {current}/{total} file{s}",
+                            s = if total > 1 { "s" } else { "" }
+                        );
+                        let percentage = ((current * 100) as f64 / total as f64) as u32;
+                        token.update(&client, message, percentage).await
+                    }
+                },
+                move || {
+                    let mut validator = Validator::default();
+                    if lint {
+                        validator.add_visitor(Linter::default());
+                    }
+                    validator
+                },
+            ),
+            client_support: Default::default(),
+            folders: Default::default(),
+        }
+    }
+
     /// Runs the server until a request is received to shut down.
     pub async fn run(options: ServerOptions) -> Result<()> {
         debug!("running LSP server: {options:#?}");
 
-        let (service, socket) = LspService::new(|client| {
-            let lint = options.lint;
-            let analyzer_client = client.clone();
-
-            Self {
-                client,
-                options,
-                analyzer: Analyzer::<ProgressToken>::new_with_validator(
-                    // TODO ACF 2025-07-07: add configurability around the fallback behavior; see
-                    // https://github.com/stjude-rust-labs/wdl/issues/517
-                    AnalysisConfig::default().with_fallback_version(Some(Default::default())),
-                    move |token, kind, current, total| {
-                        let client = analyzer_client.clone();
-                        async move {
-                            let message = format!(
-                                "{kind} {current}/{total} file{s}",
-                                s = if total > 1 { "s" } else { "" }
-                            );
-                            let percentage = ((current * 100) as f64 / total as f64) as u32;
-                            token.update(&client, message, percentage).await
-                        }
-                    },
-                    move || {
-                        let mut validator = Validator::default();
-                        if lint {
-                            validator.add_visitor(Linter::default());
-                        }
-                        validator
-                    },
-                ),
-                client_support: Default::default(),
-                folders: Default::default(),
-            }
-        });
+        let (service, socket) = LspService::new(|client| Self::new(client, options.clone()));
 
         let stdin = tokio::io::stdin();
         let stdout = tokio::io::stdout();
