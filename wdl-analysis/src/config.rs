@@ -82,12 +82,16 @@ impl Config {
     ///
     /// <div class="warning">
     ///
-    /// # Warning
+    /// # Warnings
     ///
     /// This option is intended only for situations where unexpected behavior due to unsupported
     /// syntax is acceptable, such as when providing best-effort editor hints via `wdl-lsp`. The
     /// semantics of executing a WDL workflow with an unrecognized version is undefined and not
     /// recommended.
+    ///
+    /// Once this option has been configured for an `Analyzer`, it should not be changed. A document
+    /// that was initially parsed and analyzed with one fallback option may cause errors if
+    /// subsequent operations are performed with a different fallback option.
     ///
     /// </div>
     pub fn with_fallback_version(&self, fallback_version: Option<SupportedVersion>) -> Self {
