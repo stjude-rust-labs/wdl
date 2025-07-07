@@ -1,3 +1,5 @@
+//! Configuration for this crate.
+
 use std::sync::Arc;
 
 use tracing::warn;
@@ -21,6 +23,7 @@ use crate::rules;
 /// sent between threads.
 #[derive(Clone, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 pub struct Config {
+    /// The actual fields, `Arc`ed up for easy cloning.
     #[serde(flatten)]
     inner: Arc<ConfigInner>,
 }
@@ -53,7 +56,8 @@ impl Config {
         &self.inner.diagnostics
     }
 
-    /// Get this configuration's fallback version; see [`Config::with_fallback_version()`].
+    /// Get this configuration's fallback version; see
+    /// [`Config::with_fallback_version()`].
     pub fn fallback_version(&self) -> Option<SupportedVersion> {
         self.inner.fallback_version
     }
@@ -71,27 +75,30 @@ impl Config {
     /// Return a new configuration with the previous version fallback option
     /// replaced by the argument.
     ///
-    /// This option controls what happens when analyzing a WDL document with a syntactically valid
-    /// but unrecognized version in the version statement. The default value is `None`, with no
-    /// fallback behavior.
+    /// This option controls what happens when analyzing a WDL document with a
+    /// syntactically valid but unrecognized version in the version
+    /// statement. The default value is `None`, with no fallback behavior.
     ///
-    /// Configured with `Some(fallback_version)`, analysis will proceed as normal if the version
-    /// statement contains a recognized version. If the version is unrecognized, analysis will
-    /// continue as if the version statement contained `fallback_version`, though the concrete
+    /// Configured with `Some(fallback_version)`, analysis will proceed as
+    /// normal if the version statement contains a recognized version. If
+    /// the version is unrecognized, analysis will continue as if the
+    /// version statement contained `fallback_version`, though the concrete
     /// syntax of the version statement will remain unchanged.
     ///
     /// <div class="warning">
     ///
     /// # Warnings
     ///
-    /// This option is intended only for situations where unexpected behavior due to unsupported
-    /// syntax is acceptable, such as when providing best-effort editor hints via `wdl-lsp`. The
-    /// semantics of executing a WDL workflow with an unrecognized version is undefined and not
+    /// This option is intended only for situations where unexpected behavior
+    /// due to unsupported syntax is acceptable, such as when providing
+    /// best-effort editor hints via `wdl-lsp`. The semantics of executing a
+    /// WDL workflow with an unrecognized version is undefined and not
     /// recommended.
     ///
-    /// Once this option has been configured for an `Analyzer`, it should not be changed. A document
-    /// that was initially parsed and analyzed with one fallback option may cause errors if
-    /// subsequent operations are performed with a different fallback option.
+    /// Once this option has been configured for an `Analyzer`, it should not be
+    /// changed. A document that was initially parsed and analyzed with one
+    /// fallback option may cause errors if subsequent operations are
+    /// performed with a different fallback option.
     ///
     /// </div>
     pub fn with_fallback_version(&self, fallback_version: Option<SupportedVersion>) -> Self {
@@ -103,10 +110,13 @@ impl Config {
     }
 }
 
+/// The actual configuration fields inside the [`Config`] wrapper.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 struct ConfigInner {
+    /// See [`DiagnosticsConfig`].
     #[serde(default)]
     diagnostics: DiagnosticsConfig,
+    /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
 }

@@ -48,7 +48,8 @@ pub enum SupportedVersion {
 }
 
 impl SupportedVersion {
-    /// Returns `true` if the other version has the same major version as this one.
+    /// Returns `true` if the other version has the same major version as this
+    /// one.
     ///
     /// ```
     /// # use wdl_grammar::SupportedVersion;

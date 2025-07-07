@@ -492,21 +492,23 @@ impl<N: TreeNode> Document<N> {
         self.ast_with_version_fallback(None)
     }
 
-    /// Gets the AST representation of the document, falling back to the specified WDL version if
-    /// the document's version statement contains an unrecognized version.
+    /// Gets the AST representation of the document, falling back to the
+    /// specified WDL version if the document's version statement contains
+    /// an unrecognized version.
     ///
-    /// A fallback version of `None` does not have any fallback behavior, and is equivalent to
-    /// calling [`Document::ast()`].
+    /// A fallback version of `None` does not have any fallback behavior, and is
+    /// equivalent to calling [`Document::ast()`].
     ///
-    /// It is the caller's responsibility to ensure that a mismatch does not introduce unwanted
-    /// behavior. For applications where correctness is essential, the caller should only provide a
-    /// version that is known to be compatible with the version declared in the document.
+    /// It is the caller's responsibility to ensure that a mismatch does not
+    /// introduce unwanted behavior. For applications where correctness is
+    /// essential, the caller should only provide a version that is known to
+    /// be compatible with the version declared in the document.
     pub fn ast_with_version_fallback(&self, fallback_version: Option<SupportedVersion>) -> Ast<N> {
         let Some(stmt) = self.version_statement() else {
             return Ast::Unsupported;
         };
-        // Parse the version statement, fall back to the fallback, and finally give up if neither of
-        // those works.
+        // Parse the version statement, fall back to the fallback, and finally give up
+        // if neither of those works.
         let Some(version) = stmt
             .version()
             .text()

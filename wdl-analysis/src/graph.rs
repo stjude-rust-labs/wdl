@@ -245,7 +245,8 @@ impl DocumentGraphNode {
 
     /// Gets the WDL version of the document.
     ///
-    /// Returns `None` if the document was not parsed or was missing a version statement.
+    /// Returns `None` if the document was not parsed or was missing a version
+    /// statement.
     pub fn wdl_version(&self) -> Option<SupportedVersion> {
         if let ParseState::Parsed {
             wdl_version: Some(v),
@@ -491,6 +492,7 @@ pub struct DocumentGraph {
 }
 
 impl DocumentGraph {
+    /// Make a new [`DocumentGraph`] with the given configuration.
     pub fn new(config: Config) -> Self {
         DocumentGraph {
             config,
