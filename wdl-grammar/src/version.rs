@@ -48,6 +48,13 @@ pub enum SupportedVersion {
 }
 
 impl SupportedVersion {
+    /// Returns `true` if the other version has the same major version as this one.
+    ///
+    /// ```
+    /// # use wdl_grammar::SupportedVersion;
+    /// # use wdl_grammar::version::V1;
+    /// assert!(SupportedVersion::V1(V1::Zero).has_same_major_version(SupportedVersion::V1(V1::Two)));
+    /// ```
     pub fn has_same_major_version(self, other: SupportedVersion) -> bool {
         match (self, other) {
             (SupportedVersion::V1(_), SupportedVersion::V1(_)) => true,
