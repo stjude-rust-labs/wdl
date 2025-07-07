@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Changed
 
 * `Analyzer` now takes a general-purpose `Config` argument, which contains the previous `DiagnosticsConfig` argument ([#475](https://github.com/stjude-rust-labs/wdl/pull/475)).
+* Non-error diagnostics during parsing no longer prevent `wdl-analysis` from analyzing documents ([#475](https://github.com/stjude-rust-labs/wdl/pull/475)).
 
 #### Fixed
 
