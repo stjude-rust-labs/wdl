@@ -145,6 +145,7 @@ pub fn completion(
                         add_scope_completions(scope, &mut items);
                     }
                     add_stdlib_completions(&mut items);
+                    add_struct_completions(document, &mut items);
                     break;
                 }
                 SyntaxKind::RootNode => {

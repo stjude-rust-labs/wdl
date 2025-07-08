@@ -44,7 +44,7 @@ fn assert_contains(items: &[CompletionItem], expected_label: &str) {
 
 fn assert_not_contains(items: &[CompletionItem], unexpected_label: &str) {
     assert!(
-        items.iter().any(|item| item.label == unexpected_label),
+        !items.iter().any(|item| item.label == unexpected_label),
         "completion items should NOT have contained '{unexpected_label}"
     );
 }
