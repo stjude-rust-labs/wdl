@@ -124,7 +124,7 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     let analyzer = Analyzer::new_with_validator(
-        AnalysisConfig::default().with_diagnostics(DiagnosticsConfig::except_all()),
+        AnalysisConfig::default().with_diagnostics_config(DiagnosticsConfig::except_all()),
         |_, _, _, _| async {},
         || {
             let mut validator = Validator::default();

@@ -1821,7 +1821,7 @@ workflow test {
 
         // Analyze the source file
         let analyzer = Analyzer::new(
-            AnalysisConfig::default().with_diagnostics(DiagnosticsConfig::except_all()),
+            AnalysisConfig::default().with_diagnostics_config(DiagnosticsConfig::except_all()),
             |(), _, _, _| async {},
         );
         analyzer
@@ -1957,7 +1957,7 @@ workflow w {
 
         // Analyze the source files
         let analyzer = Analyzer::new(
-            AnalysisConfig::default().with_diagnostics(DiagnosticsConfig::except_all()),
+            AnalysisConfig::default().with_diagnostics_config(DiagnosticsConfig::except_all()),
             |(), _, _, _| async {},
         );
         analyzer

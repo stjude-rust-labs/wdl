@@ -546,7 +546,9 @@ impl Document {
         let root = node.root().expect("node should have been parsed");
         let (config, wdl_version) = match (root.version_statement(), wdl_version) {
             (Some(stmt), Some(wdl_version)) => (
-                config.with_diagnostics(config.diagnostics().excepted_for_node(stmt.inner())),
+                config.with_diagnostics_config(
+                    config.diagnostics_config().excepted_for_node(stmt.inner()),
+                ),
                 *wdl_version,
             ),
             _ => {
@@ -577,7 +579,7 @@ impl Document {
         }
 
         // Check for unused imports
-        if let Some(severity) = config.diagnostics().unused_import {
+        if let Some(severity) = config.diagnostics_config().unused_import {
             let DocumentData {
                 namespaces,
                 diagnostics,

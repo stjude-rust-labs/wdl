@@ -144,7 +144,7 @@ async fn main() -> anyhow::Result<()> {
         let config = if config_path.exists() {
             toml::from_str(&std::fs::read_to_string(config_path)?)?
         } else {
-            Config::default().with_diagnostics(DiagnosticsConfig::except_all())
+            Config::default().with_diagnostics_config(DiagnosticsConfig::except_all())
         };
         let analyzer = Analyzer::new(config, |_, _, _, _| async {});
         analyzer

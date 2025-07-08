@@ -99,7 +99,7 @@ impl Analysis {
     pub async fn run(self) -> std::result::Result<AnalysisResults, NonEmpty<Arc<Error>>> {
         warn_unknown_rules(&self.exceptions);
         let config = wdl_analysis::Config::default()
-            .with_diagnostics(get_diagnostics_config(&self.exceptions));
+            .with_diagnostics_config(get_diagnostics_config(&self.exceptions));
 
         (self.init)();
 

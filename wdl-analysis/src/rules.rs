@@ -18,7 +18,7 @@ pub const UNUSED_CALL_RULE_ID: &str = "UnusedCall";
 pub const UNNECESSARY_FUNCTION_CALL: &str = "UnnecessaryFunctionCall";
 
 /// The rule identifier for unsupported version fallback warnings.
-pub const UNSUPPORTED_VERSION_FALLBACK: &str = "UnsupportedVersionFallback";
+pub const USING_FALLBACK_VERSION: &str = "UsingFallbackVersion";
 
 /// A trait implemented by analysis rules.
 pub trait Rule: Send + Sync {
@@ -292,7 +292,7 @@ impl Default for UnsupportedVersionFallback {
 
 impl Rule for UnsupportedVersionFallback {
     fn id(&self) -> &'static str {
-        UNSUPPORTED_VERSION_FALLBACK
+        USING_FALLBACK_VERSION
     }
 
     fn description(&self) -> &'static str {

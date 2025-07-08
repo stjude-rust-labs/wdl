@@ -602,7 +602,7 @@ fn add_task(config: &Config, document: &mut DocumentData, definition: &TaskDefin
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.diagnostics().unused_input {
+                if let Some(severity) = config.diagnostics_config().unused_input {
                     if decl.env().is_none() {
                         // For any input that isn't an environment variable, check to see if there's
                         // a single implicit dependency edge; if so, it might be unused
@@ -638,7 +638,7 @@ fn add_task(config: &Config, document: &mut DocumentData, definition: &TaskDefin
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.diagnostics().unused_declaration {
+                if let Some(severity) = config.diagnostics_config().unused_declaration {
                     let name = decl.name();
                     // Don't warn for environment variables as they are always implicitly used
                     if decl.env().is_none()
@@ -867,7 +867,7 @@ fn populate_workflow(config: &Config, document: &mut DocumentData, workflow: &Wo
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.diagnostics().unused_input {
+                if let Some(severity) = config.diagnostics_config().unused_input {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -904,7 +904,7 @@ fn populate_workflow(config: &Config, document: &mut DocumentData, workflow: &Wo
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.diagnostics().unused_declaration {
+                if let Some(severity) = config.diagnostics_config().unused_declaration {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -987,7 +987,7 @@ fn populate_workflow(config: &Config, document: &mut DocumentData, workflow: &Wo
                 );
 
                 // Check for unused call
-                if let Some(severity) = config.diagnostics().unused_call {
+                if let Some(severity) = config.diagnostics_config().unused_call {
                     if graph
                         .edges_directed(index, Direction::Outgoing)
                         .next()
@@ -1617,7 +1617,7 @@ impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
     }
 
     fn diagnostics_config(&self) -> DiagnosticsConfig {
-        *self.config.diagnostics()
+        *self.config.diagnostics_config()
     }
 
     fn add_diagnostic(&mut self, diagnostic: Diagnostic) {

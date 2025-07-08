@@ -10,11 +10,11 @@ use wdl_ast::SyntaxNode;
 use crate::Rule;
 use crate::SyntaxNodeExt as _;
 use crate::UNNECESSARY_FUNCTION_CALL;
-use crate::UNSUPPORTED_VERSION_FALLBACK;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
+use crate::USING_FALLBACK_VERSION;
 use crate::rules;
 
 /// Configuration for `wdl-analysis`.
@@ -33,7 +33,7 @@ pub struct Config {
 impl std::fmt::Debug for Config {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Config")
-            .field("diagnostics", &self.inner.diagnostics)
+            .field("diagnostics_config", &self.inner.diagnostics_config)
             .field("fallback_version", &self.inner.fallback_version)
             .finish()
     }
@@ -43,7 +43,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             inner: Arc::new(ConfigInner {
-                diagnostics: Default::default(),
+                diagnostics_config: Default::default(),
                 fallback_version: None,
             }),
         }
@@ -52,8 +52,8 @@ impl Default for Config {
 
 impl Config {
     /// Get this configuration's [`DiagnosticsConfig`].
-    pub fn diagnostics(&self) -> &DiagnosticsConfig {
-        &self.inner.diagnostics
+    pub fn diagnostics_config(&self) -> &DiagnosticsConfig {
+        &self.inner.diagnostics_config
     }
 
     /// Get this configuration's fallback version; see
@@ -64,9 +64,9 @@ impl Config {
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
     /// replaced by the argument.
-    pub fn with_diagnostics(&self, diagnostics: DiagnosticsConfig) -> Self {
+    pub fn with_diagnostics_config(&self, diagnostics: DiagnosticsConfig) -> Self {
         let mut inner = (*self.inner).clone();
-        inner.diagnostics = diagnostics;
+        inner.diagnostics_config = diagnostics;
         Self {
             inner: Arc::new(inner),
         }
@@ -115,7 +115,7 @@ impl Config {
 struct ConfigInner {
     /// See [`DiagnosticsConfig`].
     #[serde(default)]
-    diagnostics: DiagnosticsConfig,
+    diagnostics_config: DiagnosticsConfig,
     /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
@@ -149,10 +149,11 @@ pub struct DiagnosticsConfig {
     ///
     /// A value of `None` disables the diagnostic.
     pub unnecessary_function_call: Option<Severity>,
-    /// The severity for the unsupported version fallback diagnostic.
+    /// The severity for the using fallback version diagnostic.
     ///
-    /// A value of `None` disables the diagnostic.
-    pub unsupported_version_fallback: Option<Severity>,
+    /// A value of `None` disables the diagnostic. If there is no version configured with
+    /// [`Config::with_fallback_version()`], this diagnostic will not be emitted.
+    pub using_fallback_version: Option<Severity>,
 }
 
 impl Default for DiagnosticsConfig {
@@ -169,7 +170,7 @@ impl DiagnosticsConfig {
         let mut unused_declaration = None;
         let mut unused_call = None;
         let mut unnecessary_function_call = None;
-        let mut unsupported_version_fallback = None;
+        let mut using_fallback_version = None;
 
         for rule in rules {
             let rule = rule.as_ref();
@@ -179,9 +180,7 @@ impl DiagnosticsConfig {
                 UNUSED_DECL_RULE_ID => unused_declaration = Some(rule.severity()),
                 UNUSED_CALL_RULE_ID => unused_call = Some(rule.severity()),
                 UNNECESSARY_FUNCTION_CALL => unnecessary_function_call = Some(rule.severity()),
-                UNSUPPORTED_VERSION_FALLBACK => {
-                    unsupported_version_fallback = Some(rule.severity())
-                }
+                USING_FALLBACK_VERSION => using_fallback_version = Some(rule.severity()),
                 unrecognized => {
                     warn!(unrecognized, "unrecognized rule");
                     if cfg!(test) {
@@ -197,7 +196,7 @@ impl DiagnosticsConfig {
             unused_declaration,
             unused_call,
             unnecessary_function_call,
-            unsupported_version_fallback,
+            using_fallback_version,
         }
     }
 
@@ -226,8 +225,8 @@ impl DiagnosticsConfig {
             self.unnecessary_function_call = None;
         }
 
-        if exceptions.contains(UNSUPPORTED_VERSION_FALLBACK) {
-            self.unsupported_version_fallback = None;
+        if exceptions.contains(USING_FALLBACK_VERSION) {
+            self.using_fallback_version = None;
         }
 
         self
@@ -241,7 +240,7 @@ impl DiagnosticsConfig {
             unused_declaration: None,
             unused_call: None,
             unnecessary_function_call: None,
-            unsupported_version_fallback: None,
+            using_fallback_version: None,
         }
     }
 }
