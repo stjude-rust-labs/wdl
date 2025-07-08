@@ -2190,7 +2190,7 @@ workflow contains_string {
                         .ret(PrimitiveType::String)
                         .definition(
                             r#"
-Given three String parameters `input`, `pattern`, `replace`, this function replaces all non-overlapping occurrences of `pattern` in `input` by `replace`. `pattern` is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression) and is evaluated as a [POSIX Extended Regular Expression (ERE)](https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended).
+Given three `String` parameters `input`, `pattern`, `replace`, this function replaces all non-overlapping occurrences of `pattern` in `input` by `replace`. `pattern` is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression) and is evaluated as a [POSIX Extended Regular Expression (ERE)](https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended).
 Regular expressions are written using regular WDL strings, so backslash characters need to be double-escaped (e.g., "\t").
 
 🗑 The option for execution engines to allow other regular expression grammars besides POSIX ERE is deprecated.

@@ -21,7 +21,7 @@ workflow main {
 
     String n = my_foo.
 
-    output  {
+    output {
         String result = t1.out
     }
 }
