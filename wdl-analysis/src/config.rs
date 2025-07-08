@@ -151,8 +151,9 @@ pub struct DiagnosticsConfig {
     pub unnecessary_function_call: Option<Severity>,
     /// The severity for the using fallback version diagnostic.
     ///
-    /// A value of `None` disables the diagnostic. If there is no version configured with
-    /// [`Config::with_fallback_version()`], this diagnostic will not be emitted.
+    /// A value of `None` disables the diagnostic. If there is no version
+    /// configured with [`Config::with_fallback_version()`], this diagnostic
+    /// will not be emitted.
     pub using_fallback_version: Option<Severity>,
 }
 

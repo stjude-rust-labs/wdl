@@ -395,10 +395,7 @@ impl DocumentGraphNode {
                 }
                 // The version in the document is not supported, but fallback behavior is configured
                 (Err(unrecognized), Some(fallback)) => {
-                    if let Some(severity) = self
-                        .config
-                        .diagnostics_config()
-                        .using_fallback_version
+                    if let Some(severity) = self.config.diagnostics_config().using_fallback_version
                     {
                         diagnostics.push(
                             Diagnostic::warning(format!(
