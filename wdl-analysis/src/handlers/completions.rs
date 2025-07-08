@@ -1,6 +1,6 @@
-//! Handlers for "code completion" requests.
+//! Handlers for code completion requests.
 //!
-//! This module implements the LSP "textDocument/completion" functionality for
+//! This module implements the LSP `textDocument/completion` functionality for
 //! WDL files. It provides context-aware completions for various WDL language
 //! constructs including:
 //!
@@ -70,7 +70,7 @@ pub fn completion(
     encoding: SourcePositionEncoding,
 ) -> Result<Vec<CompletionItem>> {
     let Some(index) = graph.get_index(document_uri) else {
-        bail!("document `{document_uri}` not found in graph.")
+        bail!("document `{document_uri}` not found in graph")
     };
     let node = graph.get(index);
     let (root, lines) = match node.parse_state() {
