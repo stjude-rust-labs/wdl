@@ -1747,6 +1747,36 @@ workflow test_round {
             .is_none()
     );
 
+    const MIN_DEFINITION: &str = r#"
+Returns the smaller of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
+
+**Parameters**:
+
+1. `Int|Float`: the first number to compare.
+2. `Int|Float`: the second number to compare.
+
+**Returns**: The smaller of the two arguments.
+
+Example: test_min.wdl
+
+```wdl
+version 1.2
+
+workflow test_min {
+  input {
+    Int value1
+    Float value2
+  }
+
+  output {
+    # these two expressions are equivalent
+    Float min1 = if value1 < value2 then value1 else value2
+    Float min2 = min(value1, value2)
+  }
+}
+```
+"#;
+
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
     assert!(
         functions
@@ -1758,154 +1788,64 @@ workflow test_round {
                         .parameter(PrimitiveType::Integer)
                         .parameter(PrimitiveType::Integer)
                         .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
-Returns the smaller of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The smaller of the two arguments.
-
-Example: test_min.wdl
-
-```wdl
-version 1.2
-
-workflow test_min {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 < value2 then value1 else value2
-    Float min2 = min(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MIN_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Integer)
                         .parameter(PrimitiveType::Float)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the smaller of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The smaller of the two arguments.
-
-Example: test_min.wdl
-
-```wdl
-version 1.2
-
-workflow test_min {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 < value2 then value1 else value2
-    Float min2 = min(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MIN_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Float)
                         .parameter(PrimitiveType::Integer)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the smaller of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The smaller of the two arguments.
-
-Example: test_min.wdl
-
-```wdl
-version 1.2
-
-workflow test_min {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 < value2 then value1 else value2
-    Float min2 = min(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MIN_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Float)
                         .parameter(PrimitiveType::Float)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the smaller of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The smaller of the two arguments.
-
-Example: test_min.wdl
-
-```wdl
-version 1.2
-
-workflow test_min {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 < value2 then value1 else value2
-    Float min2 = min(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MIN_DEFINITION)
                         .build(),
                 ])
                 .into(),
             )
             .is_none()
     );
+
+    const MAX_DEFINITION: &str = r#"
+Returns the larger of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
+
+**Parameters**:
+
+1. `Int|Float`: the first number to compare.
+2. `Int|Float`: the second number to compare.
+
+**Returns**: The larger of the two arguments.
+
+Example: test_max.wdl
+
+```wdl
+version 1.2
+
+workflow test_max {
+  input {
+    Int value1
+    Float value2
+  }
+
+  output {
+    # these two expressions are equivalent
+    Float min1 = if value1 > value2 then value1 else value2
+    Float min2 = max(value1, value2)
+  }
+}
+```
+"#;
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
     assert!(
@@ -1918,148 +1858,28 @@ workflow test_min {
                         .parameter(PrimitiveType::Integer)
                         .parameter(PrimitiveType::Integer)
                         .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
-Returns the larger of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The larger of the two arguments.
-
-Example: test_max.wdl
-
-```wdl
-version 1.2
-
-workflow test_max {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 > value2 then value1 else value2
-    Float min2 = max(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MAX_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Integer)
                         .parameter(PrimitiveType::Float)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the larger of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The larger of the two arguments.
-
-Example: test_max.wdl
-
-```wdl
-version 1.2
-
-workflow test_max {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 > value2 then value1 else value2
-    Float min2 = max(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MAX_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Float)
                         .parameter(PrimitiveType::Integer)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the larger of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The larger of the two arguments.
-
-Example: test_max.wdl
-
-```wdl
-version 1.2
-
-workflow test_max {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 > value2 then value1 else value2
-    Float min2 = max(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MAX_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .parameter(PrimitiveType::Float)
                         .parameter(PrimitiveType::Float)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Returns the larger of two values. If both values are `Int`s, the return value is an `Int`, otherwise it is a `Float`.
-
-**Parameters**:
-
-1. `Int|Float`: the first number to compare.
-2. `Int|Float`: the second number to compare.
-
-**Returns**: The larger of the two arguments.
-
-Example: test_max.wdl
-
-```wdl
-version 1.2
-
-workflow test_max {
-  input {
-    Int value1
-    Float value2
-  }
-
-  output {
-    # these two expressions are equivalent
-    Float min1 = if value1 > value2 then value1 else value2
-    Float min2 = max(value1, value2)
-  }
-}
-```
-"#
-                        )
+                        .definition(MAX_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -2230,6 +2050,33 @@ workflow test_sub {
             .is_none()
     );
 
+    const BASENAME_DEFINITION: &str = r#"
+Returns the "basename" of a file or directory - the name after the last directory separator in the path. 
+
+The optional second parameter specifies a literal suffix to remove from the file name. If the file name does not end with the specified suffix then it is ignored.
+
+**Parameters**
+
+1. `File|Directory`: Path of the file or directory to read. If the argument is a `String`, it is assumed to be a local file path relative to the current working directory of the task.
+2. `String`: (Optional) Suffix to remove from the file name.
+
+**Returns**: The file's basename as a `String`.
+
+Example: test_basename.wdl
+
+```wdl
+version 1.2
+
+workflow test_basename {
+  output {
+    Boolean is_true1 = basename("/path/to/file.txt") == "file.txt"
+    Boolean is_true2 = basename("/path/to/file.txt", ".txt") == "file"
+    Boolean is_true3 = basename("/path/to/dir") == "dir" 
+  }
+}
+```
+"#;
+
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#basename
     assert!(
         functions
@@ -2241,34 +2088,7 @@ workflow test_sub {
                         .parameter(PrimitiveType::File)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::String)
-                        .definition(
-                            r#"
-Returns the "basename" of a file or directory - the name after the last directory separator in the path. 
-
-The optional second parameter specifies a literal suffix to remove from the file name. If the file name does not end with the specified suffix then it is ignored.
-
-**Parameters**
-
-1. `File|Directory`: Path of the file or directory to read. If the argument is a `String`, it is assumed to be a local file path relative to the current working directory of the task.
-2. `String`: (Optional) Suffix to remove from the file name.
-
-**Returns**: The file's basename as a `String`.
-
-Example: test_basename.wdl
-
-```wdl
-version 1.2
-
-workflow test_basename {
-  output {
-    Boolean is_true1 = basename("/path/to/file.txt") == "file.txt"
-    Boolean is_true2 = basename("/path/to/file.txt", ".txt") == "file"
-    Boolean is_true3 = basename("/path/to/dir") == "dir" 
-  }
-}
-```
-"#
-                        )
+                        .definition(BASENAME_DEFINITION)
                         .build(),
                     // This overload isn't explicitly specified in the spec, but the spec
                     // allows for `String` where file/directory are accepted; an explicit
@@ -2280,34 +2100,7 @@ workflow test_basename {
                         .parameter(PrimitiveType::String)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::String)
-                        .definition(
-                            r#"
-Returns the "basename" of a file or directory - the name after the last directory separator in the path. 
-
-The optional second parameter specifies a literal suffix to remove from the file name. If the file name does not end with the specified suffix then it is ignored.
-
-**Parameters**
-
-1. `File|Directory`: Path of the file or directory to read. If the argument is a `String`, it is assumed to be a local file path relative to the current working directory of the task.
-2. `String`: (Optional) Suffix to remove from the file name.
-
-**Returns**: The file's basename as a `String`.
-
-Example: test_basename.wdl
-
-```wdl
-version 1.2
-
-workflow test_basename {
-  output {
-    Boolean is_true1 = basename("/path/to/file.txt") == "file.txt"
-    Boolean is_true2 = basename("/path/to/file.txt", ".txt") == "file"
-    Boolean is_true3 = basename("/path/to/dir") == "dir" 
-  }
-}
-```
-"#
-                        )
+                        .definition(BASENAME_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -2315,40 +2108,77 @@ workflow test_basename {
                         .parameter(PrimitiveType::Directory)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::String)
-                        .definition(
-                            r#"
-Returns the "basename" of a file or directory - the name after the last directory separator in the path. 
-
-The optional second parameter specifies a literal suffix to remove from the file name. If the file name does not end with the specified suffix then it is ignored.
-
-**Parameters**
-
-1. `File|Directory`: Path of the file or directory to read. If the argument is a `String`, it is assumed to be a local file path relative to the current working directory of the task.
-2. `String`: (Optional) Suffix to remove from the file name.
-
-**Returns**: The file's basename as a `String`.
-
-Example: test_basename.wdl
-
-```wdl
-version 1.2
-
-workflow test_basename {
-  output {
-    Boolean is_true1 = basename("/path/to/file.txt") == "file.txt"
-    Boolean is_true2 = basename("/path/to/file.txt", ".txt") == "file"
-    Boolean is_true3 = basename("/path/to/dir") == "dir" 
-  }
-}
-```
-"#
-                        )
+                        .definition(BASENAME_DEFINITION)
                         .build(),
                 ])
                 .into(),
             )
             .is_none()
     );
+
+    const JOIN_PATHS_DEFINITION: &str = r#"
+Joins together two or more paths into an absolute path in the host filesystem.
+
+There are three variants of this function:
+
+1. `File join_paths(File, String)`: Joins together exactly two paths. The first path may be either absolute or relative and must specify a directory; the second path is relative to the first path and may specify a file or directory.
+2. `File join_paths(File, Array[String]+)`: Joins together any number of relative paths with a base path. The first argument may be either an absolute or a relative path and must specify a directory. The paths in the second array argument must all be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
+3. `File join_paths(Array[String]+)`: Joins together any number of paths. The array must not be empty. The *first* element of the array may be either absolute or relative; subsequent path(s) must be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
+
+An absolute path starts with `/` and indicates that the path is relative to the root of the environment in which the task is executed. Only the first path may be absolute. If any subsequent paths are absolute, it is an error.
+
+A relative path does not start with `/` and indicates the path is relative to its parent directory. It is up to the execution engine to determine which directory to use as the parent when resolving relative paths; by default it is the working directory in which the task is executed.
+
+**Parameters**
+
+1. `File|Array[String]+`: Either a path or an array of paths.
+2. `String|Array[String]+`: A relative path or paths; only allowed if the first argument is a `File`.
+
+**Returns**: A `File` representing an absolute path that results from joining all the paths in order (left-to-right), and resolving the resulting path against the default parent directory if it is relative.
+
+Example: join_paths_task.wdl
+
+```wdl
+version 1.2
+
+task resolve_paths_task {
+  input {
+    File abs_file = "/usr"
+    String abs_str = "/usr"
+    String rel_dir_str = "bin"
+    File rel_file = "echo"
+    File rel_dir_file = "mydir"
+    String rel_str = "mydata.txt"
+  }
+
+  # these are all equivalent to '/usr/bin/echo'
+  File bin1 = join_paths(abs_file, [rel_dir_str, rel_file])
+  File bin2 = join_paths(abs_str, [rel_dir_str, rel_file])
+  File bin3 = join_paths([abs_str, rel_dir_str, rel_file])
+  
+  # the default behavior is that this resolves to 
+  # '<working dir>/mydir/mydata.txt'
+  File data = join_paths(rel_dir_file, rel_str)
+  
+  # this resolves to '<working dir>/bin/echo', which is non-existent
+  File doesnt_exist = join_paths([rel_dir_str, rel_file])
+  command <<<
+    mkdir ~{rel_dir_file}
+    ~{bin1} -n "hello" > ~{data}
+  >>>
+
+  output {
+    Boolean bins_equal = (bin1 == bin2) && (bin1 == bin3)
+    String result = read_string(data)
+    File? missing_file = doesnt_exist
+  }
+  
+  runtime {
+    container: "ubuntu:latest"
+  }
+}
+```
+"#;
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
     assert!(
@@ -2361,212 +2191,20 @@ workflow test_basename {
                         .parameter(PrimitiveType::File)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Joins together two or more paths into an absolute path in the host filesystem.
-
-There are three variants of this function:
-
-1. `File join_paths(File, String)`: Joins together exactly two paths. The first path may be either absolute or relative and must specify a directory; the second path is relative to the first path and may specify a file or directory.
-2. `File join_paths(File, Array[String]+)`: Joins together any number of relative paths with a base path. The first argument may be either an absolute or a relative path and must specify a directory. The paths in the second array argument must all be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-3. `File join_paths(Array[String]+)`: Joins together any number of paths. The array must not be empty. The *first* element of the array may be either absolute or relative; subsequent path(s) must be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-
-An absolute path starts with `/` and indicates that the path is relative to the root of the environment in which the task is executed. Only the first path may be absolute. If any subsequent paths are absolute, it is an error.
-
-A relative path does not start with `/` and indicates the path is relative to its parent directory. It is up to the execution engine to determine which directory to use as the parent when resolving relative paths; by default it is the working directory in which the task is executed.
-
-**Parameters**
-
-1. `File|Array[String]+`: Either a path or an array of paths.
-2. `String|Array[String]+`: A relative path or paths; only allowed if the first argument is a `File`.
-
-**Returns**: A `File` representing an absolute path that results from joining all the paths in order (left-to-right), and resolving the resulting path against the default parent directory if it is relative.
-
-Example: join_paths_task.wdl
-
-```wdl
-version 1.2
-
-task resolve_paths_task {
-  input {
-    File abs_file = "/usr"
-    String abs_str = "/usr"
-    String rel_dir_str = "bin"
-    File rel_file = "echo"
-    File rel_dir_file = "mydir"
-    String rel_str = "mydata.txt"
-  }
-
-  # these are all equivalent to '/usr/bin/echo'
-  File bin1 = join_paths(abs_file, [rel_dir_str, rel_file])
-  File bin2 = join_paths(abs_str, [rel_dir_str, rel_file])
-  File bin3 = join_paths([abs_str, rel_dir_str, rel_file])
-  
-  # the default behavior is that this resolves to 
-  # '<working dir>/mydir/mydata.txt'
-  File data = join_paths(rel_dir_file, rel_str)
-  
-  # this resolves to '<working dir>/bin/echo', which is non-existent
-  File doesnt_exist = join_paths([rel_dir_str, rel_file])
-  command <<<
-    mkdir ~{rel_dir_file}
-    ~{bin1} -n "hello" > ~{data}
-  >>>
-
-  output {
-    Boolean bins_equal = (bin1 == bin2) && (bin1 == bin3)
-    String result = read_string(data)
-    File? missing_file = doesnt_exist
-  }
-  
-  runtime {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(JOIN_PATHS_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(PrimitiveType::File)
                         .parameter(array_string_non_empty.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Joins together two or more paths into an absolute path in the host filesystem.
-
-There are three variants of this function:
-
-1. `File join_paths(File, String)`: Joins together exactly two paths. The first path may be either absolute or relative and must specify a directory; the second path is relative to the first path and may specify a file or directory.
-2. `File join_paths(File, Array[String]+)`: Joins together any number of relative paths with a base path. The first argument may be either an absolute or a relative path and must specify a directory. The paths in the second array argument must all be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-3. `File join_paths(Array[String]+)`: Joins together any number of paths. The array must not be empty. The *first* element of the array may be either absolute or relative; subsequent path(s) must be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-
-An absolute path starts with `/` and indicates that the path is relative to the root of the environment in which the task is executed. Only the first path may be absolute. If any subsequent paths are absolute, it is an error.
-
-A relative path does not start with `/` and indicates the path is relative to its parent directory. It is up to the execution engine to determine which directory to use as the parent when resolving relative paths; by default it is the working directory in which the task is executed.
-
-**Parameters**
-
-1. `File|Array[String]+`: Either a path or an array of paths.
-2. `String|Array[String]+`: A relative path or paths; only allowed if the first argument is a `File`.
-
-**Returns**: A `File` representing an absolute path that results from joining all the paths in order (left-to-right), and resolving the resulting path against the default parent directory if it is relative.
-
-Example: join_paths_task.wdl
-
-```wdl
-version 1.2
-
-task resolve_paths_task {
-  input {
-    File abs_file = "/usr"
-    String abs_str = "/usr"
-    String rel_dir_str = "bin"
-    File rel_file = "echo"
-    File rel_dir_file = "mydir"
-    String rel_str = "mydata.txt"
-  }
-
-  # these are all equivalent to '/usr/bin/echo'
-  File bin1 = join_paths(abs_file, [rel_dir_str, rel_file])
-  File bin2 = join_paths(abs_str, [rel_dir_str, rel_file])
-  File bin3 = join_paths([abs_str, rel_dir_str, rel_file])
-  
-  # the default behavior is that this resolves to 
-  # '<working dir>/mydir/mydata.txt'
-  File data = join_paths(rel_dir_file, rel_str)
-  
-  # this resolves to '<working dir>/bin/echo', which is non-existent
-  File doesnt_exist = join_paths([rel_dir_str, rel_file])
-  command <<<
-    mkdir ~{rel_dir_file}
-    ~{bin1} -n "hello" > ~{data}
-  >>>
-
-  output {
-    Boolean bins_equal = (bin1 == bin2) && (bin1 == bin3)
-    String result = read_string(data)
-    File? missing_file = doesnt_exist
-  }
-  
-  runtime {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(JOIN_PATHS_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(array_string_non_empty.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Joins together two or more paths into an absolute path in the host filesystem.
-
-There are three variants of this function:
-
-1. `File join_paths(File, String)`: Joins together exactly two paths. The first path may be either absolute or relative and must specify a directory; the second path is relative to the first path and may specify a file or directory.
-2. `File join_paths(File, Array[String]+)`: Joins together any number of relative paths with a base path. The first argument may be either an absolute or a relative path and must specify a directory. The paths in the second array argument must all be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-3. `File join_paths(Array[String]+)`: Joins together any number of paths. The array must not be empty. The *first* element of the array may be either absolute or relative; subsequent path(s) must be relative. The *last* element may specify a file or directory; all other elements must specify a directory.
-
-An absolute path starts with `/` and indicates that the path is relative to the root of the environment in which the task is executed. Only the first path may be absolute. If any subsequent paths are absolute, it is an error.
-
-A relative path does not start with `/` and indicates the path is relative to its parent directory. It is up to the execution engine to determine which directory to use as the parent when resolving relative paths; by default it is the working directory in which the task is executed.
-
-**Parameters**
-
-1. `File|Array[String]+`: Either a path or an array of paths.
-2. `String|Array[String]+`: A relative path or paths; only allowed if the first argument is a `File`.
-
-**Returns**: A `File` representing an absolute path that results from joining all the paths in order (left-to-right), and resolving the resulting path against the default parent directory if it is relative.
-
-Example: join_paths_task.wdl
-
-```wdl
-version 1.2
-
-task resolve_paths_task {
-  input {
-    File abs_file = "/usr"
-    String abs_str = "/usr"
-    String rel_dir_str = "bin"
-    File rel_file = "echo"
-    File rel_dir_file = "mydir"
-    String rel_str = "mydata.txt"
-  }
-
-  # these are all equivalent to '/usr/bin/echo'
-  File bin1 = join_paths(abs_file, [rel_dir_str, rel_file])
-  File bin2 = join_paths(abs_str, [rel_dir_str, rel_file])
-  File bin3 = join_paths([abs_str, rel_dir_str, rel_file])
-  
-  # the default behavior is that this resolves to 
-  # '<working dir>/mydir/mydata.txt'
-  File data = join_paths(rel_dir_file, rel_str)
-  
-  # this resolves to '<working dir>/bin/echo', which is non-existent
-  File doesnt_exist = join_paths([rel_dir_str, rel_file])
-  command <<<
-    mkdir ~{rel_dir_file}
-    ~{bin1} -n "hello" > ~{data}
-  >>>
-
-  output {
-    Boolean bins_equal = (bin1 == bin2) && (bin1 == bin3)
-    String result = read_string(data)
-    File? missing_file = doesnt_exist
-  }
-  
-  runtime {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(JOIN_PATHS_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -2630,6 +2268,52 @@ task gen_files {
             .is_none()
     );
 
+    const SIZE_DEFINITION: &str = r#"
+Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
+
+In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
+
+If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
+
+**Parameters**
+
+1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
+2. `String`: (Optional) The unit of storage; defaults to 'B'.
+
+**Returns**: The size of the files/directories as a `Float`.
+
+Example: file_sizes_task.wdl
+
+```wdl
+version 1.2
+
+task file_sizes {
+  command <<<
+    printf "this file is 22 bytes\n" > created_file
+  >>>
+
+  File? missing_file = None
+
+  output {
+    File created_file = "created_file"
+    Float missing_file_bytes = size(missing_file)
+    Float created_file_bytes = size(created_file, "B")
+    Float multi_file_kb = size([created_file, missing_file], "K")
+
+    Map[String, Pair[Int, File]] nested = {
+      "a": (10, created_file),
+      "b": (50, missing_file)
+    }
+    Float nested_bytes = size(nested)
+  }
+  
+  requirements {
+    container: "ubuntu:latest"
+  }
+}
+```
+"#;
+
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#size
     assert!(
         functions
@@ -2644,106 +2328,14 @@ task gen_files {
                         .parameter(Type::None)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
-
-In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
-
-If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
-
-**Parameters**
-
-1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
-2. `String`: (Optional) The unit of storage; defaults to 'B'.
-
-**Returns**: The size of the files/directories as a `Float`.
-
-Example: file_sizes_task.wdl
-
-```wdl
-version 1.2
-
-task file_sizes {
-  command <<<
-    printf "this file is 22 bytes\n" > created_file
-  >>>
-
-  File? missing_file = None
-
-  output {
-    File created_file = "created_file"
-    Float missing_file_bytes = size(missing_file)
-    Float created_file_bytes = size(created_file, "B")
-    Float multi_file_kb = size([created_file, missing_file], "K")
-
-    Map[String, Pair[Int, File]] nested = {
-      "a": (10, created_file),
-      "b": (50, missing_file)
-    }
-    Float nested_bytes = size(nested)
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(SIZE_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .required(1)
                         .parameter(Type::from(PrimitiveType::File).optional())
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
-
-In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
-
-If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
-
-**Parameters**
-
-1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
-2. `String`: (Optional) The unit of storage; defaults to 'B'.
-
-**Returns**: The size of the files/directories as a `Float`.
-
-Example: file_sizes_task.wdl
-
-```wdl
-version 1.2
-
-task file_sizes {
-  command <<<
-    printf "this file is 22 bytes\n" > created_file
-  >>>
-
-  File? missing_file = None
-
-  output {
-    File created_file = "created_file"
-    Float missing_file_bytes = size(missing_file)
-    Float created_file_bytes = size(created_file, "B")
-    Float multi_file_kb = size([created_file, missing_file], "K")
-
-    Map[String, Pair[Int, File]] nested = {
-      "a": (10, created_file),
-      "b": (50, missing_file)
-    }
-    Float nested_bytes = size(nested)
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(SIZE_DEFINITION)
                         .build(),
                     // This overload isn't explicitly specified in the spec, but the spec
                     // allows for `String` where file/directory are accepted; an explicit
@@ -2755,53 +2347,7 @@ task file_sizes {
                         .parameter(Type::from(PrimitiveType::String).optional())
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
-
-In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
-
-If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
-
-**Parameters**
-
-1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
-2. `String`: (Optional) The unit of storage; defaults to 'B'.
-
-**Returns**: The size of the files/directories as a `Float`.
-
-Example: file_sizes_task.wdl
-
-```wdl
-version 1.2
-
-task file_sizes {
-  command <<<
-    printf "this file is 22 bytes\n" > created_file
-  >>>
-
-  File? missing_file = None
-
-  output {
-    File created_file = "created_file"
-    Float missing_file_bytes = size(missing_file)
-    Float created_file_bytes = size(created_file, "B")
-    Float multi_file_kb = size([created_file, missing_file], "K")
-
-    Map[String, Pair[Int, File]] nested = {
-      "a": (10, created_file),
-      "b": (50, missing_file)
-    }
-    Float nested_bytes = size(nested)
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(SIZE_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -2809,53 +2355,7 @@ task file_sizes {
                         .parameter(Type::from(PrimitiveType::Directory).optional())
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
-
-In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
-
-If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
-
-**Parameters**
-
-1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
-2. `String`: (Optional) The unit of storage; defaults to 'B'.
-
-**Returns**: The size of the files/directories as a `Float`.
-
-Example: file_sizes_task.wdl
-
-```wdl
-version 1.2
-
-task file_sizes {
-  command <<<
-    printf "this file is 22 bytes\n" > created_file
-  >>>
-
-  File? missing_file = None
-
-  output {
-    File created_file = "created_file"
-    Float missing_file_bytes = size(missing_file)
-    Float created_file_bytes = size(created_file, "B")
-    Float multi_file_kb = size([created_file, missing_file], "K")
-
-    Map[String, Pair[Int, File]] nested = {
-      "a": (10, created_file),
-      "b": (50, missing_file)
-    }
-    Float nested_bytes = size(nested)
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(SIZE_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .required(1)
@@ -2863,53 +2363,7 @@ task file_sizes {
                         .parameter(GenericType::Parameter("X"))
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Float)
-                        .definition(
-                            r#"
-Determines the size of a file, directory, or the sum total sizes of the files/directories contained within a compound value. The files may be optional values; `None` values have a size of `0.0`. By default, the size is returned in bytes unless the optional second argument is specified with a [unit](#units-of-storage)
-
-In the second variant of the `size` function, the parameter type `X` represents any compound type that contains `File` or `File?` nested at any depth.
-
-If the size cannot be represented in the specified unit because the resulting value is too large to fit in a `Float`, an error is raised. It is recommended to use a unit that will always be large enough to handle any expected inputs without numerical overflow.
-
-**Parameters**
-
-1. `File|File?|Directory|Directory?|X|X?`: A file, directory, or a compound value containing files/directories, for which to determine the size.
-2. `String`: (Optional) The unit of storage; defaults to 'B'.
-
-**Returns**: The size of the files/directories as a `Float`.
-
-Example: file_sizes_task.wdl
-
-```wdl
-version 1.2
-
-task file_sizes {
-  command <<<
-    printf "this file is 22 bytes\n" > created_file
-  >>>
-
-  File? missing_file = None
-
-  output {
-    File created_file = "created_file"
-    Float missing_file_bytes = size(missing_file)
-    Float created_file_bytes = size(created_file, "B")
-    Float multi_file_kb = size([created_file, missing_file], "K")
-
-    Map[String, Pair[Int, File]] nested = {
-      "a": (10, created_file),
-      "b": (50, missing_file)
-    }
-    Float nested_bytes = size(nested)
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(SIZE_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -3286,6 +2740,58 @@ task write_lines {
             .is_none()
     );
 
+    const READ_TSV_DEFINITION: &str = r#"
+Reads a tab-separated value (TSV) file as an `Array[Array[String]]` representing a table of values. Trailing end-of-line characters (`` and `\n`) are removed from each line.
+
+This function has three variants:
+
+1. `Array[Array[String]] read_tsv(File, [false])`: Returns each row of the table as an `Array[String]`. There is no requirement that the rows of the table are all the same length.
+2. `Array[Object] read_tsv(File, true)`: The second parameter must be `true` and specifies that the TSV file contains a header line. Each row is returned as an `Object` with its keys determined by the header (the first line in the file) and its values as `String`s. All rows in the file must be the same length and the field names in the header row must be valid `Object` field names, or an error is raised.
+3. `Array[Object] read_tsv(File, Boolean, Array[String])`: The second parameter specifies whether the TSV file contains a header line, and the third parameter is an array of field names that is used to specify the field names to use for the returned `Object`s. If the second parameter is `true`, the specified field names override those in the file's header (i.e., the header line is ignored).
+
+If the file is empty, an empty array is returned.
+
+If the entire contents of the file can not be read for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, not having access to the file, resource limitations (e.g. memory) when reading the file, and implementation-imposed file size limits.
+
+**Parameters**
+
+1. `File`: The TSV file to read.
+2. `Boolean`: (Optional) Whether to treat the file's first line as a header.
+3. `Array[String]`: (Optional) An array of field names. If specified, then the second parameter is also required.
+
+**Returns**: An `Array` of rows in the TSV file, where each row is an `Array[String]` of fields or an `Object` with keys determined by the second and third parameters and `String` values.
+
+Example: read_tsv_task.wdl
+
+```wdl
+version 1.2
+
+task read_tsv {
+  command <<<
+    {
+      printf "row1\tvalue1\n"
+      printf "row2\tvalue2\n"
+      printf "row3\tvalue3\n"
+    } >> data.no_headers.tsv
+
+    {
+      printf "header1\theader2\n"
+      printf "row1\tvalue1\n"
+      printf "row2\tvalue2\n"
+      printf "row3\tvalue3\n"
+    } >> data.headers.tsv
+  >>>
+
+  output {
+    Array[Array[String]] output_table = read_tsv("data.no_headers.tsv")
+    Array[Object] output_objs1 = read_tsv("data.no_headers.tsv", false, ["name", "value"])
+    Array[Object] output_objs2 = read_tsv("data.headers.tsv", true)
+    Array[Object] output_objs3 = read_tsv("data.headers.tsv", true, ["name", "value"])
+  }
+}
+```
+"#;
+
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_tsv
     assert!(
         functions
@@ -3295,118 +2801,14 @@ task write_lines {
                     FunctionSignature::builder()
                         .parameter(PrimitiveType::File)
                         .ret(array_array_string.clone())
-                        .definition(
-                            r#"
-Reads a tab-separated value (TSV) file as an `Array[Array[String]]` representing a table of values. Trailing end-of-line characters (`` and `\n`) are removed from each line.
-
-This function has three variants:
-
-1. `Array[Array[String]] read_tsv(File, [false])`: Returns each row of the table as an `Array[String]`. There is no requirement that the rows of the table are all the same length.
-2. `Array[Object] read_tsv(File, true)`: The second parameter must be `true` and specifies that the TSV file contains a header line. Each row is returned as an `Object` with its keys determined by the header (the first line in the file) and its values as `String`s. All rows in the file must be the same length and the field names in the header row must be valid `Object` field names, or an error is raised.
-3. `Array[Object] read_tsv(File, Boolean, Array[String])`: The second parameter specifies whether the TSV file contains a header line, and the third parameter is an array of field names that is used to specify the field names to use for the returned `Object`s. If the second parameter is `true`, the specified field names override those in the file's header (i.e., the header line is ignored).
-
-If the file is empty, an empty array is returned.
-
-If the entire contents of the file can not be read for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, not having access to the file, resource limitations (e.g. memory) when reading the file, and implementation-imposed file size limits.
-
-**Parameters**
-
-1. `File`: The TSV file to read.
-2. `Boolean`: (Optional) Whether to treat the file's first line as a header.
-3. `Array[String]`: (Optional) An array of field names. If specified, then the second parameter is also required.
-
-**Returns**: An `Array` of rows in the TSV file, where each row is an `Array[String]` of fields or an `Object` with keys determined by the second and third parameters and `String` values.
-
-Example: read_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task read_tsv {
-  command <<<
-    {
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.no_headers.tsv
-
-    {
-      printf "header1\theader2\n"
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.headers.tsv
-  >>>
-
-  output {
-    Array[Array[String]] output_table = read_tsv("data.no_headers.tsv")
-    Array[Object] output_objs1 = read_tsv("data.no_headers.tsv", false, ["name", "value"])
-    Array[Object] output_objs2 = read_tsv("data.headers.tsv", true)
-    Array[Object] output_objs3 = read_tsv("data.headers.tsv", true, ["name", "value"])
-  }
-}
-```
-"#
-                        )
+                        .definition(READ_TSV_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(PrimitiveType::File)
                         .parameter(PrimitiveType::Boolean)
                         .ret(array_object.clone())
-                        .definition(
-                            r#"
-Reads a tab-separated value (TSV) file as an `Array[Array[String]]` representing a table of values. Trailing end-of-line characters (`` and `\n`) are removed from each line.
-
-This function has three variants:
-
-1. `Array[Array[String]] read_tsv(File, [false])`: Returns each row of the table as an `Array[String]`. There is no requirement that the rows of the table are all the same length.
-2. `Array[Object] read_tsv(File, true)`: The second parameter must be `true` and specifies that the TSV file contains a header line. Each row is returned as an `Object` with its keys determined by the header (the first line in the file) and its values as `String`s. All rows in the file must be the same length and the field names in the header row must be valid `Object` field names, or an error is raised.
-3. `Array[Object] read_tsv(File, Boolean, Array[String])`: The second parameter specifies whether the TSV file contains a header line, and the third parameter is an array of field names that is used to specify the field names to use for the returned `Object`s. If the second parameter is `true`, the specified field names override those in the file's header (i.e., the header line is ignored).
-
-If the file is empty, an empty array is returned.
-
-If the entire contents of the file can not be read for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, not having access to the file, resource limitations (e.g. memory) when reading the file, and implementation-imposed file size limits.
-
-**Parameters**
-
-1. `File`: The TSV file to read.
-2. `Boolean`: (Optional) Whether to treat the file's first line as a header.
-3. `Array[String]`: (Optional) An array of field names. If specified, then the second parameter is also required.
-
-**Returns**: An `Array` of rows in the TSV file, where each row is an `Array[String]` of fields or an `Object` with keys determined by the second and third parameters and `String` values.
-
-Example: read_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task read_tsv {
-  command <<<
-    {
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.no_headers.tsv
-
-    {
-      printf "header1\theader2\n"
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.headers.tsv
-  >>>
-
-  output {
-    Array[Array[String]] output_table = read_tsv("data.no_headers.tsv")
-    Array[Object] output_objs1 = read_tsv("data.no_headers.tsv", false, ["name", "value"])
-    Array[Object] output_objs2 = read_tsv("data.headers.tsv", true)
-    Array[Object] output_objs3 = read_tsv("data.headers.tsv", true, ["name", "value"])
-  }
-}
-```
-"#
-                        )
+                        .definition(READ_TSV_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -3414,65 +2816,88 @@ task read_tsv {
                         .parameter(PrimitiveType::Boolean)
                         .parameter(array_string.clone())
                         .ret(array_object.clone())
-                        .definition(
-                            r#"
-Reads a tab-separated value (TSV) file as an `Array[Array[String]]` representing a table of values. Trailing end-of-line characters (`` and `\n`) are removed from each line.
-
-This function has three variants:
-
-1. `Array[Array[String]] read_tsv(File, [false])`: Returns each row of the table as an `Array[String]`. There is no requirement that the rows of the table are all the same length.
-2. `Array[Object] read_tsv(File, true)`: The second parameter must be `true` and specifies that the TSV file contains a header line. Each row is returned as an `Object` with its keys determined by the header (the first line in the file) and its values as `String`s. All rows in the file must be the same length and the field names in the header row must be valid `Object` field names, or an error is raised.
-3. `Array[Object] read_tsv(File, Boolean, Array[String])`: The second parameter specifies whether the TSV file contains a header line, and the third parameter is an array of field names that is used to specify the field names to use for the returned `Object`s. If the second parameter is `true`, the specified field names override those in the file's header (i.e., the header line is ignored).
-
-If the file is empty, an empty array is returned.
-
-If the entire contents of the file can not be read for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, not having access to the file, resource limitations (e.g. memory) when reading the file, and implementation-imposed file size limits.
-
-**Parameters**
-
-1. `File`: The TSV file to read.
-2. `Boolean`: (Optional) Whether to treat the file's first line as a header.
-3. `Array[String]`: (Optional) An array of field names. If specified, then the second parameter is also required.
-
-**Returns**: An `Array` of rows in the TSV file, where each row is an `Array[String]` of fields or an `Object` with keys determined by the second and third parameters and `String` values.
-
-Example: read_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task read_tsv {
-  command <<<
-    {
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.no_headers.tsv
-
-    {
-      printf "header1\theader2\n"
-      printf "row1\tvalue1\n"
-      printf "row2\tvalue2\n"
-      printf "row3\tvalue3\n"
-    } >> data.headers.tsv
-  >>>
-
-  output {
-    Array[Array[String]] output_table = read_tsv("data.no_headers.tsv")
-    Array[Object] output_objs1 = read_tsv("data.no_headers.tsv", false, ["name", "value"])
-    Array[Object] output_objs2 = read_tsv("data.headers.tsv", true)
-    Array[Object] output_objs3 = read_tsv("data.headers.tsv", true, ["name", "value"])
-  }
-}
-```
-"#
-                        )
+                        .definition(READ_TSV_DEFINITION)
                         .build(),
                 ])
                 .into(),
             )
             .is_none()
     );
+
+    const WRITE_TSV_DEFINITION: &str = r#"
+Given an `Array` of elements, writes a tab-separated value (TSV) file with one line for each element.
+
+There are three variants of this function:
+
+1. `File write_tsv(Array[Array[String]])`: Each element is concatenated using a tab ('\t') delimiter and written as a row in the file. There is no header row.
+
+2. `File write_tsv(Array[Array[String]], true, Array[String])`: The second argument must be `true` and the third argument provides an `Array` of column names. The column names are concatenated to create a header that is written as the first row of the file. All elements must be the same length as the header array.
+
+3. `File write_tsv(Array[Struct], [Boolean, [Array[String]]])`: Each element is a struct whose field values are concatenated in the order the fields are defined. The optional second argument specifies whether to write a header row. If it is `true`, then the header is created from the struct field names. If the second argument is `true`, then the optional third argument may be used to specify column names to use instead of the struct field names.
+
+Each line is terminated by the newline (`\n`) character. 
+
+The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
+
+If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
+
+
+**Parameters**
+
+1. `Array[Array[String]] | Array[Struct]`: An array of rows, where each row is either an `Array` of column values or a struct whose values are the column values.
+2. `Boolean`: (Optional) Whether to write a header row.
+3. `Array[String]`: An array of column names. If the first argument is `Array[Array[String]]` and the second argument is `true` then it is required, otherwise it is optional. Ignored if the second argument is `false`.
+
+
+**Returns**: A `File`.
+
+Example: write_tsv_task.wdl
+
+```wdl
+version 1.2
+
+task write_tsv {
+  input {
+    Array[Array[String]] array = [["one", "two", "three"], ["un", "deux", "trois"]]
+    Array[Numbers] structs = [
+      Numbers {
+        first: "one",
+        second: "two",
+        third: "three"
+      },
+      Numbers {
+        first: "un",
+        second: "deux",
+        third: "trois"
+      }
+    ]
+  }
+
+  command <<<
+    cut -f 1 ~{write_tsv(array)} >> array_no_header.txt
+    cut -f 1 ~{write_tsv(array, true, ["first", "second", "third"])} > array_header.txt
+    cut -f 1 ~{write_tsv(structs)} >> structs_default.txt
+    cut -f 2 ~{write_tsv(structs, false)} >> structs_no_header.txt
+    cut -f 2 ~{write_tsv(structs, true)} >> structs_header.txt
+    cut -f 3 ~{write_tsv(structs, true, ["no1", "no2", "no3"])} >> structs_user_header.txt
+  >>>
+
+  output {
+    Array[String] array_no_header = read_lines("array_no_header.txt")
+    Array[String] array_header = read_lines("array_header.txt")
+    Array[String] structs_default = read_lines("structs_default.txt")
+    Array[String] structs_no_header = read_lines("structs_no_header.txt")
+    Array[String] structs_header = read_lines("structs_header.txt")
+    Array[String] structs_user_header = read_lines("structs_user_header.txt")
+
+  }
+  
+  requirements {
+    container: "ubuntu:latest"
+  }
+}
+```
+"#;
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_tsv
     assert!(
@@ -3483,82 +2908,7 @@ task read_tsv {
                     FunctionSignature::builder()
                         .parameter(array_array_string.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Given an `Array` of elements, writes a tab-separated value (TSV) file with one line for each element.
-
-There are three variants of this function:
-
-1. `File write_tsv(Array[Array[String]])`: Each element is concatenated using a tab ('\t') delimiter and written as a row in the file. There is no header row.
-
-2. `File write_tsv(Array[Array[String]], true, Array[String])`: The second argument must be `true` and the third argument provides an `Array` of column names. The column names are concatenated to create a header that is written as the first row of the file. All elements must be the same length as the header array.
-
-3. `File write_tsv(Array[Struct], [Boolean, [Array[String]]])`: Each element is a struct whose field values are concatenated in the order the fields are defined. The optional second argument specifies whether to write a header row. If it is `true`, then the header is created from the struct field names. If the second argument is `true`, then the optional third argument may be used to specify column names to use instead of the struct field names.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-
-**Parameters**
-
-1. `Array[Array[String]] | Array[Struct]`: An array of rows, where each row is either an `Array` of column values or a struct whose values are the column values.
-2. `Boolean`: (Optional) Whether to write a header row.
-3. `Array[String]`: An array of column names. If the first argument is `Array[Array[String]]` and the second argument is `true` then it is required, otherwise it is optional. Ignored if the second argument is `false`.
-
-
-**Returns**: A `File`.
-
-Example: write_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task write_tsv {
-  input {
-    Array[Array[String]] array = [["one", "two", "three"], ["un", "deux", "trois"]]
-    Array[Numbers] structs = [
-      Numbers {
-        first: "one",
-        second: "two",
-        third: "three"
-      },
-      Numbers {
-        first: "un",
-        second: "deux",
-        third: "trois"
-      }
-    ]
-  }
-
-  command <<<
-    cut -f 1 ~{write_tsv(array)} >> array_no_header.txt
-    cut -f 1 ~{write_tsv(array, true, ["first", "second", "third"])} > array_header.txt
-    cut -f 1 ~{write_tsv(structs)} >> structs_default.txt
-    cut -f 2 ~{write_tsv(structs, false)} >> structs_no_header.txt
-    cut -f 2 ~{write_tsv(structs, true)} >> structs_header.txt
-    cut -f 3 ~{write_tsv(structs, true, ["no1", "no2", "no3"])} >> structs_user_header.txt
-  >>>
-
-  output {
-    Array[String] array_no_header = read_lines("array_no_header.txt")
-    Array[String] array_header = read_lines("array_header.txt")
-    Array[String] structs_default = read_lines("structs_default.txt")
-    Array[String] structs_no_header = read_lines("structs_no_header.txt")
-    Array[String] structs_header = read_lines("structs_header.txt")
-    Array[String] structs_user_header = read_lines("structs_user_header.txt")
-
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_TSV_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -3566,82 +2916,7 @@ task write_tsv {
                         .parameter(PrimitiveType::Boolean)
                         .parameter(array_string.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Given an `Array` of elements, writes a tab-separated value (TSV) file with one line for each element.
-
-There are three variants of this function:
-
-1. `File write_tsv(Array[Array[String]])`: Each element is concatenated using a tab ('\t') delimiter and written as a row in the file. There is no header row.
-
-2. `File write_tsv(Array[Array[String]], true, Array[String])`: The second argument must be `true` and the third argument provides an `Array` of column names. The column names are concatenated to create a header that is written as the first row of the file. All elements must be the same length as the header array.
-
-3. `File write_tsv(Array[Struct], [Boolean, [Array[String]]])`: Each element is a struct whose field values are concatenated in the order the fields are defined. The optional second argument specifies whether to write a header row. If it is `true`, then the header is created from the struct field names. If the second argument is `true`, then the optional third argument may be used to specify column names to use instead of the struct field names.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-
-**Parameters**
-
-1. `Array[Array[String]] | Array[Struct]`: An array of rows, where each row is either an `Array` of column values or a struct whose values are the column values.
-2. `Boolean`: (Optional) Whether to write a header row.
-3. `Array[String]`: An array of column names. If the first argument is `Array[Array[String]]` and the second argument is `true` then it is required, otherwise it is optional. Ignored if the second argument is `false`.
-
-
-**Returns**: A `File`.
-
-Example: write_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task write_tsv {
-  input {
-    Array[Array[String]] array = [["one", "two", "three"], ["un", "deux", "trois"]]
-    Array[Numbers] structs = [
-      Numbers {
-        first: "one",
-        second: "two",
-        third: "three"
-      },
-      Numbers {
-        first: "un",
-        second: "deux",
-        third: "trois"
-      }
-    ]
-  }
-
-  command <<<
-    cut -f 1 ~{write_tsv(array)} >> array_no_header.txt
-    cut -f 1 ~{write_tsv(array, true, ["first", "second", "third"])} > array_header.txt
-    cut -f 1 ~{write_tsv(structs)} >> structs_default.txt
-    cut -f 2 ~{write_tsv(structs, false)} >> structs_no_header.txt
-    cut -f 2 ~{write_tsv(structs, true)} >> structs_header.txt
-    cut -f 3 ~{write_tsv(structs, true, ["no1", "no2", "no3"])} >> structs_user_header.txt
-  >>>
-
-  output {
-    Array[String] array_no_header = read_lines("array_no_header.txt")
-    Array[String] array_header = read_lines("array_header.txt")
-    Array[String] structs_default = read_lines("structs_default.txt")
-    Array[String] structs_no_header = read_lines("structs_no_header.txt")
-    Array[String] structs_header = read_lines("structs_header.txt")
-    Array[String] structs_user_header = read_lines("structs_user_header.txt")
-
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_TSV_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -3651,82 +2926,7 @@ task write_tsv {
                         .parameter(PrimitiveType::Boolean)
                         .parameter(array_string.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Given an `Array` of elements, writes a tab-separated value (TSV) file with one line for each element.
-
-There are three variants of this function:
-
-1. `File write_tsv(Array[Array[String]])`: Each element is concatenated using a tab ('\t') delimiter and written as a row in the file. There is no header row.
-
-2. `File write_tsv(Array[Array[String]], true, Array[String])`: The second argument must be `true` and the third argument provides an `Array` of column names. The column names are concatenated to create a header that is written as the first row of the file. All elements must be the same length as the header array.
-
-3. `File write_tsv(Array[Struct], [Boolean, [Array[String]]])`: Each element is a struct whose field values are concatenated in the order the fields are defined. The optional second argument specifies whether to write a header row. If it is `true`, then the header is created from the struct field names. If the second argument is `true`, then the optional third argument may be used to specify column names to use instead of the struct field names.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-
-**Parameters**
-
-1. `Array[Array[String]] | Array[Struct]`: An array of rows, where each row is either an `Array` of column values or a struct whose values are the column values.
-2. `Boolean`: (Optional) Whether to write a header row.
-3. `Array[String]`: An array of column names. If the first argument is `Array[Array[String]]` and the second argument is `true` then it is required, otherwise it is optional. Ignored if the second argument is `false`.
-
-
-**Returns**: A `File`.
-
-Example: write_tsv_task.wdl
-
-```wdl
-version 1.2
-
-task write_tsv {
-  input {
-    Array[Array[String]] array = [["one", "two", "three"], ["un", "deux", "trois"]]
-    Array[Numbers] structs = [
-      Numbers {
-        first: "one",
-        second: "two",
-        third: "three"
-      },
-      Numbers {
-        first: "un",
-        second: "deux",
-        third: "trois"
-      }
-    ]
-  }
-
-  command <<<
-    cut -f 1 ~{write_tsv(array)} >> array_no_header.txt
-    cut -f 1 ~{write_tsv(array, true, ["first", "second", "third"])} > array_header.txt
-    cut -f 1 ~{write_tsv(structs)} >> structs_default.txt
-    cut -f 2 ~{write_tsv(structs, false)} >> structs_no_header.txt
-    cut -f 2 ~{write_tsv(structs, true)} >> structs_header.txt
-    cut -f 3 ~{write_tsv(structs, true, ["no1", "no2", "no3"])} >> structs_user_header.txt
-  >>>
-
-  output {
-    Array[String] array_no_header = read_lines("array_no_header.txt")
-    Array[String] array_header = read_lines("array_header.txt")
-    Array[String] structs_default = read_lines("structs_default.txt")
-    Array[String] structs_no_header = read_lines("structs_no_header.txt")
-    Array[String] structs_header = read_lines("structs_header.txt")
-    Array[String] structs_user_header = read_lines("structs_user_header.txt")
-
-  }
-  
-  requirements {
-    container: "ubuntu:latest"
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_TSV_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -4061,6 +3261,42 @@ task read_objects {
             .is_none()
     );
 
+    const WRITE_OBJECT_DEFINITION: &str = r#"
+Writes a tab-separated value (TSV) file representing the names and values of the members of an `Object`. The file will contain exactly two rows. The first row specifies the object member names. The second row specifies the object member values corresponding to the names in the first row.
+
+Each line is terminated by the newline (`\n`) character. 
+
+The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
+
+If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
+
+**Parameters**
+
+1. `Object`: An `Object` whose members will be written to the file.
+
+**Returns**: A `File`.
+
+Example: write_object_task.wdl
+
+```wdl
+version 1.2
+
+task write_object {
+  input {
+    Object my_obj = {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"}
+  }
+
+  command <<<
+    cat ~{write_object(my_obj)}
+  >>>
+
+  output {
+    Object new_obj = read_object(stdout())
+  }
+}
+```
+"#;
+
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_object
     assert!(
         functions
@@ -4070,52 +3306,23 @@ task read_objects {
                     FunctionSignature::builder()
                         .parameter(Type::Object)
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Writes a tab-separated value (TSV) file representing the names and values of the members of an `Object`. The file will contain exactly two rows. The first row specifies the object member names. The second row specifies the object member values corresponding to the names in the first row.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-**Parameters**
-
-1. `Object`: An `Object` whose members will be written to the file.
-
-**Returns**: A `File`.
-
-Example: write_object_task.wdl
-
-```wdl
-version 1.2
-
-task write_object {
-  input {
-    Object my_obj = {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"}
-  }
-
-  command <<<
-    cat ~{write_object(my_obj)}
-  >>>
-
-  output {
-    Object new_obj = read_object(stdout())
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_OBJECT_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericType::Parameter("S"))
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Writes a tab-separated value (TSV) file representing the names and values of the members of an `Object`. The file will contain exactly two rows. The first row specifies the object member names. The second row specifies the object member values corresponding to the names in the first row.
+                        .definition(WRITE_OBJECT_DEFINITION)
+                        .build(),
+                ])
+                .into(),
+            )
+            .is_none()
+    );
+
+    const WRITE_OBJECTS_DEFINITION: &str = r#"
+Writes a tab-separated value (TSV) file representing the names and values of the members of any number of `Object`s. The first line of the file will be a header row with the names of the object members. There will be one additional row for each element in the input array, where each additional row contains the values of an object corresponding to the member names.
 
 Each line is terminated by the newline (`\n`) character. 
 
@@ -4125,37 +3332,34 @@ If the entire contents of the file can not be written for any reason, the callin
 
 **Parameters**
 
-1. `Object`: An `Object` whose members will be written to the file.
+1. `Array[Object]`: An `Array[Object]` whose elements will be written to the file.
 
 **Returns**: A `File`.
 
-Example: write_object_task.wdl
+Example: write_objects_task.wdl
 
 ```wdl
 version 1.2
 
-task write_object {
+task write_objects {
   input {
-    Object my_obj = {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"}
+    Array[Object] my_objs = [
+      {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"},
+      {"key_0": "value_B0", "key_1": "value_B1", "key_2": "value_B2"},
+      {"key_0": "value_C0", "key_1": "value_C1", "key_2": "value_C2"}
+    ]
   }
 
   command <<<
-    cat ~{write_object(my_obj)}
+    cat ~{write_objects(my_objs)}
   >>>
 
   output {
-    Object new_obj = read_object(stdout())
+    Array[Object] new_objs = read_objects(stdout())
   }
 }
 ```
-"#
-                        )
-                        .build(),
-                ])
-                .into(),
-            )
-            .is_none()
-    );
+"#;
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_objects
     assert!(
@@ -4166,94 +3370,14 @@ task write_object {
                     FunctionSignature::builder()
                         .parameter(array_object.clone())
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Writes a tab-separated value (TSV) file representing the names and values of the members of any number of `Object`s. The first line of the file will be a header row with the names of the object members. There will be one additional row for each element in the input array, where each additional row contains the values of an object corresponding to the member names.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-**Parameters**
-
-1. `Array[Object]`: An `Array[Object]` whose elements will be written to the file.
-
-**Returns**: A `File`.
-
-Example: write_objects_task.wdl
-
-```wdl
-version 1.2
-
-task write_objects {
-  input {
-    Array[Object] my_objs = [
-      {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"},
-      {"key_0": "value_B0", "key_1": "value_B1", "key_2": "value_B2"},
-      {"key_0": "value_C0", "key_1": "value_C1", "key_2": "value_C2"}
-    ]
-  }
-
-  command <<<
-    cat ~{write_objects(my_objs)}
-  >>>
-
-  output {
-    Array[Object] new_objs = read_objects(stdout())
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_OBJECTS_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::One))
                         .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericArrayType::new(GenericType::Parameter("S")))
                         .ret(PrimitiveType::File)
-                        .definition(
-                            r#"
-Writes a tab-separated value (TSV) file representing the names and values of the members of any number of `Object`s. The first line of the file will be a header row with the names of the object members. There will be one additional row for each element in the input array, where each additional row contains the values of an object corresponding to the member names.
-
-Each line is terminated by the newline (`\n`) character. 
-
-The generated file should be given a random name and written in a temporary directory, so as not to conflict with any other task output files.
-
-If the entire contents of the file can not be written for any reason, the calling task or workflow fails with an error. Examples of failure include, but are not limited to, insufficient disk space to write the file.
-
-**Parameters**
-
-1. `Array[Object]`: An `Array[Object]` whose elements will be written to the file.
-
-**Returns**: A `File`.
-
-Example: write_objects_task.wdl
-
-```wdl
-version 1.2
-
-task write_objects {
-  input {
-    Array[Object] my_objs = [
-      {"key_0": "value_A0", "key_1": "value_A1", "key_2": "value_A2"},
-      {"key_0": "value_B0", "key_1": "value_B1", "key_2": "value_B2"},
-      {"key_0": "value_C0", "key_1": "value_C1", "key_2": "value_C2"}
-    ]
-  }
-
-  command <<<
-    cat ~{write_objects(my_objs)}
-  >>>
-
-  output {
-    Array[Object] new_objs = read_objects(stdout())
-  }
-}
-```
-"#
-                        )
+                        .definition(WRITE_OBJECTS_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -5091,23 +4215,7 @@ task as_map {
             .is_none()
     );
 
-    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#keys
-    assert!(
-        functions
-            .insert(
-                "keys",
-                PolymorphicFunction::new(vec![
-                    FunctionSignature::builder()
-                        .min_version(SupportedVersion::V1(V1::One))
-                        .type_parameter("K", PrimitiveTypeConstraint)
-                        .any_type_parameter("V")
-                        .parameter(GenericMapType::new(
-                            GenericType::Parameter("K"),
-                            GenericType::Parameter("V")
-                        ))
-                        .ret(GenericArrayType::new(GenericType::Parameter("K")))
-                        .definition(
-                            r#"
+    const KEYS_DEFINITION: &str = r#"
 Given a `Map[K, V]` `m`, returns a new `Array[K]` containing all the keys in `m`. The order of the keys in the returned array is the same as the order in which the elements were added to the `Map`.
 
 If `m` is empty, an empty array is returned.
@@ -5133,78 +4241,37 @@ task keys_map {
   }
 }
 ```
-"#
-                        )
+"#;
+
+    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#keys
+    assert!(
+        functions
+            .insert(
+                "keys",
+                PolymorphicFunction::new(vec![
+                    FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::One))
+                        .type_parameter("K", PrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        ))
+                        .ret(GenericArrayType::new(GenericType::Parameter("K")))
+                        .definition(KEYS_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .type_parameter("S", StructConstraint)
                         .parameter(GenericType::Parameter("S"))
                         .ret(array_string.clone())
-                        .definition(
-                            r#"
-Given a `Struct` `s`, returns a new `Array[String]` containing all the field names in `s`. The order of the field names in the returned array is the same as the order in which the fields are defined in the `Struct`.
-
-**Parameters**
-
-1. `Struct`: The struct to get the field names from.
-
-**Returns**: A new `Array[String]` with the field names.
-
-Example: keys_struct_task.wdl
-
-```wdl
-version 1.2
-
-struct Person {
-  String name
-  Int age
-}
-
-task keys_struct {
-  input {
-    Person p = {name: "Alice", age: 30}
-  }
-
-  output {
-    Array[String] keys = keys(p) # ["name", "age"]
-  }
-}
-```
-"#
-                        )
+                        .definition(KEYS_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(Type::Object)
                         .ret(array_string.clone())
-                        .definition(
-                            r#"
-Given an `Object` `o`, returns a new `Array[String]` containing all the member names in `o`. The order of the member names in the returned array is the same as the order in which the members were added to the `Object`.
-
-**Parameters**
-
-1. `Object`: The object to get the member names from.
-
-**Returns**: A new `Array[String]` with the member names.
-
-Example: keys_object_task.wdl
-
-```wdl
-version 1.2
-
-task keys_object {
-  input {
-    Object o = {"a": 1, "b": 2}
-  }
-
-  output {
-    Array[String] keys = keys(o) # ["a", "b"]
-  }
-}
-```
-"#
-                        )
+                        .definition(KEYS_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -5212,24 +4279,7 @@ task keys_object {
             .is_none()
     );
 
-    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#contains_key
-    assert!(
-        functions
-            .insert(
-                "contains_key",
-                PolymorphicFunction::new(vec![
-                    FunctionSignature::builder()
-                        .min_version(SupportedVersion::V1(V1::Two))
-                        .type_parameter("K", PrimitiveTypeConstraint)
-                        .any_type_parameter("V")
-                        .parameter(GenericMapType::new(
-                            GenericType::Parameter("K"),
-                            GenericType::Parameter("V")
-                        ))
-                        .parameter(GenericType::Parameter("K"))
-                        .ret(PrimitiveType::Boolean)
-                        .definition(
-                            r#"
+    const CONTAINS_KEY_DEFINITION: &str = r#"
 Given a `Map[K, V]` `m` and a key `k` of type `K`, returns `true` if `k` is present in `m`, otherwise `false`.
 
 **Parameters**
@@ -5255,43 +4305,32 @@ task contains_key_map {
   }
 }
 ```
-"#
-                        )
+"#;
+
+    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#contains_key
+    assert!(
+        functions
+            .insert(
+                "contains_key",
+                PolymorphicFunction::new(vec![
+                    FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
+                        .type_parameter("K", PrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        ))
+                        .parameter(GenericType::Parameter("K"))
+                        .ret(PrimitiveType::Boolean)
+                        .definition(CONTAINS_KEY_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(Type::Object)
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Boolean)
-                        .definition(
-                            r#"
-Given an `Object` `o` and a `String` `key`, returns `true` if `key` is present in `o`, otherwise `false`.
-
-**Parameters**
-
-1. `Object`: The object to search.
-2. `String`: The key to search for.
-
-**Returns**: `true` if `key` is present in `o`, otherwise `false`.
-
-Example: contains_key_object_task.wdl
-
-```wdl
-version 1.2
-
-task contains_key_object {
-  input {
-    Object o = {"a": 1, "b": 2}
-  }
-
-  output {
-    Boolean contains_a = contains_key(o, "a") # true
-    Boolean contains_c = contains_key(o, "c") # false
-  }
-}
-```
-"#
-                        )
+                        .definition(CONTAINS_KEY_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -5302,35 +4341,7 @@ task contains_key_object {
                         ))
                         .parameter(array_string.clone())
                         .ret(PrimitiveType::Boolean)
-                        .definition(
-                            r#"
-Given a `Map[String, V]` `m` and an `Array[String]` `keys`, returns `true` if all `keys` are present in `m`, otherwise `false`.
-
-**Parameters**
-
-1. `Map[String, V]`: The map to search.
-2. `Array[String]`: The keys to search for.
-
-**Returns**: `true` if all `keys` are present in `m`, otherwise `false`.
-
-Example: contains_key_map_array_task.wdl
-
-```wdl
-version 1.2
-
-task contains_key_map_array {
-  input {
-    Map[String, Int] map = {"a": 1, "b": 2, "c": 3}
-  }
-
-  output {
-    Boolean contains_ab = contains_key(map, ["a", "b"]) # true
-    Boolean contains_ad = contains_key(map, ["a", "d"]) # false
-  }
-}
-```
-"#
-                        )
+                        .definition(CONTAINS_KEY_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
@@ -5338,76 +4349,14 @@ task contains_key_map_array {
                         .parameter(GenericType::Parameter("S"))
                         .parameter(array_string.clone())
                         .ret(PrimitiveType::Boolean)
-                        .definition(
-                            r#"
-Given a `Struct` `s` and an `Array[String]` `field_names`, returns `true` if all `field_names` are present in `s`, otherwise `false`.
-
-**Parameters**
-
-1. `Struct`: The struct to search.
-2. `Array[String]`: The field names to search for.
-
-**Returns**: `true` if all `field_names` are present in `s`, otherwise `false`.
-
-Example: contains_key_struct_array_task.wdl
-
-```wdl
-version 1.2
-
-struct Person {
-  String name
-  Int age
-  String city
-}
-
-task contains_key_struct_array {
-  input {
-    Person p = {name: "Alice", age: 30, city: "New York"}
-  }
-
-  output {
-    Boolean contains_name_age = contains_key(p, ["name", "age"]) # true
-    Boolean contains_name_zip = contains_key(p, ["name", "zip"]) # false
-  }
-}
-```
-"#
-                        )
+                        .definition(CONTAINS_KEY_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(Type::Object)
                         .parameter(array_string.clone())
                         .ret(PrimitiveType::Boolean)
-                        .definition(
-                            r#"
-Given an `Object` `o` and an `Array[String]` `member_names`, returns `true` if all `member_names` are present in `o`, otherwise `false`.
-
-**Parameters**
-
-1. `Object`: The object to search.
-2. `Array[String]`: The member names to search for.
-
-**Returns**: `true` if all `member_names` are present in `o`, otherwise `false`.
-
-Example: contains_key_object_array_task.wdl
-
-```wdl
-version 1.2
-
-task contains_key_object_array {
-  input {
-    Object o = {"a": 1, "b": 2, "c": 3}
-  }
-
-  output {
-    Boolean contains_ab = contains_key(o, ["a", "b"]) # true
-    Boolean contains_ad = contains_key(o, ["a", "d"]) # false
-  }
-}
-```
-"#
-                        )
+                        .definition(CONTAINS_KEY_DEFINITION)
                         .build(),
                 ])
                 .into(),
@@ -5566,18 +4515,7 @@ task defined {
             .is_none()
     );
 
-    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#length
-    assert!(
-        functions
-            .insert(
-                "length",
-                PolymorphicFunction::new(vec![
-                    FunctionSignature::builder()
-                        .any_type_parameter("X")
-                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
-                        .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
+    const LENGTH_DEFINITION: &str = r#"
 Given an `Array[X]` `a`, returns the number of elements in `a`. If `a` is empty, `0` is returned.
 
 **Parameters**
@@ -5601,8 +4539,19 @@ task length_array {
   }
 }
 ```
-"#
-                        )
+"#;
+
+    // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#length
+    assert!(
+        functions
+            .insert(
+                "length",
+                PolymorphicFunction::new(vec![
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
+                        .ret(PrimitiveType::Integer)
+                        .definition(LENGTH_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .any_type_parameter("K")
@@ -5612,95 +4561,17 @@ task length_array {
                             GenericType::Parameter("V")
                         ))
                         .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
-Given a `Map[K, V]` `m`, returns the number of key-value pairs in `m`. If `m` is empty, `0` is returned.
-
-**Parameters**
-
-1. `Map[K, V]`: The map to get the length from.
-
-**Returns**: The number of key-value pairs in the map as an `Int`.
-
-Example: length_map_task.wdl
-
-```wdl
-version 1.2
-
-task length_map {
-  input {
-    Map[String, Int] map = {"a": 1, "b": 2}
-  }
-
-  output {
-    Int len = length(map) # 2
-  }
-}
-```
-"#
-                        )
+                        .definition(LENGTH_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .parameter(Type::Object)
                         .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
-Given an `Object` `o`, returns the number of members in `o`. If `o` is empty, `0` is returned.
-
-**Parameters**
-
-1. `Object`: The object to get the length from.
-
-**Returns**: The number of members in the object as an `Int`.
-
-Example: length_object_task.wdl
-
-```wdl
-version 1.2
-
-task length_object {
-  input {
-    Object o = {"a": 1, "b": 2}
-  }
-
-  output {
-    Int len = length(o) # 2
-  }
-}
-```
-"#
-                        )
+                        .definition(LENGTH_DEFINITION)
                         .build(),
                     FunctionSignature::builder()
                         .parameter(PrimitiveType::String)
                         .ret(PrimitiveType::Integer)
-                        .definition(
-                            r#"
-Given a `String` `s`, returns the number of characters in `s`. If `s` is empty, `0` is returned.
-
-**Parameters**
-
-1. `String`: The string to get the length from.
-
-**Returns**: The number of characters in the string as an `Int`.
-
-Example: length_string_task.wdl
-
-```wdl
-version 1.2
-
-task length_string {
-  input {
-    String s = "hello"
-  }
-
-  output {
-    Int len = length(s) # 5
-  }
-}
-```
-"#
-                        )
+                        .definition(LENGTH_DEFINITION)
                         .build(),
                 ])
                 .into(),
