@@ -16,6 +16,7 @@ use crate::document::ScopeRef;
 use crate::types::v1::EvaluationContext;
 
 /// Context for evaluating expression types for lsp handlers.
+#[derive(Debug)]
 pub struct TypeEvalContext<'a> {
     /// The scope reference containing the variable and name bindings at the
     /// current position.
