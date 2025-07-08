@@ -18,7 +18,7 @@ pub use identifier::Identifier;
 pub use work_dir::WorkDir;
 
 /// Fetch up to this many commits when cloning a repository.
-const FETCH_DEPTH: i32 = 25;
+const FETCH_DEPTH: i32 = 100;
 
 /// A byte slice that can be converted to a [`git2::Oid`].
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
@@ -173,7 +173,7 @@ impl Repository {
                         git2::Oid::from_bytes(&hash.0).expect("failed to convert hash"),
                         Some(git2::ObjectType::Commit),
                     )
-                    .expect("failed to find object");
+                    .expect("failed to find object; perhaps FETCH_DEPTH should be increased?");
                 git_repo
                     .set_head_detached(obj.id())
                     .expect("failed to set head detached");

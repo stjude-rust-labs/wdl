@@ -33,7 +33,7 @@ pub struct Config {
 impl std::fmt::Debug for Config {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Config")
-            .field("diagnostics_config", &self.inner.diagnostics_config)
+            .field("diagnostics", &self.inner.diagnostics)
             .field("fallback_version", &self.inner.fallback_version)
             .finish()
     }
@@ -43,7 +43,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             inner: Arc::new(ConfigInner {
-                diagnostics_config: Default::default(),
+                diagnostics: Default::default(),
                 fallback_version: None,
             }),
         }
@@ -53,7 +53,7 @@ impl Default for Config {
 impl Config {
     /// Get this configuration's [`DiagnosticsConfig`].
     pub fn diagnostics_config(&self) -> &DiagnosticsConfig {
-        &self.inner.diagnostics_config
+        &self.inner.diagnostics
     }
 
     /// Get this configuration's fallback version; see
@@ -66,7 +66,7 @@ impl Config {
     /// replaced by the argument.
     pub fn with_diagnostics_config(&self, diagnostics: DiagnosticsConfig) -> Self {
         let mut inner = (*self.inner).clone();
-        inner.diagnostics_config = diagnostics;
+        inner.diagnostics = diagnostics;
         Self {
             inner: Arc::new(inner),
         }
@@ -115,7 +115,7 @@ impl Config {
 struct ConfigInner {
     /// See [`DiagnosticsConfig`].
     #[serde(default)]
-    diagnostics_config: DiagnosticsConfig,
+    diagnostics: DiagnosticsConfig,
     /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
