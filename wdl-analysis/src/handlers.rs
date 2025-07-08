@@ -1,12 +1,5 @@
 //! Language server protocol handlers.
 
-mod completions;
-mod find_all_references;
-mod goto_definition;
-
-pub use completions::*;
-pub use find_all_references::*;
-pub use goto_definition::*;
 use wdl_ast::Span;
 
 use crate::DiagnosticsConfig;
@@ -15,7 +8,25 @@ use crate::diagnostics;
 use crate::document::ScopeRef;
 use crate::types::v1::EvaluationContext;
 
-/// Context for evaluating expression types for lsp handlers.
+mod completions;
+mod find_all_references;
+mod goto_definition;
+
+pub use completions::*;
+pub use find_all_references::*;
+pub use goto_definition::*;
+
+/// Context for evaluating expression types during LSP operations.
+///
+/// This struct provides the necessary context for type evaluation when
+/// processing LSP requests like completions, goto definition, and hover
+/// information.
+///
+/// The context is specifically designed for LSP handlers where:
+/// - We need to evaluate expression types at a specific cursor position
+/// - We want to avoid collecting diagnostics (since they're handled separately)
+/// - We only need read-only access to scope and document information
+/// - We're typically evaluating single expressions rather than entire documents
 #[derive(Debug)]
 pub struct TypeEvalContext<'a> {
     /// The scope reference containing the variable and name bindings at the
@@ -49,13 +60,23 @@ impl EvaluationContext for TypeEvalContext<'_> {
         Err(diagnostics::unknown_type(name, span))
     }
 
+    /// Returns `None` because LSP type evaluation doesn't occur within a
+    /// specific task context.
+    ///
+    /// The task-specific
+    /// information is provided through the scope reference instead.
     fn task(&self) -> Option<&crate::document::Task> {
         None
     }
 
+    /// LSP handlers typically don't need custom diagnostics configuration since
+    /// they focus on providing information rather than validation.
     fn diagnostics_config(&self) -> DiagnosticsConfig {
         DiagnosticsConfig::default()
     }
 
+    /// LSP handlers are primarily concerned with extracting type information.
+    /// Diagnostics are collected and reported through separate mechanisms,
+    /// so we don't need to accumulate them during expression evaluation.
     fn add_diagnostic(&mut self, _: wdl_ast::Diagnostic) {}
 }
