@@ -874,6 +874,7 @@ workflow foo {} # Here is a comment that should be collected.
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
         let token = workflow.last_token().unwrap();
+        #[allow(deprecated)]
         let mut trivia = token.succeeding_trivia();
         assert_eq!(
             trivia.next().unwrap().text(),

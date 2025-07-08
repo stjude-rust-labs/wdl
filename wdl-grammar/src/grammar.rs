@@ -1,10 +1,8 @@
 //! Module for the WDL grammar functions.
 
 use super::Diagnostic;
-use super::Span;
 use super::lexer::PreambleToken;
 use super::parser::Event;
-use super::parser::Marker;
 use super::parser::Parser;
 use super::tree::SyntaxKind;
 use crate::lexer::VersionStatementToken;
@@ -78,10 +76,8 @@ pub fn document(mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>)
     // the file.
     let (mut parser, diagnostic) = match parser.peek() {
         Some((PreambleToken::VersionKeyword, _)) => {
-            let marker = parser.start();
-            let (mut parser, res) = version_statement(parser, marker);
-            match res {
-                Ok(_span) => {
+            match version_statement(parser) {
+                (parser, None) => {
                     // A version statement was successfully parsed; continue on with parsing the
                     // rest of the document.
                     let mut parser = parser.morph();
@@ -90,10 +86,7 @@ pub fn document(mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>)
                     let output = parser.finish();
                     return (output.events, output.diagnostics);
                 }
-                Err((marker, e)) => {
-                    marker.abandon(&mut parser);
-                    (parser, e)
-                }
+                (parser, Some(diag)) => (parser, diag),
             }
         }
         found => {
@@ -121,22 +114,19 @@ pub fn document(mut parser: PreambleParser<'_>) -> (Vec<Event>, Vec<Diagnostic>)
 
 /// Parses the version statement of a WDL source file.
 ///
-/// Returns the source span of the version token if present.
-pub fn version_statement(
+/// Returns a diagnostic upon failure.
+fn version_statement(
     mut parser: Parser<'_, PreambleToken>,
-    marker: Marker,
-) -> (
-    Parser<'_, PreambleToken>,
-    Result<Span, (Marker, Diagnostic)>,
-) {
+) -> (Parser<'_, PreambleToken>, Option<Diagnostic>) {
+    let marker = parser.start();
     parser.require(PreambleToken::VersionKeyword);
 
     let mut parser: Parser<'_, VersionStatementToken> = parser.morph();
-    let span = match parser.expect(VersionStatementToken::Version) {
-        Ok(span) => span,
-        Err(e) => return (parser.morph(), Err((marker, e))),
-    };
+    if let Err(e) = parser.expect(VersionStatementToken::Version) {
+        marker.abandon(&mut parser);
+        return (parser.morph(), Some(e));
+    }
 
     marker.complete(&mut parser, SyntaxKind::VersionStatementNode);
-    (parser.morph(), Ok(span))
+    (parser.morph(), None)
 }

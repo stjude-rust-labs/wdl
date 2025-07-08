@@ -201,8 +201,8 @@ impl DiagnosticsConfig {
         }
     }
 
-    /// Gets the excepted set of diagnostics based on any `#@ except` comments
-    /// that precede the given syntax node.
+    /// Returns a modified set of diagnostics that accounts for any `#@ except`
+    /// comments that precede the given syntax node.
     pub fn excepted_for_node(mut self, node: &SyntaxNode) -> Self {
         let exceptions = node.rule_exceptions();
 

@@ -51,7 +51,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<UnusedDeclarationRule>::default(),
         Box::<UnusedCallRule>::default(),
         Box::<UnnecessaryFunctionCall>::default(),
-        Box::<UnsupportedVersionFallback>::default(),
+        Box::<UsingFallbackVersion>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case
@@ -273,24 +273,24 @@ impl Rule for UnnecessaryFunctionCall {
     }
 }
 
-/// Represents the unsupported version fallback rule.
+/// Represents the using fallback version rule.
 #[derive(Debug, Clone, Copy)]
-pub struct UnsupportedVersionFallback(Severity);
+pub struct UsingFallbackVersion(Severity);
 
-impl UnsupportedVersionFallback {
-    /// Creates a new unsupported version fallback rule.
+impl UsingFallbackVersion {
+    /// Creates a new using fallback version rule.
     pub fn new() -> Self {
         Self(Severity::Warning)
     }
 }
 
-impl Default for UnsupportedVersionFallback {
+impl Default for UsingFallbackVersion {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Rule for UnsupportedVersionFallback {
+impl Rule for UsingFallbackVersion {
     fn id(&self) -> &'static str {
         USING_FALLBACK_VERSION
     }

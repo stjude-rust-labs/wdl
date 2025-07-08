@@ -1357,39 +1357,39 @@ fn resolve_import(
         Err(e) => return Err(Some(invalid_relative_import(&e, span))),
     };
 
-    let import_index = graph.get_index(&uri).expect("missing import node in graph");
-    let import_node = graph.get(import_index);
+    let imported_index = graph.get_index(&uri).expect("missing import node in graph");
+    let imported_node = graph.get(imported_index);
 
     // Check for an import cycle to report
-    if graph.contains_cycle(importer_index, import_index) {
+    if graph.contains_cycle(importer_index, imported_index) {
         return Err(Some(import_cycle(span)));
     }
 
     // Check for a failure to load the import
-    if let ParseState::Error(e) = import_node.parse_state() {
+    if let ParseState::Error(e) = imported_node.parse_state() {
         return Err(Some(import_failure(text.text(), e, span)));
     }
 
     // Check for analysis error
-    if let Some(e) = import_node.analysis_error() {
+    if let Some(e) = imported_node.analysis_error() {
         return Err(Some(import_failure(text.text(), e, span)));
     }
 
     // Ensure the import has a matching WDL version
-    let import_document = import_node
+    let imported_document = imported_node
         .document()
         .cloned()
         .expect("import should have been analyzed");
 
-    let Some(our_version) = import_document.version() else {
-        match import_document.root().version_statement() {
+    let Some(imported_version) = imported_document.version() else {
+        match imported_document.root().version_statement() {
             // The import's version statement is flat-out missing
             None => return Err(Some(import_missing_version(span))),
             // The import has a version statement, but it's not a supported version and no fallback
             // is configured
-            Some(our_version_stmt) => {
+            Some(imported_version_stmt) => {
                 return Err(Some(incompatible_import(
-                    our_version_stmt.version().text(),
+                    imported_version_stmt.version().text(),
                     span,
                     &importer_node
                         .root()
@@ -1407,9 +1407,9 @@ fn resolve_import(
     else {
         panic!("importer should have a parsed version");
     };
-    if !our_version.has_same_major_version(*importer_version) {
+    if !imported_version.has_same_major_version(*importer_version) {
         return Err(Some(incompatible_import(
-            &our_version.to_string(),
+            &imported_version.to_string(),
             span,
             &importer_node
                 .root()
@@ -1419,7 +1419,7 @@ fn resolve_import(
         )));
     }
 
-    Ok((import_node.uri().clone(), import_document))
+    Ok((imported_node.uri().clone(), imported_document))
 }
 
 /// Sets the struct types in the document.
