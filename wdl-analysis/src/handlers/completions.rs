@@ -96,8 +96,7 @@ pub fn completion(
             let start = t.text_range().start();
             let len = offset - start;
             t.text()[..len.into()].to_string()
-        })
-        .unwrap_or_default();
+        });
 
     let parent = token
         .as_ref()
@@ -162,16 +161,16 @@ pub fn completion(
         }
     }
 
-    if partial_word.is_empty() {
-        return Ok(items);
+    match partial_word {
+        Some(partial) => {
+            let items = items
+                .into_iter()
+                .filter(|item| item.label.starts_with(&partial))
+                .collect();
+            Ok(items)
+        }
+        None => Ok(items),
     }
-
-    let items = items
-        .into_iter()
-        .filter(|item| item.label.starts_with(&partial_word))
-        .collect();
-
-    Ok(items)
 }
 
 /// Generates completion items for WDL keywords based on the provided token set.
@@ -186,13 +185,11 @@ fn add_keyword_completions(token_set: &TokenSet, items: &mut Vec<CompletionItem>
             .trim_start_matches("`")
             .split("`")
             .next()
-            .unwrap_or("")
-            .to_string();
+            .unwrap();
 
         CompletionItem {
             label: label.to_string(),
             kind: Some(CompletionItemKind::KEYWORD),
-            detail: Some(token.describe().to_string()),
             ..Default::default()
         }
     }))
@@ -200,7 +197,9 @@ fn add_keyword_completions(token_set: &TokenSet, items: &mut Vec<CompletionItem>
 
 /// Adds completions for member access expressions.
 ///
-/// Handles different types of member access completions:
+/// Takes a syntax node containing the member access expression (parent of the
+/// `.` token) and handles different types of member access completions:
+///
 /// - Namespace access
 /// - Struct member access
 /// - Call output access
@@ -209,14 +208,15 @@ fn add_keyword_completions(token_set: &TokenSet, items: &mut Vec<CompletionItem>
 /// For namespace access, it directly looks up the identifier before the dot.
 /// For other types, it evaluates the expression type to determine available
 /// members.
+///
+/// The node is the parent of the `.` token. For incomplete document, it might
+/// not be fully-formed `AccessExprNode`. We find the expression to the left
+/// of the dot.
 fn add_member_access_completions(
     document: &Document,
     node: &SyntaxNode,
     items: &mut Vec<CompletionItem>,
 ) -> Result<()> {
-    // The node is the parent of the `.` token. For incomplete document, it might
-    // not be fully-formed `AccessExprNode`. We find the expression to the left
-    // of the dot.
     let Some(dot_token) = node
         .children_with_tokens()
         .find(|t| t.kind() == SyntaxKind::Dot)
@@ -253,7 +253,7 @@ fn add_member_access_completions(
         }
     }
 
-    // NOTE: We do type evaluation only for non namespaces or complex types
+    // NOTE: we do type evaluation only for non namespaces or complex types
 
     let Some(target_node) = target_element.as_node() else {
         return Ok(());
