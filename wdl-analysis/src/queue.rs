@@ -158,7 +158,7 @@ pub struct FindAllReferencesRequest {
     pub completed: oneshot::Sender<Vec<Location>>,
 }
 
-// Represents a request to get completions.
+/// Represents a request to get completions.
 pub struct CompletionRequest<Context> {
     /// The document where the request was initiated.
     pub document: Url,
@@ -522,7 +522,7 @@ where
         let mut space = Default::default();
 
         loop {
-            if completed.map_or(false, |c| c.is_closed()) {
+            if completed.is_some_and(|c| c.is_closed()) {
                 debug!("analysis request has been canceled");
                 return Cancelable::Canceled;
             }
@@ -576,7 +576,7 @@ where
         let mut set = Vec::new();
         let mut results: Vec<AnalysisResult> = Vec::new();
         while subgraph.node_count() > 0 {
-            if completed.map_or(false, |c| c.is_closed()) {
+            if completed.is_some_and(|c| c.is_closed()) {
                 debug!("analysis request has been canceled");
                 return Cancelable::Canceled;
             }
@@ -717,7 +717,7 @@ where
             let mut results = Vec::new();
             let mut last_progress = Instant::now();
             while let Some(result) = tasks.next().await {
-                if completed.map_or(false, |c| c.is_closed()) {
+                if completed.is_some_and(|c| c.is_closed()) {
                     break;
                 }
 
@@ -758,7 +758,7 @@ where
                 .block_on((self.progress)(context.clone(), kind, total, total));
         }
 
-        if completed.map_or(false, |c| c.is_closed()) {
+        if completed.is_some_and(|c| c.is_closed()) {
             Cancelable::Canceled
         } else {
             Cancelable::Completed(results)

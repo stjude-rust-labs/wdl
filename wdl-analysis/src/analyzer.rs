@@ -645,6 +645,7 @@ where
         })
     }
 
+    /// Performs a `auto-completion` for a symbol.
     pub async fn completion(
         &self,
         context: Context,
