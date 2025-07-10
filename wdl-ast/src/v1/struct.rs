@@ -1,14 +1,21 @@
 //! V1 AST representation for struct definitions.
 
+use std::fmt;
+use std::fmt::Display;
+
 use super::MetadataSection;
 use super::ParameterMetadataSection;
 use super::StructKeyword;
 use super::UnboundDecl;
 use crate::AstNode;
+use crate::AstToken;
 use crate::Ident;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
+use crate::v1::MetadataValue;
+use crate::v1::display::format_meta_value;
+use crate::v1::display::get_param_meta;
 
 /// Represents a struct definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -197,6 +204,43 @@ impl<N: TreeNode> StructItem<N> {
     /// Finds all children that can be cast to a [`StructItem`].
     pub fn children(node: &N) -> impl Iterator<Item = Self> + use<'_, N> {
         node.children().filter_map(Self::cast)
+    }
+}
+
+impl Display for StructDefinition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "```wdl\nstruct {} {{", self.name().text())?;
+        for member in self.members() {
+            writeln!(f, "  {} {}", member.ty(), member.name().text())?;
+        }
+        writeln!(f, "}}\n```\n---")?;
+
+        if let Some(meta) = self.metadata().next() {
+            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
+                if let MetadataValue::String(s) = desc.value() {
+                    if let Some(text) = s.text() {
+                        writeln!(f, "{}\n", text.text())?;
+                    }
+                }
+            }
+        }
+
+        let members: Vec<_> = self.members().collect();
+        if !members.is_empty() {
+            writeln!(f, "\n**Members**")?;
+            for member in members {
+                let name = member.name();
+                write!(f, "- **{}**: `{}`", name.text(), member.ty())?;
+                if let Some(meta_val) =
+                    get_param_meta(name.text(), self.parameter_metadata().next().as_ref())
+                {
+                    writeln!(f)?;
+                    format_meta_value(f, &meta_val, 2)?;
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 

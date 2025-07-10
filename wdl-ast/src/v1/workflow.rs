@@ -1,5 +1,8 @@
 //! V1 AST representation for workflows.
 
+use std::fmt;
+use std::fmt::Display;
+
 use rowan::NodeOrToken;
 use wdl_grammar::SupportedVersion;
 use wdl_grammar::version::V1;
@@ -21,6 +24,9 @@ use crate::Ident;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
+use crate::v1::display::write_input_section;
+use crate::v1::display::write_meta_object;
+use crate::v1::display::write_output_section;
 
 /// The name of the `allow_nested_inputs` workflow hint. Note that this
 /// is not a standard WDL v1.1 hint, but is used in WDL >=v1.2.
@@ -147,6 +153,31 @@ impl<N: TreeNode> AstNode<N> for WorkflowDefinition<N> {
 
     fn inner(&self) -> &N {
         &self.0
+    }
+}
+
+impl Display for WorkflowDefinition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "---")?;
+
+        if let Some(meta) = self.metadata() {
+            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
+                if let MetadataValue::String(s) = desc.value() {
+                    if let Some(text) = s.text() {
+                        writeln!(f, "# {}\n", text.text())?;
+                    }
+                }
+            }
+        }
+
+        write_input_section(f, self.input().as_ref(), self.parameter_metadata().as_ref())?;
+        write_output_section(
+            f,
+            self.output().as_ref(),
+            self.parameter_metadata().as_ref(),
+        )?;
+
+        Ok(())
     }
 }
 
