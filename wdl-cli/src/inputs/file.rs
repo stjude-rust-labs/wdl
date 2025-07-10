@@ -60,14 +60,14 @@ impl InputFile {
     /// - If no recognized extension is found, an [`Error::UnsupportedFileExt`]
     ///   is returned.
     pub fn read<P: AsRef<Path>>(path: P) -> Result<Inputs> {
-        fn map_to_inputs(map: JsonMap, origin: &Path) -> Result<Inputs> {
+        fn map_to_inputs(map: JsonMap, origin: &Path) -> Inputs {
             let mut inputs = Inputs::default();
 
             for (key, value) in map.iter() {
                 inputs.insert(key.to_owned(), (origin.to_path_buf(), value.clone()));
             }
 
-            Ok(inputs)
+            inputs
         }
 
         let path = path.as_ref();
@@ -89,7 +89,7 @@ impl InputFile {
             Some("json") => serde_json::from_str::<JsonValue>(&content)
                 .map_err(Error::from)
                 .and_then(|value| match value {
-                    JsonValue::Object(object) => map_to_inputs(object, origin),
+                    JsonValue::Object(object) => Ok(map_to_inputs(object, origin)),
                     _ => Err(Error::NonMapRoot(path.to_path_buf())),
                 }),
             Some("yml") | Some("yaml") => serde_yaml_ng::from_str::<YamlValue>(&content)
@@ -100,7 +100,7 @@ impl InputFile {
                         // transformed to a JSON value.
                         let value = serde_json::to_value(value).unwrap();
                         if let JsonValue::Object(map) = value {
-                            return map_to_inputs(map, origin);
+                            return Ok(map_to_inputs(map, origin));
                         }
 
                         // SAFETY: a serde map will always be translated to a
