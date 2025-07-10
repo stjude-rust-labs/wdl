@@ -12,6 +12,7 @@ mod r#struct;
 mod task;
 mod tokens;
 mod workflow;
+mod display;
 
 pub use decls::*;
 pub use expr::*;
