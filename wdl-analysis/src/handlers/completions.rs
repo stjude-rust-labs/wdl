@@ -51,28 +51,20 @@ use wdl_ast::v1::TASK_HINT_FPGA;
 use wdl_ast::v1::TASK_HINT_GPU;
 use wdl_ast::v1::TASK_HINT_INPUTS;
 use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL;
-use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS;
 use wdl_ast::v1::TASK_HINT_MAX_CPU;
-use wdl_ast::v1::TASK_HINT_MAX_CPU_ALIAS;
 use wdl_ast::v1::TASK_HINT_MAX_MEMORY;
-use wdl_ast::v1::TASK_HINT_MAX_MEMORY_ALIAS;
 use wdl_ast::v1::TASK_HINT_OUTPUTS;
 use wdl_ast::v1::TASK_HINT_SHORT_TASK;
-use wdl_ast::v1::TASK_HINT_SHORT_TASK_ALIAS;
 use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
-use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
 use wdl_ast::v1::TASK_REQUIREMENT_CPU;
 use wdl_ast::v1::TASK_REQUIREMENT_DISKS;
 use wdl_ast::v1::TASK_REQUIREMENT_FPGA;
 use wdl_ast::v1::TASK_REQUIREMENT_GPU;
 use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
-use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
 use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
-use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
-use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_grammar::grammar::v1::TASK_ITEM_EXPECTED_SET;
 use wdl_grammar::grammar::v1::TOP_RECOVERY_SET;
@@ -599,13 +591,10 @@ fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
 fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
     const RUNTIME_KEYS: &[&str] = &[
         TASK_REQUIREMENT_CONTAINER,
-        TASK_REQUIREMENT_CONTAINER_ALIAS,
         TASK_REQUIREMENT_CPU,
         TASK_REQUIREMENT_MEMORY,
         TASK_REQUIREMENT_DISKS,
         TASK_REQUIREMENT_GPU,
-        TASK_REQUIREMENT_MAX_RETRIES_ALIAS,  // "maxRetries"
-        TASK_REQUIREMENT_RETURN_CODES_ALIAS, // "returnCodes"
     ];
 
     for key in RUNTIME_KEYS {
@@ -621,16 +610,13 @@ fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
 fn add_requirements_key_completions(items: &mut Vec<CompletionItem>) {
     const REQUIREMENTS_KEY: &[&str] = &[
         TASK_REQUIREMENT_CONTAINER,
-        TASK_REQUIREMENT_CONTAINER_ALIAS,
         TASK_REQUIREMENT_CPU,
         TASK_REQUIREMENT_MEMORY,
         TASK_REQUIREMENT_GPU,
         TASK_REQUIREMENT_FPGA,
         TASK_REQUIREMENT_DISKS,
         TASK_REQUIREMENT_MAX_RETRIES,
-        TASK_REQUIREMENT_MAX_RETRIES_ALIAS,
         TASK_REQUIREMENT_RETURN_CODES,
-        TASK_REQUIREMENT_RETURN_CODES_ALIAS,
     ];
 
     for key in REQUIREMENTS_KEY {
@@ -650,14 +636,10 @@ fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
         TASK_HINT_FPGA,
         TASK_HINT_INPUTS,
         TASK_HINT_LOCALIZATION_OPTIONAL,
-        TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS,
         TASK_HINT_MAX_CPU,
-        TASK_HINT_MAX_CPU_ALIAS,
         TASK_HINT_MAX_MEMORY,
-        TASK_HINT_MAX_MEMORY_ALIAS,
         TASK_HINT_OUTPUTS,
         TASK_HINT_SHORT_TASK,
-        TASK_HINT_SHORT_TASK_ALIAS,
     ];
 
     for key in HINTS_KEY {
@@ -671,10 +653,7 @@ fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `workflow hints` section keys.
 fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
-    const HINTS_KEY: &[&str] = &[
-        WORKFLOW_HINT_ALLOW_NESTED_INPUTS,
-        WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS,
-    ];
+    const HINTS_KEY: &[&str] = &[WORKFLOW_HINT_ALLOW_NESTED_INPUTS];
 
     for key in HINTS_KEY {
         items.push(CompletionItem {
