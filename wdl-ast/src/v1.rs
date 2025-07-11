@@ -6,13 +6,13 @@ use crate::SyntaxNode;
 use crate::TreeNode;
 
 mod decls;
+mod display;
 mod expr;
 mod import;
 mod r#struct;
 mod task;
 mod tokens;
 mod workflow;
-mod display;
 
 pub use decls::*;
 pub use expr::*;
