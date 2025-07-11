@@ -379,3 +379,73 @@ async fn should_complete_task_variable_members() {
     // Not a member
     assert_not_contains(&items, "foo");
 }
+
+#[tokio::test]
+async fn should_complete_runtime_keys() {
+    let mut ctx = setup().await;
+
+    let response = completion_request(&mut ctx, "sections.wdl", Position::new(4, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "container");
+    assert_contains(&items, "docker");
+    assert_contains(&items, "cpu");
+    assert_contains(&items, "memory");
+    assert_contains(&items, "disks");
+    assert_contains(&items, "gpu");
+    assert_contains(&items, "maxRetries");
+    assert_contains(&items, "returnCodes");
+
+    assert_not_contains(&items, "max_retries"); // Not an alias in runtime
+}
+
+#[tokio::test]
+async fn should_complete_requirements_keys() {
+    let mut ctx = setup().await;
+
+    let response = completion_request(&mut ctx, "sections.wdl", Position::new(8, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "container");
+    assert_contains(&items, "docker");
+    assert_contains(&items, "cpu");
+    assert_contains(&items, "memory");
+    assert_contains(&items, "disks");
+    assert_contains(&items, "gpu");
+    assert_contains(&items, "fpga");
+    assert_contains(&items, "max_retries");
+    assert_contains(&items, "maxRetries");
+    assert_contains(&items, "return_codes");
+    assert_contains(&items, "returnCodes");
+}
+
+#[tokio::test]
+async fn should_complete_task_hints_keys() {
+    let mut ctx = setup().await;
+
+    let response = completion_request(&mut ctx, "sections.wdl", Position::new(12, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "maxCpu");
+    assert_contains(&items, "max_memory");
+    assert_contains(&items, "shortTask");
+}
+
+#[tokio::test]
+async fn should_complete_workflow_hints_keys() {
+    let mut ctx = setup().await;
+
+    let response = completion_request(&mut ctx, "sections.wdl", Position::new(18, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "allow_nested_inputs");
+    assert_contains(&items, "allowNestedInputs");
+}
