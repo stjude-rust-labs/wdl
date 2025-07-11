@@ -45,7 +45,7 @@ const TOP_EXPECTED_NAMES: &[&str] = &[
 ];
 
 /// The recovery set for top-level.
-const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
+pub const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
 
 /// A set of tokens for primitive types.
 const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
@@ -58,7 +58,7 @@ const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
 ]);
 
 /// A set of tokens for all types.
-const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
+pub const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
     Token::MapTypeKeyword as u8,
     Token::ArrayTypeKeyword as u8,
     Token::PairTypeKeyword as u8,
@@ -109,7 +109,7 @@ const STRUCT_ITEM_EXPECTED_NAMES: &[&str] = &[
 ];
 
 /// The expected set of tokens in a task definition.
-const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
+pub const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::CommandKeyword as u8,
     Token::OutputKeyword as u8,
@@ -136,7 +136,7 @@ const TASK_ITEM_RECOVERY_SET: TokenSet =
     TASK_ITEM_EXPECTED_SET.union(TokenSet::new(&[Token::CloseBrace as u8]));
 
 /// The expected set of tokens in a workflow definition.
-const WORKFLOW_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
+pub const WORKFLOW_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::OutputKeyword as u8,
     Token::MetaKeyword as u8,
