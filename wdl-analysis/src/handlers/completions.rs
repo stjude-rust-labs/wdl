@@ -35,7 +35,8 @@ use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_grammar::grammar::v1::TASK_ITEM_EXPECTED_SET;
-use wdl_grammar::grammar::v1::TOP_EXPECTED_SET;
+use wdl_grammar::grammar::v1::TOP_RECOVERY_SET;
+use wdl_grammar::grammar::v1::TYPE_EXPECTED_SET;
 use wdl_grammar::grammar::v1::WORKFLOW_ITEM_EXPECTED_SET;
 use wdl_grammar::parser::ParserToken;
 
@@ -155,9 +156,21 @@ pub fn completion(
                     add_struct_completions(document, &mut items);
                     break;
                 }
+
+                SyntaxKind::StructDefinitionNode => {
+                    add_keyword_completions(
+                        &TYPE_EXPECTED_SET.union(TokenSet::new(&[
+                            Token::MetaKeyword as u8,
+                            Token::ParameterMetaKeyword as u8,
+                        ])),
+                        &mut items,
+                    );
+                    break;
+                }
+
                 SyntaxKind::RootNode => {
                     add_keyword_completions(
-                        &TOP_EXPECTED_SET.union(TokenSet::new(&[Token::VersionKeyword as u8])),
+                        &TOP_RECOVERY_SET.union(TokenSet::new(&[Token::VersionKeyword as u8])),
                         &mut items,
                     );
                     add_struct_completions(document, &mut items);

@@ -29,7 +29,7 @@ use crate::tree::SyntaxKind;
 pub type Parser<'a> = parser::Parser<'a, Token>;
 
 /// The expected set of tokens at the top-level of a WDL document.
-pub const TOP_EXPECTED_SET: TokenSet = TokenSet::new(&[
+const TOP_EXPECTED_SET: TokenSet = TokenSet::new(&[
     Token::ImportKeyword as u8,
     Token::StructKeyword as u8,
     Token::TaskKeyword as u8,
@@ -45,10 +45,10 @@ const TOP_EXPECTED_NAMES: &[&str] = &[
 ];
 
 /// The recovery set for top-level.
-const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
+pub const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
 
 /// A set of tokens for primitive types.
-pub const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
+const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
     Token::BooleanTypeKeyword as u8,
     Token::IntTypeKeyword as u8,
     Token::FloatTypeKeyword as u8,
@@ -67,7 +67,7 @@ pub const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&
 ]));
 
 /// The recovery set for struct items.
-pub const STRUCT_ITEM_RECOVERY_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
+const STRUCT_ITEM_RECOVERY_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::MetaKeyword as u8,
     Token::ParameterMetaKeyword as u8,
     Token::CloseBrace as u8,

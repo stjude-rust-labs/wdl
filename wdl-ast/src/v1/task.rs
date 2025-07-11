@@ -25,7 +25,6 @@ use crate::SyntaxToken;
 use crate::TreeNode;
 use crate::TreeToken;
 use crate::v1::display::write_input_section;
-use crate::v1::display::write_meta_object;
 use crate::v1::display::write_output_section;
 
 pub mod common;
