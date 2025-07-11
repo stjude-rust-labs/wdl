@@ -237,6 +237,7 @@ impl Display for StructDefinition {
                     writeln!(f)?;
                     format_meta_value(f, &meta_val, 2)?;
                 }
+                writeln!(f)?;
             }
         }
 
