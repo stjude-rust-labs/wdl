@@ -221,6 +221,9 @@ async fn should_complete_struct_keywords() {
     assert_not_contains(&items, "input");
     assert_not_contains(&items, "output");
 
+    // other structs
+    assert_contains(&items, "Foo");
+
     // top-level keywords
     assert_not_contains(&items, "version");
     assert_not_contains(&items, "task");
@@ -340,4 +343,39 @@ async fn should_complete_scope_variables() {
     assert_contains(&items, "runtime");
     assert_contains(&items, "requirements");
     assert_not_contains(&items, "call");
+}
+
+#[tokio::test]
+async fn should_complete_task_variable_members() {
+    let mut ctx = setup().await;
+
+    // In command section
+    let response = completion_request(&mut ctx, "taskvar.wdl", Position::new(4, 21)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "name");
+    assert_contains(&items, "id");
+    assert_contains(&items, "cpu");
+    assert_contains(&items, "memory");
+    assert_contains(&items, "container");
+    assert_contains(&items, "meta");
+
+    // In output section
+    let response = completion_request(&mut ctx, "taskvar.wdl", Position::new(8, 24)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_contains(&items, "name");
+    assert_contains(&items, "id");
+    assert_contains(&items, "cpu");
+    assert_contains(&items, "memory");
+    assert_contains(&items, "container");
+    assert_contains(&items, "meta");
+    assert_contains(&items, "return_code");
+
+    // Not a member
+    assert_not_contains(&items, "foo");
 }
