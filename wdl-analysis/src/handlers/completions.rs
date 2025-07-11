@@ -32,7 +32,47 @@ use wdl_ast::lexer::TokenSet;
 use wdl_ast::lexer::v1::Token;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TASK_FIELD_ATTEMPT;
+use wdl_ast::v1::TASK_FIELD_CONTAINER;
+use wdl_ast::v1::TASK_FIELD_CPU;
+use wdl_ast::v1::TASK_FIELD_DISKS;
+use wdl_ast::v1::TASK_FIELD_END_TIME;
+use wdl_ast::v1::TASK_FIELD_EXT;
+use wdl_ast::v1::TASK_FIELD_FPGA;
+use wdl_ast::v1::TASK_FIELD_GPU;
+use wdl_ast::v1::TASK_FIELD_ID;
+use wdl_ast::v1::TASK_FIELD_MEMORY;
+use wdl_ast::v1::TASK_FIELD_META;
+use wdl_ast::v1::TASK_FIELD_NAME;
+use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
+use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
+use wdl_ast::v1::TASK_HINT_DISKS;
+use wdl_ast::v1::TASK_HINT_FPGA;
+use wdl_ast::v1::TASK_HINT_GPU;
+use wdl_ast::v1::TASK_HINT_INPUTS;
+use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL;
+use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_CPU;
+use wdl_ast::v1::TASK_HINT_MAX_CPU_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY_ALIAS;
+use wdl_ast::v1::TASK_HINT_OUTPUTS;
+use wdl_ast::v1::TASK_HINT_SHORT_TASK;
+use wdl_ast::v1::TASK_HINT_SHORT_TASK_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CPU;
+use wdl_ast::v1::TASK_REQUIREMENT_DISKS;
+use wdl_ast::v1::TASK_REQUIREMENT_FPGA;
+use wdl_ast::v1::TASK_REQUIREMENT_GPU;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
+use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_grammar::grammar::v1::TASK_ITEM_EXPECTED_SET;
 use wdl_grammar::grammar::v1::TOP_RECOVERY_SET;
@@ -45,6 +85,7 @@ use crate::SourcePosition;
 use crate::SourcePositionEncoding;
 use crate::document::ScopeRef;
 use crate::document::Struct;
+use crate::document::TASK_VAR_NAME;
 use crate::document::Task;
 use crate::document::Workflow;
 use crate::graph::DocumentGraph;
@@ -57,6 +98,7 @@ use crate::stdlib::TypeParameters;
 use crate::types::CompoundType;
 use crate::types::Type;
 use crate::types::v1::ExprTypeEvaluator;
+use crate::types::v1::task_member_type;
 
 /// Provides code completion suggestions for the given position in a document.
 ///
@@ -158,6 +200,7 @@ pub fn completion(
                 }
 
                 SyntaxKind::StructDefinitionNode => {
+                    add_struct_completions(document, &mut items);
                     add_keyword_completions(
                         &TYPE_EXPECTED_SET.union(TokenSet::new(&[
                             Token::MetaKeyword as u8,
@@ -165,6 +208,25 @@ pub fn completion(
                         ])),
                         &mut items,
                     );
+                    break;
+                }
+
+                SyntaxKind::RuntimeSectionNode => {
+                    add_runtime_key_completions(&mut items);
+                    break;
+                }
+
+                SyntaxKind::RequirementsSectionNode => {
+                    add_requirements_key_completions(&mut items);
+                    break;
+                }
+                SyntaxKind::TaskHintsSectionNode => {
+                    add_task_hints_key_completions(&mut items);
+                    break;
+                }
+
+                SyntaxKind::WorkflowHintsSectionNode => {
+                    add_workflow_hints_key_completions(&mut items);
                     break;
                 }
 
@@ -249,33 +311,52 @@ fn add_member_access_completions(
         return Ok(());
     };
 
-    if let Some(token) = target_element.as_token() {
-        if token.kind() == SyntaxKind::Ident {
-            if let Some(ns) = document.namespace(token.text()) {
-                let ns_root = ns.document().root();
-                for task in ns.document().tasks() {
-                    items.push(CompletionItem {
-                        label: task.name().to_string(),
-                        kind: Some(CompletionItemKind::FUNCTION),
-                        detail: Some(format!("task {}", task.name())),
-                        documentation: provide_task_documentation(task, &ns_root)
-                            .and_then(make_docs),
-                        ..Default::default()
-                    })
-                }
-
-                if let Some(workflow) = ns.document().workflow() {
-                    items.push(CompletionItem {
-                        label: workflow.name().to_string(),
-                        kind: Some(CompletionItemKind::FUNCTION),
-                        detail: Some(format!("workflow {}", workflow.name())),
-                        documentation: provide_workflow_documentation(workflow, &ns_root)
-                            .and_then(make_docs),
-                        ..Default::default()
-                    });
+    match &target_element {
+        rowan::NodeOrToken::Node(n) => {
+            if n.text() == TASK_VAR_NAME
+                && document.version()
+                    >= Some(wdl_ast::SupportedVersion::V1(wdl_ast::version::V1::Two))
+            {
+                if let Some(parent) = n.parent() {
+                    if matches!(
+                        parent.kind(),
+                        SyntaxKind::CommandSectionNode | SyntaxKind::OutputSectionNode
+                    ) {
+                        add_task_variable_completions(items);
+                    }
                 }
 
                 return Ok(());
+            }
+        }
+        rowan::NodeOrToken::Token(t) => {
+            if t.kind() == SyntaxKind::Ident {
+                if let Some(ns) = document.namespace(t.text()) {
+                    let ns_root = ns.document().root();
+                    for task in ns.document().tasks() {
+                        items.push(CompletionItem {
+                            label: task.name().to_string(),
+                            kind: Some(CompletionItemKind::FUNCTION),
+                            detail: Some(format!("task {}", task.name())),
+                            documentation: provide_task_documentation(task, &ns_root)
+                                .and_then(make_docs),
+                            ..Default::default()
+                        })
+                    }
+
+                    if let Some(workflow) = ns.document().workflow() {
+                        items.push(CompletionItem {
+                            label: workflow.name().to_string(),
+                            kind: Some(CompletionItemKind::FUNCTION),
+                            detail: Some(format!("workflow {}", workflow.name())),
+                            documentation: provide_workflow_documentation(workflow, &ns_root)
+                                .and_then(make_docs),
+                            ..Default::default()
+                        });
+                    }
+
+                    return Ok(());
+                }
             }
         }
     }
@@ -478,6 +559,127 @@ fn add_namespace_completions(document: &Document, items: &mut Vec<CompletionItem
             label: name.to_string(),
             kind: Some(CompletionItemKind::MODULE),
             detail: Some(format!("import alias {name}")),
+            ..Default::default()
+        });
+    }
+}
+
+/// Adds completions for the members of the implicit `task` variable.
+fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
+    const TASK_FIELDS: &[&str] = &[
+        TASK_FIELD_NAME,
+        TASK_FIELD_ID,
+        TASK_FIELD_CONTAINER,
+        TASK_FIELD_CPU,
+        TASK_FIELD_MEMORY,
+        TASK_FIELD_ATTEMPT,
+        TASK_FIELD_GPU,
+        TASK_FIELD_FPGA,
+        TASK_FIELD_DISKS,
+        TASK_FIELD_END_TIME,
+        TASK_FIELD_RETURN_CODE,
+        TASK_FIELD_META,
+        TASK_FIELD_PARAMETER_META,
+        TASK_FIELD_EXT,
+    ];
+
+    for field in TASK_FIELDS {
+        if let Some(ty) = task_member_type(field) {
+            items.push(CompletionItem {
+                label: field.to_string(),
+                kind: Some(CompletionItemKind::FIELD),
+                detail: Some(ty.to_string()),
+                ..Default::default()
+            });
+        }
+    }
+}
+
+/// Adds completions for `runtime` section keys.
+fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
+    const RUNTIME_KEYS: &[&str] = &[
+        TASK_REQUIREMENT_CONTAINER,
+        TASK_REQUIREMENT_CONTAINER_ALIAS,
+        TASK_REQUIREMENT_CPU,
+        TASK_REQUIREMENT_MEMORY,
+        TASK_REQUIREMENT_DISKS,
+        TASK_REQUIREMENT_GPU,
+        TASK_REQUIREMENT_MAX_RETRIES_ALIAS,  // "maxRetries"
+        TASK_REQUIREMENT_RETURN_CODES_ALIAS, // "returnCodes"
+    ];
+
+    for key in RUNTIME_KEYS {
+        items.push(CompletionItem {
+            label: key.to_string(),
+            kind: Some(CompletionItemKind::PROPERTY),
+            ..Default::default()
+        });
+    }
+}
+
+/// Adds completions for `requirements` section keys.
+fn add_requirements_key_completions(items: &mut Vec<CompletionItem>) {
+    const REQUIREMENTS_KEY: &[&str] = &[
+        TASK_REQUIREMENT_CONTAINER,
+        TASK_REQUIREMENT_CONTAINER_ALIAS,
+        TASK_REQUIREMENT_CPU,
+        TASK_REQUIREMENT_MEMORY,
+        TASK_REQUIREMENT_GPU,
+        TASK_REQUIREMENT_FPGA,
+        TASK_REQUIREMENT_DISKS,
+        TASK_REQUIREMENT_MAX_RETRIES,
+        TASK_REQUIREMENT_MAX_RETRIES_ALIAS,
+        TASK_REQUIREMENT_RETURN_CODES,
+        TASK_REQUIREMENT_RETURN_CODES_ALIAS,
+    ];
+
+    for key in REQUIREMENTS_KEY {
+        items.push(CompletionItem {
+            label: key.to_string(),
+            kind: Some(CompletionItemKind::PROPERTY),
+            ..Default::default()
+        });
+    }
+}
+
+/// Adds completions for `task hints` section keys.
+fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
+    const HINTS_KEY: &[&str] = &[
+        TASK_HINT_DISKS,
+        TASK_HINT_GPU,
+        TASK_HINT_FPGA,
+        TASK_HINT_INPUTS,
+        TASK_HINT_LOCALIZATION_OPTIONAL,
+        TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS,
+        TASK_HINT_MAX_CPU,
+        TASK_HINT_MAX_CPU_ALIAS,
+        TASK_HINT_MAX_MEMORY,
+        TASK_HINT_MAX_MEMORY_ALIAS,
+        TASK_HINT_OUTPUTS,
+        TASK_HINT_SHORT_TASK,
+        TASK_HINT_SHORT_TASK_ALIAS,
+    ];
+
+    for key in HINTS_KEY {
+        items.push(CompletionItem {
+            label: key.to_string(),
+            kind: Some(CompletionItemKind::PROPERTY),
+            ..Default::default()
+        });
+    }
+}
+
+/// Adds completions for `workflow hints` section keys.
+fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
+    const HINTS_KEY: &[&str] = &[
+        WORKFLOW_HINT_ALLOW_NESTED_INPUTS,
+        WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS,
+    ];
+
+    for key in HINTS_KEY {
+        items.push(CompletionItem {
+            label: key.to_string(),
+            kind: Some(CompletionItemKind::PROPERTY),
             ..Default::default()
         });
     }
