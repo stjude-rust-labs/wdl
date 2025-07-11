@@ -25,7 +25,6 @@ use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::TreeNode;
 use crate::v1::display::write_input_section;
-use crate::v1::display::write_meta_object;
 use crate::v1::display::write_output_section;
 
 /// The name of the `allow_nested_inputs` workflow hint. Note that this

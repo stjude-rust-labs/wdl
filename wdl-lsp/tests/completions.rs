@@ -13,6 +13,27 @@ use tower_lsp::lsp_types::TextDocumentIdentifier;
 use tower_lsp::lsp_types::TextDocumentPositionParams;
 use tower_lsp::lsp_types::request::Completion;
 
+const TYPES: &[&str] = &[
+    "Boolean",
+    "Int",
+    "Float",
+    "String",
+    "File",
+    "Directory",
+    "Array",
+    "Map",
+    "Object",
+    "Pair",
+];
+const IO_KEYWORDS: &[&str] = &["input", "output"];
+const META_KEYWORDS: &[&str] = &["meta", "parameter_meta"];
+
+const TOP_LEVEL_KEYWORDS: &[&str] = &["version", "task", "workflow", "struct", "import"];
+
+const TASK_SPECIFIC_KEYWORDS: &[&str] = &["command", "requirements", "hints", "runtime"];
+
+const WORKFLOW_SPECIFIC_KEYWORDS: &[&str] = &["call", "scatter", "if"];
+
 async fn completion_request(
     ctx: &mut TestContext,
     path: &str,
@@ -38,15 +59,25 @@ async fn completion_request(
 fn assert_contains(items: &[CompletionItem], expected_label: &str) {
     assert!(
         items.iter().any(|item| item.label == expected_label),
-        "completion items should have contained '{expected_label}"
+        "completion items should have contained '{expected_label}'"
     );
 }
 
 fn assert_not_contains(items: &[CompletionItem], unexpected_label: &str) {
     assert!(
         !items.iter().any(|item| item.label == unexpected_label),
-        "completion items should NOT have contained '{unexpected_label}"
+        "completion items should NOT have contained '{unexpected_label}'"
     );
+}
+
+fn assert_keywords(items: &[CompletionItem], keywords: &[&str], should_contain: bool) {
+    for &keyword in keywords {
+        if should_contain {
+            assert_contains(items, keyword);
+        } else {
+            assert_not_contains(items, keyword);
+        }
+    }
 }
 
 async fn setup() -> TestContext {
@@ -63,20 +94,76 @@ async fn should_complete_top_level_keywords() {
         panic!("expected a response, got none");
     };
 
-    assert_contains(&items, "version");
-    assert_contains(&items, "task");
-    assert_contains(&items, "workflow");
-    assert_contains(&items, "struct");
-    assert_contains(&items, "import");
+    assert_keywords(&items, TOP_LEVEL_KEYWORDS, true);
+    assert_keywords(&items, TASK_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, WORKFLOW_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, TYPES, false);
+    assert_keywords(&items, IO_KEYWORDS, false);
+    assert_keywords(&items, META_KEYWORDS, false);
 
-    // `call` is not a top-level keyword
-    assert_not_contains(&items, "call");
-    // `stdout` is a standard library
+    // `stdout` is a standard library function
     assert_not_contains(&items, "stdout");
 }
 
 #[tokio::test]
-async fn should_complete_struct_members() {
+async fn should_complete_workflow_keywords() {
+    let mut ctx = setup().await;
+    let response = completion_request(&mut ctx, "source.wdl", Position::new(13, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_keywords(&items, TOP_LEVEL_KEYWORDS, false);
+    assert_keywords(&items, TASK_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, WORKFLOW_SPECIFIC_KEYWORDS, true);
+    assert_keywords(&items, TYPES, true);
+    assert_keywords(&items, IO_KEYWORDS, true);
+    assert_keywords(&items, META_KEYWORDS, true);
+
+    // `stdout` is a standard library function
+    assert_contains(&items, "stdout");
+}
+
+#[tokio::test]
+async fn should_complete_task_keywords() {
+    let mut ctx = setup().await;
+    let response = completion_request(&mut ctx, "lib.wdl", Position::new(3, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_keywords(&items, TOP_LEVEL_KEYWORDS, false);
+    assert_keywords(&items, TASK_SPECIFIC_KEYWORDS, true);
+    assert_keywords(&items, WORKFLOW_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, TYPES, true);
+    assert_keywords(&items, IO_KEYWORDS, true);
+    assert_keywords(&items, META_KEYWORDS, true);
+
+    // `stdout` is a standard library function
+    assert_contains(&items, "stdout");
+}
+
+#[tokio::test]
+async fn should_complete_struct_keywords() {
+    let mut ctx = setup().await;
+    let response = completion_request(&mut ctx, "source.wdl", Position::new(9, 0)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+
+    assert_keywords(&items, TOP_LEVEL_KEYWORDS, false);
+    assert_keywords(&items, TASK_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, WORKFLOW_SPECIFIC_KEYWORDS, false);
+    assert_keywords(&items, TYPES, true);
+    assert_keywords(&items, IO_KEYWORDS, false);
+    assert_keywords(&items, META_KEYWORDS, true);
+
+    // `stdout` is a standard library function
+    assert_not_contains(&items, "stdout");
+}
+
+#[tokio::test]
+async fn should_complete_struct_members_access() {
     let mut ctx = setup().await;
 
     // Position of cursor `String n = my_foo.`
