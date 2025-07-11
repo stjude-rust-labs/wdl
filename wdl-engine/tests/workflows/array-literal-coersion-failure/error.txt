@@ -1,0 +1,8 @@
+error: type mismatch: expected type `Array[Int]+?`, but found type `Array[Union]`: cannot coerce empty array value to non-empty array type `Array[Int]+?`
+  ┌─ tests/workflows/array-literal-coersion-failure/source.wdl:6:37
+  │
+6 │     Array[Int] b = select_first([a, []])
+  │                                  -  ^^ this is type `Array[Union]`
+  │                                  │   
+  │                                  this expects type `Array[Int]+?`
+
