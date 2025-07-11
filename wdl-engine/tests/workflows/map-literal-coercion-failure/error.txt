@@ -1,0 +1,8 @@
+error: type mismatch: expected type `Array[Int]+?`, but found type `Array[Union]`: cannot coerce empty array value to non-empty array type `Array[Int]+?`
+  ┌─ tests/workflows/map-literal-coercion-failure/source.wdl:7:29
+  │
+7 │         key: { "a": a, "b": [] }
+  │                     -       ^^ this is type `Array[Union]`
+  │                     │        
+  │                     this expects type `Array[Int]+?`
+
