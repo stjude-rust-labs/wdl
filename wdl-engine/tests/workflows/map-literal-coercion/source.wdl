@@ -1,4 +1,5 @@
-## This is a test of a failure to coerce an element of a map literal.
+## This is a test to ensure coercion of a map literal's values.
+## See: https://github.com/stjude-rust-labs/wdl/issues/526
 version 1.2
 
 workflow test {
