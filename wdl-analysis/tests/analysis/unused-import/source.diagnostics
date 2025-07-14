@@ -4,3 +4,9 @@ warning[UnusedImport]: unused import namespace `bar`
 8 │ import "bar.wdl"
   │        ^^^^^^^^^
 
+warning[UnusedCall]: unused call `test`
+   ┌─ tests/analysis/unused-import/source.wdl:23:14
+   │
+23 │     call baz.test
+   │              ^^^^
+

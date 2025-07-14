@@ -1,3 +1,9 @@
+warning[UnusedCall]: unused call `my_task`
+   ┌─ tests/analysis/workflow-reference-cycle/source.wdl:21:14
+   │
+21 │         call my_task { x }
+   │              ^^^^^^^
+
 error: a name reference cycle was detected
    ┌─ tests/analysis/workflow-reference-cycle/source.wdl:21:14
    │
