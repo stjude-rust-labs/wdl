@@ -1205,14 +1205,12 @@ fn add_call_statement(
         // Check for unused call
         if let Some(severity) = config.diagnostics_config().unused_call
             && !any_outputs_used
+            && !ty.as_call().unwrap().outputs().is_empty()
+            && !statement.inner().is_rule_excepted(UNUSED_CALL_RULE_ID)
         {
-            if !ty.as_call().unwrap().outputs().is_empty()
-                && !statement.inner().is_rule_excepted(UNUSED_CALL_RULE_ID)
-            {
-                document
-                    .diagnostics
-                    .push(unused_call(name.text(), name.span()).with_severity(severity));
-            }
+            document
+                .diagnostics
+                .push(unused_call(name.text(), name.span()).with_severity(severity));
         }
 
         scope.insert(name.text(), name.span(), ty);
