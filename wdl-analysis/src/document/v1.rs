@@ -984,6 +984,10 @@ fn populate_workflow(config: &Config, document: &mut DocumentData, workflow: &Wo
                         .as_ref()
                         .expect("should have workflow")
                         .allows_nested_inputs,
+                    graph
+                        .edges_directed(index, Direction::Outgoing)
+                        .next()
+                        .is_some(),
                 );
             }
             WorkflowGraphNode::ExitConditional(statement) => {
@@ -1103,6 +1107,7 @@ fn add_call_statement(
     mut scope: ScopeRefMut<'_>,
     statement: &CallStatement,
     nested_inputs_allowed: bool,
+    any_outputs_used: bool,
 ) {
     // Determine the target name
     let target_name = statement
@@ -1198,7 +1203,9 @@ fn add_call_statement(
     // Don't modify the scope if there's a conflict
     if scope.lookup(name.text()).is_none() {
         // Check for unused call
-        if let Some(severity) = config.diagnostics_config().unused_call {
+        if let Some(severity) = config.diagnostics_config().unused_call
+            && !any_outputs_used
+        {
             if !ty.as_call().unwrap().outputs().is_empty()
                 && !statement.inner().is_rule_excepted(UNUSED_CALL_RULE_ID)
             {
