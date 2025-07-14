@@ -1205,9 +1205,8 @@ fn add_call_statement(
         // Check for unused call
         if let Some(severity) = config.diagnostics_config().unused_call
             && !any_outputs_used
-            && !ty.as_call().unwrap().outputs().is_empty()
             && !statement.inner().is_rule_excepted(UNUSED_CALL_RULE_ID)
-        {
+            && let Some(ty) = ty.as_call() && !ty.outputs().is_empty() {
             document
                 .diagnostics
                 .push(unused_call(name.text(), name.span()).with_severity(severity));
