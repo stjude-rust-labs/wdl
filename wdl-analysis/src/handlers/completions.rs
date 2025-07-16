@@ -167,10 +167,27 @@ pub fn completion(
         let mut current = Some(parent);
         while let Some(node) = current {
             match node.kind() {
-                SyntaxKind::WorkflowDefinitionNode
-                | SyntaxKind::ScatterStatementNode
-                | SyntaxKind::ConditionalStatementNode => {
+                SyntaxKind::WorkflowDefinitionNode => {
                     add_keyword_completions(&WORKFLOW_ITEM_EXPECTED_SET, &mut items);
+                    if let Some(scope) = document.find_scope_by_position(offset.into()) {
+                        add_scope_completions(scope, &mut items);
+                    }
+                    add_stdlib_completions(&mut items);
+                    add_struct_completions(document, &mut items);
+                    add_namespace_completions(document, &mut items);
+                    add_callable_completions(document, &mut items);
+                    break;
+                }
+                SyntaxKind::ScatterStatementNode | SyntaxKind::ConditionalStatementNode => {
+                    const NESTED_WORKFLOW_KEYWORDS: TokenSet = TokenSet::new(&[
+                        Token::CallKeyword as u8,
+                        Token::ScatterKeyword as u8,
+                        Token::IfKeyword as u8,
+                    ]);
+                    add_keyword_completions(
+                        &TYPE_EXPECTED_SET.union(NESTED_WORKFLOW_KEYWORDS),
+                        &mut items,
+                    );
                     if let Some(scope) = document.find_scope_by_position(offset.into()) {
                         add_scope_completions(scope, &mut items);
                     }
