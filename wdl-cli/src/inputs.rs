@@ -241,7 +241,7 @@ impl Inputs {
 
     /// Attempts to coalesce a set of inputs into an [`Inputs`].
     ///
-    /// `name` is the provided task or workflow the inputs are for.
+    /// `name` is the task or workflow the inputs are for.
     /// If `name` is `None` then at least one of the inputs in `iter`
     /// must be prefixed with a task or workflow name.
     pub fn coalesce<T, V>(iter: T, name: Option<String>) -> Result<Self>
