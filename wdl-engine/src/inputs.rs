@@ -829,16 +829,21 @@ impl Inputs {
         }
     }
 
-    /// Parses the root object in an input file.
+    /// Parses the root object in a [`JsonMap`].
     ///
     /// Returns `Ok(Some(_))` if the inputs are not empty.
     ///
     /// Returns `Ok(None)` if the inputs are empty.
     pub fn parse_object(document: &Document, object: JsonMap) -> Result<Option<(String, Self)>> {
+        // If the object is empty, treat it as a workflow evaluation without any inputs
+        if object.is_empty() {
+            return Ok(None);
+        }
+
         // Determine the root workflow or task name
-        let (key, name) = match object.iter().next() {
+        let (key, name) = match object.iter().find(|(k, _)| k.contains(".")) {
             Some((key, _)) => match key.split_once('.') {
-                Some((name, _)) => (key, name),
+                Some((name, _remainder)) => (key, name),
                 None => {
                     bail!(
                         "invalid input key `{key}`: expected the value to be prefixed with the \
@@ -846,9 +851,11 @@ impl Inputs {
                     )
                 }
             },
-            // If the object is empty, treat it as a workflow evaluation without any inputs
             None => {
-                return Ok(None);
+                bail!(
+                    "invalid input object: expected at least one key to be prefixed with the \
+                     workflow or task name"
+                )
             }
         };
 
@@ -872,20 +879,20 @@ impl Inputs {
     ) -> Result<(String, Self)> {
         let mut inputs = TaskInputs::default();
         for (key, value) in object {
+            // Convert from serde_json::Value to crate::Value
             let value = serde_json::from_value(value)
                 .with_context(|| format!("invalid input key `{key}`"))?;
 
             match key.split_once(".") {
-                Some((prefix, remainder)) if prefix == task.name() => {
+                Some((first, remainder)) if first == task.name() => {
                     inputs
                         .set_path_value(document, task, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
-                    bail!(
-                        "invalid input key `{key}`: expected key to be prefixed with `{task}`",
-                        task = task.name()
-                    );
+                    inputs
+                        .set_path_value(document, task, &key, value)
+                        .with_context(|| format!("invalid input key `{key}`"))?;
                 }
             }
         }
@@ -901,6 +908,7 @@ impl Inputs {
     ) -> Result<(String, Self)> {
         let mut inputs = WorkflowInputs::default();
         for (key, value) in object {
+            // Convert from serde_json::Value to crate::Value
             let value = serde_json::from_value(value)
                 .with_context(|| format!("invalid input key `{key}`"))?;
 
@@ -911,10 +919,9 @@ impl Inputs {
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
-                    bail!(
-                        "invalid input key `{key}`: expected key to be prefixed with `{workflow}`",
-                        workflow = workflow.name()
-                    );
+                    inputs
+                        .set_path_value(document, workflow, &key, value)
+                        .with_context(|| format!("invalid input key `{key}`"))?;
                 }
             }
         }
