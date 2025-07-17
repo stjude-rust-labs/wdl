@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Added
+
+* Inputs on the CL will have the common prefix (name of the called task or workflow) inferred ([#535](https://github.com/stjude-rust-labs/wdl/pull/535)).
+
 ## 0.3.1 - 07-10-2025
 
 #### Fixed
