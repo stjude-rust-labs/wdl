@@ -841,7 +841,7 @@ impl Inputs {
         }
 
         // Determine the root workflow or task name
-        let (key, name) = match object.iter().find(|(k, _)| k.contains(".")) {
+        let (key, name) = match object.iter().next() {
             Some((key, _)) => match key.split_once('.') {
                 Some((name, _remainder)) => (key, name),
                 None => {
@@ -852,10 +852,7 @@ impl Inputs {
                 }
             },
             None => {
-                bail!(
-                    "invalid input object: expected at least one key to be prefixed with the \
-                     workflow or task name"
-                )
+                unreachable!()
             }
         };
 
@@ -890,9 +887,10 @@ impl Inputs {
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
-                    inputs
-                        .set_path_value(document, task, &key, value)
-                        .with_context(|| format!("invalid input key `{key}`"))?;
+                    bail!(
+                        "invalid input key `{key}`: expected key to be prefixed with `{task}`",
+                        task = task.name()
+                    );
                 }
             }
         }
@@ -919,9 +917,10 @@ impl Inputs {
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
-                    inputs
-                        .set_path_value(document, workflow, &key, value)
-                        .with_context(|| format!("invalid input key `{key}`"))?;
+                    bail!(
+                        "invalid input key `{key}`: expected key to be prefixed with `{workflow}`",
+                        workflow = workflow.name()
+                    );
                 }
             }
         }
