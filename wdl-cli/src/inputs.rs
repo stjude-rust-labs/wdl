@@ -251,7 +251,10 @@ impl Inputs {
     /// Attempts to coalesce a set of inputs into an [`Inputs`].
     ///
     /// `name` is the task or workflow the inputs are for.
-    /// If `name` is `None` then all of the inputs in `iter`
+    /// If `name` is `Some(_)` then it will be prefixed to each
+    /// [`Input::Pair`] that does not already start with it.
+    /// Keys inside a [`Input::File`] must always have this common
+    /// prefix specified. If `name` is `None` then all of the inputs in `iter`
     /// must be prefixed with the task or workflow name.
     pub fn coalesce<T, V>(iter: T, name: Option<String>) -> Result<Self>
     where
