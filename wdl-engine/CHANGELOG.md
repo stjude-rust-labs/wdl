@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-#### Changed
-
-* Only one key in the input `JsonMap` needs to have the call prefix ([#535](https://github.com/stjude-rust-labs/wdl/pull/535)).
-
 #### Fixed
 
 * Fixed a panic that may occur in array and map literal evaluation ([#529](https://github.com/stjude-rust-labs/wdl/pull/529)).
