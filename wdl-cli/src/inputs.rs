@@ -222,6 +222,7 @@ pub struct Inputs {
 impl Inputs {
     /// Adds an input read from the command line.
     fn add_input(&mut self, input: &str) -> Result<()> {
+        let prefix = self.name.as_ref().map(|name| format!("{name}."));
         match input.parse::<Input>()? {
             Input::File(path) => {
                 let inputs = InputFile::read(&path).map_err(Error::File)?;
@@ -232,6 +233,14 @@ impl Inputs {
                 // always available for the platforms that `wdl` will run
                 // within.
                 let cwd = std::env::current_dir().unwrap();
+
+                let key = if let Some(prefix) = &prefix
+                    && !key.starts_with(prefix)
+                {
+                    format!("{prefix}{key}")
+                } else {
+                    key
+                };
                 self.insert(key, (cwd, value));
             }
         };
@@ -282,17 +291,9 @@ impl Inputs {
         self,
         document: &Document,
     ) -> anyhow::Result<Option<(String, EngineInputs, OriginPaths)>> {
-        let prefix = self.name.map(|name| format!("{name}."));
         let (origins, values) = self.inputs.into_iter().fold(
             (IndexMap::new(), serde_json::Map::new()),
             |(mut origins, mut values), (key, (origin, value))| {
-                let key = if let Some(prefix) = &prefix
-                    && !key.starts_with(prefix)
-                {
-                    format!("{prefix}{key}")
-                } else {
-                    key
-                };
                 origins.insert(key.clone(), origin);
                 values.insert(key, value);
                 (origins, values)
