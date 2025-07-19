@@ -1,7 +1,6 @@
 //! V1 AST representation for workflows.
 
 use std::fmt;
-use std::fmt::Display;
 
 use rowan::NodeOrToken;
 use wdl_grammar::SupportedVersion;
@@ -136,27 +135,9 @@ impl<N: TreeNode> WorkflowDefinition<N> {
             })
             .unwrap_or(false)
     }
-}
 
-impl<N: TreeNode> AstNode<N> for WorkflowDefinition<N> {
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::WorkflowDefinitionNode
-    }
-
-    fn cast(inner: N) -> Option<Self> {
-        match inner.kind() {
-            SyntaxKind::WorkflowDefinitionNode => Some(Self(inner)),
-            _ => None,
-        }
-    }
-
-    fn inner(&self) -> &N {
-        &self.0
-    }
-}
-
-impl Display for WorkflowDefinition {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    /// Writes a Markdown formatted description of the workflow.
+    pub fn markdown_description(&self, f: &mut impl fmt::Write) -> fmt::Result {
         writeln!(f, "---")?;
 
         if let Some(meta) = self.metadata() {
@@ -177,6 +158,23 @@ impl Display for WorkflowDefinition {
         )?;
 
         Ok(())
+    }
+}
+
+impl<N: TreeNode> AstNode<N> for WorkflowDefinition<N> {
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WorkflowDefinitionNode
+    }
+
+    fn cast(inner: N) -> Option<Self> {
+        match inner.kind() {
+            SyntaxKind::WorkflowDefinitionNode => Some(Self(inner)),
+            _ => None,
+        }
+    }
+
+    fn inner(&self) -> &N {
+        &self.0
     }
 }
 

@@ -1,7 +1,6 @@
 //! V1 AST representation for task definitions.
 
 use std::fmt;
-use std::fmt::Display;
 
 use rowan::NodeOrToken;
 
@@ -195,6 +194,30 @@ impl<N: TreeNode> TaskDefinition<N> {
     /// Gets the private declarations of the task.
     pub fn declarations(&self) -> impl Iterator<Item = BoundDecl<N>> + use<'_, N> {
         self.children()
+    }
+
+    /// Writes a Markdown formatted description of the task.
+    pub fn markdown_description(&self, f: &mut impl fmt::Write) -> fmt::Result {
+        writeln!(f, "```wdl\ntask {}\n```\n---", self.name().text())?;
+
+        if let Some(meta) = self.metadata() {
+            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
+                if let MetadataValue::String(s) = desc.value() {
+                    if let Some(text) = s.text() {
+                        writeln!(f, "{}\n", text.text())?;
+                    }
+                }
+            }
+        }
+
+        write_input_section(f, self.input().as_ref(), self.parameter_metadata().as_ref())?;
+        write_output_section(
+            f,
+            self.output().as_ref(),
+            self.parameter_metadata().as_ref(),
+        )?;
+
+        Ok(())
     }
 }
 
@@ -1663,31 +1686,6 @@ impl<N: TreeNode> AstNode<N> for ParameterMetadataSection<N> {
 
     fn inner(&self) -> &N {
         &self.0
-    }
-}
-
-impl Display for TaskDefinition {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "```wdl\ntask {}\n```\n---", self.name().text())?;
-
-        if let Some(meta) = self.metadata() {
-            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
-                if let MetadataValue::String(s) = desc.value() {
-                    if let Some(text) = s.text() {
-                        writeln!(f, "{}\n", text.text())?;
-                    }
-                }
-            }
-        }
-
-        write_input_section(f, self.input().as_ref(), self.parameter_metadata().as_ref())?;
-        write_output_section(
-            f,
-            self.output().as_ref(),
-            self.parameter_metadata().as_ref(),
-        )?;
-
-        Ok(())
     }
 }
 

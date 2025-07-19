@@ -1,7 +1,6 @@
 //! V1 AST representation for struct definitions.
 
 use std::fmt;
-use std::fmt::Display;
 
 use super::MetadataSection;
 use super::ParameterMetadataSection;
@@ -52,6 +51,48 @@ impl<N: TreeNode> StructDefinition<N> {
         &self,
     ) -> impl Iterator<Item = ParameterMetadataSection<N>> + use<'_, N> {
         self.children()
+    }
+
+    /// Writes a Markdown formatted description of the struct.
+    pub fn markdown_description(&self, f: &mut impl fmt::Write) -> fmt::Result {
+        writeln!(f, "```wdl\nstruct {} {{", self.name().text())?;
+        for member in self.members() {
+            writeln!(
+                f,
+                "  {} {}",
+                member.ty().inner().text(),
+                member.name().text()
+            )?;
+        }
+        writeln!(f, "}}\n```\n---")?;
+
+        if let Some(meta) = self.metadata().next() {
+            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
+                if let MetadataValue::String(s) = desc.value() {
+                    if let Some(text) = s.text() {
+                        writeln!(f, "{}\n", text.text())?;
+                    }
+                }
+            }
+        }
+
+        let members: Vec<_> = self.members().collect();
+        if !members.is_empty() {
+            writeln!(f, "\n**Members**")?;
+            for member in members {
+                let name = member.name();
+                write!(f, "- **{}**: `{}`", name.text(), member.ty().inner().text())?;
+                if let Some(meta_val) =
+                    get_param_meta(name.text(), self.parameter_metadata().next().as_ref())
+                {
+                    writeln!(f)?;
+                    format_meta_value(f, &meta_val, 2)?;
+                }
+                writeln!(f)?;
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -204,44 +245,6 @@ impl<N: TreeNode> StructItem<N> {
     /// Finds all children that can be cast to a [`StructItem`].
     pub fn children(node: &N) -> impl Iterator<Item = Self> + use<'_, N> {
         node.children().filter_map(Self::cast)
-    }
-}
-
-impl Display for StructDefinition {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "```wdl\nstruct {} {{", self.name().text())?;
-        for member in self.members() {
-            writeln!(f, "  {} {}", member.ty(), member.name().text())?;
-        }
-        writeln!(f, "}}\n```\n---")?;
-
-        if let Some(meta) = self.metadata().next() {
-            if let Some(desc) = meta.items().find(|i| i.name().text() == "description") {
-                if let MetadataValue::String(s) = desc.value() {
-                    if let Some(text) = s.text() {
-                        writeln!(f, "{}\n", text.text())?;
-                    }
-                }
-            }
-        }
-
-        let members: Vec<_> = self.members().collect();
-        if !members.is_empty() {
-            writeln!(f, "\n**Members**")?;
-            for member in members {
-                let name = member.name();
-                write!(f, "- **{}**: `{}`", name.text(), member.ty())?;
-                if let Some(meta_val) =
-                    get_param_meta(name.text(), self.parameter_metadata().next().as_ref())
-                {
-                    writeln!(f)?;
-                    format_meta_value(f, &meta_val, 2)?;
-                }
-                writeln!(f)?;
-            }
-        }
-
-        Ok(())
     }
 }
 

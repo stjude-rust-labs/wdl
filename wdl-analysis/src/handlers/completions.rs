@@ -348,7 +348,7 @@ fn add_member_access_completions(
                             kind: Some(CompletionItemKind::FUNCTION),
                             detail: Some(format!("task {}", task.name())),
                             documentation: provide_task_documentation(task, &ns_root)
-                                .and_then(make_docs),
+                                .and_then(make_md_docs),
                             ..Default::default()
                         })
                     }
@@ -359,7 +359,7 @@ fn add_member_access_completions(
                             kind: Some(CompletionItemKind::FUNCTION),
                             detail: Some(format!("workflow {}", workflow.name())),
                             documentation: provide_workflow_documentation(workflow, &ns_root)
-                                .and_then(make_docs),
+                                .and_then(make_md_docs),
                             ..Default::default()
                         });
                     }
@@ -441,7 +441,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
             label: task.name().to_string(),
             kind: Some(CompletionItemKind::FUNCTION),
             detail: Some(format!("task {}", task.name())),
-            documentation: provide_task_documentation(task, &root_node).and_then(make_docs),
+            documentation: provide_task_documentation(task, &root_node).and_then(make_md_docs),
             ..Default::default()
         });
     }
@@ -450,7 +450,8 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
             label: workflow.name().to_string(),
             kind: Some(CompletionItemKind::FUNCTION),
             detail: Some(format!("workflow {}", workflow.name())),
-            documentation: provide_workflow_documentation(workflow, &root_node).and_then(make_docs),
+            documentation: provide_workflow_documentation(workflow, &root_node)
+                .and_then(make_md_docs),
             ..Default::default()
         });
     }
@@ -464,7 +465,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
                 label,
                 kind: Some(CompletionItemKind::FUNCTION),
                 detail: Some("task".to_string()),
-                documentation: provide_task_documentation(task, &ns_root).and_then(make_docs),
+                documentation: provide_task_documentation(task, &ns_root).and_then(make_md_docs),
                 ..Default::default()
             });
         }
@@ -475,7 +476,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
                 kind: Some(CompletionItemKind::FUNCTION),
                 detail: Some("workflow".to_string()),
                 documentation: provide_workflow_documentation(workflow, &ns_root)
-                    .and_then(make_docs),
+                    .and_then(make_md_docs),
                 ..Default::default()
             });
         }
@@ -520,7 +521,7 @@ fn add_stdlib_completions(items: &mut Vec<CompletionItem>) {
                 let sig = m.signature();
                 let params = TypeParameters::new(sig.type_parameters());
                 let detail = Some(format!("{name}{}", sig.display(&params)));
-                let docs = sig.definition().and_then(|d| make_docs(d.to_string()));
+                let docs = sig.definition().and_then(|d| make_md_docs(d.to_string()));
                 items.push(CompletionItem {
                     label: name.to_string(),
                     kind: Some(CompletionItemKind::FUNCTION),
@@ -533,7 +534,7 @@ fn add_stdlib_completions(items: &mut Vec<CompletionItem>) {
                 for sig in p.signatures() {
                     let params = TypeParameters::new(sig.type_parameters());
                     let detail = Some(format!("{name}{}", sig.display(&params)));
-                    let docs = sig.definition().and_then(|d| make_docs(d.to_string()));
+                    let docs = sig.definition().and_then(|d| make_md_docs(d.to_string()));
                     items.push(CompletionItem {
                         label: name.to_string(),
                         kind: Some(CompletionItemKind::FUNCTION),
@@ -555,7 +556,7 @@ fn add_struct_completions(document: &Document, items: &mut Vec<CompletionItem>) 
             label: name.to_string(),
             kind: Some(CompletionItemKind::STRUCT),
             detail: Some(format!("struct {name}")),
-            documentation: provide_struct_documentation(s, &root).and_then(make_docs),
+            documentation: provide_struct_documentation(s, &root).and_then(make_md_docs),
             ..Default::default()
         })
     }
@@ -682,7 +683,7 @@ fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
 }
 
 /// Makes a LSP documentation from a definition text.
-fn make_docs(definition: String) -> Option<Documentation> {
+fn make_md_docs(definition: String) -> Option<Documentation> {
     Some(Documentation::MarkupContent(MarkupContent {
         kind: lsp_types::MarkupKind::Markdown,
         value: definition,
@@ -693,14 +694,17 @@ fn make_docs(definition: String) -> Option<Documentation> {
 /// `metadata`, `runtime`
 fn provide_task_documentation(task: &Task, root: &wdl_ast::Document) -> Option<String> {
     match TextSize::try_from(task.name_span().start()) {
-        Ok(offset) => {
-            let node = root
-                .inner()
-                .token_at_offset(offset)
-                .left_biased()
-                .and_then(|t| t.parent_ancestors().find_map(TaskDefinition::cast));
-            node.as_ref().map(ToString::to_string)
-        }
+        Ok(offset) => root
+            .inner()
+            .token_at_offset(offset)
+            .left_biased()
+            .and_then(|t| t.parent_ancestors().find_map(TaskDefinition::cast))
+            .as_ref()
+            .and_then(|n| {
+                let mut s = String::new();
+                n.markdown_description(&mut s).ok()?;
+                Some(s)
+            }),
         Err(_) => None,
     }
 }
@@ -709,14 +713,17 @@ fn provide_task_documentation(task: &Task, root: &wdl_ast::Document) -> Option<S
 /// `metadata`
 fn provide_workflow_documentation(workflow: &Workflow, root: &wdl_ast::Document) -> Option<String> {
     match TextSize::try_from(workflow.name_span().start()) {
-        Ok(offset) => {
-            let node = root
-                .inner()
-                .token_at_offset(offset)
-                .left_biased()
-                .and_then(|t| t.parent_ancestors().find_map(WorkflowDefinition::cast));
-            node.as_ref().map(ToString::to_string)
-        }
+        Ok(offset) => root
+            .inner()
+            .token_at_offset(offset)
+            .left_biased()
+            .and_then(|t| t.parent_ancestors().find_map(WorkflowDefinition::cast))
+            .as_ref()
+            .and_then(|n| {
+                let mut s = String::new();
+                n.markdown_description(&mut s).ok()?;
+                Some(s)
+            }),
         Err(_) => None,
     }
 }
@@ -724,14 +731,17 @@ fn provide_workflow_documentation(workflow: &Workflow, root: &wdl_ast::Document)
 /// Provides documentation for structs.
 fn provide_struct_documentation(struct_info: &Struct, root: &wdl_ast::Document) -> Option<String> {
     match TextSize::try_from(struct_info.name_span().start()) {
-        Ok(offset) => {
-            let node = root
-                .inner()
-                .token_at_offset(offset)
-                .left_biased()
-                .and_then(|t| t.parent_ancestors().find_map(StructDefinition::cast));
-            node.as_ref().map(ToString::to_string)
-        }
+        Ok(offset) => root
+            .inner()
+            .token_at_offset(offset)
+            .left_biased()
+            .and_then(|t| t.parent_ancestors().find_map(StructDefinition::cast))
+            .as_ref()
+            .and_then(|n| {
+                let mut s = String::new();
+                n.markdown_description(&mut s).ok()?;
+                Some(s)
+            }),
         Err(_) => None,
     }
 }
