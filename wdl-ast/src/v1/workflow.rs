@@ -35,6 +35,9 @@ pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS: &str = "allow_nested_inputs";
 /// form of the hint.
 pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS: &str = "allowNestedInputs";
 
+/// The set of all valid workflow hints section keys.
+pub const WORKFLOW_HINT_KEYS: &[&str] = &[WORKFLOW_HINT_ALLOW_NESTED_INPUTS];
+
 /// Represents a workflow definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WorkflowDefinition<N: TreeNode = SyntaxNode>(N);

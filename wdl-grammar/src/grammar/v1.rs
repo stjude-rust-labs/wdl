@@ -45,7 +45,11 @@ const TOP_EXPECTED_NAMES: &[&str] = &[
 ];
 
 /// The recovery set for top-level.
-pub const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
+const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
+
+/// The expected set of tokens for root section.
+pub const ROOT_SECTION_KEYWORDS: TokenSet =
+    TOP_RECOVERY_SET.union(TokenSet::new(&[Token::VersionKeyword as u8]));
 
 /// A set of tokens for primitive types.
 const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
@@ -58,7 +62,7 @@ const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
 ]);
 
 /// A set of tokens for all types.
-pub const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
+const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
     Token::MapTypeKeyword as u8,
     Token::ArrayTypeKeyword as u8,
     Token::PairTypeKeyword as u8,
@@ -72,6 +76,14 @@ const STRUCT_ITEM_RECOVERY_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new
     Token::ParameterMetaKeyword as u8,
     Token::CloseBrace as u8,
 ]));
+
+/// The expected set of tokens for struct sections.
+pub const STRUCT_SECTION_KEYWORDS: TokenSet = TYPE_EXPECTED_SET
+    .union(TokenSet::new(&[
+        Token::MetaKeyword as u8,
+        Token::ParameterMetaKeyword as u8,
+    ]))
+    .without(TokenSet::new(&[Token::Ident as u8]));
 
 /// The recovery set for input items.
 const INPUT_ITEM_RECOVERY_SET: TokenSet =
@@ -171,6 +183,12 @@ const WORKFLOW_STATEMENT_RECOVERY_SET: TokenSet = TokenSet::new(&[
     Token::ScatterKeyword as u8,
     Token::CloseBrace as u8,
 ]);
+
+/// The expected set of tokens for nested workflow statements.
+pub const NESTED_WORKFLOW_STATEMENT_KEYWORDS: TokenSet = TYPE_EXPECTED_SET
+    .without(TokenSet::new(&[Token::Ident as u8]))
+    .union(WORKFLOW_STATEMENT_RECOVERY_SET)
+    .without(TokenSet::new(&[Token::CloseBrace as u8]));
 
 /// The recovery set for input items in a call statement.
 const CALL_INPUT_ITEM_RECOVERY_SET: TokenSet = ANY_IDENT.union(TokenSet::new(&[

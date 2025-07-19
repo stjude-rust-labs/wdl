@@ -30,6 +30,59 @@ pub mod common;
 pub mod requirements;
 pub mod runtime;
 
+/// The set of all valid task fields for the implicit `task` variable.
+/// TODO: Make this tuple with (KEY, DESCRIPTION)
+pub const TASK_FIELDS: &[&str] = &[
+    TASK_FIELD_NAME,
+    TASK_FIELD_ID,
+    TASK_FIELD_CONTAINER,
+    TASK_FIELD_CPU,
+    TASK_FIELD_MEMORY,
+    TASK_FIELD_ATTEMPT,
+    TASK_FIELD_GPU,
+    TASK_FIELD_FPGA,
+    TASK_FIELD_DISKS,
+    TASK_FIELD_END_TIME,
+    TASK_FIELD_RETURN_CODE,
+    TASK_FIELD_META,
+    TASK_FIELD_PARAMETER_META,
+    TASK_FIELD_EXT,
+];
+
+/// The set of all valid runtime section keys.
+pub const RUNTIME_KEYS: &[&str] = &[
+    TASK_REQUIREMENT_CONTAINER,
+    TASK_REQUIREMENT_CPU,
+    TASK_REQUIREMENT_MEMORY,
+    TASK_REQUIREMENT_DISKS,
+    TASK_REQUIREMENT_GPU,
+];
+
+/// The set of all valid requirements section keys.
+pub const REQUIREMENTS_KEY: &[&str] = &[
+    TASK_REQUIREMENT_CONTAINER,
+    TASK_REQUIREMENT_CPU,
+    TASK_REQUIREMENT_MEMORY,
+    TASK_REQUIREMENT_GPU,
+    TASK_REQUIREMENT_FPGA,
+    TASK_REQUIREMENT_DISKS,
+    TASK_REQUIREMENT_MAX_RETRIES,
+    TASK_REQUIREMENT_RETURN_CODES,
+];
+
+/// The set of all valid task hints section keys.
+pub const TASK_HINT_KEYS: &[&str] = &[
+    TASK_HINT_DISKS,
+    TASK_HINT_GPU,
+    TASK_HINT_FPGA,
+    TASK_HINT_INPUTS,
+    TASK_HINT_LOCALIZATION_OPTIONAL,
+    TASK_HINT_MAX_CPU,
+    TASK_HINT_MAX_MEMORY,
+    TASK_HINT_OUTPUTS,
+    TASK_HINT_SHORT_TASK,
+];
+
 /// The name of the `name` task variable field.
 pub const TASK_FIELD_NAME: &str = "name";
 /// The name of the `id` task variable field.

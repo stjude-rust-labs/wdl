@@ -31,44 +31,18 @@ use wdl_ast::TreeNode;
 use wdl_ast::lexer::TokenSet;
 use wdl_ast::lexer::v1::Token;
 use wdl_ast::v1::Expr;
+use wdl_ast::v1::REQUIREMENTS_KEY;
+use wdl_ast::v1::RUNTIME_KEYS;
 use wdl_ast::v1::StructDefinition;
-use wdl_ast::v1::TASK_FIELD_ATTEMPT;
-use wdl_ast::v1::TASK_FIELD_CONTAINER;
-use wdl_ast::v1::TASK_FIELD_CPU;
-use wdl_ast::v1::TASK_FIELD_DISKS;
-use wdl_ast::v1::TASK_FIELD_END_TIME;
-use wdl_ast::v1::TASK_FIELD_EXT;
-use wdl_ast::v1::TASK_FIELD_FPGA;
-use wdl_ast::v1::TASK_FIELD_GPU;
-use wdl_ast::v1::TASK_FIELD_ID;
-use wdl_ast::v1::TASK_FIELD_MEMORY;
-use wdl_ast::v1::TASK_FIELD_META;
-use wdl_ast::v1::TASK_FIELD_NAME;
-use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
-use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
-use wdl_ast::v1::TASK_HINT_DISKS;
-use wdl_ast::v1::TASK_HINT_FPGA;
-use wdl_ast::v1::TASK_HINT_GPU;
-use wdl_ast::v1::TASK_HINT_INPUTS;
-use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL;
-use wdl_ast::v1::TASK_HINT_MAX_CPU;
-use wdl_ast::v1::TASK_HINT_MAX_MEMORY;
-use wdl_ast::v1::TASK_HINT_OUTPUTS;
-use wdl_ast::v1::TASK_HINT_SHORT_TASK;
-use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
-use wdl_ast::v1::TASK_REQUIREMENT_CPU;
-use wdl_ast::v1::TASK_REQUIREMENT_DISKS;
-use wdl_ast::v1::TASK_REQUIREMENT_FPGA;
-use wdl_ast::v1::TASK_REQUIREMENT_GPU;
-use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
-use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
-use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
+use wdl_ast::v1::TASK_FIELDS;
+use wdl_ast::v1::TASK_HINT_KEYS;
 use wdl_ast::v1::TaskDefinition;
-use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
+use wdl_ast::v1::WORKFLOW_HINT_KEYS;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_grammar::grammar::v1::NESTED_WORKFLOW_STATEMENT_KEYWORDS;
+use wdl_grammar::grammar::v1::ROOT_SECTION_KEYWORDS;
+use wdl_grammar::grammar::v1::STRUCT_SECTION_KEYWORDS;
 use wdl_grammar::grammar::v1::TASK_ITEM_EXPECTED_SET;
-use wdl_grammar::grammar::v1::TOP_RECOVERY_SET;
-use wdl_grammar::grammar::v1::TYPE_EXPECTED_SET;
 use wdl_grammar::grammar::v1::WORKFLOW_ITEM_EXPECTED_SET;
 use wdl_grammar::parser::ParserToken;
 
@@ -179,15 +153,7 @@ pub fn completion(
                     break;
                 }
                 SyntaxKind::ScatterStatementNode | SyntaxKind::ConditionalStatementNode => {
-                    const NESTED_WORKFLOW_KEYWORDS: TokenSet = TokenSet::new(&[
-                        Token::CallKeyword as u8,
-                        Token::ScatterKeyword as u8,
-                        Token::IfKeyword as u8,
-                    ]);
-                    add_keyword_completions(
-                        &TYPE_EXPECTED_SET.union(NESTED_WORKFLOW_KEYWORDS),
-                        &mut items,
-                    );
+                    add_keyword_completions(&NESTED_WORKFLOW_STATEMENT_KEYWORDS, &mut items);
                     if let Some(scope) = document.find_scope_by_position(offset.into()) {
                         add_scope_completions(scope, &mut items);
                     }
@@ -210,13 +176,7 @@ pub fn completion(
 
                 SyntaxKind::StructDefinitionNode => {
                     add_struct_completions(document, &mut items);
-                    add_keyword_completions(
-                        &TYPE_EXPECTED_SET.union(TokenSet::new(&[
-                            Token::MetaKeyword as u8,
-                            Token::ParameterMetaKeyword as u8,
-                        ])),
-                        &mut items,
-                    );
+                    add_keyword_completions(&STRUCT_SECTION_KEYWORDS, &mut items);
                     break;
                 }
 
@@ -240,10 +200,7 @@ pub fn completion(
                 }
 
                 SyntaxKind::RootNode => {
-                    add_keyword_completions(
-                        &TOP_RECOVERY_SET.union(TokenSet::new(&[Token::VersionKeyword as u8])),
-                        &mut items,
-                    );
+                    add_keyword_completions(&ROOT_SECTION_KEYWORDS, &mut items);
                     add_struct_completions(document, &mut items);
                     add_namespace_completions(document, &mut items);
                     break;
@@ -576,23 +533,6 @@ fn add_namespace_completions(document: &Document, items: &mut Vec<CompletionItem
 
 /// Adds completions for the members of the implicit `task` variable.
 fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
-    const TASK_FIELDS: &[&str] = &[
-        TASK_FIELD_NAME,
-        TASK_FIELD_ID,
-        TASK_FIELD_CONTAINER,
-        TASK_FIELD_CPU,
-        TASK_FIELD_MEMORY,
-        TASK_FIELD_ATTEMPT,
-        TASK_FIELD_GPU,
-        TASK_FIELD_FPGA,
-        TASK_FIELD_DISKS,
-        TASK_FIELD_END_TIME,
-        TASK_FIELD_RETURN_CODE,
-        TASK_FIELD_META,
-        TASK_FIELD_PARAMETER_META,
-        TASK_FIELD_EXT,
-    ];
-
     for field in TASK_FIELDS {
         if let Some(ty) = task_member_type(field) {
             items.push(CompletionItem {
@@ -607,14 +547,6 @@ fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `runtime` section keys.
 fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
-    const RUNTIME_KEYS: &[&str] = &[
-        TASK_REQUIREMENT_CONTAINER,
-        TASK_REQUIREMENT_CPU,
-        TASK_REQUIREMENT_MEMORY,
-        TASK_REQUIREMENT_DISKS,
-        TASK_REQUIREMENT_GPU,
-    ];
-
     for key in RUNTIME_KEYS {
         items.push(CompletionItem {
             label: key.to_string(),
@@ -626,17 +558,6 @@ fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `requirements` section keys.
 fn add_requirements_key_completions(items: &mut Vec<CompletionItem>) {
-    const REQUIREMENTS_KEY: &[&str] = &[
-        TASK_REQUIREMENT_CONTAINER,
-        TASK_REQUIREMENT_CPU,
-        TASK_REQUIREMENT_MEMORY,
-        TASK_REQUIREMENT_GPU,
-        TASK_REQUIREMENT_FPGA,
-        TASK_REQUIREMENT_DISKS,
-        TASK_REQUIREMENT_MAX_RETRIES,
-        TASK_REQUIREMENT_RETURN_CODES,
-    ];
-
     for key in REQUIREMENTS_KEY {
         items.push(CompletionItem {
             label: key.to_string(),
@@ -648,19 +569,7 @@ fn add_requirements_key_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `task hints` section keys.
 fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
-    const HINTS_KEY: &[&str] = &[
-        TASK_HINT_DISKS,
-        TASK_HINT_GPU,
-        TASK_HINT_FPGA,
-        TASK_HINT_INPUTS,
-        TASK_HINT_LOCALIZATION_OPTIONAL,
-        TASK_HINT_MAX_CPU,
-        TASK_HINT_MAX_MEMORY,
-        TASK_HINT_OUTPUTS,
-        TASK_HINT_SHORT_TASK,
-    ];
-
-    for key in HINTS_KEY {
+    for key in TASK_HINT_KEYS {
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
@@ -671,9 +580,7 @@ fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `workflow hints` section keys.
 fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
-    const HINTS_KEY: &[&str] = &[WORKFLOW_HINT_ALLOW_NESTED_INPUTS];
-
-    for key in HINTS_KEY {
+    for key in WORKFLOW_HINT_KEYS {
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
