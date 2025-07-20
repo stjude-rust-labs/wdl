@@ -16,19 +16,30 @@
 //!
 //! See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_completion
 
+use std::sync::Arc;
+
 use anyhow::Result;
 use anyhow::bail;
+use line_index::LineIndex;
 use lsp_types::CompletionItem;
 use lsp_types::CompletionItemKind;
+use lsp_types::CompletionTextEdit;
 use lsp_types::Documentation;
+use lsp_types::InsertTextFormat;
 use lsp_types::MarkupContent;
+use lsp_types::Range;
+use lsp_types::TextEdit;
 use rowan::TextSize;
+use tracing::error;
 use url::Url;
 use wdl_ast::AstNode;
+use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
+use wdl_ast::SyntaxToken;
 use wdl_ast::TreeNode;
 use wdl_ast::lexer::TokenSet;
+use wdl_ast::lexer::VersionStatementToken;
 use wdl_ast::lexer::v1::Token;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::REQUIREMENTS_KEY;
@@ -57,6 +68,7 @@ use crate::document::Workflow;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
 use crate::handlers::TypeEvalContext;
+use crate::handlers::position;
 use crate::handlers::position_to_offset;
 use crate::stdlib::Function;
 use crate::stdlib::STDLIB;
@@ -105,6 +117,27 @@ pub fn completion(
 
     let mut items = Vec::new();
 
+    if let Some(token) = token.as_ref() {
+        if token.parent().map(|p| p.kind()) == Some(SyntaxKind::VersionStatementNode) {
+            let _ = add_version_completions(token, &lines, &mut items);
+            return Ok(items);
+        }
+
+        // NOTE: Custom handling for version completion. If the token to the immediate
+        // left of the cursor (ignoring whitespace) is the `version` keyword, we are
+        // very likely completing the version number.
+        let mut non_trivia = token.clone();
+        if non_trivia.kind().is_trivia() {
+            if let Some(prev) = non_trivia.prev_token() {
+                non_trivia = prev;
+            }
+        }
+        if non_trivia.kind() == SyntaxKind::VersionKeyword {
+            let _ = add_version_completions(token, &lines, &mut items);
+            return Ok(items);
+        }
+    }
+
     let partial_word = token
         .as_ref()
         .filter(|t| t.kind() == SyntaxKind::Ident && t.text_range().contains_inclusive(offset))
@@ -140,6 +173,7 @@ pub fn completion(
     } else {
         let mut current = Some(parent);
         while let Some(node) = current {
+            error!("Current node kind is {:?}", node.kind());
             match node.kind() {
                 SyntaxKind::WorkflowDefinitionNode => {
                     add_keyword_completions(&WORKFLOW_ITEM_EXPECTED_SET, &mut items);
@@ -587,6 +621,41 @@ fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
             ..Default::default()
         });
     }
+}
+
+/// Adds completions for WDL versions.
+fn add_version_completions(
+    token_at_cursor: &SyntaxToken,
+    lines: &Arc<LineIndex>,
+    items: &mut Vec<CompletionItem>,
+) -> Result<()> {
+    let replacement_range =
+        if token_at_cursor.kind() == VersionStatementToken::Version.into_syntax() {
+            let text_range = token_at_cursor.text_range();
+            Some(Range {
+                start: position(lines, text_range.start())?,
+                end: position(lines, text_range.end())?,
+            })
+        } else {
+            None
+        };
+
+    for version in SupportedVersion::all() {
+        items.push(CompletionItem {
+            label: version.to_string(),
+            kind: Some(CompletionItemKind::ENUM_MEMBER),
+            detail: Some("WDL version".to_string()),
+            text_edit: replacement_range.map(|range| {
+                CompletionTextEdit::Edit(TextEdit {
+                    range,
+                    new_text: version.to_string(),
+                })
+            }),
+            insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+            ..Default::default()
+        });
+    }
+    Ok(())
 }
 
 /// Makes a LSP documentation from a definition text.

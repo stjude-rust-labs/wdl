@@ -441,3 +441,16 @@ async fn should_complete_workflow_hints_keys() {
 
     assert_contains(&items, "allow_nested_inputs");
 }
+
+#[tokio::test]
+async fn should_complete_versions() {
+    let mut ctx = setup().await;
+
+    let response = completion_request(&mut ctx, "version.wdl", Position::new(0, 8)).await;
+    let Some(CompletionResponse::Array(items)) = response else {
+        panic!("expected a response, got none");
+    };
+    println!("{items:?}");
+
+    assert_contains(&items, "1.0");
+}
