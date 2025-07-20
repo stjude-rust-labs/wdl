@@ -30,8 +30,10 @@ use lsp_types::MarkupContent;
 use lsp_types::Range;
 use lsp_types::TextEdit;
 use rowan::TextSize;
+use tracing::debug;
 use url::Url;
 use wdl_ast::AstNode;
+use wdl_ast::AstToken;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
@@ -40,10 +42,16 @@ use wdl_ast::TreeNode;
 use wdl_ast::lexer::TokenSet;
 use wdl_ast::lexer::VersionStatementToken;
 use wdl_ast::lexer::v1::Token;
+use wdl_ast::v1::AccessExpr;
+use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
+use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::REQUIREMENTS_KEY;
 use wdl_ast::v1::RUNTIME_KEYS;
 use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TASK_FIELD_META;
+use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
 use wdl_ast::v1::TASK_FIELDS;
 use wdl_ast::v1::TASK_HINT_KEYS;
 use wdl_ast::v1::TaskDefinition;
@@ -156,14 +164,13 @@ pub fn completion(
     // Trigger member access completions if the cursor is on a dot, or on an
     // identifier immediately following a dot.
     let is_member_access = if let Some(t) = &token {
-        if t.kind() == SyntaxKind::Dot {
-            true
-        } else if t.kind() == SyntaxKind::Ident {
-            t.prev_token()
+        match t.kind() {
+            SyntaxKind::Dot | SyntaxKind::OpenBracket => true,
+            SyntaxKind::Ident => t
+                .prev_token()
                 .filter(|prev| !prev.kind().is_trivia())
-                .is_some_and(|prev| prev.kind() == SyntaxKind::Dot)
-        } else {
-            false
+                .is_some_and(|prev| prev.kind() == SyntaxKind::Dot),
+            _ => false,
         }
     } else {
         false
@@ -300,63 +307,111 @@ fn add_member_access_completions(
     node: &SyntaxNode,
     items: &mut Vec<CompletionItem>,
 ) -> Result<()> {
-    let Some(dot_token) = node
+    let Some(accessor_token) = node
         .children_with_tokens()
-        .find(|t| t.kind() == SyntaxKind::Dot)
+        .find(|t| matches!(t.kind(), SyntaxKind::Dot | SyntaxKind::OpenBracket))
     else {
+        debug!("could not find accessor token ( or [");
         return Ok(());
     };
 
-    let Some(target_element) = dot_token.prev_sibling_or_token() else {
+    let Some(target_element) = accessor_token.prev_sibling_or_token() else {
         return Ok(());
     };
 
-    match &target_element {
-        rowan::NodeOrToken::Node(n) => {
-            if n.text() == TASK_VAR_NAME
-                && document.version()
-                    >= Some(wdl_ast::SupportedVersion::V1(wdl_ast::version::V1::Two))
-            {
-                if let Some(parent) = n.parent() {
-                    if matches!(
-                        parent.kind(),
-                        SyntaxKind::CommandSectionNode | SyntaxKind::OutputSectionNode
-                    ) {
-                        add_task_variable_completions(items);
+    // NOTE: Special case for handling `task` variable, which doesn't rely on full
+    // type evaluation.
+    if let Some(target_node) = target_element.as_node() {
+        if let Some(expr) = Expr::cast(target_node.clone()) {
+            // Case: `task.`
+            if let Some(name_ref) = expr.as_name_ref() {
+                if name_ref.name().text() == TASK_VAR_NAME
+                    && document.version()
+                        >= Some(wdl_ast::SupportedVersion::V1(wdl_ast::version::V1::Two))
+                {
+                    if let Some(parent) = node.parent() {
+                        if matches!(
+                            parent.kind(),
+                            SyntaxKind::CommandSectionNode | SyntaxKind::OutputSectionNode
+                        ) {
+                            add_task_variable_completions(items);
+                            return Ok(());
+                        }
                     }
+                }
+            }
+
+            // Case: `task.meta.` or `task.parmeter_meta.`
+            if let Some(access_expr) = expr.into_access() {
+                let (lhs, rhs) = access_expr.operands();
+                if let Some(name_ref) = lhs.as_name_ref() {
+                    if name_ref.name().text() == TASK_VAR_NAME {
+                        let member_name = rhs.text();
+
+                        if member_name == TASK_FIELD_META {
+                            if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
+                            {
+                                if let Some(meta_section) = task_def.metadata() {
+                                    for item in meta_section.items() {
+                                        items.push(CompletionItem {
+                                            label: item.name().text().to_string(),
+                                            kind: Some(CompletionItemKind::PROPERTY),
+                                            detail: Some(format_ty(item.value()).to_string()),
+                                            ..Default::default()
+                                        });
+                                    }
+                                }
+                            }
+                            return Ok(());
+                        } else if member_name == TASK_FIELD_PARAMETER_META {
+                            if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
+                            {
+                                if let Some(param_meta_section) = task_def.parameter_metadata() {
+                                    for item in param_meta_section.items() {
+                                        items.push(CompletionItem {
+                                            label: item.name().text().to_string(),
+                                            kind: Some(CompletionItemKind::PROPERTY),
+                                            detail: Some(format_ty(item.value()).to_string()),
+                                            ..Default::default()
+                                        });
+                                    }
+                                }
+                            }
+                            return Ok(());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if let rowan::NodeOrToken::Token(t) = &target_element {
+        if t.kind() == SyntaxKind::Ident {
+            if let Some(ns) = document.namespace(t.text()) {
+                let ns_root = ns.document().root();
+                for task in ns.document().tasks() {
+                    items.push(CompletionItem {
+                        label: task.name().to_string(),
+                        kind: Some(CompletionItemKind::FUNCTION),
+                        detail: Some(format!("task {}", task.name())),
+                        documentation: provide_task_documentation(task, &ns_root)
+                            .and_then(make_md_docs),
+                        ..Default::default()
+                    })
+                }
+
+                if let Some(workflow) = ns.document().workflow() {
+                    items.push(CompletionItem {
+                        label: workflow.name().to_string(),
+                        kind: Some(CompletionItemKind::FUNCTION),
+                        detail: Some(format!("workflow {}", workflow.name())),
+                        documentation: provide_workflow_documentation(workflow, &ns_root)
+                            .and_then(make_md_docs),
+                        ..Default::default()
+                    });
                 }
 
                 return Ok(());
-            }
-        }
-        rowan::NodeOrToken::Token(t) => {
-            if t.kind() == SyntaxKind::Ident {
-                if let Some(ns) = document.namespace(t.text()) {
-                    let ns_root = ns.document().root();
-                    for task in ns.document().tasks() {
-                        items.push(CompletionItem {
-                            label: task.name().to_string(),
-                            kind: Some(CompletionItemKind::FUNCTION),
-                            detail: Some(format!("task {}", task.name())),
-                            documentation: provide_task_documentation(task, &ns_root)
-                                .and_then(make_md_docs),
-                            ..Default::default()
-                        })
-                    }
-
-                    if let Some(workflow) = ns.document().workflow() {
-                        items.push(CompletionItem {
-                            label: workflow.name().to_string(),
-                            kind: Some(CompletionItemKind::FUNCTION),
-                            detail: Some(format!("workflow {}", workflow.name())),
-                            documentation: provide_workflow_documentation(workflow, &ns_root)
-                                .and_then(make_md_docs),
-                            ..Default::default()
-                        });
-                    }
-
-                    return Ok(());
-                }
             }
         }
     }
@@ -379,8 +434,8 @@ fn add_member_access_completions(
     let mut evaluator = ExprTypeEvaluator::new(&mut ctx);
     let target_type = evaluator.evaluate_expr(&target_expr).unwrap_or(Type::Union);
 
-    match target_type {
-        Type::Compound(CompoundType::Struct(s), _) => {
+    match (accessor_token.kind(), target_type) {
+        (SyntaxKind::Dot, Type::Compound(CompoundType::Struct(s), _)) => {
             for (name, ty) in s.members() {
                 items.push(CompletionItem {
                     label: name.to_string(),
@@ -390,7 +445,7 @@ fn add_member_access_completions(
                 });
             }
         }
-        Type::Call(call) => {
+        (SyntaxKind::Dot, Type::Call(call)) => {
             for (name, output) in call.outputs() {
                 items.push(CompletionItem {
                     label: name.to_string(),
@@ -400,7 +455,7 @@ fn add_member_access_completions(
                 });
             }
         }
-        Type::Compound(CompoundType::Pair(p), _) => {
+        (SyntaxKind::Dot, Type::Compound(CompoundType::Pair(p), _)) => {
             items.push(CompletionItem {
                 label: "left".to_string(),
                 kind: Some(CompletionItemKind::FIELD),
@@ -415,7 +470,115 @@ fn add_member_access_completions(
                 ..Default::default()
             });
         }
-        _ => {}
+        (SyntaxKind::OpenBracket, Type::Compound(CompoundType::Map(_), _)) => {
+            if let Expr::NameRef(name_ref) = target_expr {
+                let var_name = name_ref.name();
+
+                if let Some(decl_span) = scope.lookup(var_name.text()).map(|n| n.span()) {
+                    let token_at_decl = document
+                        .root()
+                        .inner()
+                        .token_at_offset(TextSize::try_from(decl_span.start())?)
+                        .left_biased();
+
+                    if let Some(decl_node) =
+                        token_at_decl.and_then(|t| t.parent_ancestors().find_map(BoundDecl::cast))
+                    {
+                        if let Expr::Literal(LiteralExpr::Map(map_literal)) = decl_node.expr() {
+                            for item in map_literal.items() {
+                                let (key, _) = item.key_value();
+                                if let Expr::Literal(literal_key) = key {
+                                    match literal_key {
+                                        LiteralExpr::String(s) => {
+                                            if let Some(text) = s.text() {
+                                                items.push(CompletionItem {
+                                                    label: format!("\"{}\"", text.text()),
+                                                    kind: Some(CompletionItemKind::VALUE),
+                                                    ..Default::default()
+                                                });
+                                            }
+                                        }
+
+                                        LiteralExpr::Integer(i) => {
+                                            items.push(CompletionItem {
+                                                label: format!("{}", i.text()),
+                                                kind: Some(CompletionItemKind::VALUE),
+                                                ..Default::default()
+                                            });
+                                        }
+
+                                        LiteralExpr::Float(f) => {
+                                            items.push(CompletionItem {
+                                                label: format!("{}", f.text()),
+                                                kind: Some(CompletionItemKind::VALUE),
+                                                ..Default::default()
+                                            });
+                                        }
+
+                                        LiteralExpr::Boolean(b) => {
+                                            items.push(CompletionItem {
+                                                label: format!("{}", b.text()),
+                                                kind: Some(CompletionItemKind::VALUE),
+                                                ..Default::default()
+                                            });
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if let Expr::Literal(LiteralExpr::Map(map_literal)) = target_expr {
+                for item in map_literal.items() {
+                    let (key, _) = item.key_value();
+                    if let Expr::Literal(literal_key) = key {
+                        match literal_key {
+                            LiteralExpr::String(s) => {
+                                if let Some(text) = s.text() {
+                                    items.push(CompletionItem {
+                                        label: format!("\"{}\"", text.text()),
+                                        kind: Some(CompletionItemKind::VALUE),
+                                        ..Default::default()
+                                    });
+                                }
+                            }
+
+                            LiteralExpr::Integer(i) => {
+                                items.push(CompletionItem {
+                                    label: format!("{}", i.text()),
+                                    kind: Some(CompletionItemKind::VALUE),
+                                    ..Default::default()
+                                });
+                            }
+
+                            LiteralExpr::Float(f) => {
+                                items.push(CompletionItem {
+                                    label: format!("{}", f.text()),
+                                    kind: Some(CompletionItemKind::VALUE),
+                                    ..Default::default()
+                                });
+                            }
+
+                            LiteralExpr::Boolean(b) => {
+                                items.push(CompletionItem {
+                                    label: format!("{}", b.text()),
+                                    kind: Some(CompletionItemKind::VALUE),
+                                    ..Default::default()
+                                });
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            };
+        }
+        _ => {
+            debug!(
+                "No specific access completion logic for this type {:?}",
+                accessor_token.kind()
+            );
+        }
     }
 
     Ok(())
@@ -763,5 +926,18 @@ fn provide_struct_documentation(struct_info: &Struct, root: &wdl_ast::Document) 
                 Some(s)
             }),
         Err(_) => None,
+    }
+}
+
+/// Formats metadata value to type.
+fn format_ty(value: MetadataValue) -> &'static str {
+    match value {
+        MetadataValue::Boolean(_) => "Boolean",
+        MetadataValue::Integer(_) => "Int",
+        MetadataValue::Float(_) => "Float",
+        MetadataValue::String(_) => "String",
+        MetadataValue::Null(_) => "Null",
+        MetadataValue::Object(_) => "Object",
+        MetadataValue::Array(_) => "Array",
     }
 }
