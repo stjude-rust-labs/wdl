@@ -36,7 +36,10 @@ pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS: &str = "allow_nested_inputs";
 pub const WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS: &str = "allowNestedInputs";
 
 /// The set of all valid workflow hints section keys.
-pub const WORKFLOW_HINT_KEYS: &[&str] = &[WORKFLOW_HINT_ALLOW_NESTED_INPUTS];
+pub const WORKFLOW_HINT_KEYS: &[(&str, &str)] = &[(
+    WORKFLOW_HINT_ALLOW_NESTED_INPUTS,
+    "If `true`, allows nested input objects for the workflow.",
+)];
 
 /// Represents a workflow definition.
 #[derive(Clone, Debug, PartialEq, Eq)]

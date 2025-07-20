@@ -75,7 +75,9 @@ use crate::stdlib::TypeParameters;
 use crate::types::CompoundType;
 use crate::types::Type;
 use crate::types::v1::ExprTypeEvaluator;
+use crate::types::v1::task_hint_types;
 use crate::types::v1::task_member_type;
+use crate::types::v1::task_requirement_types;
 
 /// Provides code completion suggestions for the given position in a document.
 ///
@@ -213,16 +215,16 @@ pub fn completion(
                 }
 
                 SyntaxKind::RuntimeSectionNode => {
-                    add_runtime_key_completions(&mut items);
+                    add_runtime_key_completions(document.version(), &mut items);
                     break;
                 }
 
                 SyntaxKind::RequirementsSectionNode => {
-                    add_requirements_key_completions(&mut items);
+                    add_requirements_key_completions(document.version(), &mut items);
                     break;
                 }
                 SyntaxKind::TaskHintsSectionNode => {
-                    add_task_hints_key_completions(&mut items);
+                    add_task_hints_key_completions(document.version(), &mut items);
                     break;
                 }
 
@@ -565,12 +567,13 @@ fn add_namespace_completions(document: &Document, items: &mut Vec<CompletionItem
 
 /// Adds completions for the members of the implicit `task` variable.
 fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
-    for field in TASK_FIELDS {
-        if let Some(ty) = task_member_type(field) {
+    for (key, desc) in TASK_FIELDS {
+        if let Some(ty) = task_member_type(key) {
             items.push(CompletionItem {
-                label: field.to_string(),
+                label: key.to_string(),
                 kind: Some(CompletionItemKind::FIELD),
                 detail: Some(ty.to_string()),
+                documentation: make_md_docs(desc.to_string()),
                 ..Default::default()
             });
         }
@@ -578,33 +581,75 @@ fn add_task_variable_completions(items: &mut Vec<CompletionItem>) {
 }
 
 /// Adds completions for `runtime` section keys.
-fn add_runtime_key_completions(items: &mut Vec<CompletionItem>) {
-    for key in RUNTIME_KEYS {
+fn add_runtime_key_completions(version: Option<SupportedVersion>, items: &mut Vec<CompletionItem>) {
+    for (key, desc) in RUNTIME_KEYS {
+        let ty = version
+            .and_then(|v| task_requirement_types(v, key))
+            .map(|types| {
+                types
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(" | ")
+            });
+
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
+            detail: ty,
+            documentation: make_md_docs(desc.to_string()),
             ..Default::default()
         });
     }
 }
 
 /// Adds completions for `requirements` section keys.
-fn add_requirements_key_completions(items: &mut Vec<CompletionItem>) {
-    for key in REQUIREMENTS_KEY {
+fn add_requirements_key_completions(
+    version: Option<SupportedVersion>,
+    items: &mut Vec<CompletionItem>,
+) {
+    for (key, desc) in REQUIREMENTS_KEY {
+        let ty = version
+            .and_then(|v| task_requirement_types(v, key))
+            .map(|types| {
+                types
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(" | ")
+            });
+
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
+            detail: ty,
+            documentation: make_md_docs(desc.to_string()),
             ..Default::default()
         });
     }
 }
 
 /// Adds completions for `task hints` section keys.
-fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
-    for key in TASK_HINT_KEYS {
+fn add_task_hints_key_completions(
+    version: Option<SupportedVersion>,
+    items: &mut Vec<CompletionItem>,
+) {
+    for (key, desc) in TASK_HINT_KEYS {
+        let ty = version
+            .and_then(|v| task_hint_types(v, key, false))
+            .map(|types| {
+                types
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(" | ")
+            });
+
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
+            detail: ty,
+            documentation: make_md_docs(desc.to_string()),
             ..Default::default()
         });
     }
@@ -612,10 +657,11 @@ fn add_task_hints_key_completions(items: &mut Vec<CompletionItem>) {
 
 /// Adds completions for `workflow hints` section keys.
 fn add_workflow_hints_key_completions(items: &mut Vec<CompletionItem>) {
-    for key in WORKFLOW_HINT_KEYS {
+    for (key, desc) in WORKFLOW_HINT_KEYS {
         items.push(CompletionItem {
             label: key.to_string(),
             kind: Some(CompletionItemKind::PROPERTY),
+            documentation: make_md_docs(desc.to_string()),
             ..Default::default()
         });
     }
