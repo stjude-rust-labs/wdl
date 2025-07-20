@@ -30,7 +30,6 @@ use lsp_types::MarkupContent;
 use lsp_types::Range;
 use lsp_types::TextEdit;
 use rowan::TextSize;
-use tracing::error;
 use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::SupportedVersion;
@@ -173,7 +172,6 @@ pub fn completion(
     } else {
         let mut current = Some(parent);
         while let Some(node) = current {
-            error!("Current node kind is {:?}", node.kind());
             match node.kind() {
                 SyntaxKind::WorkflowDefinitionNode => {
                     add_keyword_completions(&WORKFLOW_ITEM_EXPECTED_SET, &mut items);
