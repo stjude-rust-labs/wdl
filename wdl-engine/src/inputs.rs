@@ -881,7 +881,7 @@ impl Inputs {
                 .with_context(|| format!("invalid input key `{key}`"))?;
 
             match key.split_once(".") {
-                Some((first, remainder)) if first == task.name() => {
+                Some((prefix, remainder)) if prefix == task.name() => {
                     inputs
                         .set_path_value(document, task, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
@@ -911,7 +911,7 @@ impl Inputs {
                 .with_context(|| format!("invalid input key `{key}`"))?;
 
             match key.split_once(".") {
-                Some((first, remainder)) if first == workflow.name() => {
+                Some((prefix, remainder)) if prefix == workflow.name() => {
                     inputs
                         .set_path_value(document, workflow, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
