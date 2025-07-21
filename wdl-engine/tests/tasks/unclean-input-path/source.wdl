@@ -9,7 +9,7 @@ task test {
     }
 
     command <<<
-        cat ~{file}
+        cat '~{file}'
     >>>
 
     output {

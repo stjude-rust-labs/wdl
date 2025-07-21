@@ -1,1 +1,1 @@
-cat message.txt
+cat 'message.txt'
