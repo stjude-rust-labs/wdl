@@ -234,9 +234,7 @@ impl Inputs {
                 // within.
                 let cwd = std::env::current_dir().unwrap();
 
-                let key = if let Some(prefix) = &prefix
-                    && !key.starts_with(prefix)
-                {
+                let key = if let Some(prefix) = &prefix {
                     format!("{prefix}{key}")
                 } else {
                     key
