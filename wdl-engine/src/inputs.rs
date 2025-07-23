@@ -11,6 +11,7 @@ use anyhow::Result;
 use anyhow::bail;
 use indexmap::IndexMap;
 use serde::Serialize;
+use serde::ser::SerializeMap;
 use serde_json::Value as JsonValue;
 use serde_yaml_ng::Value as YamlValue;
 use wdl_analysis::Document;
@@ -311,7 +312,15 @@ impl Serialize for TaskInputs {
         S: serde::Serializer,
     {
         // Only serialize the input values
-        self.inputs.serialize(serializer)
+        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
+        self.inputs.iter().for_each(|(k, v)| {
+            let serialized_value = v.serializable_with_pairs();
+            map.serialize_entry(k, &serialized_value)
+                .unwrap_or_else(|e| {
+                    panic!("failed to serialize value `{v}` for input `{k}`: {e}");
+                });
+        });
+        map.end()
     }
 }
 
@@ -630,7 +639,15 @@ impl Serialize for WorkflowInputs {
     {
         // Note: for serializing, only serialize the direct inputs, not the nested
         // inputs
-        self.inputs.serialize(serializer)
+        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
+        self.inputs.iter().for_each(|(k, v)| {
+            let serialized_value = v.serializable_with_pairs();
+            map.serialize_entry(k, &serialized_value)
+                .unwrap_or_else(|e| {
+                    panic!("failed to serialize value `{v}` for input `{k}`: {e}");
+                });
+        });
+        map.end()
     }
 }
 
