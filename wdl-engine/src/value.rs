@@ -527,6 +527,28 @@ impl Value {
             _ => None,
         }
     }
+
+    /// Serializes value with special handling for pairs.
+    pub(crate) fn serializable_with_pairs(&self) -> impl serde::Serialize {
+        struct Serializable<'a>(&'a Value);
+
+        impl serde::Serialize for Serializable<'_> {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                // match self.0 and if it's a compound value,
+                // serialize with a call to `CompoundValue::serializable_with_pairs().
+                // otherwise, serialize it normally
+                match self.0 {
+                    Value::Compound(v) => v.serializable_with_pairs().serialize(serializer),
+                    _ => self.0.serialize(serializer),
+                }
+            }
+        }
+
+        Serializable(self)
+    }
 }
 
 impl fmt::Display for Value {
@@ -2352,6 +2374,32 @@ impl CompoundValue {
         }
 
         Ok(())
+    }
+
+    /// Serializes the value using a specialized serialization for `pair` types
+    pub(crate) fn serializable_with_pairs(&self) -> impl serde::Serialize {
+        struct Serializable<'a>(&'a CompoundValue);
+
+        impl serde::Serialize for Serializable<'_> {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                match self.0 {
+                    CompoundValue::Pair(pair) => {
+                        let mut state = serializer.serialize_map(Some(2))?;
+                        let left = pair.left().serializable_with_pairs();
+                        let right = pair.right().serializable_with_pairs();
+                        state.serialize_entry("left", &left)?;
+                        state.serialize_entry("right", &right)?;
+                        state.end()
+                    }
+                    _ => self.0.serialize(serializer),
+                }
+            }
+        }
+
+        Serializable(self)
     }
 }
 

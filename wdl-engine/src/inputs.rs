@@ -11,7 +11,6 @@ use anyhow::Result;
 use anyhow::bail;
 use indexmap::IndexMap;
 use serde::Serialize;
-use serde::ser::SerializeMap;
 use serde_json::Value as JsonValue;
 use serde_yaml_ng::Value as YamlValue;
 use wdl_analysis::Document;
