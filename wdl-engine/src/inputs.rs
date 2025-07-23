@@ -322,22 +322,10 @@ impl Serialize for TaskInputs {
                         "right": p.right(),
                     }),
                 )
-                .expect(
-                    format!(
-                        "failed to serialize pair value for key `{}` with value `{}`",
-                        key, value
-                    )
-                    .as_str(),
-                );
+                .unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
             }
             _ => {
-                map.serialize_entry(key, value).expect(
-                    format!(
-                        "failed to serialize pair value for key `{}` with value `{}`",
-                        key, value
-                    )
-                    .as_str(),
-                );
+                map.serialize_entry(key, value).unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
             }
         });
         map.end()
@@ -667,22 +655,10 @@ impl Serialize for WorkflowInputs {
                         "right": p.right(),
                     }),
                 )
-                .expect(
-                    format!(
-                        "failed to serialize pair value for key `{}` with value `{}`",
-                        key, value
-                    )
-                    .as_str(),
-                );
+                .unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
             }
             _ => {
-                map.serialize_entry(key, value).expect(
-                    format!(
-                        "failed to serialize pair value for key `{}` with value `{}`",
-                        key, value
-                    )
-                    .as_str(),
-                );
+                map.serialize_entry(key, value).unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
             }
         });
         map.end()
