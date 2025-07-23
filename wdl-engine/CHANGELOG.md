@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
-* Allow `Object` -> `Pair` coercion if keys are correct
-* Serialize `Pair` as `Object` type
+* Allow `Object` -> `Pair` coercion if keys are correct ([#538](https://github.com/stjude-rust-labs/wdl/pull/538)).
+* Serialize `Pair` as `Object` type ([#538](https://github.com/stjude-rust-labs/wdl/pull/538)).
 
 ## 0.5.0 - 07-09-2025
 
