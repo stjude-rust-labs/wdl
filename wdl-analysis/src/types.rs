@@ -432,6 +432,11 @@ impl Coercible for Type {
                         // Note: checking object keys and values is a runtime constraint
                         true
                     }
+                    CompoundType::Pair(_) => {
+                        // Object -> Pair is valid if the object has "left" and "right" members
+                        // Note: checking object keys and values is a runtime constraint
+                        true
+                    }
                     _ => false,
                 }
             }

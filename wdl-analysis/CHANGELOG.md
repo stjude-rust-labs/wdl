@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Changed
 
 * The `UnusedCall` rule no longer emits a diagnostic for tasks/workflows called if they have an empty or missing `output` section ([#532](https://github.com/stjude-rust-labs/wdl/pull/532)).
+* Allow `Object` -> `Pair` coercion
 
 ## 0.10.0 - 07-09-2025
 

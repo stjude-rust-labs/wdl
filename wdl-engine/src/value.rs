@@ -2497,6 +2497,34 @@ impl Coercible for CompoundValue {
                             .collect::<Result<_>>()?,
                     )));
                 }
+                // Object -> Pair
+                (Self::Object(v), CompoundType::Pair(_)) => {
+                    // Check that the object has exactly "left" and "right" members
+                    let left_value = v.get("left").ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce object to Pair type `{target}`: missing 'left' member"
+                        )
+                    })?;
+                    let right_value = v.get("right").ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce object to Pair type `{target}`: missing 'right' member"
+                        )
+                    })?;
+
+                    // Check that there are no extra members
+                    if v.len() != 2 {
+                        bail!(
+                            "cannot coerce object to Pair type `{target}`: object must have exactly 'left' and 'right' members, but found {} members",
+                            v.len()
+                        );
+                    }
+
+                    return Ok(Self::Pair(Pair::new(
+                        target.clone(),
+                        left_value.clone(),
+                        right_value.clone(),
+                    )?));
+                }
                 // Object -> Struct
                 (Self::Object(v), CompoundType::Struct(_)) => {
                     return Ok(Self::Struct(Struct::new(
@@ -2620,7 +2648,12 @@ impl serde::Serialize for CompoundValue {
         use serde::ser::Error;
 
         match self {
-            Self::Pair(_) => Err(S::Error::custom("a pair cannot be serialized")),
+            Self::Pair(_) => {
+                let mut s = serializer.serialize_map(Some(2))?;
+                s.serialize_entry("left", &self.as_pair().unwrap().left())?;
+                s.serialize_entry("right", &self.as_pair().unwrap().right())?;
+                s.end()
+            }
             Self::Array(v) => {
                 let mut s = serializer.serialize_seq(Some(v.len()))?;
                 for v in v.as_slice() {
