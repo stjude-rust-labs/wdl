@@ -450,7 +450,8 @@ async fn should_complete_versions() {
     let Some(CompletionResponse::Array(items)) = response else {
         panic!("expected a response, got none");
     };
-    println!("{items:?}");
 
     assert_contains(&items, "1.0");
+    assert_contains(&items, "1.1");
+    assert_contains(&items, "1.2");
 }
