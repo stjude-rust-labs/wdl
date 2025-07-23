@@ -7,15 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Added
+
+* Serialize `Pair` as `Object` for execution-level `inputs.json` and `outputs.json` ([#538](https://github.com/stjude-rust-labs/wdl/pull/538)).
+
 #### Fixed
 
 * Fixed a failure to clean input file and directory paths ([#537](https://github.com/stjude-rust-labs/wdl/pull/537)).
 * Fixed a panic that may occur in array and map literal evaluation ([#529](https://github.com/stjude-rust-labs/wdl/pull/529)).
-
-#### Changed
-
-* Allow `Object` -> `Pair` coercion if keys are correct ([#538](https://github.com/stjude-rust-labs/wdl/pull/538)).
-* Serialize `Pair` as `Object` type ([#538](https://github.com/stjude-rust-labs/wdl/pull/538)).
 
 ## 0.5.0 - 07-09-2025
 
