@@ -11,6 +11,7 @@ use anyhow::Result;
 use anyhow::bail;
 use indexmap::IndexMap;
 use serde::Serialize;
+use serde::ser::SerializeMap;
 use serde_json::Value as JsonValue;
 use serde_yaml_ng::Value as YamlValue;
 use wdl_analysis::Document;
@@ -24,6 +25,7 @@ use wdl_analysis::types::v1::task_hint_types;
 use wdl_analysis::types::v1::task_requirement_types;
 
 use crate::Coercible;
+use crate::CompoundValue;
 use crate::Value;
 
 /// A type alias to a JSON map (object).
@@ -310,8 +312,35 @@ impl Serialize for TaskInputs {
     where
         S: serde::Serializer,
     {
-        // Only serialize the input values
-        self.inputs.serialize(serializer)
+        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
+        self.inputs.iter().for_each(|(key, value)| match value {
+            Value::Compound(CompoundValue::Pair(p)) => {
+                map.serialize_entry(
+                    key,
+                    &serde_json::json!({
+                        "left": p.left(),
+                        "right": p.right(),
+                    }),
+                )
+                .expect(
+                    format!(
+                        "failed to serialize pair value for key `{}` with value `{}`",
+                        key, value
+                    )
+                    .as_str(),
+                );
+            }
+            _ => {
+                map.serialize_entry(key, value).expect(
+                    format!(
+                        "failed to serialize pair value for key `{}` with value `{}`",
+                        key, value
+                    )
+                    .as_str(),
+                );
+            }
+        });
+        map.end()
     }
 }
 
@@ -628,9 +657,35 @@ impl Serialize for WorkflowInputs {
     where
         S: serde::Serializer,
     {
-        // Note: for serializing, only serialize the direct inputs, not the nested
-        // inputs
-        self.inputs.serialize(serializer)
+        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
+        self.inputs.iter().for_each(|(key, value)| match value {
+            Value::Compound(CompoundValue::Pair(p)) => {
+                map.serialize_entry(
+                    key,
+                    &serde_json::json!({
+                        "left": p.left(),
+                        "right": p.right(),
+                    }),
+                )
+                .expect(
+                    format!(
+                        "failed to serialize pair value for key `{}` with value `{}`",
+                        key, value
+                    )
+                    .as_str(),
+                );
+            }
+            _ => {
+                map.serialize_entry(key, value).expect(
+                    format!(
+                        "failed to serialize pair value for key `{}` with value `{}`",
+                        key, value
+                    )
+                    .as_str(),
+                );
+            }
+        });
+        map.end()
     }
 }
 
