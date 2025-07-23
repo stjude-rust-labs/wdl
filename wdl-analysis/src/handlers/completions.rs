@@ -42,7 +42,6 @@ use wdl_ast::TreeNode;
 use wdl_ast::lexer::TokenSet;
 use wdl_ast::lexer::VersionStatementToken;
 use wdl_ast::lexer::v1::Token;
-use wdl_ast::v1::AccessExpr;
 use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
@@ -319,75 +318,10 @@ fn add_member_access_completions(
         return Ok(());
     };
 
-    // NOTE: Special case for handling `task` variable, which doesn't rely on full
-    // type evaluation.
-    if let Some(target_node) = target_element.as_node() {
-        if let Some(expr) = Expr::cast(target_node.clone()) {
-            // Case: `task.`
-            if let Some(name_ref) = expr.as_name_ref() {
-                if name_ref.name().text() == TASK_VAR_NAME
-                    && document.version()
-                        >= Some(wdl_ast::SupportedVersion::V1(wdl_ast::version::V1::Two))
-                {
-                    if let Some(parent) = node.parent() {
-                        if matches!(
-                            parent.kind(),
-                            SyntaxKind::CommandSectionNode | SyntaxKind::OutputSectionNode
-                        ) {
-                            add_task_variable_completions(items);
-                            return Ok(());
-                        }
-                    }
-                }
-            }
-
-            // Case: `task.meta.` or `task.parmeter_meta.`
-            if let Some(access_expr) = expr.into_access() {
-                let (lhs, rhs) = access_expr.operands();
-                if let Some(name_ref) = lhs.as_name_ref() {
-                    if name_ref.name().text() == TASK_VAR_NAME {
-                        let member_name = rhs.text();
-
-                        if member_name == TASK_FIELD_META {
-                            if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
-                            {
-                                if let Some(meta_section) = task_def.metadata() {
-                                    for item in meta_section.items() {
-                                        items.push(CompletionItem {
-                                            label: item.name().text().to_string(),
-                                            kind: Some(CompletionItemKind::PROPERTY),
-                                            detail: Some(format_ty(item.value()).to_string()),
-                                            ..Default::default()
-                                        });
-                                    }
-                                }
-                            }
-                            return Ok(());
-                        } else if member_name == TASK_FIELD_PARAMETER_META {
-                            if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
-                            {
-                                if let Some(param_meta_section) = task_def.parameter_metadata() {
-                                    for item in param_meta_section.items() {
-                                        items.push(CompletionItem {
-                                            label: item.name().text().to_string(),
-                                            kind: Some(CompletionItemKind::PROPERTY),
-                                            detail: Some(format_ty(item.value()).to_string()),
-                                            ..Default::default()
-                                        });
-                                    }
-                                }
-                            }
-                            return Ok(());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if let rowan::NodeOrToken::Token(t) = &target_element {
-        if t.kind() == SyntaxKind::Ident {
-            if let Some(ns) = document.namespace(t.text()) {
+    // Namespace completions
+    if let Some(token) = target_element.as_token() {
+        if token.kind() == SyntaxKind::Ident {
+            if let Some(ns) = document.namespace(token.text()) {
                 let ns_root = ns.document().root();
                 for task in ns.document().tasks() {
                     items.push(CompletionItem {
@@ -416,8 +350,6 @@ fn add_member_access_completions(
         }
     }
 
-    // NOTE: we do type evaluation only for non namespaces or complex types
-
     let Some(target_node) = target_element.as_node() else {
         return Ok(());
     };
@@ -425,6 +357,66 @@ fn add_member_access_completions(
     let Some(target_expr) = Expr::cast(target_node.clone()) else {
         return Ok(());
     };
+
+    // `task.` variable completions
+    if let Some(name_ref) = target_expr.as_name_ref() {
+        if name_ref.name().text() == TASK_VAR_NAME
+            && document.version() >= Some(SupportedVersion::V1(wdl_ast::version::V1::Two))
+            && node.ancestors().any(|n| {
+                matches!(
+                    n.kind(),
+                    SyntaxKind::CommandSectionNode | SyntaxKind::OutputSectionNode
+                )
+            })
+        {
+            add_task_variable_completions(items);
+            return Ok(());
+        }
+    } else if let Some(access_expr) = target_expr.as_access() {
+        // Inferred `task.meta.*` and `task.parameter_meta.*` completions.
+        // TODO: recurse on `Objects`
+        let (expr, member) = access_expr.operands();
+        if let Some(name_ref) = expr.as_name_ref() {
+            if name_ref.name().text() == TASK_VAR_NAME {
+                let member_name = member.text();
+                // `task.meta.*` completions.
+                if member_name == TASK_FIELD_META {
+                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast) {
+                        if let Some(meta_section) = task_def.metadata() {
+                            for item in meta_section.items() {
+                                items.push(CompletionItem {
+                                    label: item.name().text().to_string(),
+                                    kind: Some(CompletionItemKind::PROPERTY),
+                                    detail: Some(format_ty(item.value()).to_string()),
+                                    documentation: make_md_docs(item.value().text().to_string()),
+                                    ..Default::default()
+                                });
+                            }
+                        }
+                    }
+                    return Ok(());
+                } else if member_name == TASK_FIELD_PARAMETER_META {
+                    // `task.parameter_meta.*` completions.
+                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast) {
+                        if let Some(param_meta_section) = task_def.parameter_metadata() {
+                            for item in param_meta_section.items() {
+                                items.push(CompletionItem {
+                                    label: item.name().text().to_string(),
+                                    kind: Some(CompletionItemKind::PROPERTY),
+                                    detail: Some(format_ty(item.value()).to_string()),
+                                    documentation: make_md_docs(item.value().text().to_string()),
+                                    ..Default::default()
+                                });
+                            }
+                        }
+                    }
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    // NOTE: we do type evaluation only for non namespaces or complex types
 
     let Some(scope) = document.find_scope_by_position(node.span().start()) else {
         bail!("could not find scope for access expression")
