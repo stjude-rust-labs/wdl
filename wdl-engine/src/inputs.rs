@@ -25,7 +25,6 @@ use wdl_analysis::types::v1::task_hint_types;
 use wdl_analysis::types::v1::task_requirement_types;
 
 use crate::Coercible;
-use crate::CompoundValue;
 use crate::Value;
 
 /// A type alias to a JSON map (object).
@@ -312,27 +311,8 @@ impl Serialize for TaskInputs {
     where
         S: serde::Serializer,
     {
-        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
-        self.inputs.iter().for_each(|(key, value)| match value {
-            Value::Compound(CompoundValue::Pair(p)) => {
-                map.serialize_entry(
-                    key,
-                    &serde_json::json!({
-                        "left": p.left(),
-                        "right": p.right(),
-                    }),
-                )
-                .unwrap_or_else(|_| {
-                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
-                });
-            }
-            _ => {
-                map.serialize_entry(key, value).unwrap_or_else(|_| {
-                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
-                });
-            }
-        });
-        map.end()
+        // Only serialize the input values
+        self.inputs.serialize(serializer)
     }
 }
 
@@ -649,27 +629,9 @@ impl Serialize for WorkflowInputs {
     where
         S: serde::Serializer,
     {
-        let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
-        self.inputs.iter().for_each(|(key, value)| match value {
-            Value::Compound(CompoundValue::Pair(p)) => {
-                map.serialize_entry(
-                    key,
-                    &serde_json::json!({
-                        "left": p.left(),
-                        "right": p.right(),
-                    }),
-                )
-                .unwrap_or_else(|_| {
-                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
-                });
-            }
-            _ => {
-                map.serialize_entry(key, value).unwrap_or_else(|_| {
-                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
-                });
-            }
-        });
-        map.end()
+        // Note: for serializing, only serialize the direct inputs, not the nested
+        // inputs
+        self.inputs.serialize(serializer)
     }
 }
 
