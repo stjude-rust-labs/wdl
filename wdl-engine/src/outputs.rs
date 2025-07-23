@@ -84,9 +84,7 @@ impl Serialize for Outputs {
         for (k, v) in &self.values {
             let v = v.serializable_with_pairs();
             match &self.name {
-                Some(prefix) => {
-                    s.serialize_entry(&format!("{prefix}.{k}"), &v)?
-                }
+                Some(prefix) => s.serialize_entry(&format!("{prefix}.{k}"), &v)?,
                 None => s.serialize_entry(k, &v)?,
             }
         }
