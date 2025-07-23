@@ -322,10 +322,14 @@ impl Serialize for TaskInputs {
                         "right": p.right(),
                     }),
                 )
-                .unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
+                .unwrap_or_else(|_| {
+                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
+                });
             }
             _ => {
-                map.serialize_entry(key, value).unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
+                map.serialize_entry(key, value).unwrap_or_else(|_| {
+                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
+                });
             }
         });
         map.end()
@@ -655,10 +659,14 @@ impl Serialize for WorkflowInputs {
                         "right": p.right(),
                     }),
                 )
-                .unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
+                .unwrap_or_else(|_| {
+                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
+                });
             }
             _ => {
-                map.serialize_entry(key, value).unwrap_or_else(|_| panic!("failed to serialize pair value for key `{key}` with value `{value}`"));
+                map.serialize_entry(key, value).unwrap_or_else(|_| {
+                    panic!("failed to serialize pair value for key `{key}` with value `{value}`")
+                });
             }
         });
         map.end()
