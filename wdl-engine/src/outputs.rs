@@ -5,6 +5,8 @@ use std::cmp::Ordering;
 use indexmap::IndexMap;
 use serde::Serialize;
 
+use crate::CompoundValue;
+use crate::Object;
 use crate::Scope;
 use crate::Value;
 
@@ -82,11 +84,22 @@ impl Serialize for Outputs {
 
         let mut s = serializer.serialize_map(Some(self.values.len()))?;
         for (k, v) in &self.values {
+            let mut v = v.clone();
+            if let Value::Compound(CompoundValue::Pair(p)) = v {
+                // If the value is a pair, we need to serialize it as a map with two keys.
+                let left = p.left();
+                let right = p.right();
+                let mut map = IndexMap::new();
+                map.insert("left".to_string(), left.clone());
+                map.insert("right".to_string(), right.clone());
+                let obj = Value::Compound(CompoundValue::Object(Object::new(map)));
+                v = obj.clone();
+            }
             match &self.name {
                 Some(prefix) => {
-                    s.serialize_entry(&format!("{prefix}.{k}"), &Serialize { value: v })?
+                    s.serialize_entry(&format!("{prefix}.{k}"), &Serialize { value: &v })?
                 }
-                None => s.serialize_entry(k, &Serialize { value: v })?,
+                None => s.serialize_entry(k, &Serialize { value: &v })?,
             }
         }
 
