@@ -3484,7 +3484,7 @@ Caused by:
 
         let ty = PairType::new(PrimitiveType::File, PrimitiveType::String);
         let value: Value = Pair::new(ty, left, right)
-            .expect("should create map value")
+            .expect("should create pair value")
             .into();
 
         // Pair[File, String] -> Pair[String, File]
