@@ -2514,7 +2514,8 @@ impl Coercible for CompoundValue {
                     // Check that there are no extra members
                     if v.len() != 2 {
                         bail!(
-                            "cannot coerce object to Pair type `{target}`: object must have exactly 'left' and 'right' members, but found {} members",
+                            "cannot coerce object to Pair type `{target}`: object must have \
+                             exactly 'left' and 'right' members, but found {} members",
                             v.len()
                         );
                     }
