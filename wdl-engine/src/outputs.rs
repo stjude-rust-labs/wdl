@@ -65,12 +65,6 @@ impl Serialize for Outputs {
     {
         use serde::ser::SerializeMap;
 
-        /// Helper `Serialize` implementation for serializing element values.
-        struct Serialize<'a> {
-            /// The value being serialized.
-            value: &'a Value,
-        }
-
         impl serde::Serialize for Serialize<'_> {
             fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
             where
