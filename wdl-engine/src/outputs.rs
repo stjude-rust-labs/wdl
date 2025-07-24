@@ -65,15 +65,6 @@ impl Serialize for Outputs {
     {
         use serde::ser::SerializeMap;
 
-        impl serde::Serialize for Serialize<'_> {
-            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                self.value.serialize(serializer)
-            }
-        }
-
         let mut s = serializer.serialize_map(Some(self.values.len()))?;
         for (k, v) in &self.values {
             let v = v.serializable_with_pairs();
