@@ -8,6 +8,7 @@ use crate::diagnostics;
 use crate::document::ScopeRef;
 use crate::types::v1::EvaluationContext;
 
+mod common;
 mod completions;
 mod find_all_references;
 mod goto_definition;
