@@ -174,11 +174,11 @@ fn resolve_hover_by_context(
             let target = CallTarget::cast(parent_node.clone()).unwrap();
             let mut target_names = target.names();
 
-            let (callee_name, ns_name) = match (target_names.next(), target_names.next()) {
+            let (ns_name, callee_name) = match (target_names.next(), target_names.next()) {
                 // Namespaced call
                 (Some(ns), Some(name)) => {
                     if token.span() == name.span() {
-                        (name, Some(ns))
+                        (Some(ns), name)
                     } else if token.span() == ns.span() {
                         // namespace identifier hovered
                         if let Some(ns) = document.namespace(token.text()) {
@@ -196,7 +196,7 @@ fn resolve_hover_by_context(
                 // Local call
                 (Some(name), None) => {
                     if token.span() == name.span() {
-                        (name, None)
+                        (None, name)
                     } else {
                         return Ok(None);
                     }
