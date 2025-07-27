@@ -204,28 +204,29 @@ fn resolve_hover_by_context(
                 _ => return Ok(None),
             };
 
-            let (target_doc, target_root) = if let Some(ns_name) = ns_name {
-                let Some(ns) = document.namespace(ns_name.text()) else {
-                    return Ok(None);
-                };
+            let target_doc = if let Some(ns_name) = ns_name {
+                // SAFETY: we just found a call with this namespace name and the document
+                // guarantees that `document.namespaces` contains a corresponding entry for
+                // `ns_name`.
+                let ns = document.namespace(ns_name.text()).unwrap();
+
+                // SAFETY: `ns.source` comes from a valid namespace entry which guarantees the
+                // document exists in the graph.
                 let node = graph.get(graph.get_index(ns.source()).unwrap());
-                let Some(doc) = node.document() else {
-                    return Ok(None);
-                };
-                (doc, doc.root())
+                node.document().unwrap()
             } else {
-                (document, document.root())
+                document
             };
 
             if let Some(task) = target_doc.task_by_name(callee_name.text()) {
-                return Ok(provide_task_documentation(task, &target_root));
+                return Ok(provide_task_documentation(task, &target_doc.root()));
             }
 
             if let Some(workflow) = target_doc
                 .workflow()
                 .filter(|w| w.name() == callee_name.text())
             {
-                return Ok(provide_workflow_documentation(workflow, &target_root));
+                return Ok(provide_workflow_documentation(workflow, &target_doc.root()));
             }
         }
         SyntaxKind::AccessExprNode => {
