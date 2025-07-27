@@ -146,7 +146,7 @@ fn resolve_hover_content(
 
 /// Resolves hover information based on the CST of the document.
 ///
-/// This inspects the parent [SyntaxNode] of the hovered token to
+/// This inspects the parent [`SyntaxNode`] of the hovered token to
 /// determine the most specific context.
 fn resolve_hover_by_context(
     parent_node: &SyntaxNode,
@@ -285,7 +285,7 @@ fn resolve_hover_by_context(
     Ok(None)
 }
 
-/// Finds hover information for a globally defined symbol within a [Document].
+/// Finds hover information for a globally defined symbol within a [`Document`].
 fn find_global_hover_in_doc(document: &Document, token: &SyntaxToken) -> Result<Option<String>> {
     if let Some(s) = document.struct_by_name(token.text()) {
         return Ok(provide_struct_documentation(s, &document.root()));
