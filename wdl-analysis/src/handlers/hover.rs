@@ -23,6 +23,7 @@ use wdl_ast::TreeToken;
 use wdl_ast::v1::AccessExpr;
 use wdl_ast::v1::CallExpr;
 use wdl_ast::v1::CallTarget;
+use wdl_ast::v1::ParameterMetadataSection;
 
 use crate::Document;
 use crate::SourcePosition;
@@ -111,15 +112,20 @@ fn resolve_hover_content(
     // Finds hover information based on the scope.
     if let Some(scope) = document.find_scope_by_position(token.span().start()) {
         if let Some(name) = scope.lookup(token.text()) {
-            let kind = match name.ty() {
-                Type::Call(_) => "call",
-                _ => "variable",
+            let (kind, documentation) = match name.ty() {
+                Type::Call(_) => ("call", None),
+                _ => {
+                    let doc = find_parameter_meta_documentation(token);
+                    ("variable", doc)
+                }
             };
-            return Ok(Some(format!(
-                "```wdl\n({kind}) {}: {}\n```",
-                token.text(),
-                name.ty()
-            )));
+            let mut content = format!("```wdl\n({kind}) {}: {}\n```", token.text(), name.ty());
+            if let Some(doc) = documentation {
+                content.push_str("\n---\n");
+                content.push_str(&doc);
+            }
+
+            return Ok(Some(content));
         }
     }
 
@@ -333,4 +339,26 @@ fn get_function_hover_content(name: &str, func: &Function) -> String {
         }
     };
     format!("{detail}\n\n{docs}")
+}
+
+/// Finds documentation for a variable declaration from a `parameter_meta`
+/// section.
+fn find_parameter_meta_documentation(token: &SyntaxToken) -> Option<String> {
+    let parent = token.parent_ancestors().find(|p| {
+        matches!(
+            p.kind(),
+            SyntaxKind::StructDefinitionNode
+                | SyntaxKind::TaskDefinitionNode
+                | SyntaxKind::WorkflowDefinitionNode
+        )
+    })?;
+    let param_meta = parent.children().find_map(ParameterMetadataSection::cast)?;
+
+    for item in param_meta.items() {
+        if item.name().text() == token.text() {
+            let doc_text = item.value().text().to_string();
+            return Some(doc_text.trim_matches('"').to_string());
+        }
+    }
+    None
 }
