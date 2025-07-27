@@ -149,3 +149,19 @@ async fn should_hover_workflow_definition() {
     // Outputs
     assert_hover_content(&response, "**result**: `String`");
 }
+
+#[tokio::test]
+async fn should_hover_local_variable_docs() {
+    let mut ctx = setup().await;
+    let response = hover_request(&mut ctx, "meta.wdl", Position::new(23, 16)).await;
+    assert_hover_content(&response, "(variable) message: String");
+    assert_hover_content(&response, "Text to be printed");
+}
+
+#[tokio::test]
+async fn should_hover_local_struct_member_access_docs() {
+    let mut ctx = setup().await;
+    let response = hover_request(&mut ctx, "meta.wdl", Position::new(20, 22)).await;
+    assert_hover_content(&response, "(property) name: String");
+    assert_hover_content(&response, "Name of the person");
+}
