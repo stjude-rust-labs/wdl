@@ -59,6 +59,10 @@ pub enum Error {
         reason: String,
     },
 
+    /// An invalid entrypoint was specified.
+    #[error("invalid entrypoint `{0}`")]
+    InvalidEntrypoint(String),
+
     /// A deserialization error.
     #[error("unable to deserialize `{0}` as a valid WDL value")]
     Deserialize(String),
@@ -216,13 +220,12 @@ pub struct Inputs {
     /// The actual inputs map.
     inputs: InputsInner,
     /// The name of the task or workflow these inputs are provided for.
-    name: Option<String>,
+    entrypoint: Option<String>,
 }
 
 impl Inputs {
     /// Adds an input read from the command line.
     fn add_input(&mut self, input: &str) -> Result<()> {
-        let prefix = self.name.as_ref().map(|name| format!("{name}."));
         match input.parse::<Input>()? {
             Input::File(path) => {
                 let inputs = InputFile::read(&path).map_err(Error::File)?;
@@ -234,8 +237,8 @@ impl Inputs {
                 // within.
                 let cwd = std::env::current_dir().unwrap();
 
-                let key = if let Some(prefix) = &prefix {
-                    format!("{prefix}{key}")
+                let key = if let Some(prefix) = &self.entrypoint {
+                    format!("{prefix}.{key}")
                 } else {
                     key
                 };
@@ -248,18 +251,24 @@ impl Inputs {
 
     /// Attempts to coalesce a set of inputs into an [`Inputs`].
     ///
-    /// `name` is the task or workflow the inputs are for.
-    /// If `name` is `Some(_)` then it will be prefixed to each
+    /// `entrypoint` is the task or workflow the inputs are for.
+    /// If `entrypoint` is `Some(_)` then it will be prefixed to each
     /// [`Input::Pair`]. Keys inside a [`Input::File`] must always have this
     /// common prefix specified. If `name` is `None` then all of the inputs
     /// in `iter` must be prefixed with the task or workflow name.
-    pub fn coalesce<T, V>(iter: T, name: Option<String>) -> Result<Self>
+    pub fn coalesce<T, V>(iter: T, entrypoint: Option<String>) -> Result<Self>
     where
         T: IntoIterator<Item = V>,
         V: AsRef<str>,
     {
+        if let Some(ep) = &entrypoint
+            && ep.contains('.')
+        {
+            return Err(Error::InvalidEntrypoint(ep.into()));
+        }
+
         let mut inputs = Inputs {
-            name,
+            entrypoint,
             ..Default::default()
         };
 
