@@ -927,4 +927,11 @@ task test {{
             &parse_placeholder_as_expr(r#"echo ~{sep(" ", quote(arr))}"#)
         ));
     }
+    #[test]
+    fn test_evaluates_to_bash_literal7() {
+        // This contains a quoted placeholder.
+        assert!(!super::evaluates_to_bash_literal(
+            &parse_placeholder_as_expr(r#"echo ~{if 1=1 then "hello '~{foo}' world" else ""}"#)
+        ));
+    }
 }
