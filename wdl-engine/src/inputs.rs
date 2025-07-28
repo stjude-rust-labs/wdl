@@ -835,11 +835,6 @@ impl Inputs {
     ///
     /// Returns `Ok(None)` if the inputs are empty.
     pub fn parse_object(document: &Document, object: JsonMap) -> Result<Option<(String, Self)>> {
-        // If the object is empty, treat it as a workflow evaluation without any inputs
-        if object.is_empty() {
-            return Ok(None);
-        }
-
         // Determine the root workflow or task name
         let (key, name) = match object.iter().next() {
             Some((key, _)) => match key.split_once('.') {
@@ -851,8 +846,9 @@ impl Inputs {
                     )
                 }
             },
+            // If the object is empty, treat it as a workflow evaluation without any inputs
             None => {
-                unreachable!()
+                return Ok(None);
             }
         };
 
