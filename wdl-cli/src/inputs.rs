@@ -254,8 +254,8 @@ impl Inputs {
     /// `entrypoint` is the task or workflow the inputs are for.
     /// If `entrypoint` is `Some(_)` then it will be prefixed to each
     /// [`Input::Pair`]. Keys inside a [`Input::File`] must always have this
-    /// common prefix specified. If `name` is `None` then all of the inputs
-    /// in `iter` must be prefixed with the task or workflow name.
+    /// common prefix specified. If `entrypoint` is `None` then all of the
+    /// inputs in `iter` must be prefixed with the task or workflow name.
     pub fn coalesce<T, V>(iter: T, entrypoint: Option<String>) -> Result<Self>
     where
         T: IntoIterator<Item = V>,
