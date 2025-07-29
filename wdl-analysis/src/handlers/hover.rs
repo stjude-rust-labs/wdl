@@ -24,6 +24,7 @@ use wdl_ast::v1::AccessExpr;
 use wdl_ast::v1::CallExpr;
 use wdl_ast::v1::CallTarget;
 use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::StructDefinition;
 
 use crate::Document;
 use crate::SourcePosition;
@@ -251,25 +252,49 @@ fn resolve_hover_by_context(
                 .evaluate_expr(&expr)
                 .unwrap_or(crate::types::Type::Union);
 
-            let member_ty = match target_type {
+            let (member_ty, documentation) = match target_type {
                 Type::Compound(CompoundType::Struct(s), _) => {
-                    s.members().get(member.text()).cloned()
-                }
-                Type::Call(c) => c.outputs().get(member.text()).map(|o| o.ty().clone()),
-                Type::Compound(CompoundType::Pair(p), _) => match member.text() {
-                    "left" => Some(p.left_type().clone()),
-                    "right" => Some(p.right_type().clone()),
-                    _ => None,
-                },
-                _ => None,
-            };
+                    let target_doc = if let Some(s) = document.struct_by_name(s.name()) {
+                        if let Some(ns_name) = s.namespace() {
+                            // SAFETY: we just found a struct with this namespace name and the
+                            // document guarantees that `document.namespaces` contains a
+                            // corresponding entry for `ns_name`.
+                            let ns = document.namespace(ns_name).unwrap();
 
+                            // SAFETY: `ns.source` comes from a valid namespace entry which
+                            // guarantees the document exists in the graph.
+                            let node = graph.get(graph.get_index(ns.source()).unwrap());
+                            node.document().unwrap()
+                        } else {
+                            document
+                        }
+                    } else {
+                        bail!("struct not found in document");
+                    };
+                    let doc = target_doc.struct_by_name(s.name()).and_then(|s| {
+                        let def = StructDefinition::cast(SyntaxNode::new_root(s.node().clone()))?;
+                        def.members()
+                            .find(|m| m.name().text() == member.text())
+                            .and_then(|decl| find_parameter_meta_documentation(decl.name().inner()))
+                    });
+
+                    (s.members().get(member.text()).cloned(), doc)
+                }
+                Type::Call(c) => (c.outputs().get(member.text()).map(|o| o.ty().clone()), None),
+                Type::Compound(CompoundType::Pair(p), _) => match member.text() {
+                    "left" => (Some(p.left_type().clone()), None),
+                    "right" => (Some(p.right_type().clone()), None),
+                    _ => (None, None),
+                },
+                _ => (None, None),
+            };
             if let Some(ty) = member_ty {
-                return Ok(Some(format!(
-                    "```wdl\n(property) {}: {}\n```",
-                    member.text(),
-                    ty
-                )));
+                let mut content = format!("```wdl\n(property) {}: {}\n```", member.text(), ty);
+                if let Some(doc) = documentation {
+                    content.push_str("\n---\n");
+                    content.push_str(&doc);
+                }
+                return Ok(Some(content));
             }
         }
         SyntaxKind::CallExprNode => {
