@@ -205,6 +205,11 @@ impl TaskInputs {
     }
 
     /// Sets a value with dotted path notation.
+    ///
+    /// If the provided `value` is a [`PrimitiveType`] other than
+    /// [`PrimitiveType::String`] and the `path` is to an input which is of
+    /// type [`PrimitiveType::String`], `value` will be converted to a string
+    /// and accepted as valid.
     fn set_path_value(
         &mut self,
         document: &Document,
@@ -279,7 +284,8 @@ impl TaskInputs {
                 let expected = input.ty();
                 if let Some(expected_prim_ty) = expected.as_primitive()
                     && expected_prim_ty == PrimitiveType::String
-                    && let Some(_actual_prim_ty) = actual.as_primitive()
+                    && let Some(actual_prim_ty) = actual.as_primitive()
+                    && actual_prim_ty != PrimitiveType::String
                 {
                     self.inputs
                         .insert(path.to_string(), value.to_string().into());
@@ -511,6 +517,11 @@ impl WorkflowInputs {
     }
 
     /// Sets a value with dotted path notation.
+    ///
+    /// If the provided `value` is a [`PrimitiveType`] other than
+    /// [`PrimitiveType::String`] and the `path` is to an input which is of
+    /// type [`PrimitiveType::String`], `value` will be converted to a string
+    /// and accepted as valid.
     fn set_path_value(
         &mut self,
         document: &Document,
@@ -606,7 +617,8 @@ impl WorkflowInputs {
                 let actual = value.ty();
                 if let Some(expected_prim_ty) = expected.as_primitive()
                     && expected_prim_ty == PrimitiveType::String
-                    && let Some(_actual_prim_ty) = actual.as_primitive()
+                    && let Some(actual_prim_ty) = actual.as_primitive()
+                    && actual_prim_ty != PrimitiveType::String
                 {
                     self.inputs
                         .insert(path.to_string(), value.to_string().into());
