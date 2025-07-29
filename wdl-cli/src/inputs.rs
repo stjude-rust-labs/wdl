@@ -309,7 +309,7 @@ impl Inputs {
             },
         );
 
-        let result = EngineInputs::parse_object(document, values)?;
+        let result = EngineInputs::parse_object(document, values, true)?;
 
         Ok(result.map(|(callee_name, inputs)| {
             let callee_prefix = format!("{callee_name}.");
