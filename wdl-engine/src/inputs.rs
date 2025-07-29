@@ -211,7 +211,6 @@ impl TaskInputs {
         task: &Task,
         path: &str,
         value: Value,
-        coercible_to_string: bool,
     ) -> Result<()> {
         let version = document.version().expect("document should have a version");
 
@@ -278,8 +277,7 @@ impl TaskInputs {
 
                 let actual = value.ty();
                 let expected = input.ty();
-                if coercible_to_string
-                    && let Some(expected_prim_ty) = expected.as_primitive()
+                if let Some(expected_prim_ty) = expected.as_primitive()
                     && expected_prim_ty == PrimitiveType::String
                     && let Some(_actual_prim_ty) = actual.as_primitive()
                 {
@@ -519,7 +517,6 @@ impl WorkflowInputs {
         workflow: &Workflow,
         path: &str,
         value: Value,
-        coercible_to_string: bool,
     ) -> Result<()> {
         match path.split_once('.') {
             Some((name, remainder)) => {
@@ -581,7 +578,7 @@ impl WorkflowInputs {
                         inputs
                             .as_task_inputs_mut()
                             .expect("should be a task input")
-                            .set_path_value(document, task, remainder, value, coercible_to_string)
+                            .set_path_value(document, task, remainder, value)
                     }
                     CallKind::Workflow => {
                         let workflow = document.workflow().expect("should have a workflow");
@@ -593,13 +590,7 @@ impl WorkflowInputs {
                         inputs
                             .as_workflow_inputs_mut()
                             .expect("should be a task input")
-                            .set_path_value(
-                                document,
-                                workflow,
-                                remainder,
-                                value,
-                                coercible_to_string,
-                            )
+                            .set_path_value(document, workflow, remainder, value)
                     }
                 }
             }
@@ -613,8 +604,7 @@ impl WorkflowInputs {
 
                 let expected = input.ty();
                 let actual = value.ty();
-                if coercible_to_string
-                    && let Some(expected_prim_ty) = expected.as_primitive()
+                if let Some(expected_prim_ty) = expected.as_primitive()
                     && expected_prim_ty == PrimitiveType::String
                     && let Some(_actual_prim_ty) = actual.as_primitive()
                 {
@@ -731,7 +721,7 @@ impl Inputs {
                 })?,
         );
 
-        Self::parse_object(document, map, false)
+        Self::parse_object(document, map)
     }
 
     /// Parses a YAML inputs file from the given file path.
@@ -771,7 +761,7 @@ impl Inputs {
             )
         })?);
 
-        Self::parse_object(document, object, false)
+        Self::parse_object(document, object)
     }
 
     /// Gets an input value.
@@ -861,11 +851,7 @@ impl Inputs {
     /// Returns `Ok(Some(_))` if the inputs are not empty.
     ///
     /// Returns `Ok(None)` if the inputs are empty.
-    pub fn parse_object(
-        document: &Document,
-        object: JsonMap,
-        coercible_to_string: bool,
-    ) -> Result<Option<(String, Self)>> {
+    pub fn parse_object(document: &Document, object: JsonMap) -> Result<Option<(String, Self)>> {
         // Determine the root workflow or task name
         let (key, name) = match object.iter().next() {
             Some((key, _)) => match key.split_once('.') {
@@ -884,14 +870,9 @@ impl Inputs {
         };
 
         match (document.task_by_name(name), document.workflow()) {
-            (Some(task), _) => Ok(Some(Self::parse_task_inputs(
-                document,
-                task,
-                object,
-                coercible_to_string,
-            )?)),
+            (Some(task), _) => Ok(Some(Self::parse_task_inputs(document, task, object)?)),
             (None, Some(workflow)) if workflow.name() == name => Ok(Some(
-                Self::parse_workflow_inputs(document, workflow, object, coercible_to_string)?,
+                Self::parse_workflow_inputs(document, workflow, object)?,
             )),
             _ => bail!(
                 "invalid input key `{key}`: a task or workflow named `{name}` does not exist in \
@@ -905,7 +886,6 @@ impl Inputs {
         document: &Document,
         task: &Task,
         object: JsonMap,
-        coercible_to_string: bool,
     ) -> Result<(String, Self)> {
         let mut inputs = TaskInputs::default();
         for (key, value) in object {
@@ -916,7 +896,7 @@ impl Inputs {
             match key.split_once(".") {
                 Some((prefix, remainder)) if prefix == task.name() => {
                     inputs
-                        .set_path_value(document, task, remainder, value, coercible_to_string)
+                        .set_path_value(document, task, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
@@ -936,7 +916,6 @@ impl Inputs {
         document: &Document,
         workflow: &Workflow,
         object: JsonMap,
-        coercible_to_string: bool,
     ) -> Result<(String, Self)> {
         let mut inputs = WorkflowInputs::default();
         for (key, value) in object {
@@ -947,7 +926,7 @@ impl Inputs {
             match key.split_once(".") {
                 Some((prefix, remainder)) if prefix == workflow.name() => {
                     inputs
-                        .set_path_value(document, workflow, remainder, value, coercible_to_string)
+                        .set_path_value(document, workflow, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
