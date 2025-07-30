@@ -527,28 +527,6 @@ impl Value {
             _ => None,
         }
     }
-
-    /// Serializes value with special handling for pairs.
-    pub(crate) fn serializable_with_pairs(&self) -> impl serde::Serialize {
-        struct Serializable<'a>(&'a Value);
-
-        impl serde::Serialize for Serializable<'_> {
-            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                // match self.0 and if it's a compound value,
-                // serialize with a call to `CompoundValue::serializable_with_pairs().
-                // otherwise, serialize it normally
-                match self.0 {
-                    Value::Compound(v) => v.serializable_with_pairs().serialize(serializer),
-                    _ => self.0.serialize(serializer),
-                }
-            }
-        }
-
-        Serializable(self)
-    }
 }
 
 impl fmt::Display for Value {
@@ -716,24 +694,6 @@ impl From<HintsValue> for Value {
 impl From<CallValue> for Value {
     fn from(value: CallValue) -> Self {
         Self::Call(value)
-    }
-}
-
-impl serde::Serialize for Value {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::Error;
-
-        match self {
-            Self::None => serializer.serialize_none(),
-            Self::Primitive(v) => v.serialize(serializer),
-            Self::Compound(v) => v.serialize(serializer),
-            Self::Task(_) | Self::Hints(_) | Self::Input(_) | Self::Output(_) | Self::Call(_) => {
-                Err(S::Error::custom("value cannot be serialized"))
-            }
-        }
     }
 }
 
@@ -2375,32 +2335,6 @@ impl CompoundValue {
 
         Ok(())
     }
-
-    /// Serializes the value using a specialized serialization for `pair` types
-    pub(crate) fn serializable_with_pairs(&self) -> impl serde::Serialize {
-        struct Serializable<'a>(&'a CompoundValue);
-
-        impl serde::Serialize for Serializable<'_> {
-            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                match self.0 {
-                    CompoundValue::Pair(pair) => {
-                        let mut state = serializer.serialize_map(Some(2))?;
-                        let left = pair.left().serializable_with_pairs();
-                        let right = pair.right().serializable_with_pairs();
-                        state.serialize_entry("left", &left)?;
-                        state.serialize_entry("right", &right)?;
-                        state.end()
-                    }
-                    _ => self.0.serialize(serializer),
-                }
-            }
-        }
-
-        Serializable(self)
-    }
 }
 
 impl fmt::Display for CompoundValue {
@@ -2657,63 +2591,6 @@ impl From<Object> for CompoundValue {
 impl From<Struct> for CompoundValue {
     fn from(value: Struct) -> Self {
         Self::Struct(value)
-    }
-}
-
-impl serde::Serialize for CompoundValue {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::Error;
-
-        match self {
-            Self::Pair(_) => Err(S::Error::custom("a pair cannot be serialized")),
-            Self::Array(v) => {
-                let mut s = serializer.serialize_seq(Some(v.len()))?;
-                for v in v.as_slice() {
-                    s.serialize_element(v)?;
-                }
-
-                s.end()
-            }
-            Self::Map(v) => {
-                if !v
-                    .ty()
-                    .as_map()
-                    .expect("type should be a map")
-                    .key_type()
-                    .is_coercible_to(&PrimitiveType::String.into())
-                {
-                    return Err(S::Error::custom(
-                        "only maps with `String` key types may be serialized",
-                    ));
-                }
-
-                let mut s = serializer.serialize_map(Some(v.len()))?;
-                for (k, v) in v.iter() {
-                    s.serialize_entry(k, v)?;
-                }
-
-                s.end()
-            }
-            Self::Object(object) => {
-                let mut s = serializer.serialize_map(Some(object.len()))?;
-                for (k, v) in object.iter() {
-                    s.serialize_entry(k, v)?;
-                }
-
-                s.end()
-            }
-            Self::Struct(Struct { members, .. }) => {
-                let mut s = serializer.serialize_map(Some(members.len()))?;
-                for (k, v) in members.iter() {
-                    s.serialize_entry(k, v)?;
-                }
-
-                s.end()
-            }
-        }
     }
 }
 
@@ -3114,6 +2991,125 @@ impl fmt::Display for CallValue {
         }
 
         write!(f, "}}")
+    }
+}
+
+/// Serializes a value with optional serialization of pairs.
+pub(crate) struct ValueSerializer<'a> {
+    /// The value to serialize.
+    value: &'a Value,
+    /// Whether pairs should be serialized as a map with `left` and `right`
+    /// keys.
+    allow_pairs: bool,
+}
+
+impl<'a> ValueSerializer<'a> {
+    /// Constructs a new `ValueSerializer`.
+    pub(crate) fn new(value: &'a Value, allow_pairs: bool) -> Self {
+        Self { value, allow_pairs }
+    }
+}
+
+impl serde::Serialize for ValueSerializer<'_> {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::Error;
+
+        match &self.value {
+            Value::None => serializer.serialize_none(),
+            Value::Primitive(v) => v.serialize(serializer),
+            Value::Compound(v) => {
+                CompoundValueSerializer::new(v, self.allow_pairs).serialize(serializer)
+            }
+            Value::Task(_)
+            | Value::Hints(_)
+            | Value::Input(_)
+            | Value::Output(_)
+            | Value::Call(_) => Err(S::Error::custom("value cannot be serialized")),
+        }
+    }
+}
+
+/// Serializes a `CompoundValue` with optional serialization of pairs.
+pub(crate) struct CompoundValueSerializer<'a> {
+    /// The compound value to serialize.
+    value: &'a CompoundValue,
+    /// Whether pairs should be serialized as a map with `left` and `right`
+    /// keys.
+    allow_pairs: bool,
+}
+
+impl<'a> CompoundValueSerializer<'a> {
+    /// Constructs a new `CompoundValueSerializer`.
+    pub(crate) fn new(value: &'a CompoundValue, allow_pairs: bool) -> Self {
+        Self { value, allow_pairs }
+    }
+}
+
+impl serde::Serialize for CompoundValueSerializer<'_> {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::Error;
+
+        match &self.value {
+            CompoundValue::Pair(pair) if self.allow_pairs => {
+                let mut state = serializer.serialize_map(Some(2))?;
+                let left = ValueSerializer::new(pair.left(), self.allow_pairs);
+                let right = ValueSerializer::new(pair.right(), self.allow_pairs);
+                state.serialize_entry("left", &left)?;
+                state.serialize_entry("right", &right)?;
+                state.end()
+            }
+            CompoundValue::Pair(_) => Err(S::Error::custom("a pair cannot be serialized")),
+            CompoundValue::Array(v) => {
+                let mut s = serializer.serialize_seq(Some(v.len()))?;
+                for v in v.as_slice() {
+                    s.serialize_element(&ValueSerializer::new(v, self.allow_pairs))?;
+                }
+
+                s.end()
+            }
+            CompoundValue::Map(v) => {
+                if !v
+                    .ty()
+                    .as_map()
+                    .expect("type should be a map")
+                    .key_type()
+                    .is_coercible_to(&PrimitiveType::String.into())
+                {
+                    return Err(S::Error::custom(
+                        "only maps with `String` key types may be serialized",
+                    ));
+                }
+
+                let mut s = serializer.serialize_map(Some(v.len()))?;
+                for (k, v) in v.iter() {
+                    s.serialize_entry(k, &ValueSerializer::new(v, self.allow_pairs))?;
+                }
+
+                s.end()
+            }
+            CompoundValue::Object(object) => {
+                let mut s = serializer.serialize_map(Some(object.len()))?;
+                for (k, v) in object.iter() {
+                    s.serialize_entry(k, &ValueSerializer::new(v, self.allow_pairs))?;
+                }
+
+                s.end()
+            }
+            CompoundValue::Struct(Struct { members, .. }) => {
+                let mut s = serializer.serialize_map(Some(members.len()))?;
+                for (k, v) in members.iter() {
+                    s.serialize_entry(k, &ValueSerializer::new(v, self.allow_pairs))?;
+                }
+
+                s.end()
+            }
+        }
     }
 }
 
@@ -3596,5 +3592,35 @@ Caused by:
             value.to_string(),
             r#"Foo {foo: 1.101000, bar: "foo", baz: 1234}"#
         );
+    }
+
+    #[test]
+    fn pair_serialization() {
+        let pair_ty = PairType::new(PrimitiveType::File, PrimitiveType::String);
+        let pair: Value = Pair::new(
+            pair_ty,
+            PrimitiveValue::new_file("foo"),
+            PrimitiveValue::new_string("bar"),
+        )
+        .expect("should create pair value")
+        .into();
+        // Serialize pair with `left` and `right` keys
+        let value_serializer = ValueSerializer::new(&pair, true);
+        let serialized = serde_json::to_string(&value_serializer).expect("should serialize");
+        assert_eq!(serialized, r#"{"left":"foo","right":"bar"}"#);
+
+        // Serialize pair without `left` and `right` keys (should fail)
+        let value_serializer = ValueSerializer::new(&pair, false);
+        assert!(serde_json::to_string(&value_serializer).is_err());
+
+        let array_ty = ArrayType::new(PairType::new(PrimitiveType::File, PrimitiveType::String));
+        let array: Value = Array::new(array_ty, [pair])
+            .expect("should create array value")
+            .into();
+
+        // Serialize array of pairs with `left` and `right` keys
+        let value_serializer = ValueSerializer::new(&array, true);
+        let serialized = serde_json::to_string(&value_serializer).expect("should serialize");
+        assert_eq!(serialized, r#"[{"left":"foo","right":"bar"}]"#);
     }
 }

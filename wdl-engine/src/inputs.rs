@@ -313,13 +313,10 @@ impl Serialize for TaskInputs {
     {
         // Only serialize the input values
         let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
-        self.inputs.iter().for_each(|(k, v)| {
-            let serialized_value = v.serializable_with_pairs();
-            map.serialize_entry(k, &serialized_value)
-                .unwrap_or_else(|e| {
-                    panic!("failed to serialize value `{v}` for input `{k}`: {e}");
-                });
-        });
+        for (k, v) in &self.inputs {
+            let serialized_value = crate::ValueSerializer::new(v, true);
+            map.serialize_entry(k, &serialized_value)?;
+        }
         map.end()
     }
 }
@@ -640,13 +637,10 @@ impl Serialize for WorkflowInputs {
         // Note: for serializing, only serialize the direct inputs, not the nested
         // inputs
         let mut map = serializer.serialize_map(Some(self.inputs.len()))?;
-        self.inputs.iter().for_each(|(k, v)| {
-            let serialized_value = v.serializable_with_pairs();
-            map.serialize_entry(k, &serialized_value)
-                .unwrap_or_else(|e| {
-                    panic!("failed to serialize value `{v}` for input `{k}`: {e}");
-                });
-        });
+        for (k, v) in &self.inputs {
+            let serialized_value = crate::ValueSerializer::new(v, true);
+            map.serialize_entry(k, &serialized_value)?;
+        }
         map.end()
     }
 }
