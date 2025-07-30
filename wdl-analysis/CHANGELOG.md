@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added
 
+* Added hover support for the WDL Language Server ([#540](https://github.com/stjude-rust-labs/wdl/pull/540)).
 * Added an `ArrayType::unqualified` method to cheaply drop the `+` qualifier ([#529](https://github.com/stjude-rust-labs/wdl/pull/529)).
 
 #### Changed
