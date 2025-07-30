@@ -3005,7 +3005,7 @@ pub struct ValueSerializer<'a> {
 
 impl<'a> ValueSerializer<'a> {
     /// Constructs a new `ValueSerializer`.
-    pub(crate) fn new(value: &'a Value, allow_pairs: bool) -> Self {
+    pub fn new(value: &'a Value, allow_pairs: bool) -> Self {
         Self { value, allow_pairs }
     }
 }
@@ -3043,7 +3043,7 @@ pub struct CompoundValueSerializer<'a> {
 
 impl<'a> CompoundValueSerializer<'a> {
     /// Constructs a new `CompoundValueSerializer`.
-    pub(crate) fn new(value: &'a CompoundValue, allow_pairs: bool) -> Self {
+    pub fn new(value: &'a CompoundValue, allow_pairs: bool) -> Self {
         Self { value, allow_pairs }
     }
 }
