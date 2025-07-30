@@ -2995,7 +2995,7 @@ impl fmt::Display for CallValue {
 }
 
 /// Serializes a value with optional serialization of pairs.
-pub(crate) struct ValueSerializer<'a> {
+pub struct ValueSerializer<'a> {
     /// The value to serialize.
     value: &'a Value,
     /// Whether pairs should be serialized as a map with `left` and `right`
@@ -3033,7 +3033,7 @@ impl serde::Serialize for ValueSerializer<'_> {
 }
 
 /// Serializes a `CompoundValue` with optional serialization of pairs.
-pub(crate) struct CompoundValueSerializer<'a> {
+pub struct CompoundValueSerializer<'a> {
     /// The compound value to serialize.
     value: &'a CompoundValue,
     /// Whether pairs should be serialized as a map with `left` and `right`
