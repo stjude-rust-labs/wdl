@@ -24,3 +24,9 @@ task example {
         echo "~{message}"
     >>>
 }
+
+workflow hover_meta {
+    Person p = Person {
+        name: "foo",
+    }
+}

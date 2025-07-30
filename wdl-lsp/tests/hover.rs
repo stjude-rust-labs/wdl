@@ -165,3 +165,11 @@ async fn should_hover_local_struct_member_access_docs() {
     assert_hover_content(&response, "(property) name: String");
     assert_hover_content(&response, "Name of the person");
 }
+
+#[tokio::test]
+async fn should_hover_local_struct_literal_docs() {
+    let mut ctx = setup().await;
+    let response = hover_request(&mut ctx, "meta.wdl", Position::new(29, 8)).await;
+    assert_hover_content(&response, "(property) name: String");
+    assert_hover_content(&response, "Name of the person");
+}

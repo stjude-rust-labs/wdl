@@ -23,6 +23,8 @@ use wdl_ast::TreeToken;
 use wdl_ast::v1::AccessExpr;
 use wdl_ast::v1::CallExpr;
 use wdl_ast::v1::CallTarget;
+use wdl_ast::v1::LiteralStruct;
+use wdl_ast::v1::LiteralStructItem;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::StructDefinition;
 
@@ -309,6 +311,37 @@ fn resolve_hover_by_context(
             if let Some(func) = STDLIB.function(call_expr.target().text()) {
                 let content = get_function_hover_content(call_expr.target().text(), func);
                 return Ok(Some(content));
+            }
+        }
+
+        SyntaxKind::LiteralStructItemNode => {
+            let Some(item) = LiteralStructItem::cast(parent_node.clone()) else {
+                return Ok(None);
+            };
+
+            let (name, _) = item.name_value();
+            if name.span() != token.span() {
+                return Ok(None);
+            }
+
+            let Some(struct_literal) = parent_node.parent().and_then(LiteralStruct::cast) else {
+                return Ok(None);
+            };
+
+            let struct_name = struct_literal.name();
+            if let Some(s) = document.struct_by_name(struct_name.text()) {
+                let def = StructDefinition::cast(SyntaxNode::new_root(s.node().clone()))
+                    .expect("should cast to StructDefinition");
+                if let Some(member) = def.members().find(|m| m.name().text() == name.text()) {
+                    let doc = find_parameter_meta_documentation(member.name().inner());
+                    let mut content =
+                        format!("```wdl\n(property) {}: {}\n```", name.text(), member.ty());
+                    if let Some(doc) = doc {
+                        content.push_str("\n---\n");
+                        content.push_str(&doc);
+                    }
+                    return Ok(Some(content));
+                }
             }
         }
         _ => debug!("hover is not implemented for {:?}", parent_node.kind()),
