@@ -19,6 +19,7 @@ use wdl_analysis::document::Task;
 use wdl_analysis::document::Workflow;
 use wdl_analysis::types::CallKind;
 use wdl_analysis::types::Coercible as _;
+use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::display_types;
 use wdl_analysis::types::v1::task_hint_types;
@@ -205,6 +206,11 @@ impl TaskInputs {
     }
 
     /// Sets a value with dotted path notation.
+    ///
+    /// If the provided `value` is a [`PrimitiveType`] other than
+    /// [`PrimitiveType::String`] and the `path` is to an input which is of
+    /// type [`PrimitiveType::String`], `value` will be converted to a string
+    /// and accepted as valid.
     fn set_path_value(
         &mut self,
         document: &Document,
@@ -276,10 +282,19 @@ impl TaskInputs {
                 })?;
 
                 let actual = value.ty();
-                if !actual.is_coercible_to(input.ty()) {
+                let expected = input.ty();
+                if let Some(expected_prim_ty) = expected.as_primitive()
+                    && expected_prim_ty == PrimitiveType::String
+                    && let Some(actual_prim_ty) = actual.as_primitive()
+                    && actual_prim_ty != PrimitiveType::String
+                {
+                    self.inputs
+                        .insert(path.to_string(), value.to_string().into());
+                    return Ok(());
+                }
+                if !actual.is_coercible_to(expected) {
                     bail!(
                         "expected type `{expected}` for input `{path}`, but found type `{actual}`",
-                        expected = input.ty()
                     );
                 }
                 self.inputs.insert(path.to_string(), value);
@@ -508,6 +523,11 @@ impl WorkflowInputs {
     }
 
     /// Sets a value with dotted path notation.
+    ///
+    /// If the provided `value` is a [`PrimitiveType`] other than
+    /// [`PrimitiveType::String`] and the `path` is to an input which is of
+    /// type [`PrimitiveType::String`], `value` will be converted to a string
+    /// and accepted as valid.
     fn set_path_value(
         &mut self,
         document: &Document,
@@ -601,6 +621,15 @@ impl WorkflowInputs {
 
                 let expected = input.ty();
                 let actual = value.ty();
+                if let Some(expected_prim_ty) = expected.as_primitive()
+                    && expected_prim_ty == PrimitiveType::String
+                    && let Some(actual_prim_ty) = actual.as_primitive()
+                    && actual_prim_ty != PrimitiveType::String
+                {
+                    self.inputs
+                        .insert(path.to_string(), value.to_string().into());
+                    return Ok(());
+                }
                 if !actual.is_coercible_to(expected) {
                     bail!(
                         "expected type `{expected}` for input `{path}`, but found type `{actual}`"
@@ -840,7 +869,7 @@ impl Inputs {
         }
     }
 
-    /// Parses the root object in an input file.
+    /// Parses the root object in a [`JsonMap`].
     ///
     /// Returns `Ok(Some(_))` if the inputs are not empty.
     ///
@@ -849,7 +878,7 @@ impl Inputs {
         // Determine the root workflow or task name
         let (key, name) = match object.iter().next() {
             Some((key, _)) => match key.split_once('.') {
-                Some((name, _)) => (key, name),
+                Some((name, _remainder)) => (key, name),
                 None => {
                     bail!(
                         "invalid input key `{key}`: expected the value to be prefixed with the \
@@ -883,6 +912,7 @@ impl Inputs {
     ) -> Result<(String, Self)> {
         let mut inputs = TaskInputs::default();
         for (key, value) in object {
+            // Convert from serde_json::Value to crate::Value
             let value = serde_json::from_value(value)
                 .with_context(|| format!("invalid input key `{key}`"))?;
 
@@ -912,6 +942,7 @@ impl Inputs {
     ) -> Result<(String, Self)> {
         let mut inputs = WorkflowInputs::default();
         for (key, value) in object {
+            // Convert from serde_json::Value to crate::Value
             let value = serde_json::from_value(value)
                 .with_context(|| format!("invalid input key `{key}`"))?;
 

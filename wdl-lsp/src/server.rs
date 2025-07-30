@@ -25,6 +25,7 @@ use tracing::info;
 use uuid::Uuid;
 use wdl_analysis::Analyzer;
 use wdl_analysis::Config as AnalysisConfig;
+use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::IncrementalChange;
 use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
@@ -222,6 +223,9 @@ pub struct ServerOptions {
 
     /// Whether or not linting is enabled.
     pub lint: bool,
+
+    /// Analysis or lint rule IDs to except (ignore).
+    pub exceptions: Vec<String>,
 }
 
 /// Represents an LSP server for analyzing WDL documents.
@@ -243,11 +247,18 @@ impl Server {
     /// Creates a new WDL language server.
     pub fn new(client: Client, options: ServerOptions) -> Self {
         let lint = options.lint;
+        let exceptions = options.exceptions.clone();
         let analyzer_client = client.clone();
         // TODO ACF 2025-07-07: add configurability around the fallback behavior; see
         // https://github.com/stjude-rust-labs/wdl/issues/517
-        let analyzer_config =
-            AnalysisConfig::default().with_fallback_version(Some(Default::default()));
+        let analyzer_config = AnalysisConfig::default()
+            .with_fallback_version(Some(Default::default()))
+            .with_diagnostics_config(DiagnosticsConfig::new(
+                wdl_analysis::rules()
+                    .iter()
+                    .filter(|r| exceptions.contains(&r.id().into())),
+            ));
+
         Self {
             client,
             options,
@@ -267,7 +278,11 @@ impl Server {
                 move || {
                     let mut validator = Validator::default();
                     if lint {
-                        validator.add_visitor(Linter::default());
+                        validator.add_visitor(Linter::new(
+                            wdl_lint::rules()
+                                .into_iter()
+                                .filter(|r| exceptions.contains(&r.id().into())),
+                        ));
                     }
                     validator
                 },
@@ -396,6 +411,11 @@ impl LanguageServer for Server {
                 document_formatting_provider: Some(OneOf::Left(true)),
                 definition_provider: Some(OneOf::Left(true)),
                 references_provider: Some(OneOf::Left(true)),
+                completion_provider: Some(CompletionOptions {
+                    resolve_provider: Some(false),
+                    trigger_characters: Some(vec![".".to_string(), "[".to_string()]),
+                    ..Default::default()
+                }),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -756,5 +776,36 @@ impl LanguageServer for Server {
             })?;
 
         Ok(Some(result))
+    }
+
+    async fn completion(
+        &self,
+        mut params: CompletionParams,
+    ) -> RpcResult<Option<CompletionResponse>> {
+        normalize_uri_path(&mut params.text_document_position.text_document.uri);
+
+        debug!("received `textDocument/completion` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position.position.line,
+            params.text_document_position.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .completion(
+                ProgressToken::default(),
+                params.text_document_position.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
     }
 }
