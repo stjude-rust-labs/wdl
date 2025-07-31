@@ -15,11 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.15.0 - 07-30-2025
 
-TODO: yank this?
-
-#### Dependencies
-
-* Bumps dependencies.
+Mistaken release, please use `v.015.1`
 
 ## 0.14.0 - 07-09-2025
 
