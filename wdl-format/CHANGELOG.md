@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.9.0 - 07-30-2025
 
-Mistaken release, please use `v0.9.1`
+Mistaken release, please use `0.9.1`
 
 ## 0.8.0 - 07-09-2025
 
