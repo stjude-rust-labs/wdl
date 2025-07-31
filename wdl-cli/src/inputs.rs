@@ -314,7 +314,7 @@ impl Inputs {
 
         if let Some((derived, _)) = &result
             && let Some(ep) = &self.entrypoint
-            && derived != *ep
+            && derived != ep
         {
             bail!(format!(
                 "supplied entrypoint `{ep}` does not match derived entrypoint `{derived}`"
