@@ -48,9 +48,6 @@ pub(crate) trait Runnable {
     /// which contains this runnable.
     fn wdl_path(&self) -> Option<&Path>;
 
-    /// Is this runnable a workflow? Or is it a task?
-    fn is_workflow(&self) -> bool;
-
     /// Get the required input parameters of the runnable.
     fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
         self.inputs().iter().filter(|param| {
