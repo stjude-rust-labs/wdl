@@ -10,7 +10,7 @@ task hello_task {
     grep -E '~{pattern}' '~{infile}'
   >>>
 
-  requirements {
+  runtime {
     container: "ubuntu:latest"
     memory: "20000 GiB"
   }

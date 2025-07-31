@@ -108,7 +108,8 @@ fn configs(path: &Path) -> Result<Vec<(Cow<'static, str>, config::Config)>, anyh
             .ok_or_else(|| anyhow!("non-utf8 filename for {file:?}"))?
         {
             "config.toml" => (),
-            "config.linux.toml" if cfg!(target_os = "linux") => (),
+            "config.linux.toml" // if cfg!(target_os = "linux")
+                => (),
             "config.macos.toml" if cfg!(target_os = "macos") => (),
             "config.windows.toml" if cfg!(target_os = "windows") => (),
             other => {
