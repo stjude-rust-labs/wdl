@@ -131,12 +131,9 @@ pub(crate) trait Runnable {
                     }
                     div class="main__run-with-content" {
                         p class="main__run-with-content-text" {
-                            "sprocket run "
-                            @if !self.is_workflow() {
-                                "--name "
-                                (self.name())
-                                " "
-                            }
+                            "sprocket run --entrypoint "
+                            (self.name())
+                            " "
                             span x-show="unix" {
                                 (unix_path)
                             }
