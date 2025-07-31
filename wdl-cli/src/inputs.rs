@@ -312,13 +312,12 @@ impl Inputs {
 
         let result = EngineInputs::parse_object(document, values)?;
 
-        if let Some(res) = &result
+        if let Some((derived, _)) = &result
             && let Some(ep) = &self.entrypoint
-            && res.0 != *ep
+            && derived != *ep
         {
             bail!(format!(
-                "supplied entrypoint `{ep}` does not match derived entrypoint `{derived}`",
-                derived = res.0
+                "supplied entrypoint `{ep}` does not match derived entrypoint `{derived}`"
             ))
         }
 
