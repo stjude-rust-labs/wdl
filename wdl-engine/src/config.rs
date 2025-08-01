@@ -15,6 +15,7 @@ use tracing::warn;
 use url::Url;
 
 use crate::DockerBackend;
+use crate::GenericBackend;
 use crate::LocalBackend;
 use crate::SYSTEM;
 use crate::TaskExecutionBackend;
@@ -123,6 +124,9 @@ impl Config {
             }
             BackendConfig::Tes(config) => {
                 Ok(Arc::new(TesBackend::new(self.clone(), config).await?))
+            }
+            BackendConfig::Generic(config) => {
+                Ok(Arc::new(GenericBackend::new(self.clone(), config).await?))
             }
         }
     }
@@ -411,6 +415,8 @@ pub enum BackendConfig {
     Docker(DockerBackendConfig),
     /// Use the TES task execution backend.
     Tes(Box<TesBackendConfig>),
+    /// Use the generic task execution backend.
+    Generic(GenericBackendConfig),
 }
 
 impl Default for BackendConfig {
@@ -426,6 +432,7 @@ impl BackendConfig {
             Self::Local(config) => config.validate(),
             Self::Docker(config) => config.validate(),
             Self::Tes(config) => config.validate(),
+            Self::Generic(config) => config.validate(),
         }
     }
 
@@ -455,6 +462,16 @@ impl BackendConfig {
     pub fn as_tes(&self) -> Option<&TesBackendConfig> {
         match self {
             Self::Tes(config) => Some(config),
+            _ => None,
+        }
+    }
+
+    /// Converts the backend configuration into a generic backend configuration
+    ///
+    /// Returns `None` if the backend configuration is not generic.
+    pub fn as_generic(&self) -> Option<&GenericBackendConfig> {
+        match self {
+            Self::Generic(config) => Some(config),
             _ => None,
         }
     }
@@ -714,6 +731,17 @@ impl TesBackendConfig {
             None => bail!("TES backend storage configuration value `outputs` is required"),
         }
 
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", tag = "type")]
+pub struct GenericBackendConfig {}
+
+impl GenericBackendConfig {
+    /// Validates the generic backend configuration.
+    pub fn validate(&self) -> Result<()> {
         Ok(())
     }
 }
