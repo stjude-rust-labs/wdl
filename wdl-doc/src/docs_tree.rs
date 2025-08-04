@@ -300,18 +300,13 @@ impl DocsTree {
     }
 
     /// Get the path to the root directory relative to a given path.
-    pub fn root_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+    fn root_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
         let path = path.as_ref();
         diff_paths(self.root_abs_path(), path).expect("should diff paths")
     }
 
-    /// Get the absolute path to the stylesheet.
-    pub fn stylesheet(&self) -> PathBuf {
-        self.root_abs_path().join("style.css")
-    }
-
     /// Get the absolute path to the assets directory.
-    pub fn assets(&self) -> PathBuf {
+    fn assets(&self) -> PathBuf {
         self.root_abs_path().join("assets")
     }
 
