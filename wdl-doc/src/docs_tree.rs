@@ -25,6 +25,9 @@ use crate::r#struct::Struct;
 use crate::task::Task;
 use crate::workflow::Workflow;
 
+/// Filename for the logo SVG expected to be in the "assets" directory.
+const LOGO_FILE_NAME: &str = "logo.svg";
+
 /// The type of a page.
 #[derive(Debug)]
 pub(crate) enum PageType {
@@ -212,6 +215,8 @@ pub struct DocsTreeBuilder {
     homepage: Option<PathBuf>,
     /// An optional path to a custom theme to use for the docs.
     custom_theme: Option<PathBuf>,
+    /// The path to a custom logo to embed at the top of the left sidebar.
+    logo: Option<PathBuf>,
 }
 
 impl DocsTreeBuilder {
@@ -224,6 +229,7 @@ impl DocsTreeBuilder {
             root,
             homepage: None,
             custom_theme: None,
+            logo: None,
         }
     }
 
@@ -260,6 +266,17 @@ impl DocsTreeBuilder {
     /// Set the custom theme for the docs.
     pub fn custom_theme(self, theme: impl AsRef<Path>) -> Result<Self> {
         self.maybe_custom_theme(Some(theme))
+    }
+
+    /// Set the custom logo for the left sidebar with an option.
+    pub fn maybe_logo(mut self, logo: Option<impl Into<PathBuf>>) -> Self {
+        self.logo = logo.map(|l| l.into());
+        self
+    }
+
+    /// Set the custom logo for the left sidebar.
+    pub fn logo(self, logo: impl Into<PathBuf>) -> Self {
+        self.maybe_logo(Some(logo))
     }
 
     /// Build the docs tree.
@@ -356,6 +373,16 @@ impl DocsTreeBuilder {
             std::fs::write(&path, bytes)
                 .with_context(|| format!("failed to write asset to `{}`", path.display()))?;
         }
+        if let Some(supplied_logo) = &self.logo {
+            let logo_path = assets_dir.join(LOGO_FILE_NAME);
+            std::fs::copy(supplied_logo, &logo_path).with_context(|| {
+                format!(
+                    "failed to copy custom logo from `{}` to `{}`",
+                    supplied_logo.display(),
+                    logo_path.display()
+                )
+            })?;
+        }
 
         Ok(())
     }
@@ -363,7 +390,7 @@ impl DocsTreeBuilder {
 
 /// A tree representing the docs directory.
 ///
-/// For construction, see [`DocsTreeBuilder`]. 
+/// For construction, see [`DocsTreeBuilder`].
 #[derive(Debug)]
 pub struct DocsTree {
     /// The root of the tree.
@@ -859,7 +886,7 @@ impl DocsTree {
                 // top navbar
                 div class="sticky px-4" {
                     a href=(self.root_index_relative_to(base).to_string_lossy()) {
-                        img src=(self.get_asset(base, "sprocket-logo.svg")) class="w-[120px] flex-none mb-8" alt="Sprocket logo";
+                        img src=(self.get_asset(base, LOGO_FILE_NAME)) class="w-[120px] flex-none mb-8" alt="Logo";
                     }
                     div class="relative w-full h-10" {
                         input id="searchbox" "x-model.debounce"="search" type="text" placeholder="Search..." class="left-sidebar__searchbox";

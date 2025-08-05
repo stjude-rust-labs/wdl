@@ -319,6 +319,7 @@ pub async fn document_workspace(
     output_dir: impl AsRef<Path>,
     homepage: Option<impl AsRef<Path>>,
     custom_theme: Option<impl AsRef<Path>>,
+    custom_logo: Option<impl Into<PathBuf>>,
 ) -> Result<()> {
     let workspace_abs_path = absolute(workspace.as_ref())
         .with_context(|| {
@@ -366,6 +367,7 @@ pub async fn document_workspace(
     let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
         .maybe_homepage(homepage)
         .maybe_custom_theme(custom_theme)?
+        .maybe_logo(custom_logo)
         .build()
         .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
 
