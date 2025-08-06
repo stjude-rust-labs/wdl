@@ -16,7 +16,9 @@ async fn rename_request(
 ) -> Option<WorkspaceEdit> {
     ctx.request::<Rename>(RenameParams {
         text_document_position: TextDocumentPositionParams {
-            text_document: TextDocumentIdentifier { uri: ctx.doc_uri(path) },
+            text_document: TextDocumentIdentifier {
+                uri: ctx.doc_uri(path),
+            },
             position,
         },
         new_name: new_name.to_string(),
@@ -30,14 +32,9 @@ async fn should_rename_workspace_wide() {
     let mut ctx = TestContext::new("rename");
     ctx.initialize().await;
 
-    let edit = rename_request(
-        &mut ctx,
-        "source.wdl",
-        Position::new(10, 13),
-        NEW_NAME,
-    )
-    .await
-    .unwrap();
+    let edit = rename_request(&mut ctx, "source.wdl", Position::new(10, 13), NEW_NAME)
+        .await
+        .unwrap();
 
     let changes = edit.changes.expect("expected changes");
     assert!(changes.keys().any(|u| {
@@ -65,13 +62,7 @@ async fn should_reject_invalid_identifier() {
     let mut ctx = TestContext::new("rename");
     ctx.initialize().await;
 
-    let result = rename_request(
-        &mut ctx,
-        "source.wdl",
-        Position::new(10, 13),
-        "1notValid",
-    )
-    .await;
+    let result = rename_request(&mut ctx, "source.wdl", Position::new(10, 13), "1notValid").await;
 
     assert!(result.is_none());
 }
@@ -110,14 +101,9 @@ async fn should_rename_import_namespace_alias() {
     let mut ctx = TestContext::new("rename");
     ctx.initialize().await;
 
-    let edit = rename_request(
-        &mut ctx,
-        "source.wdl",
-        Position::new(3, 22),
-        "libx",
-    )
-    .await
-    .unwrap();
+    let edit = rename_request(&mut ctx, "source.wdl", Position::new(3, 22), "libx")
+        .await
+        .unwrap();
 
     let changes = edit.changes.expect("expected changes");
     assert!(changes.keys().any(|u| {
