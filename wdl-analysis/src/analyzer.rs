@@ -15,6 +15,7 @@ use anyhow::Error;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
+use ignore::WalkBuilder;
 use indexmap::IndexSet;
 use line_index::LineCol;
 use line_index::LineIndex;
@@ -28,7 +29,6 @@ use tokio::runtime::Handle;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
 use url::Url;
-use walkdir::WalkDir;
 
 use crate::config::Config;
 use crate::document::Document;
@@ -405,11 +405,22 @@ where
                 bail!("`{path}` is a file, not a directory", path = path.display());
             }
 
-            for result in WalkDir::new(&path).follow_links(true) {
-                let entry = result.with_context(|| {
-                    format!("failed to read directory `{path}`", path = path.display())
-                })?;
-                if !entry.file_type().is_file()
+            let walker = WalkBuilder::new(&path)
+                .follow_links(true)
+                .add_custom_ignore_filename(".sprocketignore")
+                .standard_filters(false) // don't use git options
+                .hidden(true)
+                .parents(true)
+                .ignore(true) // do use a "plain" `.ignore` file
+                .build();
+
+            for result in walker {
+                let entry = match result {
+                    Ok(entry) => entry,
+                    Err(_) => continue, // ignore any errors parsing the ignore files
+                };
+
+                if !entry.file_type().is_some_and(|e| e.is_file())
                     || entry.path().extension().and_then(OsStr::to_str) != Some("wdl")
                 {
                     continue;
