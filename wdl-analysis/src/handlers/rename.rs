@@ -1,4 +1,4 @@
-//! Handlers for `rename` requests.
+//! Handlers for "rename" requests.
 //!
 //! This module implements the LSP `textDocument/rename` functionality for WDL
 //! files.
@@ -34,7 +34,7 @@ pub fn rename(
     new_name: String,
 ) -> Result<Option<WorkspaceEdit>> {
     if !is_ident(&new_name) {
-        bail!("New name '{}' is not a valid identifier.", new_name);
+        bail!("name '{}' is not a valid WDL identifier.", new_name);
     }
 
     let locations = handlers::find_all_references(graph, document_uri, position, encoding, true)?;
