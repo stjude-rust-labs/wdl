@@ -17,7 +17,9 @@ use futures::stream::FuturesUnordered;
 use indexmap::IndexSet;
 use lsp_types::CompletionResponse;
 use lsp_types::GotoDefinitionResponse;
+use lsp_types::Hover;
 use lsp_types::Location;
+use lsp_types::WorkspaceEdit;
 use parking_lot::RwLock;
 use petgraph::Direction;
 use petgraph::graph::NodeIndex;
@@ -72,6 +74,10 @@ pub enum Request<Context> {
     FindAllReferences(FindAllReferencesRequest),
     /// A request to get completions at a position.
     Completion(CompletionRequest<Context>),
+    /// A request to get information about a symbol on hover.
+    Hover(HoverRequest),
+    /// A request to rename a symbol workspace wide.
+    Rename(RenameRequest),
 }
 
 /// Represents a request to add documents to the graph.
@@ -170,6 +176,32 @@ pub struct CompletionRequest<Context> {
     pub completed: oneshot::Sender<Option<CompletionResponse>>,
     /// The context to provide to the progress callback.
     pub context: Context,
+}
+
+/// Represents a request to get information of a symbol on hover
+pub struct HoverRequest {
+    /// The document where the request was initiated.
+    pub document: Url,
+    /// The position of the symbol in the document.
+    pub position: SourcePosition,
+    /// The encoding used for the position.
+    pub encoding: SourcePositionEncoding,
+    /// The sender for completing the request.
+    pub completed: oneshot::Sender<Option<Hover>>,
+}
+
+/// Represents a request to rename a symbol at a given position.
+pub struct RenameRequest {
+    /// The document where the request was initiated.
+    pub document: Url,
+    /// The position of the symbol in the document.
+    pub position: SourcePosition,
+    /// The encoding used for the position.
+    pub encoding: SourcePositionEncoding,
+    /// The new name of the symbol.
+    pub new_name: String,
+    /// The sender for completing the request.
+    pub completed: oneshot::Sender<Option<WorkspaceEdit>>,
 }
 
 /// A simple enumeration to signal a cancellation to the caller.
@@ -468,6 +500,66 @@ where
                             completed.send(result).ok();
                         }
                         Err(_) => {
+                            completed.send(None).ok();
+                        }
+                    }
+                }
+                Request::Hover(HoverRequest {
+                    document,
+                    position,
+                    encoding,
+                    completed,
+                }) => {
+                    let start = Instant::now();
+                    debug!(
+                        "received request for hover at {document}: {line}:{char}",
+                        line = position.line,
+                        char = position.character
+                    );
+
+                    let graph = self.graph.read();
+
+                    match handlers::hover(&graph, &document, position, encoding) {
+                        Ok(result) => {
+                            debug!(
+                                "hover request completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+
+                            completed.send(result).ok();
+                        }
+                        Err(err) => {
+                            debug!("error occurred while completing hover request: {err:?}");
+                            completed.send(None).ok();
+                        }
+                    }
+                }
+
+                Request::Rename(RenameRequest {
+                    document,
+                    position,
+                    encoding,
+                    new_name,
+                    completed,
+                }) => {
+                    let start = Instant::now();
+                    debug!(
+                        "received request for rename at {document}: {line}:{char}",
+                        line = position.line,
+                        char = position.character
+                    );
+
+                    let graph = self.graph.read();
+                    match handlers::rename(&graph, document, position, encoding, new_name) {
+                        Ok(result) => {
+                            debug!(
+                                "rename request completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+                            completed.send(result).ok();
+                        }
+                        Err(err) => {
+                            debug!("error occurred while completing rename request: {err:?}");
                             completed.send(None).ok();
                         }
                     }

@@ -416,6 +416,8 @@ impl LanguageServer for Server {
                     trigger_characters: Some(vec![".".to_string(), "[".to_string()]),
                     ..Default::default()
                 }),
+                hover_provider: Some(HoverProviderCapability::Simple(true)),
+                rename_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -798,6 +800,60 @@ impl LanguageServer for Server {
                 params.text_document_position.text_document.uri,
                 position,
                 SourcePositionEncoding::UTF16,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
+    }
+
+    async fn hover(&self, mut params: HoverParams) -> RpcResult<Option<Hover>> {
+        normalize_uri_path(&mut params.text_document_position_params.text_document.uri);
+
+        debug!("received `textDocument/hover` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position_params.position.line,
+            params.text_document_position_params.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .hover(
+                params.text_document_position_params.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+            )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+        Ok(result)
+    }
+
+    async fn rename(&self, mut params: RenameParams) -> RpcResult<Option<WorkspaceEdit>> {
+        normalize_uri_path(&mut params.text_document_position.text_document.uri);
+
+        debug!("received `textDocument/rename` request: {params:#?}");
+
+        let position = SourcePosition::new(
+            params.text_document_position.position.line,
+            params.text_document_position.position.character,
+        );
+
+        let result = self
+            .analyzer
+            .rename(
+                params.text_document_position.text_document.uri,
+                position,
+                SourcePositionEncoding::UTF16,
+                params.new_name,
             )
             .await
             .map_err(|e| RpcError {

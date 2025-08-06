@@ -8,13 +8,18 @@ use crate::diagnostics;
 use crate::document::ScopeRef;
 use crate::types::v1::EvaluationContext;
 
+mod common;
 mod completions;
 mod find_all_references;
 mod goto_definition;
+mod hover;
+mod rename;
 
 pub use completions::*;
 pub use find_all_references::*;
 pub use goto_definition::*;
+pub use hover::*;
+pub use rename::*;
 
 /// Context for evaluating expression types during LSP operations.
 ///

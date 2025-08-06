@@ -19,10 +19,7 @@ use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
 use line_index::LineIndex;
-use line_index::WideEncoding;
 use lsp_types::Location;
-use lsp_types::Position;
-use rowan::TextSize;
 use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -40,6 +37,10 @@ use crate::document::Document;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
 use crate::handlers::TypeEvalContext;
+use crate::handlers::common::find_identifier_token_at_offset;
+use crate::handlers::common::location_from_span;
+use crate::handlers::common::position_to_offset;
+use crate::types::Type;
 use crate::types::v1::ExprTypeEvaluator;
 
 /// Finds the definition location for an identifier at the given position.
@@ -97,6 +98,36 @@ pub fn goto_definition(
     // Scope based resolution
     if let Some(scope_ref) = analysis_doc.find_scope_by_position(token.span().start()) {
         if let Some(name_def) = scope_ref.lookup(ident_text) {
+            if let Type::Call(_) = name_def.ty() {
+                let def_offset = name_def.span().start().try_into()?;
+                let def_token = root
+                    .token_at_offset(def_offset)
+                    .find(|t| t.span() == name_def.span() && t.kind() == SyntaxKind::Ident);
+
+                if let Some(def_token) = def_token {
+                    if let Some(call_stmt) = def_token
+                        .parent_ancestors()
+                        .find_map(v1::CallStatement::cast)
+                    {
+                        if call_stmt.alias().is_none() {
+                            // NOTE: implicit alias found, resolving call target instead of the
+                            // alias
+                            let target = call_stmt.target();
+                            let callee_name =
+                                target.names().last().expect("call target must have a name");
+                            return resolve_call_target(
+                                target.inner(),
+                                callee_name.inner(),
+                                analysis_doc,
+                                &document_uri,
+                                &lines,
+                                graph,
+                            );
+                        }
+                    }
+                }
+            }
+
             return Ok(Some(location_from_span(
                 &document_uri,
                 name_def.span(),
@@ -778,41 +809,6 @@ fn find_target_input_parameter(
     Ok(None)
 }
 
-/// Finds an identifier token at the specified `TextSize` offset in the concrete
-/// syntax tree.
-fn find_identifier_token_at_offset(node: &SyntaxNode, offset: TextSize) -> Option<SyntaxToken> {
-    node.token_at_offset(offset)
-        .find(|t| t.kind() == SyntaxKind::Ident)
-}
-
-/// Converts a text size offset to LSP position.
-pub fn position(index: &LineIndex, offset: TextSize) -> Result<Position> {
-    let line_col = index.line_col(offset);
-    let line_col = index
-        .to_wide(WideEncoding::Utf16, line_col)
-        .with_context(|| {
-            format!(
-                "invalid line column: {line}:{column}",
-                line = line_col.line,
-                column = line_col.col
-            )
-        })?;
-
-    Ok(Position::new(line_col.line, line_col.col))
-}
-
-/// Converts a `Span` to an LSP location.
-pub fn location_from_span(uri: &Url, span: Span, lines: &Arc<LineIndex>) -> Result<Location> {
-    let start_offset = TextSize::from(span.start() as u32);
-    let end_offset = TextSize::from(span.end() as u32);
-    let range = lsp_types::Range {
-        start: position(lines, start_offset)?,
-        end: position(lines, end_offset)?,
-    };
-
-    Ok(Location::new(uri.clone(), range))
-}
-
 /// Finds global structs, tasks and workflow definition in a document.
 fn find_global_definition_in_doc(
     analysis_doc: &Document,
@@ -846,31 +842,4 @@ fn find_global_definition_in_doc(
     }
 
     Ok(None)
-}
-
-/// Converts a source position to a text offset based on the specified encoding.
-pub fn position_to_offset(
-    lines: &Arc<LineIndex>,
-    position: SourcePosition,
-    encoding: SourcePositionEncoding,
-) -> Result<TextSize> {
-    let line_col = match encoding {
-        SourcePositionEncoding::UTF8 => line_index::LineCol {
-            line: position.line,
-            col: position.character,
-        },
-        SourcePositionEncoding::UTF16 => {
-            let wide_col = line_index::WideLineCol {
-                line: position.line,
-                col: position.character,
-            };
-            lines
-                .to_utf8(line_index::WideEncoding::Utf16, wide_col)
-                .ok_or_else(|| anyhow!("invalid utf-16 position: {position:?}"))?
-        }
-    };
-
-    lines
-        .offset(line_col)
-        .ok_or_else(|| anyhow!("line_col is invalid"))
 }
