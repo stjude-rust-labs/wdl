@@ -421,10 +421,7 @@ where
             let walker = walker.standard_filters(false).parents(true).build();
 
             for result in walker {
-                let entry = match result {
-                    Ok(entry) => entry,
-                    Err(_) => continue, // ignore any errors parsing the ignore files
-                };
+                let entry = entry?;
 
                 // Skip entries without a file type
                 let Some(file_type) = entry.file_type() else {
