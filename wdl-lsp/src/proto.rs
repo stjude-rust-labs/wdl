@@ -91,14 +91,13 @@ pub fn diagnostic(
         })
         .collect::<Result<_>>()?;
 
-    if let Some(fix) = diagnostic.fix() {
-        if let Some(span) = diagnostic.labels().next().map(|l| l.span()) {
+    if let Some(fix) = diagnostic.fix()
+        && let Some(span) = diagnostic.labels().next().map(|l| l.span()) {
             related.push(DiagnosticRelatedInformation {
                 location: Location::new(uri.clone(), range_from_span(index, span)?),
                 message: format!("fix: {fix}"),
             });
         }
-    }
 
     Ok(Diagnostic::new(
         range.unwrap_or_default(),
@@ -188,8 +187,8 @@ pub fn workspace_diagnostic_report(
             continue;
         }
 
-        if let Some(previous) = ids.get(result.document().uri()) {
-            if previous == result.document().id().as_ref() {
+        if let Some(previous) = ids.get(result.document().uri())
+            && previous == result.document().id().as_ref() {
                 debug!(
                     "diagnostics for document `{uri}` have not changed (client has latest)",
                     uri = result.document().uri(),
@@ -206,7 +205,6 @@ pub fn workspace_diagnostic_report(
                 ));
                 continue;
             }
-        }
 
         debug!(
             "diagnostics for document `{uri}` have changed since last client request",

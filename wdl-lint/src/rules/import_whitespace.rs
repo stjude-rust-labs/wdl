@@ -123,8 +123,8 @@ impl Visitor for ImportWhitespaceRule {
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
 
-        if let Some(token) = prev_token {
-            if token.kind() == SyntaxKind::Whitespace && !token.text().ends_with('\n') {
+        if let Some(token) = prev_token
+            && token.kind() == SyntaxKind::Whitespace && !token.text().ends_with('\n') {
                 // Find the span of just the leading whitespace
                 let span: Span = token.text_range().into();
                 for (text, offset, _) in lines_with_offset(token.text()) {
@@ -140,7 +140,6 @@ impl Visitor for ImportWhitespaceRule {
                     }
                 }
             }
-        }
 
         // Third, check for whitespace between imports.
         let between_imports = stmt

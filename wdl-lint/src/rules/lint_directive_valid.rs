@@ -121,9 +121,9 @@ impl Visitor for LintDirectiveValidRule {
                 // Update the offset to account for the whitespace that was removed
                 offset += id.len() - trimmed.len();
 
-                if let Some(elem) = &excepted_element {
-                    if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
-                        if !exceptable_nodes.contains(&elem.kind()) {
+                if let Some(elem) = &excepted_element
+                    && let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed)
+                        && !exceptable_nodes.contains(&elem.kind()) {
                             diagnostics.add(misplaced_lint_directive(
                                 trimmed,
                                 Span::new(start + offset, trimmed.len()),
@@ -131,8 +131,6 @@ impl Visitor for LintDirectiveValidRule {
                                 exceptable_nodes,
                             ));
                         }
-                    }
-                }
 
                 // Update the offset to account for the rule id and comma
                 offset += trimmed.len() + 1;

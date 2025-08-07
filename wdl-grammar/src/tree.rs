@@ -735,8 +735,8 @@ impl SyntaxTokenExt for SyntaxToken {
                 break;
             }
             // Stop if a comment is not on its own line
-            if token.kind() == SyntaxKind::Comment {
-                if let Some(prev) = token.prev_token() {
+            if token.kind() == SyntaxKind::Comment
+                && let Some(prev) = token.prev_token() {
                     if prev.kind() == SyntaxKind::Whitespace {
                         let has_newlines = prev.text().chars().any(|c| c == '\n');
                         // If there are newlines in 'prev' then we know
@@ -752,7 +752,6 @@ impl SyntaxTokenExt for SyntaxToken {
                         break;
                     }
                 }
-            }
             // Filter out whitespace that is not substantial
             match token.kind() {
                 SyntaxKind::Whitespace

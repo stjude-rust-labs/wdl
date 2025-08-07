@@ -358,11 +358,10 @@ impl Postprocessor {
                         }
                         Comment::Inline(value) => {
                             assert!(self.position == LinePosition::MiddleOfLine);
-                            if let Some(next) = next {
-                                if next != &PreToken::LineEnd {
+                            if let Some(next) = next
+                                && next != &PreToken::LineEnd {
                                     self.interrupted = true;
                                 }
-                            }
                             self.trim_last_line(stream);
                             for token in INLINE_COMMENT_PRECEDING_TOKENS.iter() {
                                 stream.push(token.clone());
@@ -464,8 +463,8 @@ impl Postprocessor {
                 &mut post_buffer,
             );
 
-            if let Some(cache) = cache {
-                if post_buffer.last_line_width(config) > max_length {
+            if let Some(cache) = cache
+                && post_buffer.last_line_width(config) > max_length {
                     // The line is too long after the next step. Revert to the
                     // cached state and insert a line break.
                     post_buffer = cache;
@@ -477,7 +476,6 @@ impl Postprocessor {
                         &mut post_buffer,
                     );
                 }
-            }
         }
 
         out_stream.extend(post_buffer);

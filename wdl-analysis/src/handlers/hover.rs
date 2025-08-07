@@ -113,8 +113,8 @@ fn resolve_hover_content(
     }
 
     // Finds hover information based on the scope.
-    if let Some(scope) = document.find_scope_by_position(token.span().start()) {
-        if let Some(name) = scope.lookup(token.text()) {
+    if let Some(scope) = document.find_scope_by_position(token.span().start())
+        && let Some(name) = scope.lookup(token.text()) {
             let (kind, documentation) = match name.ty() {
                 Type::Call(_) => ("call", None),
                 _ => {
@@ -130,7 +130,6 @@ fn resolve_hover_content(
 
             return Ok(Some(content));
         }
-    }
 
     // Finds hover information across global definitions.
     if let Some(content) = find_global_hover_in_doc(document, token)? {

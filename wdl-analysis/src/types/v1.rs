@@ -797,8 +797,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 // Ensure the remaining items types share common types
                 for item in items {
                     let (key, value) = item.key_value();
-                    if let Some(actual_key) = self.evaluate_expr(&key) {
-                        if let Some(actual_value) = self.evaluate_expr(&value) {
+                    if let Some(actual_key) = self.evaluate_expr(&key)
+                        && let Some(actual_value) = self.evaluate_expr(&value) {
                             match expected_key.common_type(&actual_key) {
                                 Some(ty) => {
                                     expected_key = ty;
@@ -829,7 +829,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                 }
                             }
                         }
-                    }
                 }
 
                 MapType::new(expected_key, expected_value).into()
@@ -875,8 +874,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     match ty.members.get_full(n.text()) {
                         Some((index, _, expected)) => {
                             present[index] = true;
-                            if let Some(actual) = self.evaluate_expr(&v) {
-                                if !actual.is_coercible_to(expected) {
+                            if let Some(actual) = self.evaluate_expr(&v)
+                                && !actual.is_coercible_to(expected) {
                                     self.context.add_diagnostic(type_mismatch(
                                         expected,
                                         n.span(),
@@ -884,7 +883,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                         v.span(),
                                     ));
                                 }
-                            }
                         }
                         _ => {
                             // Not a struct member
@@ -950,8 +948,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         if !self.evaluate_requirement(name, expr, &expr_ty) {
             // Always use object types for `runtime` section `inputs` and `outputs` keys as
             // only `hints` sections can use input/output hidden types
-            if let Some(expected) = task_hint_types(self.context.version(), name.text(), false) {
-                if !expected
+            if let Some(expected) = task_hint_types(self.context.version(), name.text(), false)
+                && !expected
                     .iter()
                     .any(|target| expr_ty.is_coercible_to(target))
                 {
@@ -962,7 +960,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         expr.span(),
                     ));
                 }
-            }
         }
     }
 
@@ -1028,8 +1025,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         expr: &Expr<N>,
     ) {
         let expr_ty = self.evaluate_expr(expr).unwrap_or(Type::Union);
-        if let Some(expected) = task_hint_types(self.context.version(), name.text(), true) {
-            if !expected
+        if let Some(expected) = task_hint_types(self.context.version(), name.text(), true)
+            && !expected
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(target))
             {
@@ -1040,7 +1037,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     expr.span(),
                 ));
             }
-        }
     }
 
     /// Evaluates the type of a literal input expression.
@@ -1490,8 +1486,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         // above function expect the pattern as 2nd argument
                         if let Some(Expr::Literal(LiteralExpr::String(pattern_literal))) =
                             expr.arguments().nth(1)
-                        {
-                            if let Some(value) = pattern_literal.text() {
+                            && let Some(value) = pattern_literal.text() {
                                 let pattern = value.text().to_string();
                                 if let Err(e) = regex::Regex::new(&pattern) {
                                     self.context.add_diagnostic(invalid_regex_pattern(
@@ -1502,7 +1497,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                     ));
                                 }
                             }
-                        }
                     }
                     _ => {}
                 }
@@ -1513,8 +1507,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         Ok(binding) => {
                             if let Some(severity) =
                                 self.context.diagnostics_config().unnecessary_function_call
-                            {
-                                if !expr.inner().is_rule_excepted(UNNECESSARY_FUNCTION_CALL) {
+                                && !expr.inner().is_rule_excepted(UNNECESSARY_FUNCTION_CALL) {
                                     self.check_unnecessary_call(
                                         &target,
                                         arguments,
@@ -1522,7 +1515,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                         severity,
                                     );
                                 }
-                            }
                             return Some(binding.return_type().clone());
                         }
                         Err(FunctionBindError::RequiresVersion(minimum)) => {

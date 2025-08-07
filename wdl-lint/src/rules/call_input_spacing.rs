@@ -115,8 +115,7 @@ impl Visitor for CallInputSpacingRule {
             .inner()
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::InputKeyword)
-        {
-            if let Some(whitespace) = input_keyword.prev_sibling_or_token() {
+            && let Some(whitespace) = input_keyword.prev_sibling_or_token() {
                 if whitespace.kind() != SyntaxKind::Whitespace {
                     // If there is no whitespace before the input keyword
                     diagnostics.exceptable_add(
@@ -133,7 +132,6 @@ impl Visitor for CallInputSpacingRule {
                     );
                 }
             }
-        }
 
         call.inputs().for_each(|input| {
             // Check for assignment spacing

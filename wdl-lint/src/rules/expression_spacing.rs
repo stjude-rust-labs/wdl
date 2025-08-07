@@ -296,8 +296,8 @@ impl Visitor for ExpressionSpacingRule {
 
                 // Opening parenthesis cannot be followed by a space, but can be followed by a
                 // newline. Except in the case of an in-line comment.
-                if let Some(open_next) = open.next_sibling_or_token() {
-                    if open_next.kind() == SyntaxKind::Whitespace {
+                if let Some(open_next) = open.next_sibling_or_token()
+                    && open_next.kind() == SyntaxKind::Whitespace {
                         let token = open_next.as_token().expect("should be a token");
                         if token.text().starts_with(' ')
                             && token
@@ -312,12 +312,11 @@ impl Visitor for ExpressionSpacingRule {
                             );
                         }
                     }
-                }
 
                 // Closing parenthesis should not be preceded by a space, but can be preceded by
                 // a newline.
-                if let Some(close_prev) = close.prev_sibling_or_token() {
-                    if close_prev.kind() == SyntaxKind::Whitespace
+                if let Some(close_prev) = close.prev_sibling_or_token()
+                    && close_prev.kind() == SyntaxKind::Whitespace
                         && !close_prev
                             .as_token()
                             .expect("should be a token")
@@ -332,7 +331,6 @@ impl Visitor for ExpressionSpacingRule {
                             &self.exceptable_nodes(),
                         );
                     }
-                }
             }
             Expr::LogicalAnd(_) | Expr::LogicalOr(_) => {
                 // find the operator

@@ -355,14 +355,13 @@ impl LanguageServer for Server {
             for mut folder in folders {
                 normalize_uri_path(&mut folder.uri);
                 self.folders.write().push(folder.clone());
-                if let Ok(path) = folder.uri.to_file_path() {
-                    if let Err(e) = self.analyzer.add_directory(path).await {
+                if let Ok(path) = folder.uri.to_file_path()
+                    && let Err(e) = self.analyzer.add_directory(path).await {
                         error!(
                             "failed to add initial workspace directory {uri}: {e}",
                             uri = folder.uri
                         );
                     }
-                }
             }
         }
 
@@ -584,8 +583,8 @@ impl LanguageServer for Server {
         debug!("received `workspace/didChangeWorkspaceFolders` request: {params:#?}");
 
         // Process the removed folders
-        if !params.event.removed.is_empty() {
-            if let Err(e) = self
+        if !params.event.removed.is_empty()
+            && let Err(e) = self
                 .analyzer
                 .remove_documents(
                     params
@@ -602,7 +601,6 @@ impl LanguageServer for Server {
             {
                 error!("failed to remove documents from analyzer: {e}");
             }
-        }
 
         // Progress the added folders
         if !params.event.added.is_empty() {
@@ -623,11 +621,10 @@ impl LanguageServer for Server {
 
         /// Converts a URI into a WDL file path.
         fn to_wdl_file_path(uri: &Url) -> Option<PathBuf> {
-            if let Ok(path) = uri.to_file_path() {
-                if path.is_file() && path.extension().and_then(OsStr::to_str) == Some("wdl") {
+            if let Ok(path) = uri.to_file_path()
+                && path.is_file() && path.extension().and_then(OsStr::to_str) == Some("wdl") {
                     return Some(path);
                 }
-            }
 
             None
         }
@@ -677,11 +674,10 @@ impl LanguageServer for Server {
         }
 
         // Remove any documents from the analyzer
-        if !deleted.is_empty() {
-            if let Err(e) = self.analyzer.remove_documents(deleted).await {
+        if !deleted.is_empty()
+            && let Err(e) = self.analyzer.remove_documents(deleted).await {
                 error!("failed to remove documents from analyzer: {e}");
             }
-        }
     }
 
     async fn formatting(

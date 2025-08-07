@@ -123,9 +123,9 @@ impl Visitor for CommentWhitespaceRule {
 
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
-            if let Some(prior) = comment.inner().prev_sibling_or_token() {
-                if prior.kind() != SyntaxKind::Whitespace
-                    || prior.as_token().expect("should be a token").text() != "  "
+            if let Some(prior) = comment.inner().prev_sibling_or_token()
+                && (prior.kind() != SyntaxKind::Whitespace
+                    || prior.as_token().expect("should be a token").text() != "  ")
                 {
                     // Report a diagnostic if there are not two spaces before the comment delimiter
                     let span = Span::new(comment.span().start(), 1);
@@ -135,7 +135,6 @@ impl Visitor for CommentWhitespaceRule {
                         &self.exceptable_nodes(),
                     );
                 }
-            }
         } else {
             // Not an in-line comment, so check indentation level
             let ancestors = comment
@@ -222,11 +221,9 @@ fn filter_parent_ancestors(node: &SyntaxNode) -> bool {
     if let Some(prior) = node
         .prev_sibling_or_token()
         .and_then(SyntaxElement::into_token)
-    {
-        if prior.kind() == SyntaxKind::Whitespace && prior.text().contains('\n') {
+        && prior.kind() == SyntaxKind::Whitespace && prior.text().contains('\n') {
             return true;
         }
-    }
     // If a parenthesized expression has a prior sibling that contains a newline
     // before we get to a node, then this ancestor contributes to indentation.
     if node.kind() == SyntaxKind::ParenthesizedExprNode {

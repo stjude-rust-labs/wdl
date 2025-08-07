@@ -158,8 +158,8 @@ impl Visitor for ContainerUriRule {
             return;
         }
 
-        if let Some(container) = section.container() {
-            if let Ok(value) = container.value() {
+        if let Some(container) = section.container()
+            && let Ok(value) = container.value() {
                 check_container_value(
                     diagnostics,
                     value,
@@ -167,7 +167,6 @@ impl Visitor for ContainerUriRule {
                     &self.exceptable_nodes(),
                 );
             }
-        }
     }
 
     fn requirements_section(
@@ -180,8 +179,8 @@ impl Visitor for ContainerUriRule {
             return;
         }
 
-        if let Some(container) = section.container() {
-            if let Ok(value) = container.value() {
+        if let Some(container) = section.container()
+            && let Ok(value) = container.value() {
                 check_container_value(
                     diagnostics,
                     value,
@@ -189,7 +188,6 @@ impl Visitor for ContainerUriRule {
                     &self.exceptable_nodes(),
                 );
             }
-        }
     }
 }
 

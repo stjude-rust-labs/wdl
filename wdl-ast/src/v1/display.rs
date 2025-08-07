@@ -83,8 +83,8 @@ pub fn write_input_section<N: TreeNode>(
     input: Option<&InputSection<N>>,
     param_meta: Option<&ParameterMetadataSection<N>>,
 ) -> fmt::Result {
-    if let Some(input) = input {
-        if input.declarations().next().is_some() {
+    if let Some(input) = input
+        && input.declarations().next().is_some() {
             writeln!(f, "\n**Inputs**")?;
             for decl in input.declarations() {
                 let name = decl.name();
@@ -105,7 +105,6 @@ pub fn write_input_section<N: TreeNode>(
                 }
             }
         }
-    }
     Ok(())
 }
 
@@ -115,8 +114,8 @@ pub fn write_output_section<N: TreeNode>(
     output: Option<&OutputSection<N>>,
     param_meta: Option<&ParameterMetadataSection<N>>,
 ) -> fmt::Result {
-    if let Some(output) = output {
-        if output.declarations().next().is_some() {
+    if let Some(output) = output
+        && output.declarations().next().is_some() {
             writeln!(f, "\n**Outputs**")?;
             for decl in output.declarations() {
                 let name = decl.name();
@@ -130,6 +129,5 @@ pub fn write_output_section<N: TreeNode>(
                 }
             }
         }
-    }
     Ok(())
 }

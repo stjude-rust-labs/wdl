@@ -115,8 +115,8 @@ async fn write_array_tsv_file(
     // Write the rows
     for (index, row) in rows.as_slice().iter().enumerate() {
         let row = row.as_array().unwrap();
-        if let Some(column_count) = column_count {
-            if row.len() != column_count {
+        if let Some(column_count) = column_count
+            && row.len() != column_count {
                 return Err(function_call_failed(
                     FUNCTION_NAME,
                     format!(
@@ -128,7 +128,6 @@ async fn write_array_tsv_file(
                     call_site,
                 ));
             }
-        }
 
         for (i, column) in row.as_slice().iter().enumerate() {
             let column = column.as_string().unwrap();

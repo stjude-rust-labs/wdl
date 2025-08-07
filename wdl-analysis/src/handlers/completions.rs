@@ -132,11 +132,10 @@ pub fn completion(
         // left of the cursor (ignoring whitespace) is the `version` keyword, we are
         // very likely completing the version number.
         let mut non_trivia = token.clone();
-        if non_trivia.kind().is_trivia() {
-            if let Some(prev) = non_trivia.prev_token() {
+        if non_trivia.kind().is_trivia()
+            && let Some(prev) = non_trivia.prev_token() {
                 non_trivia = prev;
             }
-        }
         if non_trivia.kind() == SyntaxKind::VersionKeyword {
             let _ = add_version_completions(token, &lines, &mut items);
             return Ok(items);
@@ -316,9 +315,9 @@ fn add_member_access_completions(
     };
 
     // Namespace completions
-    if let Some(token) = target_element.as_token() {
-        if token.kind() == SyntaxKind::Ident {
-            if let Some(ns) = document.namespace(token.text()) {
+    if let Some(token) = target_element.as_token()
+        && token.kind() == SyntaxKind::Ident
+            && let Some(ns) = document.namespace(token.text()) {
                 let ns_root = ns.document().root();
                 for task in ns.document().tasks() {
                     items.push(CompletionItem {
@@ -344,8 +343,6 @@ fn add_member_access_completions(
 
                 return Ok(());
             }
-        }
-    }
 
     let Some(target_node) = target_element.as_node() else {
         return Ok(());
@@ -373,13 +370,13 @@ fn add_member_access_completions(
         // Inferred `task.meta.*` and `task.parameter_meta.*` completions.
         // TODO: recurse on `Objects`
         let (expr, member) = access_expr.operands();
-        if let Some(name_ref) = expr.as_name_ref() {
-            if name_ref.name().text() == TASK_VAR_NAME {
+        if let Some(name_ref) = expr.as_name_ref()
+            && name_ref.name().text() == TASK_VAR_NAME {
                 let member_name = member.text();
                 // `task.meta.*` completions.
                 if member_name == TASK_FIELD_META {
-                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast) {
-                        if let Some(meta_section) = task_def.metadata() {
+                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
+                        && let Some(meta_section) = task_def.metadata() {
                             for item in meta_section.items() {
                                 items.push(CompletionItem {
                                     label: item.name().text().to_string(),
@@ -390,12 +387,11 @@ fn add_member_access_completions(
                                 });
                             }
                         }
-                    }
                     return Ok(());
                 } else if member_name == TASK_FIELD_PARAMETER_META {
                     // `task.parameter_meta.*` completions.
-                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast) {
-                        if let Some(param_meta_section) = task_def.parameter_metadata() {
+                    if let Some(task_def) = node.ancestors().find_map(TaskDefinition::cast)
+                        && let Some(param_meta_section) = task_def.parameter_metadata() {
                             for item in param_meta_section.items() {
                                 items.push(CompletionItem {
                                     label: item.name().text().to_string(),
@@ -406,11 +402,9 @@ fn add_member_access_completions(
                                 });
                             }
                         }
-                    }
                     return Ok(());
                 }
             }
-        }
     }
 
     // NOTE: we do type evaluation only for non namespaces or complex types
@@ -472,8 +466,7 @@ fn add_member_access_completions(
 
                     if let Some(decl_node) =
                         token_at_decl.and_then(|t| t.parent_ancestors().find_map(BoundDecl::cast))
-                    {
-                        if let Expr::Literal(LiteralExpr::Map(map_literal)) = decl_node.expr() {
+                        && let Expr::Literal(LiteralExpr::Map(map_literal)) = decl_node.expr() {
                             for item in map_literal.items() {
                                 let (key, _) = item.key_value();
                                 if let Expr::Literal(literal_key) = key {
@@ -516,7 +509,6 @@ fn add_member_access_completions(
                                 }
                             }
                         }
-                    }
                 }
             } else if let Expr::Literal(LiteralExpr::Map(map_literal)) = target_expr {
                 for item in map_literal.items() {

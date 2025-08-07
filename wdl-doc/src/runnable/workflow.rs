@@ -138,8 +138,7 @@ impl Workflow {
             .meta
             .get("allowNestedInputs")
             .or(self.meta.get("allow_nested_inputs"))
-        {
-            if b.value() {
+            && b.value() {
                 return html! {
                     div class="main__badge main__badge--success" {
                         span class="main__badge-text" {
@@ -148,7 +147,6 @@ impl Workflow {
                     }
                 };
             }
-        }
         html! {
             div class="main__badge main__badge--disabled" {
                 span class="main__badge-text" {

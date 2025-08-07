@@ -99,8 +99,8 @@ impl Visitor for RuntimeSectionRule {
 
         // This rule should only be present for WDL v1.1 or earlier, as the
         // `requirements` section replaces it in WDL v1.2.
-        if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
-            if minor_version <= V1::One && task.runtime().is_none() {
+        if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here")
+            && minor_version <= V1::One && task.runtime().is_none() {
                 let name = task.name();
                 diagnostics.exceptable_add(
                     missing_runtime_section(name.text(), name.span()),
@@ -108,6 +108,5 @@ impl Visitor for RuntimeSectionRule {
                     &self.exceptable_nodes(),
                 );
             }
-        }
     }
 }

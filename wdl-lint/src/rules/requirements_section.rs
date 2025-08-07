@@ -113,8 +113,8 @@ impl Visitor for RequirementsSectionRule {
 
         // This rule should only be present for WDL v1.2 or later. Prior to that
         // version, the `runtime` section was recommended.
-        if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
-            if minor_version >= V1::Two {
+        if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here")
+            && minor_version >= V1::Two {
                 match task.runtime() {
                     Some(runtime) => {
                         let name = task.name();
@@ -144,6 +144,5 @@ impl Visitor for RequirementsSectionRule {
                     }
                 }
             }
-        }
     }
 }

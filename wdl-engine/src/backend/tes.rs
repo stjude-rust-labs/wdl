@@ -137,14 +137,13 @@ impl TesTaskRequest {
             );
         }
 
-        if let Some(mount_point) = disks.keys().next() {
-            if *mount_point != "/" {
+        if let Some(mount_point) = disks.keys().next()
+            && *mount_point != "/" {
                 bail!(
                     "TES backend does not support a disk mount point other than `/` for the \
                      `{TASK_REQUIREMENT_DISKS}` task requirement"
                 );
             }
-        }
 
         Ok(disks
             .values()
@@ -204,17 +203,15 @@ impl TaskManagerRequest for TesTaskRequest {
             // TODO: in the future, we should be uploading the entire contents to cloud
             // storage
             if input.kind() == InputKind::Directory {
-                if let EvaluationPath::Local(path) = input.path() {
-                    if let Ok(mut entries) = path.read_dir() {
-                        if entries.next().is_some() {
+                if let EvaluationPath::Local(path) = input.path()
+                    && let Ok(mut entries) = path.read_dir()
+                        && entries.next().is_some() {
                             bail!(
                                 "cannot upload contents of directory `{path}`: operation is not \
                                  yet supported",
                                 path = path.display()
                             );
                         }
-                    }
-                }
                 continue;
             }
 

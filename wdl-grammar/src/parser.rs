@@ -639,12 +639,12 @@ where
             let mut lexer = self.lexer.clone();
             let marker = self.start();
             if let Err((marker, e)) = cb(self, marker) {
-                if let Some((Ok(token), _)) = lexer.as_mut().expect("should have a lexer").peek() {
-                    if !recovery.contains(token.into_raw()) {
+                if let Some((Ok(token), _)) = lexer.as_mut().expect("should have a lexer").peek()
+                    && !recovery.contains(token.into_raw()) {
                         // Determine if the token is recoverable in the parent recovery set
                         // If so, we'll restart where we first attempted to parse this item
-                        if let Some(parent) = &parent {
-                            if parent.contains(token.into_raw()) {
+                        if let Some(parent) = &parent
+                            && parent.contains(token.into_raw()) {
                                 // Truncate the event list and abandon the marker
                                 self.events.truncate(marker.0);
                                 marker.abandon(self);
@@ -654,9 +654,7 @@ where
                                 self.lexer = lexer;
                                 break;
                             }
-                        }
                     }
-                }
 
                 self.recover(e);
                 marker.abandon(self);
@@ -664,8 +662,8 @@ where
 
             next = self.peek();
 
-            if let Some(delimiter) = delimiter {
-                if let Some((token, _)) = next {
+            if let Some(delimiter) = delimiter
+                && let Some((token, _)) = next {
                     if token == until {
                         break;
                     }
@@ -700,7 +698,6 @@ where
 
                     next = self.peek();
                 }
-            }
         }
 
         self.recovery.pop();

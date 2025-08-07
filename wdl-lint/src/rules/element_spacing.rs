@@ -473,8 +473,8 @@ impl Visitor for ElementSpacingRule {
             .inner()
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        if let Some(p) = prior {
-            if p.kind() == SyntaxKind::Whitespace {
+        if let Some(p) = prior
+            && p.kind() == SyntaxKind::Whitespace {
                 let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
@@ -502,7 +502,6 @@ impl Visitor for ElementSpacingRule {
                     }
                 }
             }
-        }
     }
 
     fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
@@ -515,8 +514,8 @@ impl Visitor for ElementSpacingRule {
         let prior = actual_start
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        if let Some(p) = prior {
-            if p.kind() == SyntaxKind::Whitespace {
+        if let Some(p) = prior
+            && p.kind() == SyntaxKind::Whitespace {
                 let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
@@ -544,7 +543,6 @@ impl Visitor for ElementSpacingRule {
                     }
                 }
             }
-        }
     }
 
     fn conditional_statement(
@@ -709,8 +707,8 @@ fn check_last_token(
         .last_token()
         .expect("node should have last token")
         .prev_token();
-    if let Some(prev) = prev {
-        if prev.kind() == SyntaxKind::Whitespace {
+    if let Some(prev) = prev
+        && prev.kind() == SyntaxKind::Whitespace {
             let count = prev.text().chars().filter(|c| *c == '\n').count();
             if count > 1 {
                 diagnostics.exceptable_add(
@@ -720,7 +718,6 @@ fn check_last_token(
                 );
             }
         }
-    }
 }
 
 /// For a given node, walk background until a non-comment or blank line is
