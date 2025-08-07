@@ -17,6 +17,9 @@ use crate::UNUSED_INPUT_RULE_ID;
 use crate::USING_FALLBACK_VERSION;
 use crate::rules;
 
+/// Default filename to search for when ignoring WDL files.
+const DEFAULT_IGNORE_FILENAME: &str = ".wdlignore";
+
 /// Configuration for `wdl-analysis`.
 ///
 /// This type is a wrapper around an `Arc`, and so can be cheaply cloned and
@@ -45,6 +48,7 @@ impl Default for Config {
             inner: Arc::new(ConfigInner {
                 diagnostics: Default::default(),
                 fallback_version: None,
+                ignore_filename: DEFAULT_IGNORE_FILENAME.to_string(),
             }),
         }
     }
@@ -60,6 +64,11 @@ impl Config {
     /// [`Config::with_fallback_version()`].
     pub fn fallback_version(&self) -> Option<SupportedVersion> {
         self.inner.fallback_version
+    }
+
+    /// Get this configuration's ignore filename.
+    pub fn ignore_filename(&self) -> &str {
+        &self.inner.ignore_filename
     }
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
@@ -108,6 +117,15 @@ impl Config {
             inner: Arc::new(inner),
         }
     }
+
+    /// Return a new configuration with the previous ignore filename replaced by the argument.
+    pub fn with_ignore_filename(&self, file_name: String) -> Self {
+        let mut inner = (*self.inner).clone();
+        inner.ignore_filename = file_name;
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
 }
 
 /// The actual configuration fields inside the [`Config`] wrapper.
@@ -119,6 +137,8 @@ struct ConfigInner {
     /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
+    /// TODO
+    ignore_filename: String,
 }
 
 /// Configuration for analysis diagnostics.
