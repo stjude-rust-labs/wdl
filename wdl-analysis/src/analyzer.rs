@@ -421,7 +421,10 @@ where
             let walker = walker.standard_filters(false).parents(true).build();
 
             for result in walker {
-                let entry = entry?;
+                let entry = result.with_context(|| {
+                    "error during recursive file search\nthis may be due to parsing an \
+                         ignorefile".to_string()
+                })?;
 
                 // Skip entries without a file type
                 let Some(file_type) = entry.file_type() else {
@@ -432,7 +435,7 @@ where
                     continue;
                 }
                 // Skip files without a `.wdl` extension
-                if entry.path().extension() != Some(&OsStr::new("wdl")) {
+                if entry.path().extension() != Some(OsStr::new("wdl")) {
                     continue;
                 }
 
