@@ -92,12 +92,13 @@ pub fn diagnostic(
         .collect::<Result<_>>()?;
 
     if let Some(fix) = diagnostic.fix()
-        && let Some(span) = diagnostic.labels().next().map(|l| l.span()) {
-            related.push(DiagnosticRelatedInformation {
-                location: Location::new(uri.clone(), range_from_span(index, span)?),
-                message: format!("fix: {fix}"),
-            });
-        }
+        && let Some(span) = diagnostic.labels().next().map(|l| l.span())
+    {
+        related.push(DiagnosticRelatedInformation {
+            location: Location::new(uri.clone(), range_from_span(index, span)?),
+            message: format!("fix: {fix}"),
+        });
+    }
 
     Ok(Diagnostic::new(
         range.unwrap_or_default(),
@@ -188,23 +189,24 @@ pub fn workspace_diagnostic_report(
         }
 
         if let Some(previous) = ids.get(result.document().uri())
-            && previous == result.document().id().as_ref() {
-                debug!(
-                    "diagnostics for document `{uri}` have not changed (client has latest)",
-                    uri = result.document().uri(),
-                );
+            && previous == result.document().id().as_ref()
+        {
+            debug!(
+                "diagnostics for document `{uri}` have not changed (client has latest)",
+                uri = result.document().uri(),
+            );
 
-                items.push(WorkspaceDocumentDiagnosticReport::Unchanged(
-                    WorkspaceUnchangedDocumentDiagnosticReport {
-                        uri: result.document().uri().as_ref().clone(),
-                        version: result.version().map(|v| v as i64),
-                        unchanged_document_diagnostic_report: UnchangedDocumentDiagnosticReport {
-                            result_id: result.document().id().as_ref().clone(),
-                        },
+            items.push(WorkspaceDocumentDiagnosticReport::Unchanged(
+                WorkspaceUnchangedDocumentDiagnosticReport {
+                    uri: result.document().uri().as_ref().clone(),
+                    version: result.version().map(|v| v as i64),
+                    unchanged_document_diagnostic_report: UnchangedDocumentDiagnosticReport {
+                        result_id: result.document().id().as_ref().clone(),
                     },
-                ));
-                continue;
-            }
+                },
+            ));
+            continue;
+        }
 
         debug!(
             "diagnostics for document `{uri}` have changed since last client request",

@@ -68,10 +68,11 @@ impl<N: TreeNode> StructDefinition<N> {
 
         if let Some(meta) = self.metadata().next()
             && let Some(desc) = meta.items().find(|i| i.name().text() == "description")
-                && let MetadataValue::String(s) = desc.value()
-                    && let Some(text) = s.text() {
-                        writeln!(f, "{}\n", text.text())?;
-                    }
+            && let MetadataValue::String(s) = desc.value()
+            && let Some(text) = s.text()
+        {
+            writeln!(f, "{}\n", text.text())?;
+        }
 
         let members: Vec<_> = self.members().collect();
         if !members.is_empty() {

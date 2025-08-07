@@ -148,10 +148,11 @@ impl<N: TreeNode> WorkflowDefinition<N> {
 
         if let Some(meta) = self.metadata()
             && let Some(desc) = meta.items().find(|i| i.name().text() == "description")
-                && let MetadataValue::String(s) = desc.value()
-                    && let Some(text) = s.text() {
-                        writeln!(f, "# {}\n", text.text())?;
-                    }
+            && let MetadataValue::String(s) = desc.value()
+            && let Some(text) = s.text()
+        {
+            writeln!(f, "# {}\n", text.text())?;
+        }
 
         write_input_section(f, self.input().as_ref(), self.parameter_metadata().as_ref())?;
         write_output_section(

@@ -55,10 +55,11 @@ where
             };
 
             if let rowan::SyntaxElement::Node(node) = &element
-                && (self.ignore_predicate)(node) {
-                    self.it.skip_subtree();
-                    continue;
-                }
+                && (self.ignore_predicate)(node)
+            {
+                self.it.skip_subtree();
+                continue;
+            }
 
             return Some(element);
         }

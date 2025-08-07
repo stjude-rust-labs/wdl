@@ -478,10 +478,11 @@ impl DocsTree {
                     .expect("node should exist");
             }
             if let Some(next_component) = components.peek()
-                && next_component.as_os_str().to_string_lossy() == "index.html" {
-                    current_node.path = current_node.path().join("index.html");
-                    break;
-                }
+                && next_component.as_os_str().to_string_lossy() == "index.html"
+            {
+                current_node.path = current_node.path().join("index.html");
+                break;
+            }
         }
 
         current_node.page = Some(page);
@@ -532,23 +533,24 @@ impl DocsTree {
 
         for node in self.root().depth_first_traversal() {
             if let Some(page) = node.page()
-                && let PageType::Workflow(workflow) = page.page_type() {
-                    if node
-                        .path()
-                        .iter()
-                        .next()
-                        .expect("path should have a next component")
-                        .to_string_lossy()
-                        == "external"
-                    {
-                        categories.insert("External".to_string());
-                    } else if let Some(category) = workflow.category() {
-                        categories.insert(category);
-                    } else {
-                        categories.insert("Other".to_string());
-                    }
-                    nodes.push(node);
+                && let PageType::Workflow(workflow) = page.page_type()
+            {
+                if node
+                    .path()
+                    .iter()
+                    .next()
+                    .expect("path should have a next component")
+                    .to_string_lossy()
+                    == "external"
+                {
+                    categories.insert("External".to_string());
+                } else if let Some(category) = workflow.category() {
+                    categories.insert(category);
+                } else {
+                    categories.insert("Other".to_string());
                 }
+                nodes.push(node);
+            }
         }
         let sorted_categories = sort_workflow_categories(categories);
 

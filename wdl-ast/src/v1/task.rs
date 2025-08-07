@@ -390,10 +390,11 @@ impl<N: TreeNode> TaskDefinition<N> {
 
         if let Some(meta) = self.metadata()
             && let Some(desc) = meta.items().find(|i| i.name().text() == "description")
-                && let MetadataValue::String(s) = desc.value()
-                    && let Some(text) = s.text() {
-                        writeln!(f, "{}\n", text.text())?;
-                    }
+            && let MetadataValue::String(s) = desc.value()
+            && let Some(text) = s.text()
+        {
+            writeln!(f, "{}\n", text.text())?;
+        }
 
         write_input_section(f, self.input().as_ref(), self.parameter_metadata().as_ref())?;
         write_output_section(
@@ -1025,9 +1026,10 @@ impl<N: TreeNode> CommandSection<N> {
     pub fn text(&self) -> Option<CommandText<N::Token>> {
         let mut parts = self.parts();
         if let Some(CommandPart::Text(text)) = parts.next()
-            && parts.next().is_none() {
-                return Some(text);
-            }
+            && parts.next().is_none()
+        {
+            return Some(text);
+        }
 
         None
     }

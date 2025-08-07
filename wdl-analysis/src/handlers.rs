@@ -58,9 +58,10 @@ impl EvaluationContext for TypeEvalContext<'_> {
         span: Span,
     ) -> std::result::Result<crate::types::Type, wdl_ast::Diagnostic> {
         if let Some(s) = self.document.struct_by_name(name)
-            && let Some(ty) = s.ty() {
-                return Ok(ty.clone());
-            }
+            && let Some(ty) = s.ty()
+        {
+            return Ok(ty.clone());
+        }
         Err(diagnostics::unknown_type(name, span))
     }
 

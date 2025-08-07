@@ -2300,9 +2300,10 @@ impl CompoundValue {
                             .drain(..)
                             .map(|(mut k, mut v)| {
                                 if let Some(v) = &mut k
-                                    && !v.visit_paths_mut(key_optional, cb)? {
-                                        k = None;
-                                    }
+                                    && !v.visit_paths_mut(key_optional, cb)?
+                                {
+                                    k = None;
+                                }
 
                                 v.visit_paths_mut(value_optional, cb)?;
                                 Ok((k, v))

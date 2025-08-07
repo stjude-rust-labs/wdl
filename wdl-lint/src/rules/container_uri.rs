@@ -159,14 +159,15 @@ impl Visitor for ContainerUriRule {
         }
 
         if let Some(container) = section.container()
-            && let Ok(value) = container.value() {
-                check_container_value(
-                    diagnostics,
-                    value,
-                    SyntaxElement::from(section.inner().clone()),
-                    &self.exceptable_nodes(),
-                );
-            }
+            && let Ok(value) = container.value()
+        {
+            check_container_value(
+                diagnostics,
+                value,
+                SyntaxElement::from(section.inner().clone()),
+                &self.exceptable_nodes(),
+            );
+        }
     }
 
     fn requirements_section(
@@ -180,14 +181,15 @@ impl Visitor for ContainerUriRule {
         }
 
         if let Some(container) = section.container()
-            && let Ok(value) = container.value() {
-                check_container_value(
-                    diagnostics,
-                    value,
-                    SyntaxElement::from(section.inner().clone()),
-                    &self.exceptable_nodes(),
-                );
-            }
+            && let Ok(value) = container.value()
+        {
+            check_container_value(
+                diagnostics,
+                value,
+                SyntaxElement::from(section.inner().clone()),
+                &self.exceptable_nodes(),
+            );
+        }
     }
 }
 

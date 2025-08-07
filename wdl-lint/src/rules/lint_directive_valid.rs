@@ -123,14 +123,15 @@ impl Visitor for LintDirectiveValidRule {
 
                 if let Some(elem) = &excepted_element
                     && let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed)
-                        && !exceptable_nodes.contains(&elem.kind()) {
-                            diagnostics.add(misplaced_lint_directive(
-                                trimmed,
-                                Span::new(start + offset, trimmed.len()),
-                                elem,
-                                exceptable_nodes,
-                            ));
-                        }
+                    && !exceptable_nodes.contains(&elem.kind())
+                {
+                    diagnostics.add(misplaced_lint_directive(
+                        trimmed,
+                        Span::new(start + offset, trimmed.len()),
+                        elem,
+                        exceptable_nodes,
+                    ));
+                }
 
                 // Update the offset to account for the rule id and comma
                 offset += trimmed.len() + 1;

@@ -823,9 +823,10 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                 WorkflowGraphNode::Input(decl) => {
                     // Only add edges for default expressions if the input wasn't provided
                     if !input_present(decl.name().text())
-                        && let Some(expr) = decl.expr() {
-                            self.add_expr_edges(from, expr, graph, diagnostics);
-                        }
+                        && let Some(expr) = decl.expr()
+                    {
+                        self.add_expr_edges(from, expr, graph, diagnostics);
+                    }
                 }
 
                 WorkflowGraphNode::Decl(decl) | WorkflowGraphNode::Output(decl) => {

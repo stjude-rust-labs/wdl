@@ -101,13 +101,14 @@ impl Visitor for ConciseInputRule {
             stmt.inputs().for_each(|input| {
                 if let Some(expr) = input.expr()
                     && let Some(expr_name) = expr.as_name_ref()
-                        && expr_name.name().text() == input.name().text() {
-                            diagnostics.exceptable_add(
-                                redundant_input_assignment(input.span(), input.name().text()),
-                                SyntaxElement::from(input.inner().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
+                    && expr_name.name().text() == input.name().text()
+                {
+                    diagnostics.exceptable_add(
+                        redundant_input_assignment(input.span(), input.name().text()),
+                        SyntaxElement::from(input.inner().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
             });
         }
     }

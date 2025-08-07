@@ -114,22 +114,23 @@ fn resolve_hover_content(
 
     // Finds hover information based on the scope.
     if let Some(scope) = document.find_scope_by_position(token.span().start())
-        && let Some(name) = scope.lookup(token.text()) {
-            let (kind, documentation) = match name.ty() {
-                Type::Call(_) => ("call", None),
-                _ => {
-                    let doc = find_parameter_meta_documentation(token);
-                    ("variable", doc)
-                }
-            };
-            let mut content = format!("```wdl\n({kind}) {}: {}\n```", token.text(), name.ty());
-            if let Some(doc) = documentation {
-                content.push_str("\n---\n");
-                content.push_str(&doc);
+        && let Some(name) = scope.lookup(token.text())
+    {
+        let (kind, documentation) = match name.ty() {
+            Type::Call(_) => ("call", None),
+            _ => {
+                let doc = find_parameter_meta_documentation(token);
+                ("variable", doc)
             }
-
-            return Ok(Some(content));
+        };
+        let mut content = format!("```wdl\n({kind}) {}: {}\n```", token.text(), name.ty());
+        if let Some(doc) = documentation {
+            content.push_str("\n---\n");
+            content.push_str(&doc);
         }
+
+        return Ok(Some(content));
+    }
 
     // Finds hover information across global definitions.
     if let Some(content) = find_global_hover_in_doc(document, token)? {

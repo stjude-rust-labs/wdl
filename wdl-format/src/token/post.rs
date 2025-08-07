@@ -359,9 +359,10 @@ impl Postprocessor {
                         Comment::Inline(value) => {
                             assert!(self.position == LinePosition::MiddleOfLine);
                             if let Some(next) = next
-                                && next != &PreToken::LineEnd {
-                                    self.interrupted = true;
-                                }
+                                && next != &PreToken::LineEnd
+                            {
+                                self.interrupted = true;
+                            }
                             self.trim_last_line(stream);
                             for token in INLINE_COMMENT_PRECEDING_TOKENS.iter() {
                                 stream.push(token.clone());
@@ -464,18 +465,19 @@ impl Postprocessor {
             );
 
             if let Some(cache) = cache
-                && post_buffer.last_line_width(config) > max_length {
-                    // The line is too long after the next step. Revert to the
-                    // cached state and insert a line break.
-                    post_buffer = cache;
-                    self.interrupted = true;
-                    self.end_line(&mut post_buffer);
-                    self.step(
-                        token.clone(),
-                        pre_buffer.peek().map(|(_, v)| &**v),
-                        &mut post_buffer,
-                    );
-                }
+                && post_buffer.last_line_width(config) > max_length
+            {
+                // The line is too long after the next step. Revert to the
+                // cached state and insert a line break.
+                post_buffer = cache;
+                self.interrupted = true;
+                self.end_line(&mut post_buffer);
+                self.step(
+                    token.clone(),
+                    pre_buffer.peek().map(|(_, v)| &**v),
+                    &mut post_buffer,
+                );
+            }
         }
 
         out_stream.extend(post_buffer);

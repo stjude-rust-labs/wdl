@@ -163,9 +163,10 @@ impl HttpConfig {
     /// Validates the HTTP configuration.
     pub fn validate(&self) -> Result<()> {
         if let Some(limit) = self.max_concurrent_downloads
-            && limit == 0 {
-                bail!("configuration value `http.max_concurrent_downloads` cannot be zero");
-            }
+            && limit == 0
+        {
+            bail!("configuration value `http.max_concurrent_downloads` cannot be zero");
+        }
         Ok(())
     }
 }
@@ -346,9 +347,10 @@ impl ScatterConfig {
     /// Validates the scatter configuration.
     pub fn validate(&self) -> Result<()> {
         if let Some(concurrency) = self.concurrency
-            && concurrency == 0 {
-                bail!("configuration value `workflow.scatter.concurrency` cannot be zero");
-            }
+            && concurrency == 0
+        {
+            bail!("configuration value `workflow.scatter.concurrency` cannot be zero");
+        }
 
         Ok(())
     }

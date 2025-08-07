@@ -474,34 +474,29 @@ impl Visitor for ElementSpacingRule {
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
         if let Some(p) = prior
-            && p.kind() == SyntaxKind::Whitespace {
-                let count = p.text().chars().filter(|c| *c == '\n').count();
-                // If we're in an `input` or `output`, we should have no blank lines, so only
-                // one `\n` is allowed.
-                if self.state == State::InputSection || self.state == State::OutputSection {
-                    if count > 1 {
-                        diagnostics.exceptable_add(
-                            excess_blank_line(p.text_range().into()),
-                            SyntaxElement::from(decl.inner().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
-                } else {
-                    let first = is_first_body(decl.inner());
+            && p.kind() == SyntaxKind::Whitespace
+        {
+            let count = p.text().chars().filter(|c| *c == '\n').count();
+            // If we're in an `input` or `output`, we should have no blank lines, so only
+            // one `\n` is allowed.
+            if self.state == State::InputSection || self.state == State::OutputSection {
+                if count > 1 {
+                    diagnostics.exceptable_add(
+                        excess_blank_line(p.text_range().into()),
+                        SyntaxElement::from(decl.inner().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
+            } else {
+                let first = is_first_body(decl.inner());
 
-                    let prev = skip_preceding_comments(decl.inner());
+                let prev = skip_preceding_comments(decl.inner());
 
-                    if first {
-                        check_prior_spacing(
-                            &prev,
-                            diagnostics,
-                            true,
-                            false,
-                            &self.exceptable_nodes(),
-                        );
-                    }
+                if first {
+                    check_prior_spacing(&prev, diagnostics, true, false, &self.exceptable_nodes());
                 }
             }
+        }
     }
 
     fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
@@ -515,34 +510,29 @@ impl Visitor for ElementSpacingRule {
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
         if let Some(p) = prior
-            && p.kind() == SyntaxKind::Whitespace {
-                let count = p.text().chars().filter(|c| *c == '\n').count();
-                // If we're in an `input` or `output`, we should have no blank lines, so only
-                // one `\n` is allowed.
-                if self.state == State::InputSection || self.state == State::OutputSection {
-                    if count > 1 {
-                        diagnostics.exceptable_add(
-                            excess_blank_line(p.text_range().into()),
-                            SyntaxElement::from(decl.inner().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
-                } else {
-                    let first = is_first_body(decl.inner());
+            && p.kind() == SyntaxKind::Whitespace
+        {
+            let count = p.text().chars().filter(|c| *c == '\n').count();
+            // If we're in an `input` or `output`, we should have no blank lines, so only
+            // one `\n` is allowed.
+            if self.state == State::InputSection || self.state == State::OutputSection {
+                if count > 1 {
+                    diagnostics.exceptable_add(
+                        excess_blank_line(p.text_range().into()),
+                        SyntaxElement::from(decl.inner().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
+            } else {
+                let first = is_first_body(decl.inner());
 
-                    let prev = skip_preceding_comments(decl.inner());
+                let prev = skip_preceding_comments(decl.inner());
 
-                    if first {
-                        check_prior_spacing(
-                            &prev,
-                            diagnostics,
-                            true,
-                            false,
-                            &self.exceptable_nodes(),
-                        );
-                    }
+                if first {
+                    check_prior_spacing(&prev, diagnostics, true, false, &self.exceptable_nodes());
                 }
             }
+        }
     }
 
     fn conditional_statement(
@@ -708,16 +698,17 @@ fn check_last_token(
         .expect("node should have last token")
         .prev_token();
     if let Some(prev) = prev
-        && prev.kind() == SyntaxKind::Whitespace {
-            let count = prev.text().chars().filter(|c| *c == '\n').count();
-            if count > 1 {
-                diagnostics.exceptable_add(
-                    excess_blank_line(prev.text_range().into()),
-                    SyntaxElement::from(syntax.clone()),
-                    exceptable_nodes,
-                );
-            }
+        && prev.kind() == SyntaxKind::Whitespace
+    {
+        let count = prev.text().chars().filter(|c| *c == '\n').count();
+        if count > 1 {
+            diagnostics.exceptable_add(
+                excess_blank_line(prev.text_range().into()),
+                SyntaxElement::from(syntax.clone()),
+                exceptable_nodes,
+            );
         }
+    }
 }
 
 /// For a given node, walk background until a non-comment or blank line is

@@ -142,9 +142,10 @@ impl SyntaxNode {
 
         while let Some(child) = children.next() {
             if let Some(node) = child.as_node()
-                && node.eq(self) {
-                    return children.next();
-                }
+                && node.eq(self)
+            {
+                return children.next();
+            }
         }
 
         None
@@ -343,9 +344,10 @@ impl SyntaxToken {
 
         while let Some(child) = children.next() {
             if let Some(token) = child.as_token()
-                && token.eq(self) {
-                    return children.next();
-                }
+                && token.eq(self)
+            {
+                return children.next();
+            }
         }
 
         None

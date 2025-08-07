@@ -163,13 +163,13 @@ fn collect_references_from_document(
             .context("failed to resolve token definition")?;
 
             if let Some(location) = resolved_location
-                && location == target.location {
-                    let reference_location =
-                        location_from_span(document.uri(), token.span(), lines)
-                            .context("failed to create reference location")?;
+                && location == target.location
+            {
+                let reference_location = location_from_span(document.uri(), token.span(), lines)
+                    .context("failed to create reference location")?;
 
-                    locations.push(reference_location);
-                }
+                locations.push(reference_location);
+            }
         }
     }
     Ok(())
