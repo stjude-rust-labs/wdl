@@ -146,7 +146,7 @@ struct ConfigInner {
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
     /// See [`Config::with_ignore_filename()`]
-    ignore: Option<String>,
+    ignore_filename: Option<String>,
 }
 
 /// Configuration for analysis diagnostics.
