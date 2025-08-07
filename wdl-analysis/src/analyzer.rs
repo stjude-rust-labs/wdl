@@ -422,8 +422,8 @@ where
 
             for result in walker {
                 let entry = result.with_context(|| {
-                    "error during recursive file search\nthis may be due to parsing an \
-                         ignorefile".to_string()
+                    "error during recursive file search\nthis may be due to parsing an ignorefile"
+                        .to_string()
                 })?;
 
                 // Skip entries without a file type
