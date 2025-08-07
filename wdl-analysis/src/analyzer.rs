@@ -426,9 +426,16 @@ where
                     Err(_) => continue, // ignore any errors parsing the ignore files
                 };
 
-                if !entry.file_type().is_some_and(|e| e.is_file())
-                    || entry.path().extension().and_then(OsStr::to_str) != Some("wdl")
-                {
+                // Skip entries without a file type
+                let Some(file_type) = entry.file_type() else {
+                    continue;
+                };
+                // Skip non-files
+                if !file_type.is_file() {
+                    continue;
+                }
+                // Skip files without a `.wdl` extension
+                if entry.path().extension() != Some(&OsStr::new("wdl")) {
                     continue;
                 }
 
