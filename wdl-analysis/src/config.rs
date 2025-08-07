@@ -1,6 +1,5 @@
 //! Configuration for this crate.
 
-use std::ffi::OsString;
 use std::sync::Arc;
 
 use tracing::warn;
@@ -65,8 +64,8 @@ impl Config {
     }
 
     /// Get this configuration's ignore filename.
-    pub fn ignore_filename(&self) -> Option<&OsString> {
-        self.inner.ignore.as_ref()
+    pub fn ignore_filename(&self) -> Option<&str> {
+        self.inner.ignore.as_deref()
     }
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
@@ -120,7 +119,7 @@ impl Config {
     /// the argument.
     ///
     /// Specifying `None` for `filename` disables ignore behavior.
-    pub fn with_ignore_filename(&self, filename: Option<OsString>) -> Self {
+    pub fn with_ignore_filename(&self, filename: Option<String>) -> Self {
         let mut inner = (*self.inner).clone();
         inner.ignore = filename;
         Self {
@@ -139,7 +138,7 @@ struct ConfigInner {
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
     /// TODO
-    ignore: Option<OsString>,
+    ignore: Option<String>,
 }
 
 /// Configuration for analysis diagnostics.
