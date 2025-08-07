@@ -118,7 +118,15 @@ impl Config {
     /// Return a new configuration with the previous ignore filename replaced by
     /// the argument.
     ///
-    /// Specifying `None` for `filename` disables ignore behavior.
+    /// Specifying `None` for `filename` disables ignore behavior. This is also
+    /// the default.
+    ///
+    /// `Some(filename)` will use `filename` as the ignorefile basename to
+    /// search for. Child directories _and_ parent directories are searched
+    /// for a file with the same basename as `filename` and if a match is
+    /// found it will attempt to be parsed as an ignorefile. Errors during
+    /// this parsing are discarded, as it is a non-critical feature and should
+    /// not block further anlaysis.
     pub fn with_ignore_filename(&self, filename: Option<String>) -> Self {
         let mut inner = (*self.inner).clone();
         inner.ignore = filename;
@@ -137,7 +145,7 @@ struct ConfigInner {
     /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
-    /// TODO
+    /// See [`Config::with_ignore_filename()`]
     ignore: Option<String>,
 }
 
