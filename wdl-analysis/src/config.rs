@@ -1,5 +1,6 @@
 //! Configuration for this crate.
 
+use std::ffi::OsString;
 use std::sync::Arc;
 
 use tracing::warn;
@@ -16,9 +17,6 @@ use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
 use crate::USING_FALLBACK_VERSION;
 use crate::rules;
-
-/// Default filename to search for when ignoring WDL files.
-const DEFAULT_IGNORE_FILENAME: &str = ".wdlignore";
 
 /// Configuration for `wdl-analysis`.
 ///
@@ -48,7 +46,7 @@ impl Default for Config {
             inner: Arc::new(ConfigInner {
                 diagnostics: Default::default(),
                 fallback_version: None,
-                ignore_filename: DEFAULT_IGNORE_FILENAME.to_string(),
+                ignore: None,
             }),
         }
     }
@@ -67,8 +65,8 @@ impl Config {
     }
 
     /// Get this configuration's ignore filename.
-    pub fn ignore_filename(&self) -> &str {
-        &self.inner.ignore_filename
+    pub fn ignore_filename(&self) -> Option<&OsString> {
+        self.inner.ignore.as_ref()
     }
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
@@ -118,10 +116,13 @@ impl Config {
         }
     }
 
-    /// Return a new configuration with the previous ignore filename replaced by the argument.
-    pub fn with_ignore_filename(&self, file_name: String) -> Self {
+    /// Return a new configuration with the previous ignore filename replaced by
+    /// the argument.
+    ///
+    /// Specifying `None` for `filename` disables ignore behavior.
+    pub fn with_ignore_filename(&self, filename: Option<OsString>) -> Self {
         let mut inner = (*self.inner).clone();
-        inner.ignore_filename = file_name;
+        inner.ignore = filename;
         Self {
             inner: Arc::new(inner),
         }
@@ -138,7 +139,7 @@ struct ConfigInner {
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
     /// TODO
-    ignore_filename: String,
+    ignore: Option<OsString>,
 }
 
 /// Configuration for analysis diagnostics.

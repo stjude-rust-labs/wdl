@@ -311,6 +311,8 @@ pub struct Analyzer<Context> {
     sender: ManuallyDrop<mpsc::UnboundedSender<Request<Context>>>,
     /// The join handle for the queue task.
     handle: Option<JoinHandle<()>>,
+    /// The config to use during analysis.
+    config: Config,
 }
 
 impl<Context> Analyzer<Context>
@@ -352,14 +354,16 @@ where
     {
         let (tx, rx) = mpsc::unbounded_channel();
         let tokio = Handle::current();
+        let inner_config = config.clone();
         let handle = std::thread::spawn(move || {
-            let queue = AnalysisQueue::new(config, tokio, progress, validator);
+            let queue = AnalysisQueue::new(inner_config, tokio, progress, validator);
             queue.run(rx);
         });
 
         Self {
             sender: ManuallyDrop::new(tx),
             handle: Some(handle),
+            config,
         }
     }
 
@@ -394,6 +398,7 @@ where
     /// specified path.
     pub async fn add_directory(&self, path: impl AsRef<Path>) -> Result<()> {
         let path = path.as_ref().to_path_buf();
+        let config = self.config.clone();
         // Start by searching for documents
         let documents = RayonHandle::spawn(move || -> Result<IndexSet<Url>> {
             let mut documents = IndexSet::new();
@@ -409,14 +414,11 @@ where
                 bail!("`{path}` is a file, not a directory", path = path.display());
             }
 
-            let walker = WalkBuilder::new(&path)
-                .follow_links(true)
-                .add_custom_ignore_filename(".sprocketignore")
-                .standard_filters(false) // don't use git options
-                .hidden(true)
-                .parents(true)
-                .ignore(true) // do use a "plain" `.ignore` file
-                .build();
+            let mut walker = WalkBuilder::new(&path);
+            if let Some(ignore_filename) = config.ignore_filename() {
+                walker.add_custom_ignore_filename(ignore_filename);
+            }
+            let walker = walker.standard_filters(false).parents(true).build();
 
             for result in walker {
                 let entry = match result {
