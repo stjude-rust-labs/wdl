@@ -255,30 +255,20 @@ impl VersionBadge {
 
 /// Analyze a workspace directory, ensure it is error-free, and return the
 /// results.
-async fn analyze_workspace(workspace: PathBuf) -> Result<Vec<wdl_analysis::AnalysisResult>> {
-    let analyzer = Analyzer::default();
-    analyzer
-        .add_directory(workspace.clone())
+async fn analyze_workspace(
+    analyzer: Analyzer<()>,
+    workspace_root: impl AsRef<Path>,
+) -> Result<Vec<wdl_analysis::AnalysisResult>> {
+    let workspace = workspace_root.as_ref();
+    let results = analyzer
+        .analyze(())
         .await
-        .with_context(|| {
-            format!(
-                "failed to add workspace directory to analyzer: `{}`",
-                workspace.display()
-            )
-        })?;
-    let results = analyzer.analyze(()).await.with_context(|| {
-        format!(
-            "failed to analyze workspace directory: `{}`",
-            workspace.display()
-        )
-    })?;
+        .with_context(|| format!("failed to analyze workspace root `{}`", workspace.display()))?;
 
     if results.is_empty() {
-        return Err(anyhow!(
-            "no WDL documents found in workspace directory: `{}`",
-            workspace.display()
-        ));
+        return Err(anyhow!("no WDL documents found in analysis",));
     }
+    let mut workspace_in_results = false;
     for r in &results {
         if let Some(e) = r.error() {
             return Err(anyhow!(
@@ -303,6 +293,21 @@ async fn analyze_workspace(workspace: PathBuf) -> Result<Vec<wdl_analysis::Analy
                 r.document().uri(),
             ));
         }
+
+        if r.document()
+            .uri()
+            .to_file_path()
+            .is_ok_and(|f| f.starts_with(workspace))
+        {
+            workspace_in_results = true;
+        }
+    }
+
+    if !workspace_in_results {
+        return Err(anyhow!(
+            "workspace root `{root}` not found in analysis results",
+            root = workspace.display(),
+        ));
     }
 
     Ok(results)
@@ -315,6 +320,7 @@ async fn analyze_workspace(workspace: PathBuf) -> Result<Vec<wdl_analysis::Analy
 /// conflict with the generated files, but will not delete any files that
 /// are already present.
 pub async fn document_workspace(
+    analyzer: Analyzer<()>,
     workspace: impl AsRef<Path>,
     output_dir: impl AsRef<Path>,
     homepage: Option<impl AsRef<Path>>,
@@ -355,7 +361,7 @@ pub async fn document_workspace(
         })?;
     }
 
-    let results = analyze_workspace(workspace_abs_path.clone())
+    let results = analyze_workspace(analyzer, workspace_abs_path.clone())
         .await
         .with_context(|| {
             format!(
