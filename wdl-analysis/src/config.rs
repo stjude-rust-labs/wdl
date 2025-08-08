@@ -125,9 +125,7 @@ impl Config {
     /// search for. Child directories _and_ parent directories are searched
     /// for a file with the same basename as `filename` and if a match is
     /// found it will attempt to be parsed as an ignorefile with a syntax
-    /// similar to `.gitignore` files. Errors during this parsing are
-    /// discarded, as it is a non-critical feature and should
-    /// not block further anlaysis.
+    /// similar to `.gitignore` files.
     pub fn with_ignore_filename(&self, filename: Option<String>) -> Self {
         let mut inner = (*self.inner).clone();
         inner.ignore_filename = filename;
