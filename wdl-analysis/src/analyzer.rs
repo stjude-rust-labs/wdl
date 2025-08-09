@@ -418,7 +418,11 @@ where
             if let Some(ignore_filename) = config.ignore_filename() {
                 walker.add_custom_ignore_filename(ignore_filename);
             }
-            let walker = walker.standard_filters(false).parents(true).build();
+            let walker = walker
+                .standard_filters(false)
+                .parents(true)
+                .follow_links(true)
+                .build();
 
             for result in walker {
                 let entry = result.with_context(|| {
