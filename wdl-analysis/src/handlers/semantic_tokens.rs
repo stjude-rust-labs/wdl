@@ -137,11 +137,9 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
         | SyntaxKind::OpenHeredoc
         | SyntaxKind::CloseHeredoc
         | SyntaxKind::LiteralCommandText => Some(SemanticTokenType::STRING),
-        SyntaxKind::Integer | SyntaxKind::Float | SyntaxKind::Version => {
-            Some(SemanticTokenType::NUMBER)
-        }
+        SyntaxKind::Integer | SyntaxKind::Float => Some(SemanticTokenType::NUMBER),
         k if k.is_keyword() => Some(SemanticTokenType::KEYWORD),
-        k if is_operator(k) => Some(SemanticTokenType::OPERATOR),
+        k if k.is_operator() => Some(SemanticTokenType::OPERATOR),
         SyntaxKind::BooleanTypeKeyword
         | SyntaxKind::IntTypeKeyword
         | SyntaxKind::FloatTypeKeyword
@@ -168,32 +166,6 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
     ty.map(|t| (t, 0))
 }
 
-/// Checks if a [`SyntaxKind`] corresponds to an operator.
-fn is_operator(kind: SyntaxKind) -> bool {
-    matches!(
-        kind,
-        SyntaxKind::Plus
-            | SyntaxKind::Minus
-            | SyntaxKind::Slash
-            | SyntaxKind::Percent
-            | SyntaxKind::Asterisk
-            | SyntaxKind::Exponentiation
-            | SyntaxKind::Equal
-            | SyntaxKind::NotEqual
-            | SyntaxKind::Less
-            | SyntaxKind::LessEqual
-            | SyntaxKind::Greater
-            | SyntaxKind::GreaterEqual
-            | SyntaxKind::LogicalAnd
-            | SyntaxKind::LogicalOr
-            | SyntaxKind::Exclamation
-            | SyntaxKind::Assignment
-            | SyntaxKind::QuestionMark
-            | SyntaxKind::Dot
-            | SyntaxKind::Colon
-    )
-}
-
 /// Resolves the semantic type of an identifier token based on its context.
 ///
 /// This inspects the identifier's parent and ancestor nodes in the CST to
@@ -214,13 +186,13 @@ fn resolve_identifier_ty(
     if let Some(t) = TaskDefinition::cast(parent.clone())
         && t.name().inner() == token
     {
-        return Some(SemanticTokenType::MACRO);
+        return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(w) = WorkflowDefinition::cast(parent.clone())
         && w.name().inner() == token
     {
-        return Some(SemanticTokenType::MACRO);
+        return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(s) = StructDefinition::cast(parent.clone())
@@ -270,7 +242,7 @@ fn resolve_identifier_ty(
             return Some(SemanticTokenType::NAMESPACE);
         }
         if names.last().is_some_and(|n| n.inner() == token) {
-            return Some(SemanticTokenType::MACRO);
+            return Some(SemanticTokenType::FUNCTION);
         }
     }
 

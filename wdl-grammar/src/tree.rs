@@ -612,6 +612,32 @@ impl SyntaxKind {
                 | SyntaxKind::WorkflowKeyword
         )
     }
+
+    /// Returns whether the [`SyntaxKind`] is an operator.
+    pub fn is_operator(&self) -> bool {
+        matches!(
+            self,
+            SyntaxKind::Plus
+                | SyntaxKind::Minus
+                | SyntaxKind::Slash
+                | SyntaxKind::Percent
+                | SyntaxKind::Asterisk
+                | SyntaxKind::Exponentiation
+                | SyntaxKind::Equal
+                | SyntaxKind::NotEqual
+                | SyntaxKind::Less
+                | SyntaxKind::LessEqual
+                | SyntaxKind::Greater
+                | SyntaxKind::GreaterEqual
+                | SyntaxKind::LogicalAnd
+                | SyntaxKind::LogicalOr
+                | SyntaxKind::Exclamation
+                | SyntaxKind::Assignment
+                | SyntaxKind::QuestionMark
+                | SyntaxKind::Dot
+                | SyntaxKind::Colon
+        )
+    }
 }
 
 /// Every [`SyntaxKind`] variant.
