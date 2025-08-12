@@ -567,6 +567,51 @@ impl SyntaxKind {
     pub fn is_trivia(&self) -> bool {
         matches!(self, Self::Whitespace | Self::Comment)
     }
+
+    /// Returns whether the [`SyntaxKind`] is a keyword.
+    pub fn is_keyword(&self) -> bool {
+        matches!(
+            self,
+            SyntaxKind::AfterKeyword
+                | SyntaxKind::AliasKeyword
+                | SyntaxKind::ArrayTypeKeyword
+                | SyntaxKind::AsKeyword
+                | SyntaxKind::BooleanTypeKeyword
+                | SyntaxKind::CallKeyword
+                | SyntaxKind::CommandKeyword
+                | SyntaxKind::DirectoryTypeKeyword
+                | SyntaxKind::ElseKeyword
+                | SyntaxKind::EnvKeyword
+                | SyntaxKind::FalseKeyword
+                | SyntaxKind::FileTypeKeyword
+                | SyntaxKind::FloatTypeKeyword
+                | SyntaxKind::HintsKeyword
+                | SyntaxKind::IfKeyword
+                | SyntaxKind::ImportKeyword
+                | SyntaxKind::InKeyword
+                | SyntaxKind::InputKeyword
+                | SyntaxKind::IntTypeKeyword
+                | SyntaxKind::MapTypeKeyword
+                | SyntaxKind::MetaKeyword
+                | SyntaxKind::NoneKeyword
+                | SyntaxKind::NullKeyword
+                | SyntaxKind::ObjectKeyword
+                | SyntaxKind::ObjectTypeKeyword
+                | SyntaxKind::OutputKeyword
+                | SyntaxKind::PairTypeKeyword
+                | SyntaxKind::ParameterMetaKeyword
+                | SyntaxKind::RequirementsKeyword
+                | SyntaxKind::RuntimeKeyword
+                | SyntaxKind::ScatterKeyword
+                | SyntaxKind::StringTypeKeyword
+                | SyntaxKind::StructKeyword
+                | SyntaxKind::TaskKeyword
+                | SyntaxKind::ThenKeyword
+                | SyntaxKind::TrueKeyword
+                | SyntaxKind::VersionKeyword
+                | SyntaxKind::WorkflowKeyword
+        )
+    }
 }
 
 /// Every [`SyntaxKind`] variant.
