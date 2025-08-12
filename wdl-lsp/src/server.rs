@@ -31,7 +31,8 @@ use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
 use wdl_analysis::SourcePositionEncoding;
 use wdl_analysis::Validator;
-use wdl_analysis::handlers::WDL_SEMANTIC_LEGEND;
+use wdl_analysis::handlers::WDL_SEMANTIC_TOKEN_MODIFIERS;
+use wdl_analysis::handlers::WDL_SEMANTIC_TOKEN_TYPES;
 use wdl_analysis::path_to_uri;
 use wdl_lint::Linter;
 
@@ -429,8 +430,8 @@ impl LanguageServer for Server {
                         SemanticTokensOptions {
                             work_done_progress_options: Default::default(),
                             legend: SemanticTokensLegend {
-                                token_types: WDL_SEMANTIC_LEGEND.to_vec(),
-                                token_modifiers: vec![],
+                                token_types: WDL_SEMANTIC_TOKEN_TYPES.to_vec(),
+                                token_modifiers: WDL_SEMANTIC_TOKEN_MODIFIERS.to_vec(),
                             },
                             range: Some(false),
                             full: Some(SemanticTokensFullOptions::Bool(true)),

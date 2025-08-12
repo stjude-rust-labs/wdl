@@ -10,6 +10,7 @@
 use anyhow::Result;
 use anyhow::bail;
 use lsp_types::SemanticToken;
+use lsp_types::SemanticTokenModifier;
 use lsp_types::SemanticTokenType;
 use lsp_types::SemanticTokens;
 use rowan::WalkEvent;
@@ -37,8 +38,8 @@ use crate::handlers::common::position;
 use crate::types::CompoundType;
 use crate::types::Type;
 
-/// The supported semantic token legend for WDL.
-pub const WDL_SEMANTIC_LEGEND: &[SemanticTokenType] = &[
+/// The supported semantic token types for WDL.
+pub const WDL_SEMANTIC_TOKEN_TYPES: &[SemanticTokenType] = &[
     SemanticTokenType::KEYWORD,
     SemanticTokenType::VARIABLE,
     SemanticTokenType::PARAMETER,
@@ -51,7 +52,13 @@ pub const WDL_SEMANTIC_LEGEND: &[SemanticTokenType] = &[
     SemanticTokenType::OPERATOR,
     SemanticTokenType::NAMESPACE, // aliases
     SemanticTokenType::COMMENT,
-    SemanticTokenType::MACRO, // task/workflow names
+];
+
+/// The supported semantic token modifiers for WDL
+pub const WDL_SEMANTIC_TOKEN_MODIFIERS: &[SemanticTokenModifier] = &[
+    SemanticTokenModifier::ASYNC,
+    SemanticTokenModifier::DEPRECATED,
+    SemanticTokenModifier::DECLARATION,
 ];
 
 /// Handles a semantic token request for a full docuement.
@@ -83,7 +90,7 @@ pub fn semantic_tokens(graph: &DocumentGraph, uri: &Url) -> Result<Option<Semant
         WalkEvent::Enter(elem) => elem.into_token(),
         WalkEvent::Leave(_) => None,
     }) {
-        if let Some((token_ty, _mod)) = token_ty(&token, document) {
+        if let Some((token_ty, token_modifiers_bitset)) = token_ty(&token, document) {
             let start_pos = position(&lines, token.text_range().start())?;
             let end_pos = position(&lines, token.text_range().end())?;
 
@@ -100,11 +107,11 @@ pub fn semantic_tokens(graph: &DocumentGraph, uri: &Url) -> Result<Option<Semant
                 delta_line,
                 delta_start,
                 length,
-                token_type: WDL_SEMANTIC_LEGEND
+                token_type: WDL_SEMANTIC_TOKEN_TYPES
                     .iter()
                     .position(|tt| tt == &token_ty)
                     .unwrap() as u32,
-                token_modifiers_bitset: 0,
+                token_modifiers_bitset,
             };
 
             tokens.push(lsp_token);
@@ -129,6 +136,32 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
     let kind = token.kind();
     let parent = token.parent()?;
 
+    let mut modifiers = 0;
+    let mut add_modifier = |modifier: SemanticTokenModifier| {
+        if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
+            .iter()
+            .position(|m| m == &modifier)
+        {
+            modifiers |= 1 << pos;
+        }
+    };
+
+    if kind == SyntaxKind::ScatterKeyword && parent.kind() == SyntaxKind::ScatterStatementNode {
+        add_modifier(SemanticTokenModifier::ASYNC)
+    }
+
+    if kind == SyntaxKind::RuntimeKeyword && parent.kind() == SyntaxKind::RuntimeSectionNode {
+        add_modifier(SemanticTokenModifier::DEPRECATED)
+    }
+
+    if token.text() == "docker"
+        && parent
+            .ancestors()
+            .any(|n| n.kind() == SyntaxKind::RuntimeSectionNode)
+    {
+        add_modifier(SemanticTokenModifier::DEPRECATED)
+    }
+
     let ty = match kind {
         SyntaxKind::Comment => Some(SemanticTokenType::COMMENT),
         SyntaxKind::LiteralStringText
@@ -150,20 +183,11 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
         | SyntaxKind::PairTypeKeyword
         | SyntaxKind::MapTypeKeyword
         | SyntaxKind::ObjectTypeKeyword => Some(SemanticTokenType::TYPE),
-
-        SyntaxKind::Ident => resolve_identifier_ty(token, &parent, document),
+        SyntaxKind::Ident => resolve_identifier_ty(token, &parent, document, &mut modifiers),
         _ => None,
     };
 
-    // TODO: SemanticTokenModifiers
-    // Token types are looked up by index, so a tokenType value of 1 means
-    // tokenTypes[1]. Since a token type can have n modifiers, multiple token
-    // modifiers can be set by using bit flags, so a tokenModifier value of 3 is
-    // first viewed as binary 0b00000011, which means [tokenModifiers[0],
-    // tokenModifiers[1]] because bits 0 and 1 are set.
-    //
-    // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#semanticTokenModifiers
-    ty.map(|t| (t, 0))
+    ty.map(|t| (t, modifiers))
 }
 
 /// Resolves the semantic type of an identifier token based on its context.
@@ -182,22 +206,35 @@ fn resolve_identifier_ty(
     token: &SyntaxToken,
     parent: &SyntaxNode,
     document: &Document,
+    modifiers: &mut u32,
 ) -> Option<SemanticTokenType> {
+    let mut add_modifier = |modifier: SemanticTokenModifier| {
+        if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
+            .iter()
+            .position(|m| m == &modifier)
+        {
+            *modifiers |= 1 << pos;
+        }
+    };
+
     if let Some(t) = TaskDefinition::cast(parent.clone())
         && t.name().inner() == token
     {
+        add_modifier(SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(w) = WorkflowDefinition::cast(parent.clone())
         && w.name().inner() == token
     {
+        add_modifier(SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(s) = StructDefinition::cast(parent.clone())
         && s.name().inner() == token
     {
+        add_modifier(SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::STRUCT);
     }
 
@@ -209,6 +246,12 @@ fn resolve_identifier_ty(
             .map(|p| p.kind() == SyntaxKind::InputSectionNode)
             .unwrap_or(false)
         {
+            if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
+                .iter()
+                .position(|m| m == &SemanticTokenModifier::READONLY)
+            {
+                *modifiers |= 1 << pos;
+            }
             return Some(SemanticTokenType::PARAMETER);
         } else {
             return Some(SemanticTokenType::VARIABLE);
@@ -268,10 +311,17 @@ fn resolve_identifier_ty(
                     .token_at_offset(offset)
                     .find(|t| t.span() == name_info.span() && t.kind() == SyntaxKind::Ident)?;
                 let def_parent = def_token.parent()?;
-                if def_parent
-                    .ancestors()
-                    .any(|n| n.kind() == SyntaxKind::InputSectionNode)
+                if def_parent.kind() == SyntaxKind::UnboundDeclNode
+                    && def_parent
+                        .ancestors()
+                        .any(|n| n.kind() == SyntaxKind::InputSectionNode)
                 {
+                    if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
+                        .iter()
+                        .position(|m| m == &SemanticTokenModifier::READONLY)
+                    {
+                        *modifiers |= 1 << pos;
+                    }
                     Some(SemanticTokenType::PARAMETER)
                 } else {
                     Some(SemanticTokenType::VARIABLE)
