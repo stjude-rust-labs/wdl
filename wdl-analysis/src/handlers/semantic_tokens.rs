@@ -17,6 +17,7 @@ use rowan::WalkEvent;
 use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
+use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxToken;
@@ -30,6 +31,7 @@ use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TypeRef;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::version::V1;
 
 use crate::Document;
 use crate::graph::DocumentGraph;
@@ -150,7 +152,11 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
         add_modifier(SemanticTokenModifier::ASYNC)
     }
 
-    if kind == SyntaxKind::RuntimeKeyword && parent.kind() == SyntaxKind::RuntimeSectionNode {
+    if let Some(version) = document.version()
+        && version == SupportedVersion::V1(V1::Two)
+        && kind == SyntaxKind::RuntimeKeyword
+        && parent.kind() == SyntaxKind::RuntimeSectionNode
+    {
         add_modifier(SemanticTokenModifier::DEPRECATED)
     }
 
