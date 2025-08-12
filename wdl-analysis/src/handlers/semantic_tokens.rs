@@ -211,57 +211,57 @@ fn resolve_identifier_ty(
     parent: &SyntaxNode,
     document: &Document,
 ) -> Option<SemanticTokenType> {
-    if let Some(t) = TaskDefinition::cast(parent.clone()) {
-        if t.name().inner() == token {
-            return Some(SemanticTokenType::MACRO);
+    if let Some(t) = TaskDefinition::cast(parent.clone())
+        && t.name().inner() == token
+    {
+        return Some(SemanticTokenType::MACRO);
+    }
+
+    if let Some(w) = WorkflowDefinition::cast(parent.clone())
+        && w.name().inner() == token
+    {
+        return Some(SemanticTokenType::MACRO);
+    }
+
+    if let Some(s) = StructDefinition::cast(parent.clone())
+        && s.name().inner() == token
+    {
+        return Some(SemanticTokenType::STRUCT);
+    }
+
+    if let Some(d) = Decl::cast(parent.clone())
+        && d.name().inner() == token
+    {
+        if parent
+            .parent()
+            .map(|p| p.kind() == SyntaxKind::InputSectionNode)
+            .unwrap_or(false)
+        {
+            return Some(SemanticTokenType::PARAMETER);
+        } else {
+            return Some(SemanticTokenType::VARIABLE);
         }
     }
 
-    if let Some(w) = WorkflowDefinition::cast(parent.clone()) {
-        if w.name().inner() == token {
-            return Some(SemanticTokenType::MACRO);
-        }
-    }
-
-    if let Some(s) = StructDefinition::cast(parent.clone()) {
-        if s.name().inner() == token {
+    if let Some(ty_ref) = TypeRef::cast(parent.clone())
+        && ty_ref.name().inner() == token
+    {
+        if document.struct_by_name(token.text()).is_some() {
             return Some(SemanticTokenType::STRUCT);
         }
+        return Some(SemanticTokenType::TYPE);
     }
 
-    if let Some(d) = Decl::cast(parent.clone()) {
-        if d.name().inner() == token {
-            if parent
-                .parent()
-                .map(|p| p.kind() == SyntaxKind::InputSectionNode)
-                .unwrap_or(false)
-            {
-                return Some(SemanticTokenType::PARAMETER);
-            } else {
-                return Some(SemanticTokenType::VARIABLE);
-            }
-        }
+    if let Some(c) = CallExpr::cast(parent.clone())
+        && c.target().inner() == token
+    {
+        return Some(SemanticTokenType::FUNCTION);
     }
 
-    if let Some(ty_ref) = TypeRef::cast(parent.clone()) {
-        if ty_ref.name().inner() == token {
-            if document.struct_by_name(token.text()).is_some() {
-                return Some(SemanticTokenType::STRUCT);
-            }
-            return Some(SemanticTokenType::TYPE);
-        }
-    }
-
-    if let Some(c) = CallExpr::cast(parent.clone()) {
-        if c.target().inner() == token {
-            return Some(SemanticTokenType::FUNCTION);
-        }
-    }
-
-    if let Some(i) = parent.ancestors().find_map(ImportStatement::cast) {
-        if i.explicit_namespace().is_some_and(|ns| ns.inner() == token) {
-            return Some(SemanticTokenType::NAMESPACE);
-        }
+    if let Some(i) = parent.ancestors().find_map(ImportStatement::cast)
+        && i.explicit_namespace().is_some_and(|ns| ns.inner() == token)
+    {
+        return Some(SemanticTokenType::NAMESPACE);
     }
 
     if let Some(ct) = CallTarget::cast(parent.clone()) {
@@ -282,30 +282,30 @@ fn resolve_identifier_ty(
     }
 
     // Fallback to scope lookup
-    if let Some(scope) = document.find_scope_by_position(token.span().start()) {
-        if let Some(name_info) = scope.lookup(token.text()) {
-            return match name_info.ty() {
-                Type::Call(_) => Some(SemanticTokenType::VARIABLE),
-                Type::Compound(CompoundType::Struct(_), _) => Some(SemanticTokenType::STRUCT),
-                _ => {
-                    let offset = name_info.span().start().try_into().ok()?;
-                    let root = document.root();
-                    let def_token = root
-                        .inner()
-                        .token_at_offset(offset)
-                        .find(|t| t.span() == name_info.span() && t.kind() == SyntaxKind::Ident)?;
-                    let def_parent = def_token.parent()?;
-                    if def_parent
-                        .ancestors()
-                        .any(|n| n.kind() == SyntaxKind::InputSectionNode)
-                    {
-                        Some(SemanticTokenType::PARAMETER)
-                    } else {
-                        Some(SemanticTokenType::VARIABLE)
-                    }
+    if let Some(scope) = document.find_scope_by_position(token.span().start())
+        && let Some(name_info) = scope.lookup(token.text())
+    {
+        return match name_info.ty() {
+            Type::Call(_) => Some(SemanticTokenType::VARIABLE),
+            Type::Compound(CompoundType::Struct(_), _) => Some(SemanticTokenType::STRUCT),
+            _ => {
+                let offset = name_info.span().start().try_into().ok()?;
+                let root = document.root();
+                let def_token = root
+                    .inner()
+                    .token_at_offset(offset)
+                    .find(|t| t.span() == name_info.span() && t.kind() == SyntaxKind::Ident)?;
+                let def_parent = def_token.parent()?;
+                if def_parent
+                    .ancestors()
+                    .any(|n| n.kind() == SyntaxKind::InputSectionNode)
+                {
+                    Some(SemanticTokenType::PARAMETER)
+                } else {
+                    Some(SemanticTokenType::VARIABLE)
                 }
-            };
-        }
+            }
+        };
     }
 
     None
