@@ -255,6 +255,8 @@ impl VersionBadge {
 
 /// Analyze a workspace directory, ensure it is error-free, and return the
 /// results.
+///
+/// `workspace_root` should be an absolute path.
 async fn analyze_workspace(
     analyzer: Analyzer<()>,
     workspace_root: impl AsRef<Path>,
@@ -263,7 +265,7 @@ async fn analyze_workspace(
     let results = analyzer
         .analyze(())
         .await
-        .with_context(|| format!("failed to analyze workspace root `{}`", workspace.display()))?;
+        .with_context(|| "failed to analyze workspace".to_string())?;
 
     if results.is_empty() {
         return Err(anyhow!("no WDL documents found in analysis",));
