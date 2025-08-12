@@ -19,7 +19,6 @@ use lsp_types::CompletionResponse;
 use lsp_types::GotoDefinitionResponse;
 use lsp_types::Hover;
 use lsp_types::Location;
-use lsp_types::SemanticTokens;
 use lsp_types::SemanticTokensResult;
 use lsp_types::WorkspaceEdit;
 use parking_lot::RwLock;
