@@ -139,17 +139,8 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
     let parent = token.parent()?;
 
     let mut modifiers = 0;
-    let mut add_modifier = |modifier: SemanticTokenModifier| {
-        if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
-            .iter()
-            .position(|m| m == &modifier)
-        {
-            modifiers |= 1 << pos;
-        }
-    };
-
     if kind == SyntaxKind::ScatterKeyword && parent.kind() == SyntaxKind::ScatterStatementNode {
-        add_modifier(SemanticTokenModifier::ASYNC)
+        add_modifier(&mut modifiers, SemanticTokenModifier::ASYNC)
     }
 
     if let Some(version) = document.version()
@@ -157,7 +148,7 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
         && kind == SyntaxKind::RuntimeKeyword
         && parent.kind() == SyntaxKind::RuntimeSectionNode
     {
-        add_modifier(SemanticTokenModifier::DEPRECATED)
+        add_modifier(&mut modifiers, SemanticTokenModifier::DEPRECATED)
     }
 
     if token.text() == "docker"
@@ -165,7 +156,7 @@ fn token_ty(token: &SyntaxToken, document: &Document) -> Option<(SemanticTokenTy
             .ancestors()
             .any(|n| n.kind() == SyntaxKind::RuntimeSectionNode)
     {
-        add_modifier(SemanticTokenModifier::DEPRECATED)
+        add_modifier(&mut modifiers, SemanticTokenModifier::DEPRECATED)
     }
 
     let ty = match kind {
@@ -214,33 +205,24 @@ fn resolve_identifier_ty(
     document: &Document,
     modifiers: &mut u32,
 ) -> Option<SemanticTokenType> {
-    let mut add_modifier = |modifier: SemanticTokenModifier| {
-        if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
-            .iter()
-            .position(|m| m == &modifier)
-        {
-            *modifiers |= 1 << pos;
-        }
-    };
-
     if let Some(t) = TaskDefinition::cast(parent.clone())
         && t.name().inner() == token
     {
-        add_modifier(SemanticTokenModifier::DECLARATION);
+        add_modifier(modifiers, SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(w) = WorkflowDefinition::cast(parent.clone())
         && w.name().inner() == token
     {
-        add_modifier(SemanticTokenModifier::DECLARATION);
+        add_modifier(modifiers, SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::FUNCTION);
     }
 
     if let Some(s) = StructDefinition::cast(parent.clone())
         && s.name().inner() == token
     {
-        add_modifier(SemanticTokenModifier::DECLARATION);
+        add_modifier(modifiers, SemanticTokenModifier::DECLARATION);
         return Some(SemanticTokenType::STRUCT);
     }
 
@@ -252,12 +234,7 @@ fn resolve_identifier_ty(
             .map(|p| p.kind() == SyntaxKind::InputSectionNode)
             .unwrap_or(false)
         {
-            if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
-                .iter()
-                .position(|m| m == &SemanticTokenModifier::READONLY)
-            {
-                *modifiers |= 1 << pos;
-            }
+            add_modifier(modifiers, SemanticTokenModifier::READONLY);
             return Some(SemanticTokenType::PARAMETER);
         } else {
             return Some(SemanticTokenType::VARIABLE);
@@ -322,12 +299,7 @@ fn resolve_identifier_ty(
                         .ancestors()
                         .any(|n| n.kind() == SyntaxKind::InputSectionNode)
                 {
-                    if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
-                        .iter()
-                        .position(|m| m == &SemanticTokenModifier::READONLY)
-                    {
-                        *modifiers |= 1 << pos;
-                    }
+                    add_modifier(modifiers, SemanticTokenModifier::READONLY);
                     Some(SemanticTokenType::PARAMETER)
                 } else {
                     Some(SemanticTokenType::VARIABLE)
@@ -337,4 +309,14 @@ fn resolve_identifier_ty(
     }
 
     None
+}
+
+/// Adds a semantic token modifier to the bitset.
+fn add_modifier(modifiers: &mut u32, modifier: SemanticTokenModifier) {
+    if let Some(pos) = WDL_SEMANTIC_TOKEN_MODIFIERS
+        .iter()
+        .position(|m| m == &modifier)
+    {
+        *modifiers |= 1 << pos;
+    }
 }
