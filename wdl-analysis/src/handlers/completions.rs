@@ -182,7 +182,7 @@ pub fn completion(
         let mut current = Some(parent);
         while let Some(node) = current {
             if visisted_kinds.insert(node.kind()) {
-                add_snippet_completions(&node, &mut items);
+                add_snippet_completions(document, &node, &mut items);
             }
 
             match node.kind() {
@@ -860,15 +860,25 @@ fn add_version_completions(
 }
 
 /// Generates completion items for snippets based on the current node.
-fn add_snippet_completions(node: &SyntaxNode, items: &mut Vec<CompletionItem>) {
-    for s in snippets::SNIPPETS {
+fn add_snippet_completions(
+    document: &Document,
+    node: &SyntaxNode,
+    items: &mut Vec<CompletionItem>,
+) {
+    for s in &*snippets::SNIPPETS {
         if s.contexts.contains(&node.kind()) {
+            let insert_text = if s.label == "#@ except:" {
+                let all_rules = document.config().all_rules().join(",");
+                format!("#@ except: ${{1|{}|}}", all_rules)
+            } else {
+                s.insert_text.to_owned()
+            };
             items.push(CompletionItem {
                 label: s.label.to_string(),
                 kind: Some(CompletionItemKind::SNIPPET),
                 detail: Some(s.detail.to_string()),
                 insert_text_format: Some(InsertTextFormat::SNIPPET),
-                insert_text: Some(s.insert_text.to_string()),
+                insert_text: Some(insert_text),
                 ..Default::default()
             });
         }
