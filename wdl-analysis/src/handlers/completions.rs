@@ -21,6 +21,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use anyhow::bail;
+use indexmap::IndexMap;
 use indexmap::IndexSet;
 use line_index::LineIndex;
 use lsp_types::CompletionItem;
@@ -585,21 +586,46 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
     let root_node = document.root();
 
     for task in document.tasks() {
+        let name = task.name();
         items.push(CompletionItem {
-            label: task.name().to_string(),
+            label: name.to_string(),
             kind: Some(CompletionItemKind::FUNCTION),
-            detail: Some(format!("task {}", task.name())),
+            detail: Some(format!("task {}", name)),
             documentation: provide_task_documentation(task, &root_node).and_then(make_md_docs),
+            ..Default::default()
+        });
+
+        let snippet = build_call_snippet(name, task.inputs());
+        items.push(CompletionItem {
+            label: format!("{} {{...}}", name),
+            kind: Some(CompletionItemKind::SNIPPET),
+            detail: Some(format!("call task {} with required_inputs", name)),
+            documentation: provide_task_documentation(task, &root_node).and_then(make_md_docs),
+            insert_text_format: Some(InsertTextFormat::SNIPPET),
+            insert_text: Some(snippet),
             ..Default::default()
         });
     }
     if let Some(workflow) = document.workflow() {
+        let name = workflow.name();
         items.push(CompletionItem {
-            label: workflow.name().to_string(),
+            label: name.to_string(),
             kind: Some(CompletionItemKind::FUNCTION),
-            detail: Some(format!("workflow {}", workflow.name())),
+            detail: Some(format!("workflow {}", name)),
             documentation: provide_workflow_documentation(workflow, &root_node)
                 .and_then(make_md_docs),
+            ..Default::default()
+        });
+
+        let snippet = build_call_snippet(name, workflow.inputs());
+        items.push(CompletionItem {
+            label: format!("{} {{...}}", name),
+            kind: Some(CompletionItemKind::SNIPPET),
+            detail: Some(format!("call task {} with required_inputs", name)),
+            documentation: provide_workflow_documentation(workflow, &root_node)
+                .and_then(make_md_docs),
+            insert_text_format: Some(InsertTextFormat::SNIPPET),
+            insert_text: Some(snippet),
             ..Default::default()
         });
     }
@@ -608,23 +634,49 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
         let ns_root = ns.document().root();
 
         for task in ns.document().tasks() {
-            let label = format!("{ns_name}.{}", task.name());
+            let name = task.name();
+            let label = format!("{ns_name}.{name}");
             items.push(CompletionItem {
-                label,
+                label: label.clone(),
                 kind: Some(CompletionItemKind::FUNCTION),
                 detail: Some("task".to_string()),
                 documentation: provide_task_documentation(task, &ns_root).and_then(make_md_docs),
                 ..Default::default()
             });
+
+            let snippet = build_call_snippet(&label, task.inputs());
+            items.push(CompletionItem {
+                label: format!("{} {{...}}", label),
+                kind: Some(CompletionItemKind::SNIPPET),
+                detail: Some(format!("call task {} with required inputs", label)),
+                documentation: provide_task_documentation(task, &ns_root).and_then(make_md_docs),
+                insert_text_format: Some(InsertTextFormat::SNIPPET),
+                insert_text: Some(snippet),
+                ..Default::default()
+            });
         }
         if let Some(workflow) = ns.document().workflow() {
-            let label = format!("{ns_name}.{}", workflow.name());
+            let name = workflow.name();
+            let label = format!("{ns_name}.{name}");
+
             items.push(CompletionItem {
-                label,
+                label: label.clone(),
                 kind: Some(CompletionItemKind::FUNCTION),
                 detail: Some("workflow".to_string()),
                 documentation: provide_workflow_documentation(workflow, &ns_root)
                     .and_then(make_md_docs),
+                ..Default::default()
+            });
+
+            let snippet = build_call_snippet(&label, workflow.inputs());
+            items.push(CompletionItem {
+                label: format!("{} {{...}}", label),
+                kind: Some(CompletionItemKind::SNIPPET),
+                detail: Some(format!("call workflow {} with required inputs", label)),
+                documentation: provide_workflow_documentation(workflow, &ns_root)
+                    .and_then(make_md_docs),
+                insert_text_format: Some(InsertTextFormat::SNIPPET),
+                insert_text: Some(snippet),
                 ..Default::default()
             });
         }
@@ -706,7 +758,38 @@ fn add_struct_completions(document: &Document, items: &mut Vec<CompletionItem>) 
             detail: Some(format!("struct {name}")),
             documentation: provide_struct_documentation(s, &root).and_then(make_md_docs),
             ..Default::default()
-        })
+        });
+
+        if let Some(ty) = s.ty()
+            && let Some(struct_ty) = ty.as_struct()
+        {
+            let members = struct_ty.members();
+            if !members.is_empty() {
+                let member_names = members
+                    .keys()
+                    .map(|s| s.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let label = format!("{} {{ {} }}", name, member_names);
+
+                let member_snippets: Vec<String> = members
+                    .keys()
+                    .enumerate()
+                    .map(|(i, member_name)| format!("\t{}: ${{{}}}", member_name, i + 1))
+                    .collect();
+                let snippet = format!("{} {{\n{}\n}}", name, member_snippets.join(",\n"));
+
+                items.push(CompletionItem {
+                    label,
+                    kind: Some(CompletionItemKind::SNIPPET),
+                    detail: Some(format!("struct {} with members", name)),
+                    documentation: provide_struct_documentation(s, &root).and_then(make_md_docs),
+                    insert_text_format: Some(InsertTextFormat::SNIPPET),
+                    insert_text: Some(snippet),
+                    ..Default::default()
+                });
+            }
+        }
     }
 }
 
@@ -882,6 +965,29 @@ fn add_snippet_completions(
                 ..Default::default()
             });
         }
+    }
+}
+
+/// Builds a snippet for a `call` statement with required inputs.
+///
+/// NOTE: skips all optional and default inputs.
+fn build_call_snippet(name: &str, inputs: &IndexMap<String, crate::document::Input>) -> String {
+    let required_inputs: Vec<_> = inputs
+        .iter()
+        .filter(|(_, input)| input.required())
+        .map(|(name, _)| name)
+        .collect();
+
+    if required_inputs.is_empty() {
+        format!("{} {{\n\t$0\n}}", name)
+    } else {
+        let input_snippets: Vec<String> = required_inputs
+            .iter()
+            .enumerate()
+            .map(|(i, input_name)| format!("\t\t{} = ${{{}}}", input_name, i + 1))
+            .collect();
+
+        format!("{} {{\n\tinput:\n{}\n}}", name, input_snippets.join("\n"))
     }
 }
 
