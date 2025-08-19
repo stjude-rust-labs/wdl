@@ -13,6 +13,7 @@
 //! - Member access completions for struct fields, call outputs, and pair
 //!   elements
 //! - Import namespace identifiers
+//! - Snippets for common WDL constructs
 //!
 //! See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_completion
 
@@ -20,6 +21,7 @@ use std::sync::Arc;
 
 use anyhow::Result;
 use anyhow::bail;
+use indexmap::IndexSet;
 use line_index::LineIndex;
 use lsp_types::CompletionItem;
 use lsp_types::CompletionItemKind;
@@ -73,6 +75,7 @@ use crate::handlers::common::position_to_offset;
 use crate::handlers::common::provide_struct_documentation;
 use crate::handlers::common::provide_task_documentation;
 use crate::handlers::common::provide_workflow_documentation;
+use crate::handlers::snippets;
 use crate::stdlib::Function;
 use crate::stdlib::STDLIB;
 use crate::stdlib::TypeParameters;
@@ -175,8 +178,13 @@ pub fn completion(
     if is_member_access {
         add_member_access_completions(document, &parent, &mut items)?;
     } else {
+        let mut visisted_kinds = IndexSet::new();
         let mut current = Some(parent);
         while let Some(node) = current {
+            if visisted_kinds.insert(node.kind()) {
+                add_snippet_completions(&node, &mut items);
+            }
+
             match node.kind() {
                 SyntaxKind::WorkflowDefinitionNode => {
                     add_keyword_completions(&WORKFLOW_ITEM_EXPECTED_SET, &mut items);
@@ -849,6 +857,22 @@ fn add_version_completions(
         });
     }
     Ok(())
+}
+
+/// Generates completion items for snippets based on the current node.
+fn add_snippet_completions(node: &SyntaxNode, items: &mut Vec<CompletionItem>) {
+    for s in snippets::SNIPPETS {
+        if s.contexts.contains(&node.kind()) {
+            items.push(CompletionItem {
+                label: s.label.to_string(),
+                kind: Some(CompletionItemKind::SNIPPET),
+                detail: Some(s.detail.to_string()),
+                insert_text_format: Some(InsertTextFormat::SNIPPET),
+                insert_text: Some(s.insert_text.to_string()),
+                ..Default::default()
+            });
+        }
+    }
 }
 
 /// Formats metadata value to type.
