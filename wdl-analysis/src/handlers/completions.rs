@@ -179,10 +179,10 @@ pub fn completion(
     if is_member_access {
         add_member_access_completions(document, &parent, &mut items)?;
     } else {
-        let mut visisted_kinds = IndexSet::new();
+        let mut visited_kinds = IndexSet::new();
         let mut current = Some(parent);
         while let Some(node) = current {
-            if visisted_kinds.insert(node.kind()) {
+            if visited_kinds.insert(node.kind()) {
                 add_snippet_completions(document, &node, &mut items);
             }
 
