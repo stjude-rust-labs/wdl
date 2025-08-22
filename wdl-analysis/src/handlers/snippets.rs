@@ -23,7 +23,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
     vec![
         Snippet {
             label: "struct",
-            insert_text: "struct ${TM_SELECTED_TEXT:${1:MyScruct}} \
+            insert_text: "struct ${TM_SELECTED_TEXT:${1:MyStruct}} \
                           {\n\t${2|Array,Boolean,Directory,File,Float,Int,Map,Object,Pair,\
                           String|} ${3:name}\n}",
             detail: "Create a new struct",
@@ -31,7 +31,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         },
         Snippet {
             label: "task",
-            insert_text: "task ${TM_SELECTED_TEXT:${1:my_task}} {\n\n\tcommand <<<\n\t\techo \
+            insert_text: "task ${TM_SELECTED_TEXT:${1:my_task}} {\n\tcommand <<<\n\t\techo \
                           \"Hello, world!\"\n\t>>>\n\n\trequirements {\n\t\tcontainer: \
                           \"ubuntu:latest\"\n\t}\n}",
             detail: "Create a new task",
@@ -39,7 +39,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         },
         Snippet {
             label: "meta",
-            insert_text: "meta {\n\tdescription: \"${1: This is a description.}\"\n}",
+            insert_text: "meta {\n\tdescription: \"${1: This is a description.}\"\n\n}",
             detail: "Create a new `meta` section",
             contexts: &[
                 SyntaxKind::TaskDefinitionNode,
@@ -48,7 +48,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         },
         Snippet {
             label: "parameter_meta",
-            insert_text: "parameter_meta {\n\t$0\n}",
+            insert_text: "parameter_meta {\n\t$0\n\n}",
             detail: "Create a new `parameter_meta` section",
             contexts: &[
                 SyntaxKind::TaskDefinitionNode,
@@ -59,7 +59,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         Snippet {
             label: "input",
             insert_text: "input {\n\t${1|Array,Boolean,Directory,File,Float,Int,Map,Object,Pair,\
-                          String|} ${2:name}\n}",
+                          String|} ${2:name}\n\n}",
             detail: "Create a new `input` section",
             contexts: &[
                 SyntaxKind::TaskDefinitionNode,
@@ -69,7 +69,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         Snippet {
             label: "output",
             insert_text: "output {\n\t${1|Array,Boolean,Directory,File,Float,Int,Map,Object,Pair,\
-                          String|} ${2:name} = $0\n}",
+                          String|} ${2:name} = $0\n\n}",
             detail: "Create a new `output` section",
             contexts: &[
                 SyntaxKind::TaskDefinitionNode,
@@ -80,14 +80,14 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
             label: "requirements",
             insert_text: "requirements {\n\tcontainer: ${1:\"*\"}\n\tcpu: ${2:1}\n\tmemory: \
                           ${3:\"2 GiB\"}\n\tgpu: ${4:false}\n\tfpga: ${5:false}\n\tdisks: ${6:\"1 \
-                          GiB\"}\n\tmax_retries: ${7:0}\n\treturn_codes: ${8:0}\n}",
+                          GiB\"}\n\tmax_retries: ${7:0}\n\treturn_codes: ${8:0}\n\n}",
             detail: "Create a new `requirements` section",
             contexts: &[SyntaxKind::TaskDefinitionNode],
         },
         Snippet {
             label: "runtime",
             insert_text: "runtime {\n\tcontainer: ${1:\"*\"}\n\tcpu: ${2:1}\n\tmemory: ${3:\"2 \
-                          GiB\"}\n\tdisks: ${4:\"1 GiB\"}\n\tgpu: ${5:false}\n}",
+                          GiB\"}\n\tdisks: ${4:\"1 GiB\"}\n\tgpu: ${5:false}\n\n}",
             detail: "Create a new `runtime` section",
             contexts: &[SyntaxKind::TaskDefinitionNode],
         },
@@ -97,12 +97,12 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
                           ${3:\"500 GiB\"}\n\tgpu: ${4:0}\n\tfpga: ${5:0}\n\tshort_task: \
                           ${6:false}\n\tlocalization_optional: ${7:false}\n\t# inputs: TODO \
                           (e.g., `input { name: hints { min_length: 3 } }`)\n\t# outputs: TODO \
-                          (e.g., `output { name: hints { max_length: 5 } }`)\n}",
+                          (e.g., `output { name: hints { max_length: 5 } }`)\n\n}",
             detail: "Create a new `hints` section",
             contexts: &[SyntaxKind::TaskDefinitionNode],
         },
         Snippet {
-            label: "complete-task",
+            label: "full-task",
             insert_text: r#"task ${TM_SELECTED_TEXT:${1:my_task}} {
 	meta {
 		description: "${2:This task greets the name passed to the input.}"
@@ -117,7 +117,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
 	}
 
 	command <<<
-		echo "Hello, \${name}"
+		echo "Hello, ~{name}"
 	>>>
 
 	output {
@@ -152,7 +152,7 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         },
         Snippet {
             label: "call",
-            insert_text: "call ${1:a_task} {\n\t$0\n}",
+            insert_text: "call ${1:my_task} {\n\t$0\n}",
             detail: "Create a new `call` statement",
             contexts: &[
                 SyntaxKind::WorkflowDefinitionNode,
@@ -182,8 +182,8 @@ pub static SNIPPETS: LazyLock<Vec<Snippet>> = LazyLock::new(|| {
         },
         Snippet {
             label: "workflow",
-            insert_text: "workflow ${TM_SELECTED_TEXT:${1:my_workflow}} {\n\n\tinput \
-                          {\n\t\t$2\n\t}\n\n\tcall ${3:a_task} {\n\t\t$4\n\t}\n\n\n\toutput \
+            insert_text: "workflow ${TM_SELECTED_TEXT:${1:my_workflow}} {\n\tinput \
+                          {\n\t\t$2\n\t}\n\n\tcall ${3:my_task} {\n\t\t$4\n\t}\n\n\n\toutput \
                           {\n\t\t$0\n\t}\n}",
             detail: "Create a new workflow",
             contexts: &[SyntaxKind::RootNode],
