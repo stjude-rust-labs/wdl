@@ -766,19 +766,7 @@ fn add_struct_completions(document: &Document, items: &mut Vec<CompletionItem>) 
         {
             let members = struct_ty.members();
             if !members.is_empty() {
-                let member_names = members
-                    .keys()
-                    .map(|s| s.as_str())
-                    .collect::<Vec<_>>()
-                    .join(", ");
-                let label = format!("{} {{ {} }}", name, member_names);
-
-                let member_snippets: Vec<String> = members
-                    .keys()
-                    .enumerate()
-                    .map(|(i, member_name)| format!("\t{}: ${{{}}}", member_name, i + 1))
-                    .collect();
-                let snippet = format!("{} {{\n{}\n}}", name, member_snippets.join(",\n"));
+                let (label, snippet) = build_struct_snippet(name, members);
 
                 items.push(CompletionItem {
                     label,
@@ -1001,6 +989,24 @@ fn build_call_snippet(
     } else {
         format!("call {} {{\n{}\n}}", name, input_snippets.join("\n"))
     }
+}
+
+/// Builds a snippet for a `struct` with its members.
+fn build_struct_snippet(name: &str, members: &IndexMap<String, Type>) -> (String, String) {
+    let member_names = members
+        .keys()
+        .map(|s| s.as_str())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let label = format!("{} {{ {} }}", name, member_names);
+
+    let member_snippets: Vec<String> = members
+        .keys()
+        .enumerate()
+        .map(|(i, member_name)| format!("\t{}: ${{{}}}", member_name, i + 1))
+        .collect();
+    let snippet = format!("{} {{\n{}\n}}", name, member_snippets.join(",\n"));
+    (label, snippet)
 }
 
 /// Formats metadata value to type.
