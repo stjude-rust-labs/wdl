@@ -972,13 +972,13 @@ fn build_call_snippet(
         .collect();
 
     if required_inputs.is_empty() {
-        return format!("call {} {{\n\t$0\n}}", name);
+        return format!("{} {{\n\t$0\n}}", name);
     }
 
     let use_input_block = version < Some(SupportedVersion::V1(wdl_ast::version::V1::Two));
     let indent = if use_input_block { "\t\t" } else { "\t" };
 
-    let input_snippets: Vec<String> = required_inputs
+    let input_snippets: Vec<_> = required_inputs
         .iter()
         .enumerate()
         .map(|(i, input_name)| format!("{}{} = ${{{}}}", indent, input_name, i + 1))
@@ -987,7 +987,7 @@ fn build_call_snippet(
     if use_input_block {
         format!("{} {{\n\tinput:\n{}\n}}", name, input_snippets.join("\n"))
     } else {
-        format!("call {} {{\n{}\n}}", name, input_snippets.join("\n"))
+        format!("{} {{\n{}\n}}", name, input_snippets.join("\n"))
     }
 }
 
