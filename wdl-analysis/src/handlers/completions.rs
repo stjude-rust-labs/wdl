@@ -584,6 +584,7 @@ fn add_member_access_completions(
 /// Includes both local and imported tasks and workflows.
 fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>) {
     let root_node = document.root();
+    let version = document.version();
 
     for task in document.tasks() {
         let name = task.name();
@@ -595,11 +596,11 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
             ..Default::default()
         });
 
-        let snippet = build_call_snippet(name, task.inputs());
+        let snippet = build_call_snippet(name, task.inputs(), version);
         items.push(CompletionItem {
             label: format!("{} {{...}}", name),
             kind: Some(CompletionItemKind::SNIPPET),
-            detail: Some(format!("call task {} with required_inputs", name)),
+            detail: Some(format!("call task {} with required inputs", name)),
             documentation: provide_task_documentation(task, &root_node).and_then(make_md_docs),
             insert_text_format: Some(InsertTextFormat::SNIPPET),
             insert_text: Some(snippet),
@@ -617,7 +618,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
             ..Default::default()
         });
 
-        let snippet = build_call_snippet(name, workflow.inputs());
+        let snippet = build_call_snippet(name, workflow.inputs(), version);
         items.push(CompletionItem {
             label: format!("{} {{...}}", name),
             kind: Some(CompletionItemKind::SNIPPET),
@@ -644,7 +645,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
                 ..Default::default()
             });
 
-            let snippet = build_call_snippet(&label, task.inputs());
+            let snippet = build_call_snippet(&label, task.inputs(), version);
             items.push(CompletionItem {
                 label: format!("{} {{...}}", label),
                 kind: Some(CompletionItemKind::SNIPPET),
@@ -668,7 +669,7 @@ fn add_callable_completions(document: &Document, items: &mut Vec<CompletionItem>
                 ..Default::default()
             });
 
-            let snippet = build_call_snippet(&label, workflow.inputs());
+            let snippet = build_call_snippet(&label, workflow.inputs(), version);
             items.push(CompletionItem {
                 label: format!("{} {{...}}", label),
                 kind: Some(CompletionItemKind::SNIPPET),
@@ -971,7 +972,11 @@ fn add_snippet_completions(
 /// Builds a snippet for a `call` statement with required inputs.
 ///
 /// NOTE: skips all optional and default inputs.
-fn build_call_snippet(name: &str, inputs: &IndexMap<String, crate::document::Input>) -> String {
+fn build_call_snippet(
+    name: &str,
+    inputs: &IndexMap<String, crate::document::Input>,
+    version: Option<SupportedVersion>,
+) -> String {
     let required_inputs: Vec<_> = inputs
         .iter()
         .filter(|(_, input)| input.required())
@@ -979,15 +984,22 @@ fn build_call_snippet(name: &str, inputs: &IndexMap<String, crate::document::Inp
         .collect();
 
     if required_inputs.is_empty() {
-        format!("{} {{\n\t$0\n}}", name)
-    } else {
-        let input_snippets: Vec<String> = required_inputs
-            .iter()
-            .enumerate()
-            .map(|(i, input_name)| format!("\t\t{} = ${{{}}}", input_name, i + 1))
-            .collect();
+        return format!("call {} {{\n\t$0\n}}", name);
+    }
 
+    let input_supported = version < Some(SupportedVersion::V1(wdl_ast::version::V1::Two));
+    let indent = if input_supported { "\t\t" } else { "\t" };
+
+    let input_snippets: Vec<String> = required_inputs
+        .iter()
+        .enumerate()
+        .map(|(i, input_name)| format!("{}{} = ${{{}}}", indent, input_name, i + 1))
+        .collect();
+
+    if input_supported {
         format!("{} {{\n\tinput:\n{}\n}}", name, input_snippets.join("\n"))
+    } else {
+        format!("call {} {{\n{}\n}}", name, input_snippets.join("\n"))
     }
 }
 
