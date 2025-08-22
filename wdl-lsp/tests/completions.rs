@@ -285,7 +285,7 @@ async fn should_complete_namespace_members() {
         panic!("expected a response, got none");
     };
 
-    assert_eq!(items.len(), 1);
+    assert_eq!(items.len(), 2);
     assert_contains(&items, "greet");
 }
 
