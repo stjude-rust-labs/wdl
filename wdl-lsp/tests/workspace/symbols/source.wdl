@@ -27,6 +27,20 @@ task greet {
 workflow main {
     input {
         Person p
+        Boolean condition
+        Array[Int] numbers = [
+            1,
+            2,
+            3,
+        ]
+    }
+
+    if (condition) {
+        call greet as greet_in_if { input: person = p }
+    }
+
+    scatter (i in numbers) {
+        call greet as greet_in_scatter { input: person = p }
     }
 
     call greet { input: person = p }

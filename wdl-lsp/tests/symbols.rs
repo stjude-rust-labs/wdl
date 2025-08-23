@@ -62,10 +62,37 @@ async fn should_provide_document_symbols() {
 
     let main_workflow = symbols.iter().find(|s| s.name == "main").unwrap();
     let main_children = main_workflow.children.as_ref().unwrap();
-    assert_eq!(main_children.len(), 3); // input p, call greet, output result
+
+    // input p, call greet, output result
+    // 3 inputs, 1 if, 1 scatter, 1 call, 1 output
+    assert_eq!(main_children.len(), 7);
     assert_symbol(main_children, "p", SymbolKind::VARIABLE);
     assert_symbol(main_children, "greet", SymbolKind::FUNCTION);
     assert_symbol(main_children, "result", SymbolKind::VARIABLE);
+    assert_symbol(main_children, "condition", SymbolKind::VARIABLE);
+    assert_symbol(main_children, "numbers", SymbolKind::VARIABLE);
+    assert_symbol(main_children, "if (condition)", SymbolKind::OPERATOR);
+    assert_symbol(
+        main_children,
+        "scatter (i in numbers)",
+        SymbolKind::OPERATOR,
+    );
+
+    let if_block = main_children
+        .iter()
+        .find(|s| s.name == "if (condition)")
+        .unwrap();
+    let if_children = if_block.children.as_ref().unwrap();
+    assert_eq!(if_children.len(), 1);
+    assert_symbol(if_children, "greet_in_if", SymbolKind::FUNCTION);
+
+    let scatter_block = main_children
+        .iter()
+        .find(|s| s.name == "scatter (i in numbers)")
+        .unwrap();
+    let scatter_children = scatter_block.children.as_ref().unwrap();
+    assert_eq!(scatter_children.len(), 1);
+    assert_symbol(scatter_children, "greet_in_scatter", SymbolKind::FUNCTION);
 
     let person_struct = symbols.iter().find(|s| s.name == "Person").unwrap();
     let person_children = person_struct.children.as_ref().unwrap();

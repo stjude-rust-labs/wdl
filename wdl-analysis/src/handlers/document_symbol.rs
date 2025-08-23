@@ -15,15 +15,20 @@ use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::v1::BoundDecl;
+use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::ImportStatement;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowItem;
+use wdl_ast::v1::WorkflowStatement;
 
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
@@ -110,31 +115,21 @@ fn workflow_to_symbol(
 
     for item in workflow.items() {
         match item {
-            wdl_ast::v1::WorkflowItem::Input(section) => {
-                children.extend(input_section_to_symbols(uri, &section, lines)?);
+            WorkflowItem::Input(section) => {
+                children.extend(input_section_to_symbols(uri, &section, lines)?)
             }
-            wdl_ast::v1::WorkflowItem::Output(section) => {
-                children.extend(output_section_to_symbols(uri, &section, lines)?);
+            WorkflowItem::Output(section) => {
+                children.extend(output_section_to_symbols(uri, &section, lines)?)
             }
-            wdl_ast::v1::WorkflowItem::Declaration(decl) => {
-                children.push(bound_decl_to_symbol(uri, &decl, lines)?);
+            WorkflowItem::Declaration(decl) => {
+                children.push(bound_decl_to_symbol(uri, &decl, lines)?)
             }
-            wdl_ast::v1::WorkflowItem::Call(call) => {
-                let name = call
-                    .alias()
-                    .map(|a| a.name())
-                    .unwrap_or_else(|| call.target().names().last().unwrap());
-                children.push(DocumentSymbol {
-                    name: name.text().to_string(),
-                    detail: Some(call.target().text().to_string()),
-                    kind: SymbolKind::FUNCTION,
-                    range: common::location_from_span(uri, call.span(), lines)?.range,
-                    selection_range: common::location_from_span(uri, name.span(), lines)?.range,
-                    children: None,
-                    tags: None,
-                    #[allow(deprecated)]
-                    deprecated: None,
-                });
+            WorkflowItem::Call(call) => children.push(call_to_symbol(uri, &call, lines)?),
+            WorkflowItem::Conditional(cond) => {
+                children.push(conditional_to_symbol(uri, &cond, lines)?)
+            }
+            WorkflowItem::Scatter(scatter) => {
+                children.push(scatter_to_symbol(uri, &scatter, lines)?)
             }
             _ => {}
         }
@@ -288,6 +283,96 @@ fn bound_decl_to_symbol(
         range: common::location_from_span(uri, decl.span(), lines)?.range,
         selection_range: common::location_from_span(uri, decl.name().span(), lines)?.range,
         children: None,
+        tags: None,
+        #[allow(deprecated)]
+        deprecated: None,
+    })
+}
+
+/// Converts a [`WorkflowStatement`] to a [`DocumentSymbol`].
+fn workflow_statement_to_symbol(
+    uri: &Url,
+    statement: &WorkflowStatement,
+    lines: &std::sync::Arc<line_index::LineIndex>,
+) -> Result<DocumentSymbol> {
+    match statement {
+        WorkflowStatement::Call(call) => call_to_symbol(uri, call, lines),
+        WorkflowStatement::Conditional(cond) => conditional_to_symbol(uri, cond, lines),
+        WorkflowStatement::Scatter(scatter) => scatter_to_symbol(uri, scatter, lines),
+        WorkflowStatement::Declaration(decl) => bound_decl_to_symbol(uri, decl, lines),
+    }
+}
+
+/// Converts a [`CallStatement`] to a [`DocumentSymbol`].
+fn call_to_symbol(
+    uri: &Url,
+    call: &CallStatement,
+    lines: &std::sync::Arc<line_index::LineIndex>,
+) -> Result<DocumentSymbol> {
+    let name = call
+        .alias()
+        .map(|a| a.name())
+        .unwrap_or_else(|| call.target().names().last().unwrap());
+
+    Ok(DocumentSymbol {
+        name: name.text().to_string(),
+        detail: Some(call.target().text().to_string()),
+        kind: SymbolKind::FUNCTION,
+        range: common::location_from_span(uri, call.span(), lines)?.range,
+        selection_range: common::location_from_span(uri, name.span(), lines)?.range,
+        children: None,
+        tags: None,
+        #[allow(deprecated)]
+        deprecated: None,
+    })
+}
+
+/// Converts a [`ConditionalStatement`] to a [`DocumentSymbol`].
+fn conditional_to_symbol(
+    uri: &Url,
+    cond: &ConditionalStatement,
+    lines: &std::sync::Arc<line_index::LineIndex>,
+) -> Result<DocumentSymbol> {
+    let mut children = Vec::new();
+    for stmt in cond.statements() {
+        children.push(workflow_statement_to_symbol(uri, &stmt, lines)?);
+    }
+
+    Ok(DocumentSymbol {
+        name: format!("if ({})", cond.expr().text()),
+        detail: None,
+        kind: SymbolKind::OPERATOR,
+        range: common::location_from_span(uri, cond.span(), lines)?.range,
+        selection_range: common::location_from_span(uri, cond.expr().span(), lines)?.range,
+        children: Some(children),
+        tags: None,
+        #[allow(deprecated)]
+        deprecated: None,
+    })
+}
+
+/// Converts a [`ScatterStatement`] to a [`DocumentSymbol`].
+fn scatter_to_symbol(
+    uri: &Url,
+    scatter: &ScatterStatement,
+    lines: &std::sync::Arc<line_index::LineIndex>,
+) -> Result<DocumentSymbol> {
+    let mut children = Vec::new();
+    for stmt in scatter.statements() {
+        children.push(workflow_statement_to_symbol(uri, &stmt, lines)?);
+    }
+
+    Ok(DocumentSymbol {
+        name: format!(
+            "scatter ({} in {})",
+            scatter.variable().text(),
+            scatter.expr().text()
+        ),
+        detail: None,
+        kind: SymbolKind::OPERATOR,
+        range: common::location_from_span(uri, scatter.span(), lines)?.range,
+        selection_range: common::location_from_span(uri, scatter.variable().span(), lines)?.range,
+        children: Some(children),
         tags: None,
         #[allow(deprecated)]
         deprecated: None,
