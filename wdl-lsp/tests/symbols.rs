@@ -52,13 +52,13 @@ async fn should_provide_document_symbols() {
     assert_symbol(&symbols, "lib_alias", SymbolKind::NAMESPACE);
     assert_symbol(&symbols, "Person", SymbolKind::STRUCT);
     assert_symbol(&symbols, "greet", SymbolKind::FUNCTION);
-    assert_symbol(&symbols, "main", SymbolKind::MODULE);
+    assert_symbol(&symbols, "main", SymbolKind::FUNCTION);
 
     let greet_task = symbols.iter().find(|s| s.name == "greet").unwrap();
     let greet_children = greet_task.children.as_ref().unwrap();
     assert_eq!(greet_children.len(), 3);
-    assert_symbol(greet_children, "input", SymbolKind::NAMESPACE);
-    assert_symbol(greet_children, "output", SymbolKind::NAMESPACE);
+    assert_symbol(greet_children, "inputs", SymbolKind::NAMESPACE);
+    assert_symbol(greet_children, "outputs", SymbolKind::NAMESPACE);
 
     let main_workflow = symbols.iter().find(|s| s.name == "main").unwrap();
     let main_children = main_workflow.children.as_ref().unwrap();
@@ -66,7 +66,7 @@ async fn should_provide_document_symbols() {
     // input p, call greet, output result
     // 1 inputs, 1 if, 1 scatter, 1 call, 1 output
     assert_eq!(main_children.len(), 5);
-    assert_symbol(main_children, "input", SymbolKind::NAMESPACE);
+    assert_symbol(main_children, "inputs", SymbolKind::NAMESPACE);
     assert_symbol(main_children, "if (condition)", SymbolKind::OPERATOR);
     assert_symbol(
         main_children,
@@ -74,7 +74,7 @@ async fn should_provide_document_symbols() {
         SymbolKind::OPERATOR,
     );
     assert_symbol(main_children, "greet", SymbolKind::FUNCTION);
-    assert_symbol(main_children, "output", SymbolKind::NAMESPACE);
+    assert_symbol(main_children, "outputs", SymbolKind::NAMESPACE);
 
     let if_block = main_children
         .iter()
