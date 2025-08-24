@@ -57,26 +57,25 @@ async fn should_provide_document_symbols() {
     let greet_task = symbols.iter().find(|s| s.name == "greet").unwrap();
     let greet_children = greet_task.children.as_ref().unwrap();
     assert_eq!(greet_children.len(), 3);
-    assert_symbol(greet_children, "person", SymbolKind::VARIABLE);
-    assert_symbol(greet_children, "out", SymbolKind::VARIABLE);
+    assert_symbol(greet_children, "input", SymbolKind::NAMESPACE);
+    assert_symbol(greet_children, "output", SymbolKind::NAMESPACE);
+
 
     let main_workflow = symbols.iter().find(|s| s.name == "main").unwrap();
     let main_children = main_workflow.children.as_ref().unwrap();
 
     // input p, call greet, output result
-    // 3 inputs, 1 if, 1 scatter, 1 call, 1 output
-    assert_eq!(main_children.len(), 7);
-    assert_symbol(main_children, "p", SymbolKind::VARIABLE);
-    assert_symbol(main_children, "greet", SymbolKind::FUNCTION);
-    assert_symbol(main_children, "result", SymbolKind::VARIABLE);
-    assert_symbol(main_children, "condition", SymbolKind::VARIABLE);
-    assert_symbol(main_children, "numbers", SymbolKind::VARIABLE);
+    // 1 inputs, 1 if, 1 scatter, 1 call, 1 output
+    assert_eq!(main_children.len(), 5);
+    assert_symbol(main_children, "input", SymbolKind::NAMESPACE);
     assert_symbol(main_children, "if (condition)", SymbolKind::OPERATOR);
     assert_symbol(
         main_children,
         "scatter (i in numbers)",
         SymbolKind::OPERATOR,
     );
+    assert_symbol(main_children, "greet", SymbolKind::FUNCTION);
+    assert_symbol(main_children, "output", SymbolKind::NAMESPACE);
 
     let if_block = main_children
         .iter()

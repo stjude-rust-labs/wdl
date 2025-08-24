@@ -116,10 +116,10 @@ fn workflow_to_symbol(
     for item in workflow.items() {
         match item {
             WorkflowItem::Input(section) => {
-                children.extend(input_section_to_symbols(uri, &section, lines)?)
+                children.push(input_section_to_symbol(uri, &section, lines)?)
             }
             WorkflowItem::Output(section) => {
-                children.extend(output_section_to_symbols(uri, &section, lines)?)
+                children.push(output_section_to_symbol(uri, &section, lines)?)
             }
             WorkflowItem::Declaration(decl) => {
                 children.push(bound_decl_to_symbol(uri, &decl, lines)?)
@@ -157,11 +157,11 @@ fn task_to_symbol(
     let mut children = Vec::new();
 
     if let Some(input_section) = task.input() {
-        children.extend(input_section_to_symbols(uri, &input_section, lines)?);
+        children.push(input_section_to_symbol(uri, &input_section, lines)?);
     }
 
     if let Some(output_section) = task.output() {
-        children.extend(output_section_to_symbols(uri, &output_section, lines)?);
+        children.push(output_section_to_symbol(uri, &output_section, lines)?);
     }
 
     for decl in task.declarations() {
@@ -206,30 +206,51 @@ fn struct_to_symbol(
     })
 }
 
-/// Converts an [`InputSection`] to a [`Vec<DocumentSymbol>`.]
-fn input_section_to_symbols(
+/// Converts an [`InputSection`] to a [`DocumentSymbol`].
+fn input_section_to_symbol(
     uri: &Url,
     section: &InputSection,
     lines: &std::sync::Arc<line_index::LineIndex>,
-) -> Result<Vec<DocumentSymbol>> {
+) -> Result<DocumentSymbol> {
     let mut symbols = Vec::new();
     for decl in section.declarations() {
         symbols.push(decl_to_symbol(uri, &decl, lines)?);
     }
-    Ok(symbols)
+    Ok(DocumentSymbol {
+        name: "input".to_string(),
+        detail: None,
+        kind: SymbolKind::NAMESPACE,
+        range: common::location_from_span(uri, section.span(), lines)?.range,
+        selection_range: common::location_from_span(uri, section.span(), lines)?.range,
+        children: Some(symbols),
+        tags: None,
+        #[allow(deprecated)]
+        deprecated: None,
+    })
 }
 
-/// Converts an [`OutputSection`] to a [`Vec<DocumentSymbol>`.]
-fn output_section_to_symbols(
+/// Converts an [`OutputSection`] to a [`DocumentSymbol`].
+fn output_section_to_symbol(
     uri: &Url,
     section: &OutputSection,
     lines: &std::sync::Arc<line_index::LineIndex>,
-) -> Result<Vec<DocumentSymbol>> {
+) -> Result<DocumentSymbol> {
     let mut symbols = Vec::new();
     for decl in section.declarations() {
         symbols.push(bound_decl_to_symbol(uri, &decl, lines)?);
     }
-    Ok(symbols)
+
+    Ok(DocumentSymbol {
+        name: "output".to_string(),
+        detail: None,
+        kind: SymbolKind::NAMESPACE,
+        range: common::location_from_span(uri, section.span(), lines)?.range,
+        selection_range: common::location_from_span(uri, section.span(), lines)?.range,
+        children: Some(symbols),
+        tags: None,
+        #[allow(deprecated)]
+        deprecated: None,
+    })
 }
 
 /// Converts a [`Decl`] to a [`DocumentSymbol`].
