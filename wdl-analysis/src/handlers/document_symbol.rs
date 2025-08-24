@@ -47,7 +47,7 @@ pub fn document_symbol(graph: &DocumentGraph, uri: &Url) -> Result<Option<Docume
     };
 
     let Some(document) = node.document() else {
-        bail!("document analysis data not available for {}", uri);
+        bail!("analysis data not available for document `{}`", uri);
     };
 
     let mut symbols = Vec::new();
@@ -55,7 +55,7 @@ pub fn document_symbol(graph: &DocumentGraph, uri: &Url) -> Result<Option<Docume
         return Ok(None);
     };
 
-    // NOTE: The reason for using `Ast` here is we don't want to wait for analysis
+    // NOTE: the reason for using `Ast` here is we don't want to wait for analysis
     // to complete and call `structs`, `tasks` and `workflow` on
     // `analysis::Document`. Doing so will break the outline while the user is
     // typing.
