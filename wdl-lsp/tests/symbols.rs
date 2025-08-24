@@ -60,7 +60,6 @@ async fn should_provide_document_symbols() {
     assert_symbol(greet_children, "input", SymbolKind::NAMESPACE);
     assert_symbol(greet_children, "output", SymbolKind::NAMESPACE);
 
-
     let main_workflow = symbols.iter().find(|s| s.name == "main").unwrap();
     let main_children = main_workflow.children.as_ref().unwrap();
 
