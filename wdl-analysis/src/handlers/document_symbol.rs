@@ -138,7 +138,7 @@ fn workflow_to_symbol(
     Ok(DocumentSymbol {
         name: workflow.name().text().to_string(),
         detail: Some("workflow".to_string()),
-        kind: SymbolKind::MODULE,
+        kind: SymbolKind::FUNCTION,
         range: common::location_from_span(uri, workflow.span(), lines)?.range,
         selection_range: common::location_from_span(uri, workflow.name().span(), lines)?.range,
         children: Some(children),
