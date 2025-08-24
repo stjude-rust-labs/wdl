@@ -217,7 +217,7 @@ fn input_section_to_symbol(
         symbols.push(decl_to_symbol(uri, &decl, lines)?);
     }
     Ok(DocumentSymbol {
-        name: "input".to_string(),
+        name: "inputs".to_string(),
         detail: None,
         kind: SymbolKind::NAMESPACE,
         range: common::location_from_span(uri, section.span(), lines)?.range,
@@ -241,7 +241,7 @@ fn output_section_to_symbol(
     }
 
     Ok(DocumentSymbol {
-        name: "output".to_string(),
+        name: "outputs".to_string(),
         detail: None,
         kind: SymbolKind::NAMESPACE,
         range: common::location_from_span(uri, section.span(), lines)?.range,
