@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Fixed
 
+* Fixed deserialization of `Object` to no longer require keys be WDL
+  identifiers; also implemented coercion between `Map` <-> `Object`/`Struct`
+  where the map key type <-> `String` ([#586](https://github.com/stjude-rust-labs/wdl/pull/586)).
 * Fixed a panic caused by an incorrect type calculation of non-empty array
   literals ([#585](https://github.com/stjude-rust-labs/wdl/pull/585)).
 * Fixed incorrect common type calculations from `None` values ([#584](https://github.com/stjude-rust-labs/wdl/pull/584)).
