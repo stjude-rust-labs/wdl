@@ -623,7 +623,7 @@ impl Coercible for CompoundType {
                 true
             }
 
-            // Struct -> Map[X, Y], Struct -> Map[X, y]?, Struct? -> Map[X, Y]? where: String -> X
+            // Struct -> Map[X, Y], Struct -> Map[X, Y]?, Struct? -> Map[X, Y]? where: String -> X
             // and member types -> Y
             (Self::Struct(src), Self::Map(target)) => {
                 if !Type::from(PrimitiveType::String).is_coercible_to(&target.key_type) {
