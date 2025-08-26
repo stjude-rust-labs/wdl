@@ -6,7 +6,7 @@ task tail {
   }
 
   command <<<
-  tail -n ~{to_tail.right} ~{to_tail.left}
+  tail -n ~{to_tail.right} '~{to_tail.left}'
   >>>
 
   output {
