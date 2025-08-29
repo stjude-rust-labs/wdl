@@ -76,7 +76,7 @@ use crate::Value;
 use crate::WorkflowInputs;
 use crate::config::Config;
 use crate::diagnostics::if_conditional_mismatch;
-use crate::diagnostics::output_evaluation_failed;
+use crate::diagnostics::io_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
 use crate::http::Downloader;
 use crate::http::HttpDownloader;
@@ -184,8 +184,8 @@ impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
         None
     }
 
-    fn temp_dir(&self) -> &Path {
-        self.temp_dir
+    fn temp_dir(&self) -> (&Path, Option<&str>) {
+        (self.temp_dir, None)
     }
 
     fn stdout(&self) -> Option<&Value> {
@@ -200,12 +200,12 @@ impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
         None
     }
 
-    fn translate_path(&self, _path: &str) -> Option<Cow<'_, Path>> {
-        None
-    }
-
     fn downloader(&self) -> &dyn Downloader {
         self.downloader
+    }
+
+    fn host_path<'a>(&self, path: &'a str) -> anyhow::Result<Cow<'a, str>> {
+        Ok(path.into())
     }
 }
 
@@ -1046,9 +1046,39 @@ impl WorkflowEvaluator {
         };
 
         // Coerce the value to the expected type
-        let value = value
+        let mut value = value
             .coerce(&expected_ty)
             .map_err(|e| runtime_type_mismatch(e, &expected_ty, name.span(), &value.ty(), span))?;
+
+        // Ensure input paths exist
+        value
+            .visit_paths_mut(expected_ty.is_optional(), &mut |optional, value| {
+                let path = match value {
+                    PrimitiveValue::File(path) => path,
+                    PrimitiveValue::Directory(path) => path,
+                    _ => unreachable!("only file and directory values should be visited"),
+                };
+
+                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
+                    bail!("relative path `{path}` cannot be used as a workflow input");
+                }
+
+                value.ensure_path_exists(optional)
+            })
+            .map_err(|e| {
+                io_evaluation_failed(
+                    e,
+                    state
+                        .document
+                        .workflow()
+                        .expect("should have workflow")
+                        .name(),
+                    false,
+                    true,
+                    name.text(),
+                    name.span(),
+                )
+            })?;
 
         // Write the value into the root scope
         state
@@ -1132,19 +1162,20 @@ impl WorkflowEvaluator {
                 };
 
                 if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
-                    bail!("relative path `{path}` cannot be a workflow output");
+                    bail!("relative path `{path}` cannot be used as a workflow output");
                 }
 
                 value.ensure_path_exists(optional)
             })
             .map_err(|e| {
-                output_evaluation_failed(
+                io_evaluation_failed(
                     e,
                     state
                         .document
                         .workflow()
                         .expect("should have workflow")
                         .name(),
+                    false,
                     false,
                     name.text(),
                     name.span(),

@@ -17,6 +17,7 @@ use crankshaft::events::Event;
 use indexmap::IndexMap;
 use petgraph::algo::toposort;
 use tokio::sync::broadcast;
+use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::Level;
 use tracing::debug;
@@ -39,6 +40,7 @@ use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1::CommandPart;
@@ -67,8 +69,10 @@ use crate::Coercible;
 use crate::EvaluationContext;
 use crate::EvaluationError;
 use crate::EvaluationResult;
+use crate::GuestRoots;
 use crate::Input;
 use crate::InputKind;
+use crate::InputTrie;
 use crate::ONE_GIBIBYTE;
 use crate::Outputs;
 use crate::PrimitiveValue;
@@ -85,7 +89,7 @@ use crate::Value;
 use crate::config::Config;
 use crate::config::MAX_RETRIES;
 use crate::convert_unit_string;
-use crate::diagnostics::output_evaluation_failed;
+use crate::diagnostics::io_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
 use crate::diagnostics::task_execution_failed;
 use crate::diagnostics::task_localization_failed;
@@ -95,6 +99,7 @@ use crate::http::HttpDownloader;
 use crate::path;
 use crate::path::EvaluationPath;
 use crate::tree::SyntaxNode;
+use crate::tree::SyntaxToken;
 use crate::v1::ExprEvaluator;
 use crate::v1::INPUTS_FILE;
 use crate::v1::OUTPUTS_FILE;
@@ -463,8 +468,6 @@ struct TaskEvaluationContext<'a, 'b> {
     ///
     /// This field is only available after task execution.
     stderr: Option<&'a Value>,
-    /// The inputs for the evaluation.
-    inputs: Option<&'a [Input]>,
     /// Whether or not the evaluation has associated task information.
     ///
     /// This is `true` when evaluating hints sections.
@@ -481,7 +484,6 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
             work_dir: None,
             stdout: None,
             stderr: None,
-            inputs: None,
             task: false,
         }
     }
@@ -501,12 +503,6 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
     /// Sets the stderr value to use for the evaluation context.
     pub fn with_stderr(mut self, stderr: &'a Value) -> Self {
         self.stderr = Some(stderr);
-        self
-    }
-
-    /// Sets the inputs associated with the evaluation context.
-    pub fn with_inputs(mut self, inputs: &'a [Input]) -> Self {
-        self.inputs = Some(inputs);
         self
     }
 
@@ -542,8 +538,12 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
         self.work_dir
     }
 
-    fn temp_dir(&self) -> &Path {
-        self.state.temp_dir
+    fn temp_dir(&self) -> (&Path, Option<&str>) {
+        (
+            self.state.temp_dir,
+            // The first input is always the temporary directory
+            self.state.inputs.as_slice()[0].guest_path(),
+        )
     }
 
     fn stdout(&self) -> Option<&Value> {
@@ -562,53 +562,27 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
         }
     }
 
-    fn translate_path(&self, path: &str) -> Option<Cow<'_, Path>> {
-        let inputs = self.inputs?;
-        let is_url = path::is_url(path);
-
-        // We cannot translate a relative path
-        if !is_url && Path::new(path).is_relative() {
-            return None;
-        }
-
-        // The most specific (i.e. shortest stripped path) wins
-        let (guest_path, stripped) = inputs
-            .iter()
-            .filter_map(|i| {
-                match i.path() {
-                    EvaluationPath::Local(base) if !is_url => {
-                        let stripped = Path::new(path).strip_prefix(base).ok()?;
-                        Some((i.guest_path()?, stripped.to_str()?))
-                    }
-                    EvaluationPath::Remote(url) if is_url => {
-                        let url = url.as_str();
-                        let stripped = path.strip_prefix(url.strip_suffix('/').unwrap_or(url))?;
-
-                        // Strip off the query string or fragment
-                        let stripped = if let Some(pos) = stripped.find('?') {
-                            &stripped[..pos]
-                        } else if let Some(pos) = stripped.find('#') {
-                            &stripped[..pos]
-                        } else {
-                            stripped.strip_prefix('/').unwrap_or(stripped)
-                        };
-
-                        Some((i.guest_path()?, stripped))
-                    }
-                    _ => None,
-                }
-            })
-            .min_by(|(_, a), (_, b)| a.len().cmp(&b.len()))?;
-
-        if stripped.is_empty() {
-            return Some(Path::new(guest_path).into());
-        }
-
-        Some(Path::new(guest_path).join(stripped).into())
-    }
-
     fn downloader(&self) -> &dyn Downloader {
         self.downloader
+    }
+
+    fn host_path<'a>(&'a self, path: &'a str) -> Result<Cow<'a, str>> {
+        // If the path exists inside of the temp directory's parent (i.e. the root),
+        // it's a host path already
+        if let Some(parent) = self.state.temp_dir.parent()
+            && Path::new(path).starts_with(parent)
+        {
+            return Ok(path.into());
+        }
+
+        match self.state.guest_roots.map(|r| r.work_dir) {
+            Some(guest_work_dir) => {
+                self.state
+                    .inputs
+                    .host_path(path, guest_work_dir, self.work_dir)
+            }
+            None => Ok(path.into()),
+        }
     }
 }
 
@@ -616,6 +590,8 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
 struct State<'a> {
     /// The temp directory.
     temp_dir: &'a Path,
+    /// The backend guest root paths.
+    guest_roots: Option<GuestRoots>,
     /// The document containing the workflow being evaluated.
     document: &'a Document,
     /// The task being evaluated.
@@ -630,11 +606,18 @@ struct State<'a> {
     ///
     /// Environment variables do not change between retries.
     env: IndexMap<String, String>,
+    /// The input trie for mapping inputs.
+    inputs: InputTrie,
 }
 
 impl<'a> State<'a> {
     /// Constructs a new task evaluation state.
-    fn new(temp_dir: &'a Path, document: &'a Document, task: &'a Task) -> Result<Self> {
+    fn new(
+        document: &'a Document,
+        task: &'a Task,
+        temp_dir: &'a Path,
+        guest_roots: Option<GuestRoots>,
+    ) -> Result<Self> {
         // Tasks have a root scope (index 0), an output scope (index 1), and a `task`
         // variable scope (index 2). The output scope inherits from the root scope and
         // the task scope inherits from the output scope. Inputs and private
@@ -649,12 +632,28 @@ impl<'a> State<'a> {
             Scope::new(OUTPUT_SCOPE_INDEX),
         ];
 
+        let mut inputs = if let Some(roots) = guest_roots {
+            InputTrie::new(roots.inputs_dir)
+        } else {
+            InputTrie::default()
+        };
+
+        // Always insert the temp directory as the first input
+        inputs.insert(
+            InputKind::Directory,
+            temp_dir
+                .to_str()
+                .context("temporary directory is not UTF-8")?,
+        )?;
+
         Ok(Self {
             temp_dir,
+            guest_roots,
             document,
             task,
             scopes,
             env: Default::default(),
+            inputs,
         })
     }
 }
@@ -667,8 +666,6 @@ struct EvaluatedSections {
     requirements: Arc<HashMap<String, Value>>,
     /// The evaluated hints.
     hints: Arc<HashMap<String, Value>>,
-    /// The inputs to the task.
-    inputs: Vec<Input>,
 }
 
 /// Represents a WDL V1 task evaluator.
@@ -814,7 +811,7 @@ impl TaskEvaluator {
         // Write the inputs to the task's root directory
         write_json_file(root_dir.join(INPUTS_FILE), inputs)?;
 
-        let mut state = State::new(&temp_dir, document, task)?;
+        let mut state = State::new(document, task, &temp_dir, self.backend.guest_roots())?;
         let nodes = toposort(&graph, None).expect("graph should be acyclic");
         let mut current = 0;
         while current < nodes.len() {
@@ -845,10 +842,8 @@ impl TaskEvaluator {
             current += 1;
         }
 
-        // TODO: check call cache for a hit. if so, skip task execution and use cache
-        // paths for output evaluation
-
         let env = Arc::new(mem::take(&mut state.env));
+        let backend_inputs = self.localize_inputs(id, &mut state).await?;
 
         // Spawn the task in a retry loop
         let mut attempt = 0;
@@ -857,7 +852,6 @@ impl TaskEvaluator {
                 command,
                 requirements,
                 hints,
-                inputs,
             } = self
                 .evaluate_sections(id, &mut state, &definition, inputs, attempt)
                 .await?;
@@ -887,7 +881,7 @@ impl TaskEvaluator {
                 id.to_string(),
                 TaskSpawnInfo::new(
                     command,
-                    inputs,
+                    backend_inputs.clone(),
                     requirements.clone(),
                     hints.clone(),
                     env.clone(),
@@ -974,9 +968,8 @@ impl TaskEvaluator {
             }
         }
 
-        // Take the output scope and return it
+        // Take the output scope and return it in declaration sort order
         let mut outputs: Outputs = mem::take(&mut state.scopes[OUTPUT_SCOPE_INDEX.0]).into();
-        drop(state);
         if let Some(section) = definition.output() {
             let indexes: HashMap<_, _> = section
                 .declarations()
@@ -1032,9 +1025,20 @@ impl TaskEvaluator {
             },
         };
 
-        let value = value
+        let mut value = value
             .coerce(&ty)
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), span))?;
+
+        // If the backend does not run tasks in a container, add the input without guest
+        // path
+        if state.guest_roots.is_none() {
+            self.add_input(&name, &ty, &mut value, state).await?;
+        } else {
+            self.add_guest_path_input(&name, &ty, &mut value, state)
+                .await?;
+        }
+
+        // Insert the name into the scope
         state.scopes[ROOT_SCOPE_INDEX.0].insert(name.text(), value.clone());
 
         // Insert an environment variable, if it is one
@@ -1044,7 +1048,7 @@ impl TaskEvaluator {
                 value
                     .as_primitive()
                     .expect("value should be primitive")
-                    .raw(None)
+                    .raw()
                     .to_string(),
             );
         }
@@ -1082,6 +1086,7 @@ impl TaskEvaluator {
         let value = value
             .coerce(&ty)
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span()))?;
+
         state.scopes[ROOT_SCOPE_INDEX.0].insert(name.text(), value.clone());
 
         // Insert an environment variable, if it is one
@@ -1091,7 +1096,7 @@ impl TaskEvaluator {
                 value
                     .as_primitive()
                     .expect("value should be primitive")
-                    .raw(None)
+                    .raw()
                     .to_string(),
             );
         }
@@ -1264,14 +1269,13 @@ impl TaskEvaluator {
 
     /// Evaluates the command of a task.
     ///
-    /// Returns the evaluated command and the mounts to use for spawning the
-    /// task.
+    /// Returns the evaluated command as a string.
     async fn evaluate_command(
         &self,
         id: &str,
-        state: &State<'_>,
+        state: &mut State<'_>,
         section: &CommandSection<SyntaxNode>,
-    ) -> EvaluationResult<(String, Vec<Input>)> {
+    ) -> EvaluationResult<String> {
         debug!(
             task_id = id,
             task_name = state.task.name(),
@@ -1279,66 +1283,14 @@ impl TaskEvaluator {
             "evaluating command section",
         );
 
-        // Determine the inputs to the task
-        let mut inputs = Vec::new();
-
-        // Discover every input that's visible to the scope
-        ScopeRef::new(&state.scopes, TASK_SCOPE_INDEX.0).for_each(|_, v| {
-            v.visit_paths(false, &mut |_, value| {
-                inputs.push(Input::from_primitive(value)?);
-                Ok(())
-            })
-        })?;
-
-        // The temp directory should always be an input
-        inputs.push(Input::new(
-            InputKind::Directory,
-            EvaluationPath::Local(state.temp_dir.to_path_buf()),
-        ));
-
-        // Localize the inputs
-        self.backend
-            .localize_inputs(&self.downloader, &mut inputs)
-            .await
-            .map_err(|e| {
-                EvaluationError::new(
-                    state.document.clone(),
-                    task_localization_failed(e, state.task.name(), state.task.name_span()),
-                )
-            })?;
-
-        if enabled!(Level::DEBUG) {
-            for input in inputs.iter() {
-                if let Some(location) = input.location() {
-                    debug!(
-                        task_id = id,
-                        task_name = state.task.name(),
-                        document = state.document.uri().as_str(),
-                        "task input `{path}` (downloaded to `{location}`) mapped to `{guest_path}`",
-                        path = input.path().display(),
-                        location = location.display(),
-                        guest_path = input.guest_path().unwrap_or(""),
-                    );
-                } else {
-                    debug!(
-                        task_id = id,
-                        task_name = state.task.name(),
-                        document = state.document.uri().as_str(),
-                        "task input `{path}` mapped to `{guest_path}`",
-                        path = input.path().display(),
-                        guest_path = input.guest_path().unwrap_or(""),
-                    );
-                }
-            }
-        }
-
         let mut command = String::new();
         match section.strip_whitespace() {
             Some(parts) => {
-                let mut evaluator = ExprEvaluator::new(
-                    TaskEvaluationContext::new(state, &self.downloader, TASK_SCOPE_INDEX)
-                        .with_inputs(&inputs),
-                );
+                let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    TASK_SCOPE_INDEX,
+                ));
 
                 for part in parts {
                     match part {
@@ -1362,10 +1314,11 @@ impl TaskEvaluator {
                     uri = state.document.uri(),
                 );
 
-                let mut evaluator = ExprEvaluator::new(
-                    TaskEvaluationContext::new(state, &self.downloader, TASK_SCOPE_INDEX)
-                        .with_inputs(&inputs),
-                );
+                let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    TASK_SCOPE_INDEX,
+                ));
 
                 let heredoc = section.is_heredoc();
                 for part in section.parts() {
@@ -1384,7 +1337,7 @@ impl TaskEvaluator {
             }
         }
 
-        Ok((command, inputs))
+        Ok(command)
     }
 
     /// Evaluates sections prior to spawning the command.
@@ -1462,7 +1415,7 @@ impl TaskEvaluator {
             }
         }
 
-        let (command, inputs) = self
+        let command = self
             .evaluate_command(
                 id,
                 state,
@@ -1474,7 +1427,6 @@ impl TaskEvaluator {
             command,
             requirements: Arc::new(requirements),
             hints: Arc::new(hints),
-            inputs,
         })
     }
 
@@ -1507,92 +1459,303 @@ impl TaskEvaluator {
         let expr = decl.expr().expect("outputs should have expressions");
         let value = evaluator.evaluate_expr(&expr).await?;
 
-        // First coerce the output value to the expected type
+        // Coerce the output value to the expected type
         let mut value = value
             .coerce(&ty)
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span()))?;
 
-        let result = if let Some(guest_work_dir) = self.backend.guest_work_dir() {
-            // Perform guest to host path translation and check for existence
-            value.visit_paths_mut(ty.is_optional(), &mut |optional, value| {
+        // Map the value to a host path and ensure the paths exist
+        value
+            .visit_paths_mut(ty.is_optional(), &mut |optional, value| {
                 let path = match value {
                     PrimitiveValue::File(path) => path,
                     PrimitiveValue::Directory(path) => path,
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                // If the path isn't in the temp directory or the attempt directory, perform
-                // translation
-                if !Path::new(path.as_str()).starts_with(state.temp_dir)
-                    && !Path::new(path.as_str()).starts_with(evaluated.attempt_dir())
+                // Translate the guest path to a host path
+                let host_path = if let Some(guest_work_dir) = state.guest_roots.map(|r| r.work_dir)
                 {
-                    // It's a file scheme'd URL, treat it as an absolute guest path
-                    let guest = if path::is_file_url(path) {
-                        path::parse_url(path)
-                            .and_then(|u| u.to_file_path().ok())
-                            .ok_or_else(|| anyhow!("guest path `{path}` is not a valid file URI"))?
-                    } else if path::is_url(path) {
-                        // Treat other URLs as if they exist
-                        // TODO: should probably issue a HEAD request to verify
-                        return Ok(true);
+                    // If the path is within the attempt directory, it's already a host path
+                    if Path::new(path.as_str()).starts_with(evaluated.attempt_dir()) {
+                        path.as_str().into()
                     } else {
-                        // Otherwise, treat as relative to the guest working directory
-                        guest_work_dir.join(path.as_str())
-                    };
+                        // Otherwise, translate it
+                        state.inputs.host_path(
+                            path,
+                            guest_work_dir,
+                            Some(&evaluated.result.work_dir),
+                        )?
+                    }
+                } else {
+                    evaluated
+                        .result
+                        .work_dir
+                        .join(path)?
+                        .into_string()
+                        .with_context(|| format!("path `{path}` is not UTF-8"))?
+                        .into()
+                };
 
-                    // If the path is inside of the working directory, join with the task's working
-                    // directory
-                    let host = if let Ok(stripped) = guest.strip_prefix(guest_work_dir) {
-                        Cow::Owned(
-                            evaluated.result.work_dir.join(
-                                stripped.to_str().with_context(|| {
-                                    format!("output path `{path}` is not UTF-8")
-                                })?,
-                            )?,
-                        )
-                    } else {
-                        evaluated
-                            .inputs()
-                            .iter()
-                            .filter_map(|i| {
-                                Some((i.path(), guest.strip_prefix(i.guest_path()?).ok()?))
-                            })
-                            .min_by(|(_, a), (_, b)| a.as_os_str().len().cmp(&b.as_os_str().len()))
-                            .and_then(|(path, stripped)| {
-                                if stripped.as_os_str().is_empty() {
-                                    return Some(Cow::Borrowed(path));
-                                }
+                *Arc::make_mut(path) = host_path.into_owned();
 
-                                Some(Cow::Owned(path.join(stripped.to_str()?).ok()?))
-                            })
-                            .ok_or_else(|| {
-                                anyhow!("guest path `{path}` is not within a container mount")
-                            })?
-                    };
-
-                    // Update the value to the host path
-                    *Arc::make_mut(path) = host.into_owned().try_into()?;
-                }
-
-                // Finally, ensure the value exists
+                // Ensure the path exists; if it does not and it was optional, the value is
+                // replaced with `None`
                 value.ensure_path_exists(optional)
             })
-        } else {
-            // Backend isn't containerized, just join host paths and check for existence
-            value.visit_paths_mut(ty.is_optional(), &mut |optional, value| {
-                if let Some(work_dir) = evaluated.result.work_dir.as_local() {
-                    value.join_path_to(work_dir);
-                }
-
-                value.ensure_path_exists(optional)
-            })
-        };
-
-        result.map_err(|e| {
-            output_evaluation_failed(e, state.task.name(), true, name.text(), name.span())
-        })?;
+            .map_err(|e| {
+                io_evaluation_failed(e, state.task.name(), true, false, name.text(), name.span())
+            })?;
 
         state.scopes[OUTPUT_SCOPE_INDEX.0].insert(name.text(), value);
         Ok(())
+    }
+
+    /// Localizes inputs for execution.
+    ///
+    /// Returns the inputs to pass to the backend.
+    async fn localize_inputs(
+        &self,
+        task_id: &str,
+        state: &mut State<'_>,
+    ) -> EvaluationResult<Arc<[Input]>> {
+        // If the backend needs local inputs, download them now
+        if self.backend.needs_local_inputs() {
+            let mut downloads = JoinSet::new();
+
+            // Download any necessary files
+            for (idx, input) in state.inputs.as_slice_mut().iter_mut().enumerate() {
+                if input.location().is_some() {
+                    continue;
+                }
+
+                if let EvaluationPath::Remote(url) = input.path() {
+                    let downloader = self.downloader.clone();
+                    let url = url.clone();
+                    downloads.spawn(async move {
+                        downloader
+                            .download(&url)
+                            .await
+                            .map(|l| (idx, l))
+                            .map_err(|e| anyhow!("failed to localize `{url}`: {e:#}"))
+                    });
+                }
+            }
+
+            // Wait for the downloads to complete
+            while let Some(result) = downloads.join_next().await {
+                match result.unwrap_or_else(|e| Err(anyhow!("download task failed: {e}"))) {
+                    Ok((idx, location)) => {
+                        state.inputs.as_slice_mut()[idx].set_location(location);
+                    }
+                    Err(e) => {
+                        return Err(EvaluationError::new(
+                            state.document.clone(),
+                            task_localization_failed(e, state.task.name(), state.task.name_span()),
+                        ));
+                    }
+                }
+            }
+        }
+
+        if enabled!(Level::DEBUG) {
+            for input in state.inputs.as_slice() {
+                match (input.location(), input.guest_path()) {
+                    (None, None) => {}
+                    (None, Some(guest_path)) => {
+                        debug!(
+                            task_id,
+                            task_name = state.task.name(),
+                            document = state.document.uri().as_str(),
+                            "task input `{path}` mapped to `{guest_path}`",
+                            path = input.path().display(),
+                        );
+                    }
+                    (Some(location), None) => {
+                        debug!(
+                            task_id,
+                            task_name = state.task.name(),
+                            document = state.document.uri().as_str(),
+                            "task input `{path}` downloaded to `{location}`",
+                            path = input.path().display(),
+                            location = location.display()
+                        );
+                    }
+                    (Some(location), Some(guest_path)) => {
+                        debug!(
+                            task_id,
+                            task_name = state.task.name(),
+                            document = state.document.uri().as_str(),
+                            "task input `{path}` downloaded to `{location}` and mapped to \
+                             `{guest_path}`",
+                            path = input.path().display(),
+                            location = location.display(),
+                        );
+                    }
+                }
+            }
+        }
+
+        Ok(state.inputs.as_slice().into())
+    }
+
+    /// Adds an input to the state when it does not have a guest path.
+    ///
+    /// This method is called when the backend does not use containers.
+    ///
+    /// It will also immediately localize a remote input as without the use of
+    /// guest paths the download location must be immediately substituted for
+    /// the URL.
+    async fn add_input(
+        &self,
+        name: &Ident<SyntaxToken>,
+        ty: &Type,
+        value: &mut Value,
+        state: &mut State<'_>,
+    ) -> Result<(), Diagnostic> {
+        let mut urls = Vec::new();
+
+        value
+            .visit_paths_mut(ty.is_optional(), &mut |optional, value| {
+                let path = match value {
+                    PrimitiveValue::File(path) => path,
+                    PrimitiveValue::Directory(path) => path,
+                    _ => unreachable!("only file and directory values should be visited"),
+                };
+
+                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
+                    // Task inputs cannot be relative paths
+                    bail!("relative path `{path}` cannot be used as a task input");
+                }
+
+                let path: EvaluationPath = path.parse()?;
+                if let EvaluationPath::Remote(url) = path {
+                    urls.push(url);
+                }
+
+                // Ensure the path exists before we translate it
+                value.ensure_path_exists(optional)
+            })
+            .map_err(|e| {
+                io_evaluation_failed(e, state.task.name(), true, true, name.text(), name.span())
+            })?;
+
+        let mut downloads = JoinSet::new();
+
+        // Download any necessary files
+        for url in urls {
+            let downloader = self.downloader.clone();
+            let url = url.clone();
+            downloads.spawn(async move {
+                downloader
+                    .download(&url)
+                    .await
+                    .map_err(|e| anyhow!("failed to localize `{url}`: {e:#}"))
+                    .map(|l| (url, l))
+            });
+        }
+
+        // Wait for the downloads to complete
+        let mut locations = HashMap::new();
+        while let Some(result) = downloads.join_next().await {
+            match result.unwrap_or_else(|e| Err(anyhow!("download task failed: {e}"))) {
+                Ok((url, location)) => {
+                    locations.insert(String::from(url), location);
+                }
+                Err(e) => {
+                    return Err(io_evaluation_failed(
+                        e,
+                        state.task.name(),
+                        true,
+                        true,
+                        name.text(),
+                        name.span(),
+                    ));
+                }
+            }
+        }
+
+        // Update the values
+        value
+            .visit_paths_mut(ty.is_optional(), &mut |_, value| {
+                let (kind, path) = match value {
+                    PrimitiveValue::File(path) => (InputKind::File, path),
+                    PrimitiveValue::Directory(path) => (InputKind::Directory, path),
+                    _ => unreachable!("only file and directory values should be visited"),
+                };
+
+                state.inputs.insert(kind, path)?;
+
+                if let Some(location) = locations.get(path.as_str()) {
+                    let path = Arc::make_mut(path);
+                    path.clear();
+                    path.push_str(location.as_os_str().to_str().ok_or_else(|| {
+                        anyhow!(
+                            "download location `{location}` is not UTF-8",
+                            location = location.display()
+                        )
+                    })?);
+                }
+
+                Ok(true)
+            })
+            .map_err(|e| {
+                io_evaluation_failed(e, state.task.name(), true, true, name.text(), name.span())
+            })
+    }
+
+    /// Adds an input to the state using a gust path.
+    ///
+    /// This method is called for backends that use containers.
+    ///
+    /// It does not localize remote inputs; instead localization will be delayed
+    /// until the call to `localize_inputs`.
+    async fn add_guest_path_input(
+        &self,
+        name: &Ident<SyntaxToken>,
+        ty: &Type,
+        value: &mut Value,
+        state: &mut State<'_>,
+    ) -> Result<(), Diagnostic> {
+        value
+            .visit_paths_mut(ty.is_optional(), &mut |optional, value| {
+                let (kind, path) = match value {
+                    PrimitiveValue::File(path) => (InputKind::File, path),
+                    PrimitiveValue::Directory(path) => (InputKind::Directory, path),
+                    _ => unreachable!("only file and directory values should be visited"),
+                };
+
+                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
+                    // Task inputs cannot be relative paths
+                    bail!("relative path `{path}` cannot be used as a task input");
+                }
+
+                // Ensure the path exists before we translate it
+                if !value.ensure_path_exists(optional)? {
+                    return Ok(false);
+                }
+
+                // Acquire the path from the value again
+                let path = match value {
+                    PrimitiveValue::File(path) => path,
+                    PrimitiveValue::Directory(path) => path,
+                    _ => unreachable!("only file and directory values should be visited"),
+                };
+
+                // Insert an input for the path; if there is a guest path for the input, update
+                // the value
+                if let Some(input) = state.inputs.insert(kind, path)?
+                    && let Some(guest_path) = input.guest_path()
+                {
+                    let path = Arc::make_mut(path);
+                    path.clear();
+                    path.push_str(guest_path);
+                }
+
+                Ok(true)
+            })
+            .map_err(|e| {
+                io_evaluation_failed(e, state.task.name(), true, true, name.text(), name.span())
+            })
     }
 }

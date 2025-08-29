@@ -378,9 +378,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                         None => write!(buffer, "{v}").unwrap(),
                     }
                 }
-                Value::Primitive(v) => {
-                    write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
-                }
+                Value::Primitive(v) => write!(buffer, "{v}", v = v.raw()).unwrap(),
                 Value::Compound(CompoundValue::Array(v))
                     if matches!(placeholder.option(), Some(PlaceholderOption::Sep(_)))
                         && v.as_slice()
@@ -401,9 +399,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                         match e {
                             Value::None(_) => {}
-                            Value::Primitive(v) => {
-                                write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
-                            }
+                            Value::Primitive(v) => write!(buffer, "{v}", v = v.raw()).unwrap(),
                             _ => {
                                 return Err(cannot_coerce_to_string(&v.ty(), expr.span()));
                             }
@@ -1244,24 +1240,15 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                     && !matches!(right, PrimitiveValue::Boolean(_)) =>
             {
                 Some(
-                    PrimitiveValue::new_string(format!(
-                        "{left}{right}",
-                        right = right.raw(Some(&self.context))
-                    ))
-                    .into(),
+                    PrimitiveValue::new_string(format!("{left}{right}", right = right.raw()))
+                        .into(),
                 )
             }
             (Value::Primitive(left), Value::Primitive(PrimitiveValue::String(right)))
                 if op == NumericOperator::Addition
                     && !matches!(left, PrimitiveValue::Boolean(_)) =>
             {
-                Some(
-                    PrimitiveValue::new_string(format!(
-                        "{left}{right}",
-                        left = left.raw(Some(&self.context))
-                    ))
-                    .into(),
-                )
+                Some(PrimitiveValue::new_string(format!("{left}{right}", left = left.raw())).into())
             }
             (Value::Primitive(PrimitiveValue::String(_)), Value::None(_))
             | (Value::None(_), Value::Primitive(PrimitiveValue::String(_)))
@@ -1643,8 +1630,8 @@ pub(crate) mod test {
             self.env.work_dir()
         }
 
-        fn temp_dir(&self) -> &Path {
-            self.env.temp_dir()
+        fn temp_dir(&self) -> (&Path, Option<&str>) {
+            (self.env.temp_dir(), None)
         }
 
         fn stdout(&self) -> Option<&Value> {
@@ -1659,12 +1646,12 @@ pub(crate) mod test {
             None
         }
 
-        fn translate_path(&self, _path: &str) -> Option<Cow<'_, Path>> {
-            None
-        }
-
         fn downloader(&self) -> &dyn Downloader {
             self.env
+        }
+
+        fn host_path<'a>(&self, path: &'a str) -> anyhow::Result<Cow<'a, str>> {
+            Ok(path.into())
         }
     }
 

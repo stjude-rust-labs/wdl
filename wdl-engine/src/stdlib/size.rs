@@ -30,61 +30,6 @@ use crate::stdlib::ensure_local_path;
 /// The name of the function defined in this file for use in diagnostics.
 const FUNCTION_NAME: &str = "size";
 
-/// Gets the size of a local file.
-async fn file_size(path: impl AsRef<Path>) -> Result<u64> {
-    let path = path.as_ref();
-
-    let metadata = fs::metadata(path).await.with_context(|| {
-        format!(
-            "failed to read metadata for file `{path}`",
-            path = path.display()
-        )
-    })?;
-
-    if !metadata.is_file() {
-        bail!("path `{path}` is not a file", path = path.display());
-    }
-
-    Ok(metadata.len())
-}
-
-/// Gets the size of a remote resource.
-async fn resource_size(downloader: &dyn Downloader, url: &Url) -> Result<u64> {
-    downloader
-        .size(url)
-        .await
-        .with_context(|| format!("failed to determine content length of URL `{url}`"))?
-        .with_context(|| format!("URL `{url}` has an unknown content length"))
-}
-
-/// Gets the size of a file path.
-///
-/// The path might be to a local file or to a remote URL.
-async fn file_path_size(
-    downloader: &dyn Downloader,
-    work_dir: Option<&EvaluationPath>,
-    path: &str,
-) -> Result<u64> {
-    // If the path is a URL, get the resource size
-    if let Some(url) = path::parse_url(path) {
-        return resource_size(downloader, &url).await;
-    }
-
-    // If the path is absolute, get the file size
-    if Path::new(path).is_absolute() {
-        return file_size(path).await;
-    }
-
-    // If the provided path is relative, we must have a working directory to join to
-    let work_dir = work_dir.with_context(|| {
-        format!("relative path `{path}` can only be used in a task output section")
-    })?;
-    match work_dir.join(path)? {
-        EvaluationPath::Local(path) => file_size(path).await,
-        EvaluationPath::Remote(url) => resource_size(downloader, &url).await,
-    }
-}
-
 /// Determines the size of a file, directory, or the sum total sizes of the
 /// files/directories contained within a compound value. The files may be
 /// optional values; None values have a size of 0.0. By default, the size is
@@ -161,6 +106,61 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
         .map(Into::into)
     }
     .boxed()
+}
+
+/// Gets the size of a local file.
+async fn file_size(path: impl AsRef<Path>) -> Result<u64> {
+    let path = path.as_ref();
+
+    let metadata = fs::metadata(path).await.with_context(|| {
+        format!(
+            "failed to read metadata for file `{path}`",
+            path = path.display()
+        )
+    })?;
+
+    if !metadata.is_file() {
+        bail!("path `{path}` is not a file", path = path.display());
+    }
+
+    Ok(metadata.len())
+}
+
+/// Gets the size of a remote resource.
+async fn resource_size(downloader: &dyn Downloader, url: &Url) -> Result<u64> {
+    downloader
+        .size(url)
+        .await
+        .with_context(|| format!("failed to determine content length of URL `{url}`"))?
+        .with_context(|| format!("URL `{url}` has an unknown content length"))
+}
+
+/// Gets the size of a file path.
+///
+/// The path might be to a local file or to a remote URL.
+async fn file_path_size(
+    downloader: &dyn Downloader,
+    work_dir: Option<&EvaluationPath>,
+    path: &str,
+) -> Result<u64> {
+    // If the path is a URL, get the resource size
+    if let Some(url) = path::parse_url(path) {
+        return resource_size(downloader, &url).await;
+    }
+
+    // If the path is absolute, get the file size
+    if Path::new(path).is_absolute() {
+        return file_size(path).await;
+    }
+
+    // If the provided path is relative, we must have a working directory to join to
+    let work_dir = work_dir.with_context(|| {
+        format!("relative path `{path}` can only be used in a task output section")
+    })?;
+    match work_dir.join(path)? {
+        EvaluationPath::Local(path) => file_size(path).await,
+        EvaluationPath::Remote(url) => resource_size(downloader, &url).await,
+    }
 }
 
 /// Used to calculate the disk size of a value.

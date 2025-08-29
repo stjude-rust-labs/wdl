@@ -1,7 +1,6 @@
 //! Module for evaluation.
 
 use std::borrow::Cow;
-use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufRead;
@@ -11,10 +10,13 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use anyhow::Result;
+use anyhow::anyhow;
 use anyhow::bail;
 use indexmap::IndexMap;
 use itertools::Itertools;
+use path_clean::PathClean;
 use rev_buf_reader::RevBufReader;
+use url::Url;
 use wdl_analysis::Document;
 use wdl_analysis::document::Task;
 use wdl_analysis::types::Type;
@@ -31,6 +33,7 @@ use crate::TaskExecutionResult;
 use crate::Value;
 use crate::http::Downloader;
 use crate::http::Location;
+use crate::path;
 use crate::path::EvaluationPath;
 use crate::stdlib::download_file;
 
@@ -152,20 +155,23 @@ pub trait EvaluationContext: Send + Sync {
 
     /// Gets the working directory for the evaluation.
     ///
-    /// Returns `None` if the task execution hasn't occurred yet.
+    /// Returns `None` if we're not evaluating a task's outputs section.
     fn work_dir(&self) -> Option<&EvaluationPath>;
 
     /// Gets the temp directory for the evaluation.
-    fn temp_dir(&self) -> &Path;
+    ///
+    /// Returns the host path of the temp directory and its guest path, if there
+    /// is one.
+    fn temp_dir(&self) -> (&Path, Option<&str>);
 
     /// Gets the value to return for a call to the `stdout` function.
     ///
-    /// This is `Some` only when evaluating task outputs.
+    /// This is `Some` only when evaluating a task's outputs section.
     fn stdout(&self) -> Option<&Value>;
 
     /// Gets the value to return for a call to the `stderr` function.
     ///
-    /// This is `Some` only when evaluating task outputs.
+    /// This is `Some` only when evaluating a task's outputs section.
     fn stderr(&self) -> Option<&Value>;
 
     /// Gets the task associated with the evaluation context.
@@ -173,13 +179,11 @@ pub trait EvaluationContext: Send + Sync {
     /// This is only `Some` when evaluating task hints sections.
     fn task(&self) -> Option<&Task>;
 
-    /// Translates a host path to a guest path.
-    ///
-    /// Returns `None` if no translation is available.
-    fn translate_path(&self, path: &str) -> Option<Cow<'_, Path>>;
-
     /// Gets the downloader to use for evaluating expressions.
     fn downloader(&self) -> &dyn Downloader;
+
+    /// Translates a guest path to a host path.
+    fn host_path<'a>(&'a self, path: &'a str) -> anyhow::Result<Cow<'a, str>>;
 }
 
 /// Represents an index of a scope in a collection of scopes.
@@ -377,11 +381,6 @@ impl EvaluatedTask {
         &self.attempt_dir
     }
 
-    /// Gets the inputs that were given to the task.
-    pub fn inputs(&self) -> &[Input] {
-        &self.result.inputs
-    }
-
     /// Gets the working directory of the evaluated task.
     pub fn work_dir(&self) -> &EvaluationPath {
         &self.result.work_dir
@@ -531,39 +530,25 @@ pub struct Input {
     kind: InputKind,
     /// The path for the input.
     path: EvaluationPath,
+    /// The guest path for the input.
+    ///
+    /// This is `None` when the backend isn't mapping input paths.
+    guest_path: Option<String>,
     /// The download location for the input.
     ///
     /// This is `Some` if the input has been downloaded to a known location.
     location: Option<Location<'static>>,
-    /// The guest path for the input.
-    guest_path: Option<String>,
 }
 
 impl Input {
     /// Creates a new input with the given path and access.
-    pub fn new(kind: InputKind, path: EvaluationPath) -> Self {
+    fn new(kind: InputKind, path: EvaluationPath, guest_path: Option<String>) -> Self {
         Self {
             kind,
             path,
+            guest_path,
             location: None,
-            guest_path: None,
         }
-    }
-
-    /// Creates an input from a primitive value.
-    pub fn from_primitive(value: &PrimitiveValue) -> Result<Self> {
-        let (kind, path) = match value {
-            PrimitiveValue::File(path) => (InputKind::File, path),
-            PrimitiveValue::Directory(path) => (InputKind::Directory, path),
-            _ => bail!("value is not a `File` or `Directory`"),
-        };
-
-        Ok(Self {
-            kind,
-            path: path.parse()?,
-            location: None,
-            guest_path: None,
-        })
     }
 
     /// Gets the kind of the input.
@@ -576,7 +561,14 @@ impl Input {
         &self.path
     }
 
+    /// Gets the guest path for the input.
+    pub fn guest_path(&self) -> Option<&str> {
+        self.guest_path.as_deref()
+    }
+
     /// Gets the location of the input if it has been downloaded.
+    ///
+    /// Returns `None` if the input has not been downloaded or is not remote.
     pub fn location(&self) -> Option<&Path> {
         self.location.as_deref()
     }
@@ -585,90 +577,31 @@ impl Input {
     pub fn set_location(&mut self, location: Location<'static>) {
         self.location = Some(location);
     }
-
-    /// Gets the guest path for the input.
-    pub fn guest_path(&self) -> Option<&str> {
-        self.guest_path.as_deref()
-    }
-
-    /// Sets the guest path for the input.
-    pub fn set_guest_path(&mut self, path: impl Into<String>) {
-        self.guest_path = Some(path.into());
-    }
 }
 
 /// Represents a node in an input trie.
 #[derive(Debug)]
-struct InputTrieNode<'a> {
+struct InputTrieNode {
     /// The children of this node.
-    ///
-    /// A `BTreeMap` is used here to get a consistent walk of the tree.
-    children: BTreeMap<&'a str, Self>,
+    children: HashMap<String, Self>,
     /// The identifier of the node in the trie.
     ///
     /// A node's identifier is used when formatting guest paths of children.
     id: usize,
-    /// The input represented by this node.
+    /// The index into the trie's `inputs` collection.
     ///
     /// This is `Some` only for terminal nodes in the trie.
-    ///
-    /// The first element in the tuple is the index of the input.
-    input: Option<(usize, &'a Input)>,
+    index: Option<usize>,
 }
 
-impl InputTrieNode<'_> {
-    /// Constructs a new input trie node with the given component.
+impl InputTrieNode {
+    /// Constructs a new input trie node with the given id.
     fn new(id: usize) -> Self {
         Self {
             children: Default::default(),
             id,
-            input: None,
+            index: None,
         }
-    }
-
-    /// Calculates the guest path for all terminal nodes in the trie.
-    fn calculate_guest_paths(
-        &self,
-        root: &str,
-        parent_id: usize,
-        paths: &mut Vec<(usize, String)>,
-    ) -> Result<()> {
-        // Invoke the callback for any terminal node in the trie
-        if let Some((index, input)) = self.input {
-            let file_name = input.path.file_name()?.unwrap_or("");
-
-            // If the file name is empty, it means this is a root URL
-            let guest_path = if file_name.is_empty() {
-                format!(
-                    "{root}{sep}{parent_id}/.root",
-                    root = root,
-                    sep = if root.as_bytes().last() == Some(&b'/') {
-                        ""
-                    } else {
-                        "/"
-                    }
-                )
-            } else {
-                format!(
-                    "{root}{sep}{parent_id}/{file_name}",
-                    root = root,
-                    sep = if root.as_bytes().last() == Some(&b'/') {
-                        ""
-                    } else {
-                        "/"
-                    },
-                )
-            };
-
-            paths.push((index, guest_path));
-        }
-
-        // Traverse into the children
-        for child in self.children.values() {
-            child.calculate_guest_paths(root, self.id, paths)?;
-        }
-
-        Ok(())
     }
 }
 
@@ -678,139 +611,277 @@ impl InputTrieNode<'_> {
 ///
 /// From the root to a terminal node represents a unique input.
 #[derive(Debug)]
-pub struct InputTrie<'a> {
+pub struct InputTrie {
+    /// The guest inputs root directory.
+    ///
+    /// This is `None` for backends that don't use containers.
+    guest_inputs_dir: Option<&'static str>,
     /// The URL path children of the tree.
     ///
     /// The key in the map is the scheme of each URL.
-    ///
-    /// A `BTreeMap` is used here to get a consistent walk of the tree.
-    urls: BTreeMap<&'a str, InputTrieNode<'a>>,
+    urls: HashMap<String, InputTrieNode>,
     /// The local path children of the tree.
     ///
     /// The key in the map is the first component of each path.
-    ///
-    /// A `BTreeMap` is used here to get a consistent walk of the tree.
-    paths: BTreeMap<&'a str, InputTrieNode<'a>>,
+    paths: HashMap<String, InputTrieNode>,
+    /// The inputs in the trie.
+    inputs: Vec<Input>,
     /// The next node identifier.
     next_id: usize,
-    /// The number of inputs in the trie.
-    count: usize,
 }
 
-impl<'a> InputTrie<'a> {
+impl InputTrie {
+    /// Constructs a new inputs trie with the given guest inputs directory.
+    pub fn new(guest_inputs_dir: &'static str) -> Self {
+        Self {
+            guest_inputs_dir: Some(guest_inputs_dir),
+            ..Default::default()
+        }
+    }
+
     /// Inserts a new input into the trie.
-    pub fn insert(&mut self, input: &'a Input) -> Result<()> {
-        let node = match &input.path {
+    ///
+    /// Returns `Ok(Some(_))` if an input was added.
+    ///
+    /// Returns `Ok(None)` if the provided path was already a guest input path
+    /// or if the path was relative (relative paths are relative to the working
+    /// directory).
+    ///
+    /// Returns an error for an invalid input path.
+    pub fn insert(&mut self, kind: InputKind, path: &str) -> Result<Option<&Input>> {
+        let path: EvaluationPath = path.parse()?;
+        match path {
             EvaluationPath::Local(path) => {
-                // Don't both inserting anything into the trie for relative paths
-                // We still consider the input part of the trie, but it will never have a guest
-                // path
+                // Check to see if the path being inserted is already a guest path
+                if let Some(dir) = self.guest_inputs_dir
+                    && path.starts_with(dir)
+                {
+                    return Ok(None);
+                }
+
+                // Don't add an input for relative paths; they will be treated as relative to
+                // the working directory and therefore not an input
                 if path.is_relative() {
-                    self.count += 1;
-                    return Ok(());
+                    return Ok(None);
                 }
 
-                let mut components = path.components();
-
-                let component = components
-                    .next()
-                    .context("input path cannot be empty")?
-                    .as_os_str()
-                    .to_str()
-                    .with_context(|| {
-                        format!("input path `{path}` is not UTF-8", path = path.display())
-                    })?;
-                let mut node = self.paths.entry(component).or_insert_with(|| {
-                    let node = InputTrieNode::new(self.next_id);
-                    self.next_id += 1;
-                    node
-                });
-
-                for component in components {
-                    match component {
-                        Component::CurDir | Component::ParentDir => {
-                            bail!(
-                                "input path `{path}` may not contain `.` or `..`",
-                                path = path.display()
-                            );
-                        }
-                        _ => {}
-                    }
-
-                    let component = component.as_os_str().to_str().with_context(|| {
-                        format!("input path `{path}` is not UTF-8", path = path.display())
-                    })?;
-                    node = node.children.entry(component).or_insert_with(|| {
-                        let node = InputTrieNode::new(self.next_id);
-                        self.next_id += 1;
-                        node
-                    });
-                }
-
-                node
+                self.insert_path(kind, path).map(Some)
             }
-            EvaluationPath::Remote(url) => {
-                // Insert for scheme
-                let mut node = self.urls.entry(url.scheme()).or_insert_with(|| {
-                    let node = InputTrieNode::new(self.next_id);
-                    self.next_id += 1;
-                    node
-                });
-
-                // Insert the authority
-                node = node.children.entry(url.authority()).or_insert_with(|| {
-                    let node = InputTrieNode::new(self.next_id);
-                    self.next_id += 1;
-                    node
-                });
-
-                // Insert the path segments
-                if let Some(segments) = url.path_segments() {
-                    for segment in segments {
-                        node = node.children.entry(segment).or_insert_with(|| {
-                            let node = InputTrieNode::new(self.next_id);
-                            self.next_id += 1;
-                            node
-                        });
-                    }
-                }
-
-                // Ignore query parameters and fragments
-                node
-            }
-        };
-
-        node.input = Some((self.count, input));
-        self.count += 1;
-        Ok(())
+            EvaluationPath::Remote(url) => Ok(Some(self.insert_url(kind, url))),
+        }
     }
 
-    /// Calculates guest paths for the inputs in the trie.
+    /// Gets the inputs of the trie as a slice.
+    pub fn as_slice(&self) -> &[Input] {
+        &self.inputs
+    }
+
+    /// Gets the inputs of the trie as a mutable slice.
+    pub fn as_slice_mut(&mut self) -> &mut [Input] {
+        &mut self.inputs
+    }
+
+    /// Inserts an input with a local path into the trie.
+    fn insert_path(&mut self, kind: InputKind, path: PathBuf) -> Result<&Input> {
+        let mut components = path.components();
+
+        let component = components
+            .next()
+            .context("input path cannot be empty")?
+            .as_os_str()
+            .to_str()
+            .with_context(|| format!("input path `{path}` is not UTF-8", path = path.display()))?;
+
+        let mut parent_id = 0;
+        let mut node = self.paths.entry(component.to_string()).or_insert_with(|| {
+            let node = InputTrieNode::new(self.next_id);
+            self.next_id += 1;
+            node
+        });
+
+        let mut last_component = None;
+        for component in components {
+            match component {
+                Component::CurDir | Component::ParentDir => {
+                    bail!(
+                        "input path `{path}` may not contain `.` or `..`",
+                        path = path.display()
+                    );
+                }
+                _ => {}
+            }
+
+            let component = component.as_os_str().to_str().with_context(|| {
+                format!("input path `{path}` is not UTF-8", path = path.display())
+            })?;
+
+            parent_id = node.id;
+
+            node = node
+                .children
+                .entry(component.to_string())
+                .or_insert_with(|| {
+                    let node = InputTrieNode::new(self.next_id);
+                    self.next_id += 1;
+                    node
+                });
+
+            last_component = Some(component);
+        }
+
+        // Check to see if the input already exists in the trie
+        if let Some(index) = node.index {
+            return Ok(&self.inputs[index]);
+        }
+
+        let guest_path = self.guest_inputs_dir.map(|d| {
+            format!(
+                "{d}/{parent_id}/{last}",
+                last = last_component.unwrap_or(".root")
+            )
+        });
+
+        let index = self.inputs.len();
+        self.inputs
+            .push(Input::new(kind, EvaluationPath::Local(path), guest_path));
+        node.index = Some(index);
+        Ok(&self.inputs[index])
+    }
+
+    /// Determines the host path of a given guest path.
     ///
-    /// Returns a collection of input insertion index paired with the calculated
-    /// guest path.
-    pub fn calculate_guest_paths(&self, root: &str) -> Result<Vec<(usize, String)>> {
-        let mut paths = Vec::with_capacity(self.count);
-        for child in self.urls.values() {
-            child.calculate_guest_paths(root, 0, &mut paths)?;
+    /// If the backend doesn't use containers or if the path is a non-file URL,
+    /// the given path is returned.
+    ///
+    /// Returns an error if the guest path cannot be mapped to a host path.
+    pub fn host_path<'a>(
+        &'a self,
+        path: &'a str,
+        guest_work_dir: &str,
+        host_work_dir: Option<&EvaluationPath>,
+    ) -> Result<Cow<'a, str>> {
+        // It's a file scheme'd URL, treat it as an absolute guest path
+        // Otherwise, if it is any other URL, return it as-is
+        // If it's not a URL, join it with the guest working directory
+        let guest = if path::is_file_url(path) {
+            path::parse_url(path)
+                .and_then(|u| u.to_file_path().ok())
+                .ok_or_else(|| anyhow!("guest path `{path}` is not a valid file URI"))?
+        } else if path::is_url(path) {
+            // Path is a URL, return it as is
+            return Ok(path.into());
+        } else {
+            Path::new(guest_work_dir).join(path)
+        }
+        .clean();
+
+        // If the path is prefixed with the guest working directory, join it with the
+        // host
+        if let Ok(stripped) = guest.strip_prefix(guest_work_dir) {
+            match host_work_dir {
+                Some(host_work_dir) => Ok(host_work_dir
+                    .join(
+                        stripped
+                            .to_str()
+                            .with_context(|| format!("guest path `{path}` is not UTF-8"))?,
+                    )?
+                    .into_string()
+                    .with_context(|| format!("guest path `{path}` is not UTF-8"))?
+                    .into()),
+                _ => bail!("guest path `{path}` can only be used in a task output section"),
+            }
+        } else {
+            // Search for an input with the longest prefix match (i.e. strips to the minimal
+            // size)
+            self.inputs
+                .iter()
+                .filter_map(|i| Some((i.path(), guest.strip_prefix(i.guest_path()?).ok()?)))
+                .min_by(|(_, a), (_, b)| a.as_os_str().len().cmp(&b.as_os_str().len()))
+                .and_then(|(path, stripped)| {
+                    if stripped.as_os_str().is_empty() {
+                        return Some(Cow::Borrowed(path.to_str()?));
+                    }
+
+                    Some(path.join(stripped.to_str()?).ok()?.into_string()?.into())
+                })
+                .ok_or_else(|| {
+                    anyhow!(
+                        "guest path `{path}` is not relative to an input or the task working \
+                         directory"
+                    )
+                })
+        }
+    }
+
+    /// Inserts an input with a URL into the trie.
+    fn insert_url(&mut self, kind: InputKind, url: Url) -> &Input {
+        // Insert for scheme
+        let mut node = self
+            .urls
+            .entry(url.scheme().to_string())
+            .or_insert_with(|| {
+                let node = InputTrieNode::new(self.next_id);
+                self.next_id += 1;
+                node
+            });
+
+        // Insert the authority; if the URL's path is empty, we'll
+        let mut parent_id = node.id;
+        node = node
+            .children
+            .entry(url.authority().to_string())
+            .or_insert_with(|| {
+                let node = InputTrieNode::new(self.next_id);
+                self.next_id += 1;
+                node
+            });
+
+        // Insert the path segments
+        let mut last_segment = None;
+        if let Some(segments) = url.path_segments() {
+            for segment in segments {
+                parent_id = node.id;
+                node = node.children.entry(segment.to_string()).or_insert_with(|| {
+                    let node = InputTrieNode::new(self.next_id);
+                    self.next_id += 1;
+                    node
+                });
+
+                if !segment.is_empty() {
+                    last_segment = Some(segment);
+                }
+            }
         }
 
-        for child in self.paths.values() {
-            child.calculate_guest_paths(root, 0, &mut paths)?;
+        // Check to see if the input already exists in the trie
+        if let Some(index) = node.index {
+            return &self.inputs[index];
         }
 
-        Ok(paths)
+        let guest_path = self.guest_inputs_dir.as_ref().map(|d| {
+            format!(
+                "{d}/{parent_id}/{last}",
+                last = last_segment.unwrap_or(".root")
+            )
+        });
+
+        let index = self.inputs.len();
+        self.inputs
+            .push(Input::new(kind, EvaluationPath::Remote(url), guest_path));
+        node.index = Some(index);
+        &self.inputs[index]
     }
 }
 
-impl Default for InputTrie<'_> {
+impl Default for InputTrie {
     fn default() -> Self {
         Self {
+            guest_inputs_dir: None,
             urls: Default::default(),
             paths: Default::default(),
+            inputs: Default::default(),
             // The first id starts at 1 as 0 is considered the "virtual root" of the trie
             next_id: 1,
-            count: 0,
         }
     }
 }
@@ -824,84 +895,104 @@ mod test {
     #[test]
     fn empty_trie() {
         let empty = InputTrie::default();
-        let paths = empty.calculate_guest_paths("/mnt/").unwrap();
-        assert!(paths.is_empty());
+        assert!(empty.as_slice().is_empty());
+    }
+
+    #[test]
+    fn unmapped_inputs() {
+        let mut trie = InputTrie::default();
+        trie.insert(InputKind::File, "/foo/bar/baz").unwrap();
+        assert_eq!(trie.as_slice().len(), 1);
+        assert_eq!(trie.as_slice()[0].path().to_str(), Some("/foo/bar/baz"));
+        assert!(trie.as_slice()[0].guest_path().is_none());
     }
 
     #[cfg(unix)]
     #[test]
     fn non_empty_trie_unix() {
-        let mut trie = InputTrie::default();
-        let inputs = [
-            Input::new(InputKind::Directory, "/".parse().unwrap()),
-            Input::new(InputKind::File, "/foo/bar/foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "/foo/bar/bar.txt".parse().unwrap()),
-            Input::new(InputKind::File, "/foo/baz/foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "/foo/baz/bar.txt".parse().unwrap()),
-            Input::new(InputKind::File, "/bar/foo/foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "/bar/foo/bar.txt".parse().unwrap()),
-            Input::new(InputKind::Directory, "/baz".parse().unwrap()),
-            Input::new(InputKind::File, "https://example.com/".parse().unwrap()),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/bar/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/bar/bar.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/baz/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/baz/bar.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/bar/foo/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/bar/foo/bar.txt".parse().unwrap(),
-            ),
-            Input::new(InputKind::File, "https://foo.com/bar".parse().unwrap()),
-        ];
+        let mut trie = InputTrie::new("/inputs");
+        trie.insert(InputKind::Directory, "/").unwrap().unwrap();
+        trie.insert(InputKind::File, "/foo/bar/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "/foo/bar/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "/foo/baz/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "/foo/baz/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "/bar/foo/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "/bar/foo/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::Directory, "/baz").unwrap().unwrap();
+        trie.insert(InputKind::File, "https://example.com/")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/bar/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/bar/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/baz/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/baz/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/bar/foo/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/bar/foo/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://foo.com/bar")
+            .unwrap()
+            .unwrap();
 
-        for input in &inputs {
-            trie.insert(input).unwrap();
-        }
+        // Can't add relative path inputs
+        assert!(trie.insert(InputKind::File, "foo.txt").unwrap().is_none());
 
         // The important part of the guest paths are:
         // 1) The guest file name should be the same (or `.root` if the path is
         //    considered to be root)
         // 2) Paths with the same parent should have the same guest parent
-        let paths = trie.calculate_guest_paths("/mnt/").unwrap();
-        let paths: Vec<_> = paths
+        let paths: Vec<_> = trie
+            .as_slice()
             .iter()
-            .map(|(index, guest)| (inputs[*index].path().to_str().unwrap(), guest.as_str()))
+            .map(|i| {
+                (
+                    i.path().to_str().expect("should be a string"),
+                    i.guest_path().expect("should have guest path"),
+                )
+            })
             .collect();
 
         assert_eq!(
             paths,
             [
-                ("https://example.com/", "/mnt/15/.root"),
-                ("https://example.com/bar/foo/bar.txt", "/mnt/25/bar.txt"),
-                ("https://example.com/bar/foo/foo.txt", "/mnt/25/foo.txt"),
-                ("https://example.com/foo/bar/bar.txt", "/mnt/18/bar.txt"),
-                ("https://example.com/foo/bar/foo.txt", "/mnt/18/foo.txt"),
-                ("https://example.com/foo/baz/bar.txt", "/mnt/21/bar.txt"),
-                ("https://example.com/foo/baz/foo.txt", "/mnt/21/foo.txt"),
-                ("https://foo.com/bar", "/mnt/28/bar"),
-                ("/", "/mnt/0/.root"),
-                ("/bar/foo/bar.txt", "/mnt/10/bar.txt"),
-                ("/bar/foo/foo.txt", "/mnt/10/foo.txt"),
-                ("/baz", "/mnt/1/baz"),
-                ("/foo/bar/bar.txt", "/mnt/3/bar.txt"),
-                ("/foo/bar/foo.txt", "/mnt/3/foo.txt"),
-                ("/foo/baz/bar.txt", "/mnt/6/bar.txt"),
-                ("/foo/baz/foo.txt", "/mnt/6/foo.txt"),
+                ("/", "/inputs/0/.root"),
+                ("/foo/bar/foo.txt", "/inputs/3/foo.txt"),
+                ("/foo/bar/bar.txt", "/inputs/3/bar.txt"),
+                ("/foo/baz/foo.txt", "/inputs/6/foo.txt"),
+                ("/foo/baz/bar.txt", "/inputs/6/bar.txt"),
+                ("/bar/foo/foo.txt", "/inputs/10/foo.txt"),
+                ("/bar/foo/bar.txt", "/inputs/10/bar.txt"),
+                ("/baz", "/inputs/1/baz"),
+                ("https://example.com/", "/inputs/15/.root"),
+                ("https://example.com/foo/bar/foo.txt", "/inputs/18/foo.txt"),
+                ("https://example.com/foo/bar/bar.txt", "/inputs/18/bar.txt"),
+                ("https://example.com/foo/baz/foo.txt", "/inputs/21/foo.txt"),
+                ("https://example.com/foo/baz/bar.txt", "/inputs/21/bar.txt"),
+                ("https://example.com/bar/foo/foo.txt", "/inputs/25/foo.txt"),
+                ("https://example.com/bar/foo/bar.txt", "/inputs/25/bar.txt"),
+                ("https://foo.com/bar", "/inputs/28/bar"),
             ]
         );
     }
@@ -909,77 +1000,91 @@ mod test {
     #[cfg(windows)]
     #[test]
     fn non_empty_trie_windows() {
-        let mut trie = InputTrie::default();
-        let inputs = [
-            Input::new(InputKind::Directory, "C:\\".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\foo\\bar\\foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\foo\\bar\\bar.txt".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\foo\\baz\\foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\foo\\baz\\bar.txt".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\bar\\foo\\foo.txt".parse().unwrap()),
-            Input::new(InputKind::File, "C:\\bar\\foo\\bar.txt".parse().unwrap()),
-            Input::new(InputKind::Directory, "C:\\baz".parse().unwrap()),
-            Input::new(InputKind::File, "https://example.com/".parse().unwrap()),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/bar/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/bar/bar.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/baz/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/foo/baz/bar.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/bar/foo/foo.txt".parse().unwrap(),
-            ),
-            Input::new(
-                InputKind::File,
-                "https://example.com/bar/foo/bar.txt".parse().unwrap(),
-            ),
-            Input::new(InputKind::File, "https://foo.com/bar".parse().unwrap()),
-        ];
+        let mut trie = InputTrie::new("C:\\inputs");
+        trie.insert(InputKind::Directory, "/").unwrap().unwrap();
+        trie.insert(InputKind::File, "C:\\foo\\bar\\foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "C:\\foo\\bar\\bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "C:\\foo\\baz\\foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "C:\\foo\\baz\\bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "C:\\bar\\foo\\foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "C:\\bar\\foo\\bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::Directory, "C:\\baz")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/bar/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/bar/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/baz/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/foo/baz/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/bar/foo/foo.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://example.com/bar/foo/bar.txt")
+            .unwrap()
+            .unwrap();
+        trie.insert(InputKind::File, "https://foo.com/bar")
+            .unwrap()
+            .unwrap();
 
-        for input in &inputs {
-            trie.insert(input).unwrap();
-        }
+        // Can't add relative path inputs
+        assert!(trie.insert(InputKind::File, "foo.txt").unwrap().is_none());
 
         // The important part of the guest paths are:
         // 1) The guest file name should be the same (or `.root` if the path is
         //    considered to be root)
         // 2) Paths with the same parent should have the same guest parent
-        let paths = trie.calculate_guest_paths("/mnt/").unwrap();
-        let paths: Vec<_> = paths
+        let paths: Vec<_> = trie
+            .as_slice()
             .iter()
-            .map(|(index, guest)| (inputs[*index].path().to_str().unwrap(), guest.as_str()))
+            .map(|i| {
+                (
+                    i.path().to_str().expect("should be a string"),
+                    i.guest_path().expect("should have guest path"),
+                )
+            })
             .collect();
 
         assert_eq!(
             paths,
             [
-                ("https://example.com/", "/mnt/16/.root"),
-                ("https://example.com/bar/foo/bar.txt", "/mnt/26/bar.txt"),
-                ("https://example.com/bar/foo/foo.txt", "/mnt/26/foo.txt"),
-                ("https://example.com/foo/bar/bar.txt", "/mnt/19/bar.txt"),
-                ("https://example.com/foo/bar/foo.txt", "/mnt/19/foo.txt"),
-                ("https://example.com/foo/baz/bar.txt", "/mnt/22/bar.txt"),
-                ("https://example.com/foo/baz/foo.txt", "/mnt/22/foo.txt"),
-                ("https://foo.com/bar", "/mnt/29/bar"),
-                ("C:\\", "/mnt/1/.root"),
-                ("C:\\bar\\foo\\bar.txt", "/mnt/11/bar.txt"),
-                ("C:\\bar\\foo\\foo.txt", "/mnt/11/foo.txt"),
-                ("C:\\baz", "/mnt/2/baz"),
-                ("C:\\foo\\bar\\bar.txt", "/mnt/4/bar.txt"),
-                ("C:\\foo\\bar\\foo.txt", "/mnt/4/foo.txt"),
-                ("C:\\foo\\baz\\bar.txt", "/mnt/7/bar.txt"),
-                ("C:\\foo\\baz\\foo.txt", "/mnt/7/foo.txt"),
+                ("C:\\", "/inputs/0/.root"),
+                ("C:\\foo\\bar\\foo.txt", "/inputs/3/foo.txt"),
+                ("C:\\foo\\bar\\bar.txt", "/inputs/3/bar.txt"),
+                ("C:\\foo\\baz\\foo.txt", "/inputs/6/foo.txt"),
+                ("C:\\foo\\baz\\bar.txt", "/inputs/6/bar.txt"),
+                ("C:\\bar\\foo\\foo.txt", "/inputs/10/foo.txt"),
+                ("C:\\bar\\foo\\bar.txt", "/inputs/10/bar.txt"),
+                ("C:\\baz", "/inputs/1/baz"),
+                ("https://example.com/", "/inputs/15/.root"),
+                ("https://example.com/foo/bar/foo.txt", "/inputs/18/foo.txt"),
+                ("https://example.com/foo/bar/bar.txt", "/inputs/18/bar.txt"),
+                ("https://example.com/foo/baz/foo.txt", "/inputs/21/foo.txt"),
+                ("https://example.com/foo/baz/bar.txt", "/inputs/21/bar.txt"),
+                ("https://example.com/bar/foo/foo.txt", "/inputs/25/foo.txt"),
+                ("https://example.com/bar/foo/bar.txt", "/inputs/25/bar.txt"),
+                ("https://foo.com/bar", "/inputs/28/bar"),
             ]
         );
     }

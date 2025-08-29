@@ -152,17 +152,19 @@ pub fn function_call_failed(name: &str, error: impl fmt::Display, span: Span) ->
     Diagnostic::error(format!("call to function `{name}` failed: {error}")).with_highlight(span)
 }
 
-/// Creates an "output evaluation failed" diagnostic.
-pub fn output_evaluation_failed(
+/// Creates an "input/output evaluation failed" diagnostic.
+pub fn io_evaluation_failed(
     e: anyhow::Error,
     name: &str,
     task: bool,
-    output: &str,
+    input: bool,
+    io_name: &str,
     span: Span,
 ) -> Diagnostic {
     let e = e.context(format!(
-        "failed to evaluate output `{output}` for {kind} `{name}`",
-        kind = if task { "task" } else { "workflow" }
+        "failed to evaluate {io_kind} `{io_name}` for {kind} `{name}`",
+        kind = if task { "task" } else { "workflow" },
+        io_kind = if input { "input" } else { "output" },
     ));
 
     Diagnostic::error(format!("{e:#}")).with_highlight(span)
