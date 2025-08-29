@@ -127,7 +127,6 @@ async fn should_provide_document_symbols() {
 async fn should_provide_workspace_symbols() {
     let mut ctx = setup().await;
     let response = workspace_symbol_request(&mut ctx, "").await;
-    println!("{:?}", response);
     let Some(WorkspaceSymbolResponse::Flat(symbols)) = response else {
         panic!("expected a response, got none");
     };
