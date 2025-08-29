@@ -45,7 +45,7 @@ fn flatten_document_symbols(
     symbols: &mut Vec<SymbolInformation>,
 ) -> Result<()> {
     for symbol in document_symbols {
-        if query.is_empty() || symbol.name.contains(&query) {
+        if query.is_empty() || symbol.name.contains(query) {
             #[allow(deprecated)]
             symbols.push(SymbolInformation {
                 name: symbol.name.clone(),
