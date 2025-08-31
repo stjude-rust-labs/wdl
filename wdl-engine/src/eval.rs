@@ -42,6 +42,11 @@ pub mod v1;
 /// The maximum number of stderr lines to display in error messages.
 const MAX_STDERR_LINES: usize = 10;
 
+/// A name used whenever a file system "root" is mapped.
+///
+/// A root might be a root directory like `/` or `C:\`, but it also might be the root of a URL like `https://example.com`.
+const ROOT_NAME: &str = ".root";
+
 /// Represents the location of a call in an evaluation error.
 #[derive(Debug, Clone)]
 pub struct CallLocation {
@@ -737,7 +742,13 @@ impl InputTrie {
         let guest_path = self.guest_inputs_dir.map(|d| {
             format!(
                 "{d}/{parent_id}/{last}",
-                last = last_component.unwrap_or(".root")
+                // On Windows, `last_component` might be `Some` despite being a root due to the
+                // prefix (e.g. `C:`); instead check if the path has a parent
+                last = if path.parent().is_none() {
+                    ROOT_NAME
+                } else {
+                    last_component.unwrap_or(ROOT_NAME)
+                }
             )
         });
 
@@ -861,7 +872,7 @@ impl InputTrie {
         let guest_path = self.guest_inputs_dir.as_ref().map(|d| {
             format!(
                 "{d}/{parent_id}/{last}",
-                last = last_segment.unwrap_or(".root")
+                last = last_segment.unwrap_or(ROOT_NAME)
             )
         });
 
@@ -898,12 +909,26 @@ mod test {
         assert!(empty.as_slice().is_empty());
     }
 
+    #[cfg(unix)]
     #[test]
-    fn unmapped_inputs() {
+    fn unmapped_inputs_unix() {
         let mut trie = InputTrie::default();
         trie.insert(InputKind::File, "/foo/bar/baz").unwrap();
         assert_eq!(trie.as_slice().len(), 1);
         assert_eq!(trie.as_slice()[0].path().to_str(), Some("/foo/bar/baz"));
+        assert!(trie.as_slice()[0].guest_path().is_none());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn unmapped_inputs_windows() {
+        let mut trie = InputTrie::default();
+        trie.insert(InputKind::File, "C:\\foo\\bar\\baz").unwrap();
+        assert_eq!(trie.as_slice().len(), 1);
+        assert_eq!(
+            trie.as_slice()[0].path().to_str(),
+            Some("C:\\foo\\bar\\baz")
+        );
         assert!(trie.as_slice()[0].guest_path().is_none());
     }
 
@@ -1000,8 +1025,8 @@ mod test {
     #[cfg(windows)]
     #[test]
     fn non_empty_trie_windows() {
-        let mut trie = InputTrie::new("C:\\inputs");
-        trie.insert(InputKind::Directory, "/").unwrap().unwrap();
+        let mut trie = InputTrie::new("/inputs");
+        trie.insert(InputKind::Directory, "C:\\").unwrap().unwrap();
         trie.insert(InputKind::File, "C:\\foo\\bar\\foo.txt")
             .unwrap()
             .unwrap();
@@ -1069,22 +1094,22 @@ mod test {
         assert_eq!(
             paths,
             [
-                ("C:\\", "/inputs/0/.root"),
-                ("C:\\foo\\bar\\foo.txt", "/inputs/3/foo.txt"),
-                ("C:\\foo\\bar\\bar.txt", "/inputs/3/bar.txt"),
-                ("C:\\foo\\baz\\foo.txt", "/inputs/6/foo.txt"),
-                ("C:\\foo\\baz\\bar.txt", "/inputs/6/bar.txt"),
-                ("C:\\bar\\foo\\foo.txt", "/inputs/10/foo.txt"),
-                ("C:\\bar\\foo\\bar.txt", "/inputs/10/bar.txt"),
-                ("C:\\baz", "/inputs/1/baz"),
-                ("https://example.com/", "/inputs/15/.root"),
-                ("https://example.com/foo/bar/foo.txt", "/inputs/18/foo.txt"),
-                ("https://example.com/foo/bar/bar.txt", "/inputs/18/bar.txt"),
-                ("https://example.com/foo/baz/foo.txt", "/inputs/21/foo.txt"),
-                ("https://example.com/foo/baz/bar.txt", "/inputs/21/bar.txt"),
-                ("https://example.com/bar/foo/foo.txt", "/inputs/25/foo.txt"),
-                ("https://example.com/bar/foo/bar.txt", "/inputs/25/bar.txt"),
-                ("https://foo.com/bar", "/inputs/28/bar"),
+                ("C:\\", "/inputs/1/.root"),
+                ("C:\\foo\\bar\\foo.txt", "/inputs/4/foo.txt"),
+                ("C:\\foo\\bar\\bar.txt", "/inputs/4/bar.txt"),
+                ("C:\\foo\\baz\\foo.txt", "/inputs/7/foo.txt"),
+                ("C:\\foo\\baz\\bar.txt", "/inputs/7/bar.txt"),
+                ("C:\\bar\\foo\\foo.txt", "/inputs/11/foo.txt"),
+                ("C:\\bar\\foo\\bar.txt", "/inputs/11/bar.txt"),
+                ("C:\\baz", "/inputs/2/baz"),
+                ("https://example.com/", "/inputs/16/.root"),
+                ("https://example.com/foo/bar/foo.txt", "/inputs/19/foo.txt"),
+                ("https://example.com/foo/bar/bar.txt", "/inputs/19/bar.txt"),
+                ("https://example.com/foo/baz/foo.txt", "/inputs/22/foo.txt"),
+                ("https://example.com/foo/baz/bar.txt", "/inputs/22/bar.txt"),
+                ("https://example.com/bar/foo/foo.txt", "/inputs/26/foo.txt"),
+                ("https://example.com/bar/foo/bar.txt", "/inputs/26/bar.txt"),
+                ("https://foo.com/bar", "/inputs/29/bar"),
             ]
         );
     }
