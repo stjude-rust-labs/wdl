@@ -57,6 +57,7 @@ use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::ScatterStatement;
+use wdl_ast::version::V1;
 
 use crate::Array;
 use crate::CallLocation;
@@ -1053,17 +1054,17 @@ impl WorkflowEvaluator {
         // Ensure input paths exist
         value
             .visit_paths_mut(expected_ty.is_optional(), &mut |optional, value| {
-                let path = match value {
-                    PrimitiveValue::File(path) => path,
-                    PrimitiveValue::Directory(path) => path,
-                    _ => unreachable!("only file and directory values should be visited"),
-                };
-
-                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
-                    bail!("relative path `{path}` cannot be used as a workflow input");
+                // Ensure the path exists before we translate it (1.2+ behavior)
+                if state
+                    .document
+                    .version()
+                    .expect("document should have a version")
+                    >= SupportedVersion::V1(V1::Two)
+                {
+                    return value.ensure_path_exists(optional);
                 }
 
-                value.ensure_path_exists(optional)
+                Ok(true)
             })
             .map_err(|e| {
                 io_evaluation_failed(

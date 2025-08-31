@@ -96,7 +96,6 @@ use crate::diagnostics::task_localization_failed;
 use crate::eval::EvaluatedTask;
 use crate::http::Downloader;
 use crate::http::HttpDownloader;
-use crate::path;
 use crate::path::EvaluationPath;
 use crate::tree::SyntaxNode;
 use crate::tree::SyntaxToken;
@@ -1623,18 +1622,22 @@ impl TaskEvaluator {
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
-                    // Task inputs cannot be relative paths
-                    bail!("relative path `{path}` cannot be used as a task input");
-                }
-
                 let path: EvaluationPath = path.parse()?;
                 if let EvaluationPath::Remote(url) = path {
                     urls.push(url);
                 }
 
-                // Ensure the path exists before we translate it
-                value.ensure_path_exists(optional)
+                // Ensure the path exists before we translate it (1.2+ behavior)
+                if state
+                    .document
+                    .version()
+                    .expect("document should have a version")
+                    >= SupportedVersion::V1(V1::Two)
+                {
+                    return value.ensure_path_exists(optional);
+                }
+
+                Ok(true)
             })
             .map_err(|e| {
                 io_evaluation_failed(e, state.task.name(), true, true, name.text(), name.span())
@@ -1719,26 +1722,20 @@ impl TaskEvaluator {
     ) -> Result<(), Diagnostic> {
         value
             .visit_paths_mut(ty.is_optional(), &mut |optional, value| {
-                let (kind, path) = match value {
-                    PrimitiveValue::File(path) => (InputKind::File, path),
-                    PrimitiveValue::Directory(path) => (InputKind::Directory, path),
-                    _ => unreachable!("only file and directory values should be visited"),
-                };
-
-                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
-                    // Task inputs cannot be relative paths
-                    bail!("relative path `{path}` cannot be used as a task input");
-                }
-
-                // Ensure the path exists before we translate it
-                if !value.ensure_path_exists(optional)? {
+                // Ensure the path exists before we translate it (1.2+ behavior)
+                if state
+                    .document
+                    .version()
+                    .expect("document should have a version")
+                    >= SupportedVersion::V1(V1::Two)
+                    && !value.ensure_path_exists(optional)?
+                {
                     return Ok(false);
                 }
 
-                // Acquire the path from the value again
-                let path = match value {
-                    PrimitiveValue::File(path) => path,
-                    PrimitiveValue::Directory(path) => path,
+                let (kind, path) = match value {
+                    PrimitiveValue::File(path) => (InputKind::File, path),
+                    PrimitiveValue::Directory(path) => (InputKind::Directory, path),
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 

@@ -57,7 +57,7 @@ fn join_paths<'a>(
             v.visit_paths_mut(false, &mut |_, v| {
                 v.expand_path()?;
                 v.join_path_to(path);
-                Ok(true)
+                v.ensure_path_exists(false)
             })?;
             current = v;
         }
