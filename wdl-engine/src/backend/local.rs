@@ -54,7 +54,6 @@ use crate::v1::memory;
 ///
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
-#[derive(Debug)]
 struct LocalTaskRequest {
     /// The engine configuration.
     config: Arc<Config>,

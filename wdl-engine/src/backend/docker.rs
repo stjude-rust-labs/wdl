@@ -76,7 +76,6 @@ const GUEST_STDERR_PATH: &str = "/mnt/task/stderr";
 
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
-#[derive(Debug)]
 struct DockerTaskRequest {
     /// The engine configuration.
     config: Arc<Config>,

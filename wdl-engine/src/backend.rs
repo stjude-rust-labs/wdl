@@ -24,6 +24,7 @@ use tracing::debug;
 
 use crate::Input;
 use crate::Value;
+use crate::http::Transferer;
 use crate::path::EvaluationPath;
 
 mod docker;
@@ -89,7 +90,6 @@ pub struct TaskExecutionConstraints {
 }
 
 /// Represents information for spawning a task.
-#[derive(Debug)]
 pub struct TaskSpawnInfo {
     /// The command of the task.
     command: String,
@@ -101,6 +101,8 @@ pub struct TaskSpawnInfo {
     hints: Arc<HashMap<String, Value>>,
     /// The environment variables of the task.
     env: Arc<IndexMap<String, String>>,
+    /// The transferer to use for uploading inputs.
+    transferer: Arc<dyn Transferer>,
 }
 
 impl TaskSpawnInfo {
@@ -111,6 +113,7 @@ impl TaskSpawnInfo {
         requirements: Arc<HashMap<String, Value>>,
         hints: Arc<HashMap<String, Value>>,
         env: Arc<IndexMap<String, String>>,
+        transferer: Arc<dyn Transferer>,
     ) -> Self {
         Self {
             command,
@@ -118,12 +121,12 @@ impl TaskSpawnInfo {
             requirements,
             hints,
             env,
+            transferer,
         }
     }
 }
 
 /// Represents a request to spawn a task.
-#[derive(Debug)]
 pub struct TaskSpawnRequest {
     /// The id of the task being spawned.
     id: String,
@@ -174,6 +177,11 @@ impl TaskSpawnRequest {
     /// Gets the environment variables of the task.
     pub fn env(&self) -> &IndexMap<String, String> {
         &self.info.env
+    }
+
+    /// Gets the transferer to use for uploading inputs.
+    pub fn transferer(&self) -> &Arc<dyn Transferer> {
+        &self.info.transferer
     }
 
     /// Gets the attempt number for the task's execution.

@@ -346,7 +346,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                 }
             }
 
-            match evaluator.evaluate_expr(&expr).await? {
+            match value {
                 Value::None(_) => {
                     if let Some(o) = placeholder.option().as_ref().and_then(|o| o.as_default()) {
                         buffer.push_str(
@@ -1488,10 +1488,12 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
 #[cfg(test)]
 pub(crate) mod test {
+    use std::borrow::Cow;
     use std::collections::HashMap;
     use std::fs;
     use std::path::Path;
 
+    use anyhow::Result;
     use pretty_assertions::assert_eq;
     use tempfile::TempDir;
     use url::Url;
@@ -1506,8 +1508,8 @@ pub(crate) mod test {
     use super::*;
     use crate::ScopeRef;
     use crate::eval::Scope;
-    use crate::http::Downloader;
     use crate::http::Location;
+    use crate::http::Transferer;
     use crate::path::EvaluationPath;
 
     /// Represents a test environment.
@@ -1565,11 +1567,11 @@ pub(crate) mod test {
         }
     }
 
-    impl Downloader for TestEnv {
+    impl Transferer for TestEnv {
         fn download<'a, 'b, 'c>(
             &'a self,
             url: &'b Url,
-        ) -> BoxFuture<'c, Result<crate::http::Location<'static>, Arc<anyhow::Error>>>
+        ) -> BoxFuture<'c, Result<crate::http::Location<'static>>>
         where
             'a: 'c,
             'b: 'c,
@@ -1591,6 +1593,16 @@ pub(crate) mod test {
             .boxed()
         }
 
+        fn upload<'a, 'b, 'c, 'd>(&'a self, _: &'b Path, _: &'c Url) -> BoxFuture<'d, Result<()>>
+        where
+            'a: 'd,
+            'b: 'd,
+            'c: 'd,
+            Self: 'd,
+        {
+            unimplemented!()
+        }
+
         fn size<'a, 'b, 'c>(&'a self, _: &'b Url) -> BoxFuture<'c, anyhow::Result<Option<u64>>>
         where
             'a: 'c,
@@ -1598,6 +1610,10 @@ pub(crate) mod test {
             Self: 'c,
         {
             std::future::ready(Ok(Some(1234))).boxed()
+        }
+
+        fn apply_auth<'a>(&self, url: &'a Url) -> anyhow::Result<Cow<'a, Url>> {
+            Ok(Cow::Borrowed(url))
         }
     }
 
@@ -1672,7 +1688,7 @@ pub(crate) mod test {
             self.stderr.as_ref()
         }
 
-        fn downloader(&self) -> &dyn Downloader {
+        fn transferer(&self) -> &dyn Transferer {
             self.env
         }
     }
