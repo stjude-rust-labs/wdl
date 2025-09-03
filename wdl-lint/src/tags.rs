@@ -30,6 +30,9 @@ pub enum Tag {
 
     /// Rules associated with the use of deprecated language constructs.
     Deprecated,
+
+    /// Rules associeted with documentation.
+    Documentation,
 }
 
 /// An error for when an unknown tag is encountered.
@@ -58,6 +61,7 @@ impl std::str::FromStr for Tag {
             s if s.eq_ignore_ascii_case("correctness") => Ok(Self::Correctness),
             s if s.eq_ignore_ascii_case("sorting") => Ok(Self::Sorting),
             s if s.eq_ignore_ascii_case("deprecated") => Ok(Self::Deprecated),
+            s if s.eq_ignore_ascii_case("documentation") => Ok(Self::Documentation),
             _ => Err(UnknownTagError(s.to_string())),
         }
     }
@@ -75,6 +79,7 @@ impl std::fmt::Display for Tag {
             Self::Correctness => write!(f, "Correctness"),
             Self::Sorting => write!(f, "Sorting"),
             Self::Deprecated => write!(f, "Deprecated"),
+            Self::Documentation => write!(f, "Documentation"),
         }
     }
 }
