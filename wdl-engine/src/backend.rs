@@ -205,9 +205,9 @@ pub struct TaskExecutionResult {
 /// Represents guest root paths for backends that use containers.
 #[derive(Debug, Clone, Copy)]
 pub struct GuestRoots {
-    /// The guest path the task inputs directory (e.g. `/mnt/task/inputs`).
+    /// The guest path to the task inputs directory (e.g. `/mnt/task/inputs`).
     pub inputs_dir: &'static str,
-    /// The guest path the task working directory (e.g. `/mnt/task/work`).
+    /// The guest path to the task working directory (e.g. `/mnt/task/work`).
     pub work_dir: &'static str,
 }
 
