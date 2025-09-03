@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Changed
+
+* The initial left sidebar view is now set to the "Full Directory" view instead of the "Workflows" view and is also now configurable ([#591](https://github.com/stjude-rust-labs/wdl/pull/591)).
+
 ## 0.7.0 - 08-13-2025
 
 #### Added
