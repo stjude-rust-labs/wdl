@@ -18,6 +18,7 @@ mod source;
 
 pub use results::AnalysisResults;
 pub use source::Source;
+use wdl_lint::TagSet;
 
 /// The type of the initialization callback.
 type InitCb = Box<dyn Fn() + 'static>;
@@ -36,8 +37,11 @@ pub struct Analysis {
     /// A list of rules to except.
     exceptions: HashSet<String>,
 
-    /// Whether or not to enable linting.
-    lint: bool,
+    /// Which lint rules to enable, as specified via a [`TagSet`].
+    enabled_lint_tags: TagSet,
+
+    /// Which lint rules to disable, as specified via a [`TagSet`].
+    disabled_lint_tags: TagSet,
 
     /// Basename for any ignorefiles which should be respected.
     ignore_filename: Option<String>,
@@ -74,12 +78,6 @@ impl Analysis {
         self
     }
 
-    /// Sets whether linting is enabled.
-    pub fn lint(mut self, value: bool) -> Self {
-        self.lint = value;
-        self
-    }
-
     /// Sets the ignorefile basename.
     pub fn ignore_filename(mut self, filename: Option<String>) -> Self {
         self.ignore_filename = filename;
@@ -104,6 +102,18 @@ impl Analysis {
         self
     }
 
+    /// Sets the enabled lint tags.
+    pub fn enabled_lint_tags(mut self, tags: TagSet) -> Self {
+        self.enabled_lint_tags = tags;
+        self
+    }
+
+    /// Sets the disabled lint tags.
+    pub fn disabled_lint_tags(mut self, tags: TagSet) -> Self {
+        self.disabled_lint_tags = tags;
+        self
+    }
+
     /// Runs the analysis and returns all results (if any exist).
     pub async fn run(self) -> std::result::Result<AnalysisResults, NonEmpty<Arc<Error>>> {
         warn_unknown_rules(&self.exceptions);
@@ -116,8 +126,12 @@ impl Analysis {
         let validator = Box::new(move || {
             let mut validator = Validator::default();
 
-            if self.lint {
-                let visitor = get_lint_visitor(&self.exceptions);
+            if self.enabled_lint_tags.count() > 0 {
+                let visitor = get_lint_visitor(
+                    &self.enabled_lint_tags,
+                    &self.disabled_lint_tags,
+                    &self.exceptions,
+                );
                 validator.add_visitor(visitor);
             }
 
@@ -150,7 +164,8 @@ impl Default for Analysis {
         Self {
             sources: Default::default(),
             exceptions: Default::default(),
-            lint: Default::default(),
+            enabled_lint_tags: TagSet::new(&[]),
+            disabled_lint_tags: TagSet::new(&[]),
             ignore_filename: None,
             init: Box::new(|| {}),
             progress: Box::new(|_, _, _| Box::pin(async {})),
@@ -195,10 +210,16 @@ fn get_diagnostics_config(exceptions: &HashSet<String>) -> DiagnosticsConfig {
 }
 
 /// Gets a lint visitor with the excepted rules removed.
-fn get_lint_visitor(exceptions: &HashSet<String>) -> Linter {
+fn get_lint_visitor(
+    enabled_lint_tags: &TagSet,
+    disabled_lint_tags: &TagSet,
+    exceptions: &HashSet<String>,
+) -> Linter {
     Linter::new(wdl_lint::rules().into_iter().filter(|rule| {
-        !exceptions
-            .iter()
-            .any(|exception| exception.eq_ignore_ascii_case(rule.id()))
+        enabled_lint_tags.intersect(rule.tags()).count() > 0
+            && disabled_lint_tags.intersect(rule.tags()).count() == 0
+            && !exceptions
+                .iter()
+                .any(|exception| exception.eq_ignore_ascii_case(rule.id()))
     }))
 }
