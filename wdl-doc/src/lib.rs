@@ -46,10 +46,15 @@ use pulldown_cmark::Parser;
 use runnable::task;
 use runnable::workflow;
 use wdl_analysis::Analyzer;
+use wdl_analysis::Config as AnalysisConfig;
 use wdl_ast::AstToken;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::version::V1;
+
+/// Start on the "Full Directory" left sidebar view instead of the
+/// "Workflows" view.
+const PREFER_FULL_DIRECTORY: bool = true;
 
 /// Install the theme dependencies using npm.
 pub fn install_theme(theme_dir: &Path) -> Result<()> {
@@ -258,10 +263,15 @@ impl VersionBadge {
 ///
 /// `workspace_root` should be an absolute path.
 async fn analyze_workspace(
-    analyzer: Analyzer<()>,
     workspace_root: impl AsRef<Path>,
+    config: AnalysisConfig,
 ) -> Result<Vec<wdl_analysis::AnalysisResult>> {
     let workspace = workspace_root.as_ref();
+    let analyzer = Analyzer::new(config, async |_, _, _, _| ());
+    analyzer
+        .add_directory(workspace)
+        .await
+        .with_context(|| "failed to add directory to analyzer".to_string())?;
     let results = analyzer
         .analyze(())
         .await
@@ -315,29 +325,85 @@ async fn analyze_workspace(
     Ok(results)
 }
 
+/// Configuration for documentation generation.
+#[derive(Debug)]
+pub struct Config {
+    /// Configuration to use for analysis.
+    analysis_config: AnalysisConfig,
+    /// WDL workspace that should be documented.
+    workspace: PathBuf,
+    /// Output location for the documentation.
+    output_dir: PathBuf,
+    /// An optional markdown file to embed in the homepage.
+    homepage: Option<PathBuf>,
+    /// An optional custom theme directory.
+    custom_theme: Option<PathBuf>,
+    /// An optional custom logo to embed in the left sidebar.
+    custom_logo: Option<PathBuf>,
+    /// Prefer the "Full Directory" view over the "Workflows" view of the left
+    /// sidebar.
+    prefer_full_directory: bool,
+}
+
+impl Config {
+    /// Create a new documentation configuration.
+    pub fn new(
+        analysis_config: AnalysisConfig,
+        workspace: impl Into<PathBuf>,
+        output_dir: impl Into<PathBuf>,
+    ) -> Self {
+        Self {
+            analysis_config,
+            workspace: workspace.into(),
+            output_dir: output_dir.into(),
+            homepage: None,
+            custom_theme: None,
+            custom_logo: None,
+            prefer_full_directory: PREFER_FULL_DIRECTORY,
+        }
+    }
+
+    /// Overwrite the config's homepage with the new value.
+    pub fn set_homepage(mut self, homepage: Option<PathBuf>) -> Self {
+        self.homepage = homepage;
+        self
+    }
+
+    /// Overwrite the config's custom theme with the new value.
+    pub fn set_custom_theme(mut self, custom_theme: Option<PathBuf>) -> Self {
+        self.custom_theme = custom_theme;
+        self
+    }
+
+    /// Overwrite the config's custom logo with the new value.
+    pub fn set_custom_logo(mut self, custom_logo: Option<PathBuf>) -> Self {
+        self.custom_logo = custom_logo;
+        self
+    }
+
+    /// Overwrite the config's prefer_full_directory with the new value.
+    pub fn set_prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
+        self.prefer_full_directory = prefer_full_directory;
+        self
+    }
+}
+
 /// Generate HTML documentation for a workspace.
 ///
 /// This function will generate HTML documentation for all WDL files in the
 /// workspace directory. This function will overwrite any existing files which
 /// conflict with the generated files, but will not delete any files that
 /// are already present.
-pub async fn document_workspace(
-    analyzer: Analyzer<()>,
-    workspace: impl AsRef<Path>,
-    output_dir: impl AsRef<Path>,
-    homepage: Option<impl AsRef<Path>>,
-    custom_theme: Option<impl AsRef<Path>>,
-    custom_logo: Option<impl Into<PathBuf>>,
-) -> Result<()> {
-    let workspace_abs_path = absolute(workspace.as_ref())
+pub async fn document_workspace(config: Config) -> Result<()> {
+    let workspace_abs_path = absolute(&config.workspace)
         .with_context(|| {
             format!(
                 "failed to resolve absolute path for workspace: `{}`",
-                workspace.as_ref().display()
+                config.workspace.display()
             )
         })?
         .clean();
-    let homepage = homepage.and_then(|p| absolute(p.as_ref()).ok());
+    let homepage = config.homepage.and_then(|p| absolute(p).ok());
 
     if !workspace_abs_path.is_dir() {
         bail!(
@@ -346,11 +412,11 @@ pub async fn document_workspace(
         );
     }
 
-    let docs_dir = absolute(output_dir.as_ref())
+    let docs_dir = absolute(&config.output_dir)
         .with_context(|| {
             format!(
                 "failed to resolve absolute path for output directory: `{}`",
-                output_dir.as_ref().display()
+                config.output_dir.display()
             )
         })?
         .clean();
@@ -363,7 +429,7 @@ pub async fn document_workspace(
         })?;
     }
 
-    let results = analyze_workspace(analyzer, workspace_abs_path.clone())
+    let results = analyze_workspace(&workspace_abs_path, config.analysis_config)
         .await
         .with_context(|| {
             format!(
@@ -374,8 +440,8 @@ pub async fn document_workspace(
 
     let mut docs_tree = DocsTreeBuilder::new(docs_dir.clone())
         .maybe_homepage(homepage)
-        .maybe_custom_theme(custom_theme)?
-        .maybe_logo(custom_logo)
+        .maybe_custom_theme(config.custom_theme)?
+        .maybe_logo(config.custom_logo)
         .build()
         .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
 

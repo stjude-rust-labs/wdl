@@ -217,6 +217,9 @@ pub struct DocsTreeBuilder {
     custom_theme: Option<PathBuf>,
     /// The path to a custom logo to embed at the top of the left sidebar.
     logo: Option<PathBuf>,
+    /// Start on the "Full Directory" left sidebar view instead of the
+    /// "Workflows" view.
+    prefer_full_directory: bool,
 }
 
 impl DocsTreeBuilder {
@@ -230,6 +233,7 @@ impl DocsTreeBuilder {
             homepage: None,
             custom_theme: None,
             logo: None,
+            prefer_full_directory: crate::PREFER_FULL_DIRECTORY,
         }
     }
 
@@ -279,6 +283,13 @@ impl DocsTreeBuilder {
         self.maybe_logo(Some(logo))
     }
 
+    /// Prefer the "Full Directory" view over the "Workflows" view of the left
+    /// sidebar.
+    pub fn prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
+        self.prefer_full_directory = prefer_full_directory;
+        self
+    }
+
     /// Build the docs tree.
     pub fn build(self) -> Result<DocsTree> {
         self.write_assets().with_context(|| {
@@ -298,6 +309,7 @@ impl DocsTreeBuilder {
             root: node,
             path: self.root,
             homepage: self.homepage,
+            prefer_full_directory: self.prefer_full_directory,
         })
     }
 
@@ -400,6 +412,9 @@ pub struct DocsTree {
     /// An optional path to a Markdown file which will be embedded in the
     /// `<root>/index.html` page.
     homepage: Option<PathBuf>,
+    /// Prefer the "Full Directory" view over the "Workflows" view of the left
+    /// sidebar.
+    prefer_full_directory: bool,
 }
 
 impl DocsTree {
@@ -817,7 +832,7 @@ impl DocsTree {
 
         let data = format!(
             r#"{{
-                showWorkflows: $persist(true).using(sessionStorage),
+                showWorkflows: $persist({}).using(sessionStorage),
                 search: $persist('').using(sessionStorage),
                 dirOpen: '{}',
                 dirClosed: '{}',
@@ -869,6 +884,7 @@ impl DocsTree {
                     }});
                 }}
             }}"#,
+            !self.prefer_full_directory,
             self.get_asset(base, "chevron-up.svg"),
             self.get_asset(base, "chevron-down.svg"),
             all_nodes
