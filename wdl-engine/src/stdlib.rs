@@ -10,6 +10,7 @@ use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
 use futures::future::BoxFuture;
+use tempfile::TempPath;
 use wdl_analysis::stdlib::Binding;
 use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
@@ -17,7 +18,9 @@ use wdl_ast::Span;
 
 use crate::Coercible;
 use crate::EvaluationContext;
+use crate::PrimitiveValue;
 use crate::Value;
+use crate::diagnostics::function_call_failed;
 use crate::http::Downloader;
 use crate::http::Location;
 use crate::path;
@@ -136,6 +139,45 @@ pub(crate) async fn download_file<'a>(
     }
 }
 
+/// Helper for converting a temporary path to a value.
+///
+/// Used by the `write_*` stdlib functions.
+pub(crate) fn temp_path_to_value(
+    path: TempPath,
+    guest_temp_dir: Option<&str>,
+    function_name: &str,
+    call_site: Span,
+) -> Result<Value, Diagnostic> {
+    let path = path.keep().map_err(|e| {
+        function_call_failed(
+            function_name,
+            format!("failed to keep temporary file: {e}"),
+            call_site,
+        )
+    })?;
+
+    // Translate the host temporary path to a guest path
+    let path = if let Some(guest_temp_dir) = guest_temp_dir {
+        format!(
+            "{guest_temp_dir}/{file_name}",
+            file_name = path.file_name().expect("should have file name").display()
+        )
+    } else {
+        path.into_os_string().into_string().map_err(|path| {
+            function_call_failed(
+                function_name,
+                format!(
+                    "path `{path}` cannot be represented as UTF-8",
+                    path = Path::new(&path).display()
+                ),
+                call_site,
+            )
+        })?
+    };
+
+    Ok(PrimitiveValue::new_file(path).into())
+}
+
 /// Represents a function call argument.
 pub struct CallArgument {
     /// The value of the argument.
@@ -193,7 +235,7 @@ impl<'a> CallContext<'a> {
     }
 
     /// Gets the temp directory for the call.
-    pub fn temp_dir(&self) -> &Path {
+    pub fn temp_dir(&self) -> (&Path, Option<&str>) {
         self.context.temp_dir()
     }
 
@@ -205,6 +247,11 @@ impl<'a> CallContext<'a> {
     /// Gets the stderr value for the call.
     pub fn stderr(&self) -> Option<&Value> {
         self.context.stderr()
+    }
+
+    /// Translates a guest path to a host path.
+    fn host_path<'b>(&'b self, path: &'b str) -> Result<Cow<'b, str>> {
+        self.context.host_path(path)
     }
 
     /// Coerces an argument to the given type.

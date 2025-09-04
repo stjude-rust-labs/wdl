@@ -1,7 +1,6 @@
 //! Implements the `write_json` function from the WDL standard library.
 
 use std::io::BufWriter;
-use std::path::Path;
 
 use serde::Serialize;
 use tempfile::NamedTempFile;
@@ -12,9 +11,9 @@ use super::CallContext;
 use super::Callback;
 use super::Function;
 use super::Signature;
-use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
+use crate::stdlib::temp_path_to_value;
 
 /// The name of the function defined in this file for use in diagnostics.
 const FUNCTION_NAME: &str = "write_json";
@@ -36,7 +35,8 @@ fn write_json(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     };
 
     // Create a temporary file that will be persisted after writing the lines
-    let mut file = NamedTempFile::with_prefix_in("tmp", context.temp_dir()).map_err(|e| {
+    let (host_temp_dir, guest_temp_dir) = context.temp_dir();
+    let mut file = NamedTempFile::with_prefix_in("tmp", host_temp_dir).map_err(|e| {
         function_call_failed(
             FUNCTION_NAME,
             format!("failed to create temporary file: {e}"),
@@ -62,26 +62,11 @@ fn write_json(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .into_inner()
         .map_err(|e| write_error(e.into_error()))?;
 
-    let (_, path) = file.keep().map_err(|e| {
-        function_call_failed(
-            FUNCTION_NAME,
-            format!("failed to keep temporary file: {e}"),
-            context.call_site,
-        )
-    })?;
-
-    Ok(
-        PrimitiveValue::new_file(path.into_os_string().into_string().map_err(|path| {
-            function_call_failed(
-                FUNCTION_NAME,
-                format!(
-                    "path `{path}` cannot be represented as UTF-8",
-                    path = Path::new(&path).display()
-                ),
-                context.call_site,
-            )
-        })?)
-        .into(),
+    temp_path_to_value(
+        file.into_temp_path(),
+        guest_temp_dir,
+        FUNCTION_NAME,
+        context.call_site,
     )
 }
 

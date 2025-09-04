@@ -1,15 +1,13 @@
 version 1.2
 
 task resolve_paths_task {
-  input {
-    File abs_file = "/usr"
-    String abs_str = "/usr"
-    String rel_dir_str = "bin"
-    File rel_file = "echo"
-    File rel_dir_file = "mydir"
-    String rel_str = "mydata.txt"
-  }
-
+  File abs_file = "/usr"
+  String abs_str = "/usr"
+  String rel_dir_str = "bin"
+  File rel_file = "echo"
+  File rel_dir_file = "mydir"
+  String rel_str = "mydata.txt"
+  
   # these are all equivalent to '/usr/bin/echo'
   File bin1 = join_paths(abs_file, [rel_dir_str, rel_file])
   File bin2 = join_paths(abs_str, [rel_dir_str, rel_file])

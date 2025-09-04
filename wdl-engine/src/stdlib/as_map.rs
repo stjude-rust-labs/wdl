@@ -26,7 +26,7 @@ impl fmt::Display for DuplicateKeyError {
             Some(v) => write!(
                 f,
                 "array contains a duplicate entry for map key `{v}`",
-                v = v.raw(None)
+                v = v.raw()
             ),
             None => write!(f, "array contains a duplicate entry for map key `None`"),
         }

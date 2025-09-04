@@ -51,9 +51,7 @@ task calculate_bill {
         currency: "Yen",
         period: "hourly"
       },
-      assay_data: {
-        "glucose": "hello.txt"
-      }
+      assay_data: {}
     }
 
     PatientIncome average_income = PatientIncome {

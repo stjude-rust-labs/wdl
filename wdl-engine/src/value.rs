@@ -44,7 +44,6 @@ use wdl_ast::v1::TASK_FIELD_NAME;
 use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
 use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
 
-use crate::EvaluationContext;
 use crate::Outputs;
 use crate::TaskExecutionConstraints;
 use crate::path;
@@ -482,21 +481,6 @@ impl Value {
         match self {
             Self::Call(v) => v,
             _ => panic!("value is not a call value"),
-        }
-    }
-
-    /// Visits each `File` or `Directory` value contained in this value.
-    ///
-    /// Note that paths may be specified as URLs.
-    pub(crate) fn visit_paths(
-        &self,
-        optional: bool,
-        cb: &mut impl FnMut(bool, &PrimitiveValue) -> Result<()>,
-    ) -> Result<()> {
-        match self {
-            Self::Primitive(v) => v.visit_paths(optional, cb),
-            Self::Compound(v) => v.visit_paths(cb),
-            _ => Ok(()),
         }
     }
 
@@ -1066,16 +1050,9 @@ impl PrimitiveValue {
     ///
     /// This differs from the [Display][fmt::Display] implementation in that
     /// strings, files, and directories are not quoted and not escaped.
-    ///
-    /// If an evaluation context is provided, path translation is attempted.
-    pub fn raw<'a>(
-        &'a self,
-        context: Option<&'a dyn EvaluationContext>,
-    ) -> impl fmt::Display + use<'a> {
+    pub fn raw<'a>(&'a self) -> impl fmt::Display + use<'a> {
         /// Helper for displaying a raw value.
         struct Display<'a> {
-            /// The associated evaluation context.
-            context: Option<&'a dyn EvaluationContext>,
             /// The value to display.
             value: &'a PrimitiveValue,
         }
@@ -1089,35 +1066,13 @@ impl PrimitiveValue {
                     PrimitiveValue::String(v)
                     | PrimitiveValue::File(v)
                     | PrimitiveValue::Directory(v) => {
-                        match self.context.and_then(|c| c.translate_path(v)) {
-                            Some(path) => write!(f, "{path}", path = path.display()),
-                            None => {
-                                write!(f, "{v}")
-                            }
-                        }
+                        write!(f, "{v}")
                     }
                 }
             }
         }
 
-        Display {
-            context,
-            value: self,
-        }
-    }
-
-    /// Visits each `File` or `Directory` value contained in this value.
-    ///
-    /// Note that paths may be specified as URLs.
-    fn visit_paths(
-        &self,
-        optional: bool,
-        cb: &mut impl FnMut(bool, &PrimitiveValue) -> Result<()>,
-    ) -> Result<()> {
-        match self {
-            Self::File(_) | Self::Directory(_) => cb(optional, self),
-            _ => Ok(()),
-        }
+        Display { value: self }
     }
 
     /// Mutably visits each `File` or `Directory` value contained in this value.
@@ -2201,58 +2156,6 @@ impl CompoundValue {
             ),
             _ => None,
         }
-    }
-
-    /// Visits each `File` or `Directory` value contained in this value.
-    ///
-    /// Note that paths may be specified as URLs.
-    fn visit_paths(&self, cb: &mut impl FnMut(bool, &PrimitiveValue) -> Result<()>) -> Result<()> {
-        match self {
-            Self::Pair(pair) => {
-                let ty = pair.ty.as_pair().expect("should be a pair type");
-                pair.left().visit_paths(ty.left_type().is_optional(), cb)?;
-                pair.right()
-                    .visit_paths(ty.right_type().is_optional(), cb)?;
-            }
-            Self::Array(array) => {
-                let ty = array.ty.as_array().expect("should be an array type");
-                let optional = ty.element_type().is_optional();
-                if let Some(elements) = &array.elements {
-                    for v in elements.iter() {
-                        v.visit_paths(optional, cb)?;
-                    }
-                }
-            }
-            Self::Map(map) => {
-                let ty = map.ty.as_map().expect("should be a map type");
-                let (key_optional, value_optional) =
-                    (ty.key_type().is_optional(), ty.value_type().is_optional());
-                if let Some(elements) = &map.elements {
-                    for (k, v) in elements.iter() {
-                        if let Some(k) = k {
-                            k.visit_paths(key_optional, cb)?;
-                        }
-
-                        v.visit_paths(value_optional, cb)?;
-                    }
-                }
-            }
-            Self::Object(object) => {
-                if let Some(members) = &object.members {
-                    for v in members.values() {
-                        v.visit_paths(false, cb)?;
-                    }
-                }
-            }
-            Self::Struct(s) => {
-                let ty = s.ty.as_struct().expect("should be a struct type");
-                for (n, v) in s.members.iter() {
-                    v.visit_paths(ty.members()[n].is_optional(), cb)?;
-                }
-            }
-        }
-
-        Ok(())
     }
 
     /// Mutably visits each `File` or `Directory` value contained in this value.

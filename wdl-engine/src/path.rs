@@ -82,6 +82,16 @@ impl EvaluationPath {
         }
     }
 
+    /// Consumes the path and returns its string representation
+    ///
+    /// Returns `None` if the path is local and cannot be represented in UTF-8.
+    pub fn into_string(self) -> Option<String> {
+        match self {
+            Self::Local(path) => path.into_os_string().into_string().ok(),
+            Self::Remote(url) => Some(url.into()),
+        }
+    }
+
     /// Converts the path to a local path.
     ///
     /// Returns `None` if the path is remote.

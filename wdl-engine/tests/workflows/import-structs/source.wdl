@@ -76,9 +76,7 @@ workflow import_structs {
         currency: "Yen",
         period: "hourly"
       },
-      assay_data: {
-        "glucose": "hello.txt"
-      }
+      assay_data: {}
     }
   }
 

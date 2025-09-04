@@ -33,13 +33,18 @@ fn read_string(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnost
             .coerce_argument(0, PrimitiveType::File)
             .unwrap_file();
 
-        let file_path = download_file(
-            context.context.downloader(),
-            context.work_dir(),
-            path.as_str(),
-        )
-        .await
-        .map_err(|e| function_call_failed(FUNCTION_NAME, e, context.arguments[0].span))?;
+        // Translate a guest path to the host path to read
+        let path = context.host_path(&path).map_err(|e| {
+            function_call_failed(
+                FUNCTION_NAME,
+                format!("failed to translate path: {e:#}"),
+                context.call_site,
+            )
+        })?;
+
+        let file_path = download_file(context.context.downloader(), context.work_dir(), &path)
+            .await
+            .map_err(|e| function_call_failed(FUNCTION_NAME, e, context.arguments[0].span))?;
 
         let read_error = |e: std::io::Error| {
             function_call_failed(
