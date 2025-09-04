@@ -135,20 +135,15 @@ impl TaskManagerRequest for DockerTaskRequest {
         let mut inputs = Vec::with_capacity(self.inner.inputs().len() + 2);
         for input in self.inner.inputs().iter() {
             let guest_path = input.guest_path().expect("input should have guest path");
-            let location = input
-                .location()
-                .unwrap_or_else(|| input.path().as_local().expect("input should be local"));
-
-            if location.exists() {
-                inputs.push(
-                    Input::builder()
-                        .path(guest_path)
-                        .contents(Contents::Path(location.into()))
-                        .ty(input.kind())
-                        .read_only(true)
-                        .build(),
-                );
-            }
+            let local_path = input.local_path().expect("input should be localized");
+            inputs.push(
+                Input::builder()
+                    .path(guest_path)
+                    .contents(Contents::Path(local_path.into()))
+                    .ty(input.kind())
+                    .read_only(true)
+                    .build(),
+            );
         }
 
         // Add an input for the work directory

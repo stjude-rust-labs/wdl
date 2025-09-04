@@ -997,8 +997,23 @@ impl TaskEvaluator {
         let decl_ty = decl.ty();
         let ty = crate::convert_ast_type_v1(state.document, &decl_ty)?;
 
-        let (value, span) = match inputs.get(name.text()) {
-            Some(input) => (input.clone(), name.span()),
+        let value = match inputs.get(name.text()) {
+            Some(input) => {
+                let mut value = input.coerce(&ty).map_err(|e| {
+                    runtime_type_mismatch(e, &ty, name.span(), &input.ty(), name.span())
+                })?;
+
+                // Add the input to the inputs collection
+                // Only performed for inputs given to the task as they may contain host paths
+                if state.guest_roots.is_none() {
+                    self.add_input(&name, &ty, &mut value, state).await?;
+                } else {
+                    self.add_guest_path_input(&name, &ty, &mut value, state)
+                        .await?;
+                }
+
+                value
+            }
             None => match decl.expr() {
                 Some(expr) => {
                     debug!(
@@ -1015,27 +1030,19 @@ impl TaskEvaluator {
                         ROOT_SCOPE_INDEX,
                     ));
                     let value = evaluator.evaluate_expr(&expr).await?;
-                    (value, expr.span())
+
+                    // Note: a backend input is *not* added to the state because any literal or
+                    // reference to another input will already be a guest path
+                    value.coerce(&ty).map_err(|e| {
+                        runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span())
+                    })?
                 }
                 _ => {
                     assert!(ty.is_optional(), "type should be optional");
-                    (Value::new_none(ty.clone()), name.span())
+                    Value::new_none(ty.clone())
                 }
             },
         };
-
-        let mut value = value
-            .coerce(&ty)
-            .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), span))?;
-
-        // If the backend does not run tasks in a container, add the input without guest
-        // path
-        if state.guest_roots.is_none() {
-            self.add_input(&name, &ty, &mut value, state).await?;
-        } else {
-            self.add_guest_path_input(&name, &ty, &mut value, state)
-                .await?;
-        }
 
         // Insert the name into the scope
         state.scopes[ROOT_SCOPE_INDEX.0].insert(name.text(), value.clone());
@@ -1524,7 +1531,7 @@ impl TaskEvaluator {
 
             // Download any necessary files
             for (idx, input) in state.inputs.as_slice_mut().iter_mut().enumerate() {
-                if input.location().is_some() {
+                if input.local_path().is_some() {
                     continue;
                 }
 
@@ -1559,7 +1566,7 @@ impl TaskEvaluator {
 
         if enabled!(Level::DEBUG) {
             for input in state.inputs.as_slice() {
-                match (input.location(), input.guest_path()) {
+                match (input.local_path(), input.guest_path()) {
                     (None, None) => {}
                     (None, Some(guest_path)) => {
                         debug!(
@@ -1570,25 +1577,25 @@ impl TaskEvaluator {
                             path = input.path().display(),
                         );
                     }
-                    (Some(location), None) => {
+                    (Some(local_path), None) => {
                         debug!(
                             task_id,
                             task_name = state.task.name(),
                             document = state.document.uri().as_str(),
-                            "task input `{path}` downloaded to `{location}`",
+                            "task input `{path}` downloaded to `{local_path}`",
                             path = input.path().display(),
-                            location = location.display()
+                            local_path = local_path.display()
                         );
                     }
-                    (Some(location), Some(guest_path)) => {
+                    (Some(local_path), Some(guest_path)) => {
                         debug!(
                             task_id,
                             task_name = state.task.name(),
                             document = state.document.uri().as_str(),
-                            "task input `{path}` downloaded to `{location}` and mapped to \
+                            "task input `{path}` downloaded to `{local_path}` and mapped to \
                              `{guest_path}`",
                             path = input.path().display(),
-                            location = location.display(),
+                            local_path = local_path.display(),
                         );
                     }
                 }

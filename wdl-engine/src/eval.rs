@@ -562,6 +562,8 @@ impl Input {
     }
 
     /// Gets the path to the input.
+    ///
+    /// The path of the input may be local or remote.
     pub fn path(&self) -> &EvaluationPath {
         &self.path
     }
@@ -571,14 +573,16 @@ impl Input {
         self.guest_path.as_deref()
     }
 
-    /// Gets the location of the input if it has been downloaded.
+    /// Gets the local path of the input.
     ///
-    /// Returns `None` if the input has not been downloaded or is not remote.
-    pub fn location(&self) -> Option<&Path> {
-        self.location.as_deref()
+    /// Returns `None` if the input is remote and has not been localized.
+    pub fn local_path(&self) -> Option<&Path> {
+        self.location.as_deref().or_else(|| self.path.as_local())
     }
 
     /// Sets the location of the input.
+    ///
+    /// This is used during localization to set a local path for remote inputs.
     pub fn set_location(&mut self, location: Location<'static>) {
         self.location = Some(location);
     }
