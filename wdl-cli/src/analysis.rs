@@ -19,6 +19,7 @@ mod source;
 
 pub use results::AnalysisResults;
 pub use source::Source;
+use wdl_lint::Rule;
 use wdl_lint::TagSet;
 
 /// The type of the initialization callback.
@@ -118,6 +119,24 @@ impl Analysis {
     /// Runs the analysis and returns all results (if any exist).
     pub async fn run(self) -> std::result::Result<AnalysisResults, NonEmpty<Arc<Error>>> {
         warn_unknown_rules(&self.exceptions);
+        if tracing::enabled!(tracing::Level::INFO) {
+            let mut enabled_rules = vec![];
+            let mut disabled_rules = vec![];
+            for rule in wdl_lint::rules() {
+                if is_rule_enabled(
+                    &self.enabled_lint_tags,
+                    &self.disabled_lint_tags,
+                    &self.exceptions,
+                    rule.as_ref(),
+                ) {
+                    enabled_rules.push(rule.id());
+                } else {
+                    disabled_rules.push(rule.id());
+                }
+            }
+            info!("enabled lint rules: {:?}", enabled_rules);
+            info!("disabled lint rules: {:?}", disabled_rules);
+        }
         let config = wdl_analysis::Config::default()
             .with_diagnostics_config(get_diagnostics_config(&self.exceptions))
             .with_ignore_filename(self.ignore_filename);
@@ -210,6 +229,20 @@ fn get_diagnostics_config(exceptions: &HashSet<String>) -> DiagnosticsConfig {
     }))
 }
 
+/// Determines if a rule should be enabled.
+fn is_rule_enabled(
+    enabled_lint_tags: &TagSet,
+    disabled_lint_tags: &TagSet,
+    exceptions: &HashSet<String>,
+    rule: &dyn Rule,
+) -> bool {
+    enabled_lint_tags.intersect(rule.tags()).count() > 0
+        && disabled_lint_tags.intersect(rule.tags()).count() == 0
+        && !exceptions
+            .iter()
+            .any(|exception| exception.eq_ignore_ascii_case(rule.id()))
+}
+
 /// Gets a lint visitor with the rules depending on provided options.
 ///
 /// `enabled_lint_tags` controls which rules are considered for being added to
@@ -220,22 +253,12 @@ fn get_lint_visitor(
     disabled_lint_tags: &TagSet,
     exceptions: &HashSet<String>,
 ) -> Linter {
-    let mut enabled_rules = vec![];
-    let mut disabled_rules = vec![];
-    let linter = Linter::new(wdl_lint::rules().into_iter().filter(|rule| {
-        let enable = enabled_lint_tags.intersect(rule.tags()).count() > 0
-            && disabled_lint_tags.intersect(rule.tags()).count() == 0
-            && !exceptions
-                .iter()
-                .any(|exception| exception.eq_ignore_ascii_case(rule.id()));
-        if enable {
-            enabled_rules.push(rule.id());
-        } else {
-            disabled_rules.push(rule.id());
-        }
-        enable
-    }));
-    info!("enabled lint rules: {:?}", enabled_rules);
-    info!("disabled lint rules: {:?}", disabled_rules);
-    linter
+    Linter::new(wdl_lint::rules().into_iter().filter(|rule| {
+        is_rule_enabled(
+            enabled_lint_tags,
+            disabled_lint_tags,
+            exceptions,
+            rule.as_ref(),
+        )
+    }))
 }
