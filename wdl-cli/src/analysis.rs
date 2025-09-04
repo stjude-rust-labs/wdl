@@ -210,7 +210,11 @@ fn get_diagnostics_config(exceptions: &HashSet<String>) -> DiagnosticsConfig {
     }))
 }
 
-/// Gets a lint visitor with the excepted rules removed.
+/// Gets a lint visitor with the rules depending on provided options.
+///
+/// `enabled_lint_tags` controls which rules are considered for being added to
+/// the visitor. `disabled_lint_tags` and `exceptions` act as filters on the set
+/// considerd by `enabled_lint_tags`.
 fn get_lint_visitor(
     enabled_lint_tags: &TagSet,
     disabled_lint_tags: &TagSet,
