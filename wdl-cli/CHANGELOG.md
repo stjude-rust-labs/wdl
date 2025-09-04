@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
-* `Analysis` had it's `lint()` method replaced with `enabled_lint_tags()` and `disabled_lint_tags()` ([#592](https://github.com/stjude-rust-labs/wdl/pull/592)).
+* `Analysis` had its `lint()` method replaced with `enabled_lint_tags()` and `disabled_lint_tags()` ([#592](https://github.com/stjude-rust-labs/wdl/pull/592)).
 
 ## 0.5.0 - 08-13-2025
 
