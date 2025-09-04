@@ -6,6 +6,7 @@ use std::sync::Arc;
 use anyhow::Error;
 use futures::future::BoxFuture;
 use nonempty::NonEmpty;
+use tracing::info;
 use tracing::warn;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
@@ -215,11 +216,22 @@ fn get_lint_visitor(
     disabled_lint_tags: &TagSet,
     exceptions: &HashSet<String>,
 ) -> Linter {
-    Linter::new(wdl_lint::rules().into_iter().filter(|rule| {
-        enabled_lint_tags.intersect(rule.tags()).count() > 0
+    let mut enabled_rules = vec![];
+    let mut disabled_rules = vec![];
+    let linter = Linter::new(wdl_lint::rules().into_iter().filter(|rule| {
+        let enable = enabled_lint_tags.intersect(rule.tags()).count() > 0
             && disabled_lint_tags.intersect(rule.tags()).count() == 0
             && !exceptions
                 .iter()
-                .any(|exception| exception.eq_ignore_ascii_case(rule.id()))
-    }))
+                .any(|exception| exception.eq_ignore_ascii_case(rule.id()));
+        if enable {
+            enabled_rules.push(rule.id());
+        } else {
+            disabled_rules.push(rule.id());
+        }
+        enable
+    }));
+    info!("enabled lint rules: {:?}", enabled_rules);
+    info!("disabled lint rules: {:?}", disabled_rules);
+    linter
 }
