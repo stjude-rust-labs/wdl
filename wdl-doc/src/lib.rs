@@ -442,6 +442,7 @@ pub async fn document_workspace(config: Config) -> Result<()> {
         .maybe_homepage(homepage)
         .maybe_custom_theme(config.custom_theme)?
         .maybe_logo(config.custom_logo)
+        .prefer_full_directory(config.prefer_full_directory)
         .build()
         .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
 
