@@ -538,11 +538,14 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
     }
 
     fn temp_dir(&self) -> (&Path, Option<&str>) {
-        (
-            self.state.temp_dir,
-            // The first input is always the temporary directory
-            self.state.inputs.as_slice()[0].guest_path(),
-        )
+        // Assert that the first input entry is always the temporary directory
+        let first = &self.state.inputs.as_slice()[0];
+        debug_assert!(
+            first.kind == InputKind::Directory
+                && first.path.as_local().expect("input should be local") == self.state.temp_dir
+        );
+
+        (self.state.temp_dir, first.guest_path())
     }
 
     fn stdout(&self) -> Option<&Value> {
