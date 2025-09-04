@@ -640,8 +640,11 @@ pub struct InputTrie {
 }
 
 impl InputTrie {
-    /// Constructs a new inputs trie with the given guest inputs directory.
-    pub fn new(guest_inputs_dir: &'static str) -> Self {
+    /// Constructs a new inputs trie with a guest inputs directory.
+    ///
+    /// Inputs with a host path will be mapped to a guest path relative to the
+    /// guest inputs directory.
+    pub fn new_with_guest_dir(guest_inputs_dir: &'static str) -> Self {
         Self {
             guest_inputs_dir: Some(guest_inputs_dir),
             ..Default::default()
@@ -649,6 +652,11 @@ impl InputTrie {
     }
 
     /// Inserts a new input into the trie.
+    ///
+    /// The `path` parameter is a `File` or `Directory` value (as a string) to
+    /// treat as an input.
+    ///
+    /// It may be either a local or remote path.
     ///
     /// Returns `Ok(Some(_))` if an input was added.
     ///
@@ -939,7 +947,7 @@ mod test {
     #[cfg(unix)]
     #[test]
     fn non_empty_trie_unix() {
-        let mut trie = InputTrie::new("/inputs");
+        let mut trie = InputTrie::new_with_guest_dir("/inputs");
         trie.insert(InputKind::Directory, "/").unwrap().unwrap();
         trie.insert(InputKind::File, "/foo/bar/foo.txt")
             .unwrap()
@@ -1029,7 +1037,7 @@ mod test {
     #[cfg(windows)]
     #[test]
     fn non_empty_trie_windows() {
-        let mut trie = InputTrie::new("/inputs");
+        let mut trie = InputTrie::new_with_guest_dir("/inputs");
         trie.insert(InputKind::Directory, "C:\\").unwrap().unwrap();
         trie.insert(InputKind::File, "C:\\foo\\bar\\foo.txt")
             .unwrap()

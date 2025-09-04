@@ -632,7 +632,7 @@ impl<'a> State<'a> {
         ];
 
         let mut inputs = if let Some(roots) = guest_roots {
-            InputTrie::new(roots.inputs_dir)
+            InputTrie::new_with_guest_dir(roots.inputs_dir)
         } else {
             InputTrie::default()
         };
