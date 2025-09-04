@@ -1714,7 +1714,7 @@ impl TaskEvaluator {
             })
     }
 
-    /// Adds an input to the state using a gust path.
+    /// Adds an input to the state using a guest path.
     ///
     /// This method is called for backends that use containers.
     ///
