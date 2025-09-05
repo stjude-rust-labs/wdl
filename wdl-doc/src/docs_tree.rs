@@ -217,6 +217,8 @@ pub struct DocsTreeBuilder {
     custom_theme: Option<PathBuf>,
     /// The path to a custom logo to embed at the top of the left sidebar.
     logo: Option<PathBuf>,
+    /// An optional JavaScript file to embed in each HTML page's `<head>` tag.
+    additional_javascript: Option<PathBuf>,
     /// Start on the "Full Directory" left sidebar view instead of the
     /// "Workflows" view.
     prefer_full_directory: bool,
@@ -233,6 +235,7 @@ impl DocsTreeBuilder {
             homepage: None,
             custom_theme: None,
             logo: None,
+            additional_javascript: None,
             prefer_full_directory: crate::PREFER_FULL_DIRECTORY,
         }
     }
@@ -283,8 +286,19 @@ impl DocsTreeBuilder {
         self.maybe_logo(Some(logo))
     }
 
-    /// Prefer the "Full Directory" view over the "Workflows" view of the left
-    /// sidebar.
+    /// Set the additional javascript for each page with an option.
+    pub fn maybe_additional_javascript(mut self, js: Option<impl Into<PathBuf>>) -> Self {
+        self.additional_javascript = js.map(|js| js.into());
+        self
+    }
+
+    /// Set the additional javascript for each page.
+    pub fn additional_javascript(self, js: impl Into<PathBuf>) -> Self {
+        self.maybe_additional_javascript(Some(js))
+    }
+
+    /// Set whether the "Full Directory" view should be preferred over the
+    /// "Workflows" view of the left sidebar.
     pub fn prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
         self.prefer_full_directory = prefer_full_directory;
         self
@@ -298,6 +312,18 @@ impl DocsTreeBuilder {
                 self.root.display()
             )
         })?;
+        let js = if let Some(js_path) = self.additional_javascript {
+            let js = std::fs::read_to_string(&js_path).with_context(|| {
+                format!(
+                    "failed to read additional JavaScript file: `{}`",
+                    js_path.display()
+                )
+            })?;
+            Some(js)
+        } else {
+            None
+        };
+
         let node = Node::new(
             self.root
                 .file_name()
@@ -309,6 +335,7 @@ impl DocsTreeBuilder {
             root: node,
             path: self.root,
             homepage: self.homepage,
+            additional_javascript: js,
             prefer_full_directory: self.prefer_full_directory,
         })
     }
@@ -412,6 +439,8 @@ pub struct DocsTree {
     /// An optional path to a Markdown file which will be embedded in the
     /// `<root>/index.html` page.
     homepage: Option<PathBuf>,
+    /// Optional JavaScript to embed in each HTML page's `<head>` tag.
+    additional_javascript: Option<String>,
     /// Prefer the "Full Directory" view over the "Workflows" view of the left
     /// sidebar.
     prefer_full_directory: bool,
@@ -1135,6 +1164,7 @@ impl DocsTree {
                 &self.assets_relative_to(self.root_abs_path()),
             ),
             self.root().path(),
+            self.additional_javascript.as_deref(),
         );
         std::fs::write(&index_path, html.into_string())
             .with_context(|| format!("failed to write homepage to `{}`", index_path.display()))?;
@@ -1251,6 +1281,7 @@ impl DocsTree {
                 &self.assets_relative_to(base),
             ),
             self.root_relative_to(base),
+            self.additional_javascript.as_deref(),
         );
         std::fs::write(&path, html.into_string())
             .with_context(|| format!("failed to write page at `{}`", path.display()))?;
