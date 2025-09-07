@@ -31,6 +31,8 @@ use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
 use wdl_analysis::SourcePositionEncoding;
 use wdl_analysis::Validator;
+use wdl_analysis::handlers::WDL_SEMANTIC_TOKEN_MODIFIERS;
+use wdl_analysis::handlers::WDL_SEMANTIC_TOKEN_TYPES;
 use wdl_analysis::path_to_uri;
 use wdl_lint::Linter;
 
@@ -226,6 +228,9 @@ pub struct ServerOptions {
 
     /// Analysis or lint rule IDs to except (ignore).
     pub exceptions: Vec<String>,
+
+    /// Basename for any ignorefiles which should be respected.
+    pub ignore_filename: Option<String>,
 }
 
 /// Represents an LSP server for analyzing WDL documents.
@@ -248,7 +253,17 @@ impl Server {
     pub fn new(client: Client, options: ServerOptions) -> Self {
         let lint = options.lint;
         let exceptions = options.exceptions.clone();
+        let ignore_name = options.ignore_filename.clone();
         let analyzer_client = client.clone();
+
+        let mut all_rules: Vec<_> = wdl_analysis::rules()
+            .iter()
+            .map(|r| r.id().to_string())
+            .chain(wdl_lint::rules().iter().map(|r| r.id().to_string()))
+            .collect();
+        all_rules.sort_unstable();
+        all_rules.dedup();
+
         // TODO ACF 2025-07-07: add configurability around the fallback behavior; see
         // https://github.com/stjude-rust-labs/wdl/issues/517
         let analyzer_config = AnalysisConfig::default()
@@ -257,7 +272,9 @@ impl Server {
                 wdl_analysis::rules()
                     .iter()
                     .filter(|r| exceptions.contains(&r.id().into())),
-            ));
+            ))
+            .with_ignore_filename(ignore_name)
+            .with_all_rules(all_rules);
 
         Self {
             client,
@@ -395,6 +412,7 @@ impl LanguageServer for Server {
                     }),
                     ..Default::default()
                 }),
+                workspace_symbol_provider: Some(OneOf::Left(true)),
                 diagnostic_provider: Some(DiagnosticServerCapabilities::Options(
                     DiagnosticOptions {
                         inter_file_dependencies: true,
@@ -408,16 +426,34 @@ impl LanguageServer for Server {
                         ..Default::default()
                     },
                 )),
+                document_symbol_provider: Some(OneOf::Left(true)),
                 document_formatting_provider: Some(OneOf::Left(true)),
                 definition_provider: Some(OneOf::Left(true)),
                 references_provider: Some(OneOf::Left(true)),
                 completion_provider: Some(CompletionOptions {
                     resolve_provider: Some(false),
-                    trigger_characters: Some(vec![".".to_string(), "[".to_string()]),
+                    trigger_characters: Some(vec![
+                        ".".to_string(),
+                        "[".to_string(),
+                        "#".to_string(),
+                    ]),
                     ..Default::default()
                 }),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 rename_provider: Some(OneOf::Left(true)),
+                semantic_tokens_provider: Some(
+                    SemanticTokensServerCapabilities::SemanticTokensOptions(
+                        SemanticTokensOptions {
+                            work_done_progress_options: Default::default(),
+                            legend: SemanticTokensLegend {
+                                token_types: WDL_SEMANTIC_TOKEN_TYPES.to_vec(),
+                                token_modifiers: WDL_SEMANTIC_TOKEN_MODIFIERS.to_vec(),
+                            },
+                            range: Some(false),
+                            full: Some(SemanticTokensFullOptions::Bool(true)),
+                        },
+                    ),
+                ),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -855,6 +891,67 @@ impl LanguageServer for Server {
                 SourcePositionEncoding::UTF16,
                 params.new_name,
             )
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
+    }
+
+    async fn semantic_tokens_full(
+        &self,
+        mut params: SemanticTokensParams,
+    ) -> RpcResult<Option<SemanticTokensResult>> {
+        normalize_uri_path(&mut params.text_document.uri);
+
+        debug!("received `textDocument/semanticTokens/full` request: {params:#?}");
+
+        let result = self
+            .analyzer
+            .semantic_tokens(params.text_document.uri)
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
+    }
+
+    async fn document_symbol(
+        &self,
+        mut params: DocumentSymbolParams,
+    ) -> RpcResult<Option<DocumentSymbolResponse>> {
+        normalize_uri_path(&mut params.text_document.uri);
+
+        debug!("received `textDocument/documentSymbol` request: {params:#?}");
+
+        let result = self
+            .analyzer
+            .document_symbol(params.text_document.uri)
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
+
+        Ok(result)
+    }
+
+    async fn symbol(
+        &self,
+        params: WorkspaceSymbolParams,
+    ) -> RpcResult<Option<Vec<SymbolInformation>>> {
+        debug!("received `workspace/symbol` request: {params:#?}");
+
+        let result = self
+            .analyzer
+            .workspace_symbol(params.query)
             .await
             .map_err(|e| RpcError {
                 code: ErrorCode::InternalError,

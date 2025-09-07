@@ -45,6 +45,8 @@ impl Default for Config {
             inner: Arc::new(ConfigInner {
                 diagnostics: Default::default(),
                 fallback_version: None,
+                ignore_filename: None,
+                all_rules: Default::default(),
             }),
         }
     }
@@ -60,6 +62,16 @@ impl Config {
     /// [`Config::with_fallback_version()`].
     pub fn fallback_version(&self) -> Option<SupportedVersion> {
         self.inner.fallback_version
+    }
+
+    /// Get this configuration's ignore filename.
+    pub fn ignore_filename(&self) -> Option<&str> {
+        self.inner.ignore_filename.as_deref()
+    }
+
+    /// Gets the list of all known rule identifiers.
+    pub fn all_rules(&self) -> &[String] {
+        &self.inner.all_rules
     }
 
     /// Return a new configuration with the previous [`DiagnosticsConfig`]
@@ -108,6 +120,37 @@ impl Config {
             inner: Arc::new(inner),
         }
     }
+
+    /// Return a new configuration with the previous ignore filename replaced by
+    /// the argument.
+    ///
+    /// Specifying `None` for `filename` disables ignore behavior. This is also
+    /// the default.
+    ///
+    /// `Some(filename)` will use `filename` as the ignorefile basename to
+    /// search for. Child directories _and_ parent directories are searched
+    /// for a file with the same basename as `filename` and if a match is
+    /// found it will attempt to be parsed as an ignorefile with a syntax
+    /// similar to `.gitignore` files.
+    pub fn with_ignore_filename(&self, filename: Option<String>) -> Self {
+        let mut inner = (*self.inner).clone();
+        inner.ignore_filename = filename;
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
+
+    /// Returns a new configuration with the list of all known rule identifiers
+    /// replaced by the argument.
+    ///
+    /// This is used internally to populate the `#@ except:` snippet.
+    pub fn with_all_rules(&self, rules: Vec<String>) -> Self {
+        let mut inner = (*self.inner).clone();
+        inner.all_rules = rules;
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
 }
 
 /// The actual configuration fields inside the [`Config`] wrapper.
@@ -119,6 +162,11 @@ struct ConfigInner {
     /// See [`Config::with_fallback_version()`]
     #[serde(default)]
     fallback_version: Option<SupportedVersion>,
+    /// See [`Config::with_ignore_filename()`]
+    ignore_filename: Option<String>,
+    /// A list of all known rule identifiers.
+    #[serde(default)]
+    all_rules: Vec<String>,
 }
 
 /// Configuration for analysis diagnostics.

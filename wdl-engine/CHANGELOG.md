@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added
 
+* Implemented coercion between `Map` <-> `Object`/`Struct` where the map key
+  type <-> `String` ([#586](https://github.com/stjude-rust-labs/wdl/pull/586)).
+
+#### Changed
+
+* Removed evaluation progress callbacks in favor of Crankshaft events channel ([#583](https://github.com/stjude-rust-labs/wdl/pull/583)).
+
+#### Fixed
+
+* Fixed deserialization of `Object` to no longer require keys be WDL
+  identifiers ([#586](https://github.com/stjude-rust-labs/wdl/pull/586)).
+* Fixed a panic caused by an incorrect type calculation of non-empty array
+  literals ([#585](https://github.com/stjude-rust-labs/wdl/pull/585)).
+* Fixed incorrect common type calculations from `None` values ([#584](https://github.com/stjude-rust-labs/wdl/pull/584)).
+
+## 0.7.0 - 08-13-2025
+
+#### Added
+
 * Added an experimental config flag to support golden testing that reduces environment-specific output ([#553](https://github.com/stjude-rust-labs/wdl/pull/553)).
 
 #### Fixed

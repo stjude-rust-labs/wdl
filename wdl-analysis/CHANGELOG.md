@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Added
 
+* Added workspace symbols support for the WDL Language Server ([#588](https://github.com/stjude-rust-labs/wdl/pull/588)).
+* Implemented coercion between `Map` <-> `Object`/`Struct` where the map key
+  type <-> `String` ([#586](https://github.com/stjude-rust-labs/wdl/pull/586)).
+* Added snippets support for the WDL Language Server ([#577](https://github.com/stjude-rust-labs/wdl/pull/577)).
+* Added document symbols support for the WDL Language Server ([#582](https://github.com/stjude-rust-labs/wdl/pull/582)).
+
+## 0.12.0 - 08-13-2025
+
+* Added semantic highlighting support for the WDL Language Server ([#569](https://github.com/stjude-rust-labs/wdl/pull/569)).
+
+#### Added
+
+* Added support for ignorefiles, although by default it is not enabled ([#565](https://github.com/stjude-rust-labs/wdl/pull/565)).
 * Added rename support for the WDL Language Server ([#563](https://github.com/stjude-rust-labs/wdl/pull/563)).
 * Added hover support for the WDL Language Server ([#540](https://github.com/stjude-rust-labs/wdl/pull/540)).
 
