@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Fixed
+
+* Command-line parsing of key-value pairs can now accept any special characters other than square brackets or curly braces
+
 ## 0.4.0 - 07-31-2025
 
 #### Added
