@@ -17,8 +17,8 @@ use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 
 use crate::Coercible;
-use crate::CoercionContext;
 use crate::EvaluationContext;
+use crate::HostPath;
 use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
@@ -105,22 +105,22 @@ fn ensure_local_path<'a>(base_dir: &EvaluationPath, path: &'a str) -> Result<Cow
 pub(crate) async fn download_file<'a>(
     downloader: &dyn Downloader,
     base_dir: &EvaluationPath,
-    path: &'a str,
+    path: &HostPath,
 ) -> Result<Location<'a>> {
     // If the path is a URL, download it
-    if let Some(url) = path::parse_url(path) {
+    if let Some(url) = path::parse_url(path.as_str()) {
         return downloader
             .download(&url)
             .await
             .map_err(|e| anyhow!("failed to download file `{path}`: {e:?}"));
     }
 
-    let p = Path::new(path);
+    let p = Path::new(path.as_str());
     if p.is_absolute() {
         return Ok(Location::Path(p.clean().into()));
     }
 
-    match base_dir.join(path)? {
+    match base_dir.join(path.as_str())? {
         EvaluationPath::Local(path) => Ok(Location::Path(path.into())),
         EvaluationPath::Remote(url) => downloader
             .download(&url)
@@ -131,7 +131,8 @@ pub(crate) async fn download_file<'a>(
 
 /// Helper for converting a temporary path to a value.
 ///
-/// Notifies the provided context of the new temporary file.
+/// Notifies the provided context of the new temporary file so that a guest path
+/// can be mapped for it, if necessary.
 ///
 /// Used by the `write_*` stdlib functions.
 pub(crate) fn temp_path_to_value(
@@ -149,23 +150,19 @@ pub(crate) fn temp_path_to_value(
     })?;
 
     // Convert the path to a string
-    let path = path
-        .into_os_string()
-        .into_string()
-        .map_err(|path| {
-            function_call_failed(
-                function_name,
-                format!(
-                    "path `{path}` cannot be represented as UTF-8",
-                    path = Path::new(&path).display()
-                ),
-                context.call_site,
-            )
-        })?
-        .into();
+    let path = HostPath::new(path.into_os_string().into_string().map_err(|path| {
+        function_call_failed(
+            function_name,
+            format!(
+                "path `{path}` cannot be represented as UTF-8",
+                path = Path::new(&path).display()
+            ),
+            context.call_site,
+        )
+    })?);
 
-    // Finally, notify that the file was created
-    // For task evaluation, this will cause a guest path to be mapped
+    // Finally, notify that the file was created.
+    // For task evaluation, this will cause a guest path to be mapped.
     context.context.notify_file_created(&path).map_err(|e| {
         function_call_failed(
             function_name,
@@ -253,6 +250,11 @@ impl<'a> CallContext<'a> {
         self.context.downloader()
     }
 
+    /// Gets the inner evaluation context.
+    pub fn inner(&self) -> &dyn EvaluationContext {
+        self.context
+    }
+
     /// Coerces an argument to the given type.
     ///
     /// # Panics
@@ -263,13 +265,8 @@ impl<'a> CallContext<'a> {
     fn coerce_argument(&self, index: usize, ty: impl Into<Type>) -> Value {
         self.arguments[index]
             .value
-            .coerce(self.coercion_context(), &ty.into())
+            .coerce(Some(self.context), &ty.into())
             .expect("value should coerce")
-    }
-
-    /// Gets the associated coercion context.
-    fn coercion_context(&self) -> Option<&dyn CoercionContext> {
-        self.context.coercion_context()
     }
 
     /// Checks to see if the calculated return type equals the given type.

@@ -45,47 +45,23 @@ use wdl_ast::v1::TASK_FIELD_NAME;
 use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
 use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
 
+use crate::EvaluationContext;
+use crate::GuestPath;
+use crate::HostPath;
 use crate::Outputs;
 use crate::TaskExecutionConstraints;
 use crate::path;
-
-/// Represents context for value coercion.
-///
-/// Coercion context assists in input localization for task evaluation.
-pub trait CoercionContext {
-    /// Assists in coercing a `File` to `String`.
-    ///
-    /// This is used in certain contexts to translate host paths to guest paths.
-    fn file_to_string(&self, file: &Arc<String>) -> Arc<String>;
-
-    /// Assists in coercing a `Directory` to `String`.
-    ///
-    /// This is used in certain contexts to translate host paths to guest paths.
-    fn directory_to_string(&self, directory: &Arc<String>) -> Arc<String>;
-
-    /// Assists in coercing a `String` to `File`.
-    ///
-    /// This is used in certain contexts to translate guest paths to host paths.
-    fn string_to_file(&self, string: &Arc<String>) -> Arc<String>;
-
-    /// Assists in coercing a `String` to `Directory`.
-    ///
-    /// This is used in certain contexts to translate guest paths to host paths.
-    fn string_to_directory(&self, string: &Arc<String>) -> Arc<String>;
-}
 
 /// Implemented on coercible values.
 pub trait Coercible: Sized {
     /// Coerces the value into the given type.
     ///
-    /// If `context` is `Some`, it will be used to coerce `File` and `Directory`
-    /// values to and from `String`.
-    ///
-    /// If `context` is `None`, `File` and `Directory` will coerce to and from
-    /// `String` by cloning the inner `Arc<String>`.
+    /// If the provided evaluation context is `None`, host to guest and guest to
+    /// host translation is not performed; `File` and `Directory` values will
+    /// coerce directly to string.
     ///
     /// Returns an error if the coercion is not supported.
-    fn coerce(&self, context: Option<&dyn CoercionContext>, target: &Type) -> Result<Self>;
+    fn coerce(&self, context: Option<&dyn EvaluationContext>, target: &Type) -> Result<Self>;
 }
 
 /// Represents a WDL runtime value.
@@ -289,9 +265,9 @@ impl Value {
     /// Gets the value as a `File`.
     ///
     /// Returns `None` if the value is not a `File`.
-    pub fn as_file(&self) -> Option<&Arc<String>> {
+    pub fn as_file(&self) -> Option<&HostPath> {
         match self {
-            Self::Primitive(PrimitiveValue::File(s)) => Some(s),
+            Self::Primitive(PrimitiveValue::File(p)) => Some(p),
             _ => None,
         }
     }
@@ -301,9 +277,9 @@ impl Value {
     /// # Panics
     ///
     /// Panics if the value is not a `File`.
-    pub fn unwrap_file(self) -> Arc<String> {
+    pub fn unwrap_file(self) -> HostPath {
         match self {
-            Self::Primitive(PrimitiveValue::File(s)) => s,
+            Self::Primitive(PrimitiveValue::File(p)) => p,
             _ => panic!("value is not a file"),
         }
     }
@@ -311,9 +287,9 @@ impl Value {
     /// Gets the value as a `Directory`.
     ///
     /// Returns `None` if the value is not a `Directory`.
-    pub fn as_directory(&self) -> Option<&Arc<String>> {
+    pub fn as_directory(&self) -> Option<&HostPath> {
         match self {
-            Self::Primitive(PrimitiveValue::Directory(s)) => Some(s),
+            Self::Primitive(PrimitiveValue::Directory(p)) => Some(p),
             _ => None,
         }
     }
@@ -323,9 +299,9 @@ impl Value {
     /// # Panics
     ///
     /// Panics if the value is not a `Directory`.
-    pub fn unwrap_directory(self) -> Arc<String> {
+    pub fn unwrap_directory(self) -> HostPath {
         match self {
-            Self::Primitive(PrimitiveValue::Directory(s)) => s,
+            Self::Primitive(PrimitiveValue::Directory(p)) => p,
             _ => panic!("value is not a directory"),
         }
     }
@@ -573,7 +549,7 @@ impl fmt::Display for Value {
 }
 
 impl Coercible for Value {
-    fn coerce(&self, context: Option<&dyn CoercionContext>, target: &Type) -> Result<Self> {
+    fn coerce(&self, context: Option<&dyn EvaluationContext>, target: &Type) -> Result<Self> {
         if target.is_union() || target.is_none() || self.ty().eq(target) {
             return Ok(self.clone());
         }
@@ -885,9 +861,9 @@ pub enum PrimitiveValue {
     /// The value is a `String`.
     String(Arc<String>),
     /// The value is a `File`.
-    File(Arc<String>),
+    File(HostPath),
     /// The value is a `Directory`.
-    Directory(Arc<String>),
+    Directory(HostPath),
 }
 
 impl PrimitiveValue {
@@ -897,13 +873,13 @@ impl PrimitiveValue {
     }
 
     /// Creates a new `File` value.
-    pub fn new_file(s: impl Into<String>) -> Self {
-        Self::File(Arc::new(s.into()))
+    pub fn new_file(path: impl Into<String>) -> Self {
+        Self::File(Arc::new(path.into()).into())
     }
 
     /// Creates a new `Directory` value.
-    pub fn new_directory(s: impl Into<String>) -> Self {
-        Self::Directory(Arc::new(s.into()))
+    pub fn new_directory(path: impl Into<String>) -> Self {
+        Self::Directory(Arc::new(path.into()).into())
     }
 
     /// Gets the type of the value.
@@ -1009,9 +985,9 @@ impl PrimitiveValue {
     /// Gets the value as a `File`.
     ///
     /// Returns `None` if the value is not a `File`.
-    pub fn as_file(&self) -> Option<&Arc<String>> {
+    pub fn as_file(&self) -> Option<&HostPath> {
         match self {
-            Self::File(s) => Some(s),
+            Self::File(p) => Some(p),
             _ => None,
         }
     }
@@ -1021,9 +997,9 @@ impl PrimitiveValue {
     /// # Panics
     ///
     /// Panics if the value is not a `File`.
-    pub fn unwrap_file(self) -> Arc<String> {
+    pub fn unwrap_file(self) -> HostPath {
         match self {
-            Self::File(s) => s,
+            Self::File(p) => p,
             _ => panic!("value is not a file"),
         }
     }
@@ -1031,9 +1007,9 @@ impl PrimitiveValue {
     /// Gets the value as a `Directory`.
     ///
     /// Returns `None` if the value is not a `Directory`.
-    pub fn as_directory(&self) -> Option<&Arc<String>> {
+    pub fn as_directory(&self) -> Option<&HostPath> {
         match self {
-            Self::Directory(s) => Some(s),
+            Self::Directory(p) => Some(p),
             _ => None,
         }
     }
@@ -1043,9 +1019,9 @@ impl PrimitiveValue {
     /// # Panics
     ///
     /// Panics if the value is not a `Directory`.
-    pub fn unwrap_directory(self) -> Arc<String> {
+    pub fn unwrap_directory(self) -> HostPath {
         match self {
-            Self::Directory(s) => s,
+            Self::Directory(p) => p,
             _ => panic!("value is not a directory"),
         }
     }
@@ -1068,12 +1044,12 @@ impl PrimitiveValue {
             }
             (Self::Float(left), Self::Float(right)) => Some(left.cmp(right)),
             (Self::String(left), Self::String(right))
-            | (Self::String(left), Self::File(right))
-            | (Self::String(left), Self::Directory(right))
-            | (Self::File(left), Self::File(right))
-            | (Self::File(left), Self::String(right))
-            | (Self::Directory(left), Self::Directory(right))
-            | (Self::Directory(left), Self::String(right)) => Some(left.cmp(right)),
+            | (Self::String(left), Self::File(HostPath(right)))
+            | (Self::String(left), Self::Directory(HostPath(right)))
+            | (Self::File(HostPath(left)), Self::File(HostPath(right)))
+            | (Self::File(HostPath(left)), Self::String(right))
+            | (Self::Directory(HostPath(left)), Self::Directory(HostPath(right)))
+            | (Self::Directory(HostPath(left)), Self::String(right)) => Some(left.cmp(right)),
             _ => None,
         }
     }
@@ -1083,18 +1059,18 @@ impl PrimitiveValue {
     /// This differs from the [Display][fmt::Display] implementation in that
     /// strings, files, and directories are not quoted and not escaped.
     ///
-    /// The provided coercion context is used for coercing `File` and
-    /// `Directory` values during string interpolation; normally it is `None`.
+    /// The provided coercion context is used to translate host paths to guest
+    /// paths; if `None`, `File` and `Directory` values are displayed as-is.
     pub fn raw<'a>(
         &'a self,
-        context: Option<&'a dyn CoercionContext>,
+        context: Option<&'a dyn EvaluationContext>,
     ) -> impl fmt::Display + use<'a> {
         /// Helper for displaying a raw value.
         struct Display<'a> {
             /// The value to display.
             value: &'a PrimitiveValue,
             /// The coercion context.
-            context: Option<&'a dyn CoercionContext>,
+            context: Option<&'a dyn EvaluationContext>,
         }
 
         impl fmt::Display for Display<'_> {
@@ -1110,8 +1086,8 @@ impl PrimitiveValue {
                             "{v}",
                             v = self
                                 .context
-                                .map(|c| c.file_to_string(v))
-                                .unwrap_or_else(|| v.clone())
+                                .and_then(|c| c.guest_path(v).map(|p| Cow::Owned(p.0)))
+                                .unwrap_or(Cow::Borrowed(&v.0))
                         )
                     }
                     PrimitiveValue::Directory(v) => {
@@ -1120,8 +1096,8 @@ impl PrimitiveValue {
                             "{v}",
                             v = self
                                 .context
-                                .map(|c| c.directory_to_string(v))
-                                .unwrap_or_else(|| v.clone())
+                                .and_then(|c| c.guest_path(v).map(|p| Cow::Owned(p.0)))
+                                .unwrap_or(Cow::Borrowed(&v.0))
                         )
                     }
                 }
@@ -1165,11 +1141,11 @@ impl PrimitiveValue {
         if let Cow::Owned(s) = shellexpand::full(path.as_str())
             .with_context(|| format!("failed to shell expand path `{path}`"))?
         {
-            *Arc::make_mut(path) = s;
+            *Arc::make_mut(&mut path.0) = s;
         }
 
         // Don't join URLs
-        if path::is_url(path) {
+        if path::is_url(path.as_str()) {
             return Ok(());
         }
 
@@ -1180,7 +1156,7 @@ impl PrimitiveValue {
             .into_os_string()
             .into_string()
         {
-            *Arc::make_mut(path) = s;
+            *Arc::make_mut(&mut path.0) = s;
         }
 
         Ok(())
@@ -1212,8 +1188,8 @@ impl PrimitiveValue {
         };
 
         // If it's a file URL, check that the file exists
-        if path::is_file_url(path) {
-            let exists = path::parse_url(path)
+        if path::is_file_url(path.as_str()) {
+            let exists = path::parse_url(path.as_str())
                 .and_then(|url| url.to_file_path().ok())
                 .map(|p| p.exists())
                 .unwrap_or(false);
@@ -1226,7 +1202,7 @@ impl PrimitiveValue {
             }
 
             bail!("path `{path}` does not exist");
-        } else if path::is_url(path) {
+        } else if path::is_url(path.as_str()) {
             // Treat other URLs as they exist
             return Ok(true);
         }
@@ -1259,7 +1235,7 @@ impl fmt::Display for PrimitiveValue {
             Self::Boolean(v) => write!(f, "{v}"),
             Self::Integer(v) => write!(f, "{v}"),
             Self::Float(v) => write!(f, "{v:.6?}"),
-            Self::String(s) | Self::File(s) | Self::Directory(s) => {
+            Self::String(s) | Self::File(HostPath(s)) | Self::Directory(HostPath(s)) => {
                 // TODO: handle necessary escape sequences
                 write!(f, "\"{s}\"")
             }
@@ -1292,7 +1268,7 @@ impl Hash for PrimitiveValue {
                 1.hash(state);
                 v.hash(state);
             }
-            Self::String(v) | Self::File(v) | Self::Directory(v) => {
+            Self::String(v) | Self::File(HostPath(v)) | Self::Directory(HostPath(v)) => {
                 // Hash these with the same discriminant; this allows coercion from file and
                 // directory to string
                 2.hash(state);
@@ -1327,7 +1303,7 @@ impl From<String> for PrimitiveValue {
 }
 
 impl Coercible for PrimitiveValue {
-    fn coerce(&self, context: Option<&dyn CoercionContext>, target: &Type) -> Result<Self> {
+    fn coerce(&self, context: Option<&dyn EvaluationContext>, target: &Type) -> Result<Self> {
         if target.is_union() || target.is_none() || self.ty().eq(target) {
             return Ok(self.clone());
         }
@@ -1374,46 +1350,46 @@ impl Coercible for PrimitiveValue {
                         // String -> File
                         PrimitiveType::File => Some(Self::File(
                             context
-                                .map(|c| c.string_to_file(s))
-                                .unwrap_or_else(|| s.clone()),
+                                .and_then(|c| c.host_path(&GuestPath(s.clone())))
+                                .unwrap_or_else(|| s.clone().into()),
                         )),
                         // String -> Directory
                         PrimitiveType::Directory => Some(Self::Directory(
                             context
-                                .map(|c| c.string_to_directory(s))
-                                .unwrap_or_else(|| s.clone()),
+                                .and_then(|c| c.host_path(&GuestPath(s.clone())))
+                                .unwrap_or_else(|| s.clone().into()),
                         )),
                         _ => None,
                     })
                     .with_context(|| format!("cannot coerce type `String` to type `{target}`"))
             }
-            Self::File(s) => {
+            Self::File(p) => {
                 target
                     .as_primitive()
                     .and_then(|ty| match ty {
                         // File -> File
-                        PrimitiveType::File => Some(Self::File(s.clone())),
+                        PrimitiveType::File => Some(Self::File(p.clone())),
                         // File -> String
                         PrimitiveType::String => Some(Self::String(
                             context
-                                .map(|c| c.file_to_string(s))
-                                .unwrap_or_else(|| s.clone()),
+                                .and_then(|c| c.guest_path(p).map(Into::into))
+                                .unwrap_or_else(|| p.clone().into()),
                         )),
                         _ => None,
                     })
                     .with_context(|| format!("cannot coerce type `File` to type `{target}`"))
             }
-            Self::Directory(s) => {
+            Self::Directory(p) => {
                 target
                     .as_primitive()
                     .and_then(|ty| match ty {
                         // Directory -> Directory
-                        PrimitiveType::Directory => Some(Self::Directory(s.clone())),
+                        PrimitiveType::Directory => Some(Self::Directory(p.clone())),
                         // Directory -> String
                         PrimitiveType::String => Some(Self::String(
                             context
-                                .map(|c| c.directory_to_string(s))
-                                .unwrap_or_else(|| s.clone()),
+                                .and_then(|c| c.guest_path(p).map(Into::into))
+                                .unwrap_or_else(|| p.clone().into()),
                         )),
                         _ => None,
                     })
@@ -1432,7 +1408,9 @@ impl serde::Serialize for PrimitiveValue {
             Self::Boolean(v) => v.serialize(serializer),
             Self::Integer(v) => v.serialize(serializer),
             Self::Float(v) => v.serialize(serializer),
-            Self::String(s) | Self::File(s) | Self::Directory(s) => s.serialize(serializer),
+            Self::String(s) | Self::File(HostPath(s)) | Self::Directory(HostPath(s)) => {
+                s.serialize(serializer)
+            }
         }
     }
 }
@@ -1458,7 +1436,7 @@ impl Pair {
     ///
     /// Panics if the given type is not a pair type.
     pub fn new(
-        context: Option<&dyn CoercionContext>,
+        context: Option<&dyn EvaluationContext>,
         ty: impl Into<Type>,
         left: impl Into<Value>,
         right: impl Into<Value>,
@@ -1543,7 +1521,7 @@ impl Array {
     ///
     /// Panics if the given type is not an array type.
     pub fn new<V>(
-        context: Option<&dyn CoercionContext>,
+        context: Option<&dyn EvaluationContext>,
         ty: impl Into<Type>,
         elements: impl IntoIterator<Item = V>,
     ) -> Result<Self>
@@ -1653,7 +1631,7 @@ impl Map {
     ///
     /// Panics if the given type is not a map type.
     pub fn new<K, V>(
-        context: Option<&dyn CoercionContext>,
+        context: Option<&dyn EvaluationContext>,
         ty: impl Into<Type>,
         elements: impl IntoIterator<Item = (K, V)>,
     ) -> Result<Self>
@@ -1929,7 +1907,7 @@ impl Struct {
     ///
     /// Panics if the given type is not a struct type.
     pub fn new<S, V>(
-        context: Option<&dyn CoercionContext>,
+        context: Option<&dyn EvaluationContext>,
         ty: impl Into<Type>,
         members: impl IntoIterator<Item = (S, V)>,
     ) -> Result<Self>
@@ -2345,7 +2323,7 @@ impl fmt::Display for CompoundValue {
 }
 
 impl Coercible for CompoundValue {
-    fn coerce(&self, context: Option<&dyn CoercionContext>, target: &Type) -> Result<Self> {
+    fn coerce(&self, context: Option<&dyn EvaluationContext>, target: &Type) -> Result<Self> {
         if target.is_union() || target.is_none() || self.ty().eq(target) {
             return Ok(self.clone());
         }
@@ -3164,8 +3142,13 @@ mod test {
     use wdl_analysis::types::MapType;
     use wdl_analysis::types::PairType;
     use wdl_analysis::types::StructType;
+    use wdl_ast::Diagnostic;
+    use wdl_ast::Span;
+    use wdl_ast::SupportedVersion;
 
     use super::*;
+    use crate::http::Downloader;
+    use crate::path::EvaluationPath;
 
     #[test]
     fn boolean_coercion() {
@@ -3274,14 +3257,14 @@ mod test {
             value
                 .coerce(None, &PrimitiveType::File.into())
                 .expect("should coerce"),
-            PrimitiveValue::File(value.as_string().expect("should be string").clone())
+            PrimitiveValue::File(value.as_string().expect("should be string").clone().into())
         );
         // String -> Directory
         assert_eq!(
             value
                 .coerce(None, &PrimitiveType::Directory.into())
                 .expect("should coerce"),
-            PrimitiveValue::Directory(value.as_string().expect("should be string").clone())
+            PrimitiveValue::Directory(value.as_string().expect("should be string").clone().into())
         );
         // String -> Boolean (invalid)
         assert_eq!(
@@ -3292,6 +3275,82 @@ mod test {
                     .unwrap_err()
             ),
             "cannot coerce type `String` to type `Boolean`"
+        );
+
+        struct Context;
+
+        impl EvaluationContext for Context {
+            fn version(&self) -> SupportedVersion {
+                unimplemented!()
+            }
+
+            fn resolve_name(&self, _: &str, _: Span) -> Result<Value, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn resolve_type_name(&self, _: &str, _: Span) -> Result<Type, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn base_dir(&self) -> &EvaluationPath {
+                unimplemented!()
+            }
+
+            fn temp_dir(&self) -> &Path {
+                unimplemented!()
+            }
+
+            fn downloader(&self) -> &dyn Downloader {
+                unimplemented!()
+            }
+
+            fn host_path(&self, path: &GuestPath) -> Option<HostPath> {
+                if path.as_str() == "/mnt/task/input/0/path" {
+                    Some(HostPath::new("/some/host/path"))
+                } else {
+                    None
+                }
+            }
+        }
+
+        // String (guest path) -> File
+        assert_eq!(
+            PrimitiveValue::new_string("/mnt/task/input/0/path")
+                .coerce(Some(&Context), &PrimitiveType::File.into())
+                .expect("should coerce")
+                .unwrap_file()
+                .as_str(),
+            "/some/host/path"
+        );
+
+        // String (not a guest path) -> File
+        assert_eq!(
+            value
+                .coerce(Some(&Context), &PrimitiveType::File.into())
+                .expect("should coerce")
+                .unwrap_file()
+                .as_str(),
+            "foo"
+        );
+
+        // String (guest path) -> Directory
+        assert_eq!(
+            PrimitiveValue::new_string("/mnt/task/input/0/path")
+                .coerce(Some(&Context), &PrimitiveType::Directory.into())
+                .expect("should coerce")
+                .unwrap_directory()
+                .as_str(),
+            "/some/host/path"
+        );
+
+        // String (not a guest path) -> Directory
+        assert_eq!(
+            value
+                .coerce(Some(&Context), &PrimitiveType::Directory.into())
+                .expect("should coerce")
+                .unwrap_directory()
+                .as_str(),
+            "foo"
         );
     }
 
@@ -3317,7 +3376,7 @@ mod test {
             value
                 .coerce(None, &PrimitiveType::String.into())
                 .expect("should coerce"),
-            PrimitiveValue::String(value.as_file().expect("should be file").clone())
+            PrimitiveValue::String(value.as_file().expect("should be file").0.clone())
         );
         // File -> Directory (invalid)
         assert_eq!(
@@ -3328,6 +3387,62 @@ mod test {
                     .unwrap_err()
             ),
             "cannot coerce type `File` to type `Directory`"
+        );
+
+        struct Context;
+
+        impl EvaluationContext for Context {
+            fn version(&self) -> SupportedVersion {
+                unimplemented!()
+            }
+
+            fn resolve_name(&self, _: &str, _: Span) -> Result<Value, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn resolve_type_name(&self, _: &str, _: Span) -> Result<Type, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn base_dir(&self) -> &EvaluationPath {
+                unimplemented!()
+            }
+
+            fn temp_dir(&self) -> &Path {
+                unimplemented!()
+            }
+
+            fn downloader(&self) -> &dyn Downloader {
+                unimplemented!()
+            }
+
+            fn guest_path(&self, path: &HostPath) -> Option<GuestPath> {
+                if path.as_str() == "/some/host/path" {
+                    Some(GuestPath::new("/mnt/task/input/0/path"))
+                } else {
+                    None
+                }
+            }
+        }
+
+        // File (mapped) -> String
+        assert_eq!(
+            PrimitiveValue::new_file("/some/host/path")
+                .coerce(Some(&Context), &PrimitiveType::String.into())
+                .expect("should coerce")
+                .unwrap_string()
+                .as_str(),
+            "/mnt/task/input/0/path"
+        );
+
+        // File (not mapped) -> String
+        assert_eq!(
+            value
+                .coerce(Some(&Context), &PrimitiveType::String.into())
+                .expect("should coerce")
+                .unwrap_string()
+                .as_str(),
+            "foo"
         );
     }
 
@@ -3353,7 +3468,7 @@ mod test {
             value
                 .coerce(None, &PrimitiveType::String.into())
                 .expect("should coerce"),
-            PrimitiveValue::String(value.as_directory().expect("should be directory").clone())
+            PrimitiveValue::String(value.as_directory().expect("should be directory").0.clone())
         );
         // Directory -> File (invalid)
         assert_eq!(
@@ -3362,6 +3477,62 @@ mod test {
                 e = value.coerce(None, &PrimitiveType::File.into()).unwrap_err()
             ),
             "cannot coerce type `Directory` to type `File`"
+        );
+
+        struct Context;
+
+        impl EvaluationContext for Context {
+            fn version(&self) -> SupportedVersion {
+                unimplemented!()
+            }
+
+            fn resolve_name(&self, _: &str, _: Span) -> Result<Value, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn resolve_type_name(&self, _: &str, _: Span) -> Result<Type, Diagnostic> {
+                unimplemented!()
+            }
+
+            fn base_dir(&self) -> &EvaluationPath {
+                unimplemented!()
+            }
+
+            fn temp_dir(&self) -> &Path {
+                unimplemented!()
+            }
+
+            fn downloader(&self) -> &dyn Downloader {
+                unimplemented!()
+            }
+
+            fn guest_path(&self, path: &HostPath) -> Option<GuestPath> {
+                if path.as_str() == "/some/host/path" {
+                    Some(GuestPath::new("/mnt/task/input/0/path"))
+                } else {
+                    None
+                }
+            }
+        }
+
+        // Directory (mapped) -> String
+        assert_eq!(
+            PrimitiveValue::new_directory("/some/host/path")
+                .coerce(Some(&Context), &PrimitiveType::String.into())
+                .expect("should coerce")
+                .unwrap_string()
+                .as_str(),
+            "/mnt/task/input/0/path"
+        );
+
+        // Directory (not mapped) -> String
+        assert_eq!(
+            value
+                .coerce(Some(&Context), &PrimitiveType::String.into())
+                .expect("should coerce")
+                .unwrap_string()
+                .as_str(),
+            "foo"
         );
     }
 

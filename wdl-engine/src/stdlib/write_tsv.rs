@@ -16,6 +16,7 @@ use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
+use crate::HostPath;
 use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
@@ -37,13 +38,15 @@ pub(crate) async fn write_tsv_value<W: AsyncWrite + Unpin>(
     context: &CallContext<'_>,
 ) -> Result<bool, std::io::Error> {
     match value {
-        PrimitiveValue::String(v) | PrimitiveValue::File(v) | PrimitiveValue::Directory(v)
+        PrimitiveValue::String(v)
+        | PrimitiveValue::File(HostPath(v))
+        | PrimitiveValue::Directory(HostPath(v))
             if v.contains('\t') =>
         {
             Ok(false)
         }
         v => {
-            let s = v.raw(context.coercion_context()).to_string();
+            let s = v.raw(Some(context.inner())).to_string();
             writer.write_all(s.as_bytes()).await?;
             Ok(true)
         }

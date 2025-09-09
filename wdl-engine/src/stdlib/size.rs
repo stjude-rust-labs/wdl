@@ -68,7 +68,7 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
             Some(s) => {
                 // If the path is a URL that isn't `file` schemed, treat as a file
                 if !path::is_file_url(s) && path::is_url(s) {
-                    PrimitiveValue::File(s.clone()).into()
+                    PrimitiveValue::File(s.clone().into()).into()
                 } else {
                     let path = ensure_local_path(context.base_dir(), s).map_err(|e| {
                         function_call_failed(FUNCTION_NAME, format!("{e:?}"), context.call_site)
@@ -86,9 +86,9 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
                             function_call_failed(FUNCTION_NAME, format!("{e:?}"), context.call_site)
                         })?;
                     if metadata.is_dir() {
-                        PrimitiveValue::Directory(s.clone()).into()
+                        PrimitiveValue::Directory(s.clone().into()).into()
                     } else {
-                        PrimitiveValue::File(s.clone()).into()
+                        PrimitiveValue::File(s.clone().into()).into()
                     }
                 }
             }
@@ -191,11 +191,11 @@ async fn primitive_disk_size(
 ) -> Result<f64> {
     match value {
         PrimitiveValue::File(path) => {
-            let size = file_path_size(downloader, base_dir, path).await?;
+            let size = file_path_size(downloader, base_dir, path.as_str()).await?;
             Ok(unit.units(size))
         }
         PrimitiveValue::Directory(path) => {
-            let path = ensure_local_path(base_dir, path)?;
+            let path = ensure_local_path(base_dir, path.as_str())?;
             calculate_directory_size(&path, unit).await
         }
         _ => Ok(0.0),

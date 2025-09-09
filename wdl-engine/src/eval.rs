@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::fmt;
 use std::fs;
 use std::io::BufRead;
 use std::path::Path;
@@ -22,7 +23,6 @@ use wdl_ast::SupportedVersion;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 
-use crate::CoercionContext;
 use crate::CompoundValue;
 use crate::Outputs;
 use crate::PrimitiveValue;
@@ -144,6 +144,82 @@ impl From<anyhow::Error> for EvaluationError {
 /// Represents a result from evaluating a workflow or task.
 pub type EvaluationResult<T> = Result<T, EvaluationError>;
 
+/// Represents a path to a file or directory on the host file system or a URL to
+/// a remote file.
+///
+/// The host in this context is where the WDL evaluation is taking place.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct HostPath(pub(crate) Arc<String>);
+
+impl HostPath {
+    /// Constructs a new host path from a string.
+    pub fn new(path: impl Into<String>) -> Self {
+        Self(Arc::new(path.into()))
+    }
+
+    /// Gets the string representation of the host path.
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for HostPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl From<Arc<String>> for HostPath {
+    fn from(path: Arc<String>) -> Self {
+        Self(path)
+    }
+}
+
+impl From<HostPath> for Arc<String> {
+    fn from(path: HostPath) -> Self {
+        path.0
+    }
+}
+
+/// Represents a path to a file or directory on the guest.
+///
+/// The guest in this context is the container where tasks are run.
+///
+/// For backends that do not use containers, a guest path is the same as a host
+/// path.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct GuestPath(pub(crate) Arc<String>);
+
+impl GuestPath {
+    /// Constructs a new guest path from a string.
+    pub fn new(path: impl Into<String>) -> Self {
+        Self(Arc::new(path.into()))
+    }
+
+    /// Gets the string representation of the guest path.
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for GuestPath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl From<Arc<String>> for GuestPath {
+    fn from(path: Arc<String>) -> Self {
+        Self(path)
+    }
+}
+
+impl From<GuestPath> for Arc<String> {
+    fn from(path: GuestPath) -> Self {
+        path.0
+    }
+}
+
 /// Represents context to an expression evaluator.
 pub trait EvaluationContext: Send + Sync {
     /// Gets the supported version of the document being evaluated.
@@ -192,18 +268,29 @@ pub trait EvaluationContext: Send + Sync {
     /// Gets the downloader to use for evaluating expressions.
     fn downloader(&self) -> &dyn Downloader;
 
-    /// Gets the associated coercion context.
+    /// Gets a guest path representation of a host path.
     ///
-    /// Returns `None` if there is no associated coercion context.
+    /// Returns `None` if there is no guest path representation of the host
+    /// path.
+    fn guest_path(&self, path: &HostPath) -> Option<GuestPath> {
+        let _ = path;
+        None
+    }
+
+    /// Gets a host path representation of a guest path.
     ///
-    /// Typically only task evaluation will provide a coercion context.
-    fn coercion_context(&self) -> Option<&dyn CoercionContext> {
+    /// Returns `None` if there is no host path representation of the guest
+    /// path.
+    fn host_path(&self, path: &GuestPath) -> Option<HostPath> {
+        let _ = path;
         None
     }
 
     /// Notifies the context that a file was created as a result of a call to a
     /// stdlib function.
-    fn notify_file_created(&mut self, path: &Arc<String>) -> Result<()> {
+    ///
+    /// A context may map a guest path for the new host path.
+    fn notify_file_created(&mut self, path: &HostPath) -> Result<()> {
         let _ = path;
         Ok(())
     }
@@ -560,7 +647,7 @@ pub struct Input {
     /// The guest path for the input.
     ///
     /// This is `None` when the backend isn't mapping input paths.
-    guest_path: Option<Arc<String>>,
+    guest_path: Option<GuestPath>,
     /// The download location for the input.
     ///
     /// This is `Some` if the input has been downloaded to a known location.
@@ -569,7 +656,7 @@ pub struct Input {
 
 impl Input {
     /// Creates a new input with the given path and access.
-    fn new(kind: InputKind, path: EvaluationPath, guest_path: Option<Arc<String>>) -> Self {
+    fn new(kind: InputKind, path: EvaluationPath, guest_path: Option<GuestPath>) -> Self {
         Self {
             kind,
             path,
@@ -593,7 +680,7 @@ impl Input {
     /// Gets the guest path for the input.
     ///
     /// This is `None` for inputs to backends that don't use containers.
-    pub fn guest_path(&self) -> Option<&Arc<String>> {
+    pub fn guest_path(&self) -> Option<&GuestPath> {
         self.guest_path.as_ref()
     }
 

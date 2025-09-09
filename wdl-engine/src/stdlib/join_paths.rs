@@ -41,7 +41,7 @@ fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .unwrap_string();
 
     // Join the first argument with the base path as it might be relative
-    let first = context.base_dir().join(&first).map_err(|_| {
+    let first = context.base_dir().join(first.as_str()).map_err(|_| {
         function_call_failed(
             FUNCTION_NAME,
             format!("path `{first}` cannot be joined with the evaluation base path"),
@@ -137,7 +137,8 @@ fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     } else {
         let first = context
             .coerce_argument(0, PrimitiveType::File)
-            .unwrap_file();
+            .unwrap_file()
+            .into();
 
         let array = context
             .coerce_argument(1, ANALYSIS_STDLIB.array_string_non_empty_type().clone())

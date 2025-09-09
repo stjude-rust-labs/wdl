@@ -378,12 +378,9 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                         None => write!(buffer, "{v}").unwrap(),
                     }
                 }
-                Value::Primitive(v) => write!(
-                    buffer,
-                    "{v}",
-                    v = v.raw(evaluator.context.coercion_context())
-                )
-                .unwrap(),
+                Value::Primitive(v) => {
+                    write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
+                }
                 Value::Compound(CompoundValue::Array(v))
                     if matches!(placeholder.option(), Some(PlaceholderOption::Sep(_)))
                         && v.as_slice()
@@ -404,12 +401,9 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                         match e {
                             Value::None(_) => {}
-                            Value::Primitive(v) => write!(
-                                buffer,
-                                "{v}",
-                                v = v.raw(evaluator.context.coercion_context())
-                            )
-                            .unwrap(),
+                            Value::Primitive(v) => {
+                                write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
+                            }
                             _ => {
                                 return Err(cannot_coerce_to_string(&v.ty(), expr.span()));
                             }
@@ -515,17 +509,9 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                     match expected.common_type(&actual) {
                         Some(ty) => {
-                            value = value.coerce(self.context.coercion_context(), &ty).map_err(
-                                |e| {
-                                    runtime_type_mismatch(
-                                        e,
-                                        &ty,
-                                        expected_span,
-                                        &actual,
-                                        expr.span(),
-                                    )
-                                },
-                            )?;
+                            value = value.coerce(Some(&self.context), &ty).map_err(|e| {
+                                runtime_type_mismatch(e, &ty, expected_span, &actual, expr.span())
+                            })?;
                             expected = ty;
                             expected_span = expr.span();
                         }
@@ -547,13 +533,11 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
             None => (Type::Union, Vec::new()),
         };
 
-        Ok(Array::new(
-            self.context.coercion_context(),
-            ArrayType::new(element_ty),
-            values,
+        Ok(
+            Array::new(Some(&self.context), ArrayType::new(element_ty), values)
+                .expect("array elements should coerce")
+                .into(),
         )
-        .expect("array elements should coerce")
-        .into())
     }
 
     /// Evaluates a literal pair expression.
@@ -565,7 +549,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         let left = self.evaluate_expr(&left).await?;
         let right = self.evaluate_expr(&right).await?;
         Ok(Pair::new(
-            self.context.coercion_context(),
+            Some(&self.context),
             PairType::new(left.ty(), right.ty()),
             left,
             right,
@@ -614,9 +598,8 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                     match expected_key_ty.common_type(&actual_key_ty) {
                         Some(ty) => {
-                            actual_key = actual_key
-                                .coerce(self.context.coercion_context(), &ty)
-                                .map_err(|e| {
+                            actual_key =
+                                actual_key.coerce(Some(&self.context), &ty).map_err(|e| {
                                     runtime_type_mismatch(
                                         e,
                                         &ty,
@@ -641,9 +624,8 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                     match expected_value_ty.common_type(&actual_value_ty) {
                         Some(ty) => {
-                            actual_value = actual_value
-                                .coerce(self.context.coercion_context(), &ty)
-                                .map_err(|e| {
+                            actual_value =
+                                actual_value.coerce(Some(&self.context), &ty).map_err(|e| {
                                     runtime_type_mismatch(
                                         e,
                                         &ty,
@@ -681,7 +663,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         };
 
         Ok(Map::new(
-            self.context.coercion_context(),
+            Some(&self.context),
             MapType::new(key_ty, value_ty),
             elements,
         )
@@ -720,11 +702,9 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
             match struct_ty.members().get(n.text()) {
                 Some(expected) => {
                     let value = self.evaluate_expr(&v).await?;
-                    let value = value
-                        .coerce(self.context.coercion_context(), expected)
-                        .map_err(|e| {
-                            runtime_type_mismatch(e, expected, n.span(), &value.ty(), v.span())
-                        })?;
+                    let value = value.coerce(Some(&self.context), expected).map_err(|e| {
+                        runtime_type_mismatch(e, expected, n.span(), &value.ty(), v.span())
+                    })?;
 
                     members.insert(n.text().to_string(), value);
                 }
@@ -803,7 +783,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         if let Some(expected) = task_hint_types(self.context.version(), name.text(), true) {
             match expected
                 .iter()
-                .find_map(|ty| value.coerce(self.context.coercion_context(), ty).ok())
+                .find_map(|ty| value.coerce(Some(&self.context), ty).ok())
             {
                 Some(value) => {
                     return Ok(value);
@@ -987,10 +967,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         // expression, depending on the result of the conditional expression
         let cond = self.evaluate_expr(&cond_expr).await?;
         let (value, true_ty, false_ty) = if cond
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| if_conditional_mismatch(&cond.ty(), cond_expr.span()))?
             .unwrap_boolean()
         {
@@ -1037,7 +1014,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         })?;
 
         Ok(value
-            .coerce(self.context.coercion_context(), &ty)
+            .coerce(Some(&self.context), &ty)
             .expect("coercion should not fail"))
     }
 
@@ -1050,10 +1027,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         let operand = expr.operand();
         let value = self.evaluate_expr(&operand).await?;
         Ok((!value
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| logical_not_mismatch(&value.ty(), operand.span()))?
             .unwrap_boolean())
         .into())
@@ -1114,10 +1088,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         // Evaluate the left-hand side first
         let left = self.evaluate_expr(&lhs).await?;
         if left
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| logical_or_mismatch(&left.ty(), lhs.span()))?
             .unwrap_boolean()
         {
@@ -1128,10 +1099,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         // Otherwise, evaluate the right-hand side
         let right = self.evaluate_expr(&rhs).await?;
         right
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| logical_or_mismatch(&right.ty(), rhs.span()))
     }
 
@@ -1145,10 +1113,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         // Evaluate the left-hand side first
         let left = self.evaluate_expr(&lhs).await?;
         if !left
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| logical_and_mismatch(&left.ty(), lhs.span()))?
             .unwrap_boolean()
         {
@@ -1159,10 +1124,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         // Otherwise, evaluate the right-hand side
         let right = self.evaluate_expr(&rhs).await?;
         right
-            .coerce(
-                self.context.coercion_context(),
-                &PrimitiveType::Boolean.into(),
-            )
+            .coerce(Some(&self.context), &PrimitiveType::Boolean.into())
             .map_err(|_| logical_and_mismatch(&right.ty(), rhs.span()))
     }
 
@@ -1302,7 +1264,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                 Some(
                     PrimitiveValue::new_string(format!(
                         "{left}{right}",
-                        right = right.raw(self.context.coercion_context())
+                        right = right.raw(Some(&self.context))
                     ))
                     .into(),
                 )
@@ -1314,7 +1276,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                 Some(
                     PrimitiveValue::new_string(format!(
                         "{left}{right}",
-                        left = left.raw(self.context.coercion_context())
+                        left = left.raw(Some(&self.context))
                     ))
                     .into(),
                 )

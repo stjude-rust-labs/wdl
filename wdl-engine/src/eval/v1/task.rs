@@ -13,6 +13,7 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
+use bimap::BiHashMap;
 use crankshaft::events::Event;
 use indexmap::IndexMap;
 use petgraph::algo::toposort;
@@ -66,10 +67,11 @@ use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::version::V1;
 
 use crate::Coercible;
-use crate::CoercionContext;
 use crate::EvaluationContext;
 use crate::EvaluationError;
 use crate::EvaluationResult;
+use crate::GuestPath;
+use crate::HostPath;
 use crate::Input;
 use crate::InputKind;
 use crate::ONE_GIBIBYTE;
@@ -566,12 +568,16 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
         self.downloader
     }
 
-    fn coercion_context(&self) -> Option<&dyn CoercionContext> {
-        Some(self.state)
+    fn host_path(&self, path: &GuestPath) -> Option<HostPath> {
+        self.state.path_map.get_by_right(path).cloned()
     }
 
-    fn notify_file_created(&mut self, path: &Arc<String>) -> Result<()> {
-        self.state.insert_input(InputKind::File, path)?;
+    fn guest_path(&self, path: &HostPath) -> Option<GuestPath> {
+        self.state.path_map.get_by_left(path).cloned()
+    }
+
+    fn notify_file_created(&mut self, path: &HostPath) -> Result<()> {
+        self.state.insert_backend_input(InputKind::File, path)?;
         Ok(())
     }
 }
@@ -601,12 +607,10 @@ struct State<'a> {
     ///
     /// Environment variables do not change between retries.
     env: IndexMap<String, String>,
-    /// The input trie for mapping inputs.
-    inputs: InputTrie,
-    /// A map of host paths to guest paths.
-    host_to_guest: HashMap<Arc<String>, Arc<String>>,
-    /// A map of guest paths to host paths.
-    guest_to_host: HashMap<Arc<String>, Arc<String>>,
+    /// The trie for mapping backend inputs.
+    backend_inputs: InputTrie,
+    /// A bi-map of host paths and guest paths.
+    path_map: BiHashMap<HostPath, GuestPath>,
 }
 
 impl<'a> State<'a> {
@@ -631,7 +635,7 @@ impl<'a> State<'a> {
             Scope::new(OUTPUT_SCOPE_INDEX),
         ];
 
-        let inputs = if let Some(guest_inputs_dir) = guest_inputs_dir {
+        let backend_inputs = if let Some(guest_inputs_dir) = guest_inputs_dir {
             InputTrie::new_with_guest_dir(guest_inputs_dir)
         } else {
             InputTrie::new()
@@ -651,14 +655,13 @@ impl<'a> State<'a> {
             task,
             scopes,
             env: Default::default(),
-            inputs,
-            host_to_guest: Default::default(),
-            guest_to_host: Default::default(),
+            backend_inputs,
+            path_map: Default::default(),
         })
     }
 
-    /// Adds inputs to the state for any `File` or `Directory` values referenced
-    /// by the given value.
+    /// Adds backend inputs to the state for any `File` or `Directory` values
+    /// referenced by the given value.
     ///
     /// If the backend doesn't use containers, remote inputs are immediately
     /// localized.
@@ -668,7 +671,7 @@ impl<'a> State<'a> {
     ///
     /// This method also ensures that a `File` or `Directory` paths exist for
     /// WDL 1.2+.
-    async fn add_inputs(
+    async fn add_backend_inputs(
         &mut self,
         is_optional: bool,
         value: &mut Value,
@@ -685,6 +688,8 @@ impl<'a> State<'a> {
                 >= SupportedVersion::V1(V1::Two)
                 && !value.ensure_path_exists(optional, self.base_dir.as_local())?
             {
+                // Return `Ok(false)` to the caller to replace the optional value with `None`
+                // We don't need to insert a backend input for a `None` value
                 return Ok(false);
             }
 
@@ -694,14 +699,14 @@ impl<'a> State<'a> {
                 _ => unreachable!("only file and directory values should be visited"),
             };
 
-            // Insert an input for the path
-            if let Some(index) = self.insert_input(kind, path)? {
+            // Insert a backend input for the path
+            if let Some(index) = self.insert_backend_input(kind, path)? {
                 // Check to see if there's no guest path for a remote URL that needs to be
                 // localized; if so, we must localize it now
                 if needs_local_inputs
-                    && self.inputs.as_slice()[index].guest_path.is_none()
-                    && is_url(path)
-                    && !is_file_url(path)
+                    && self.backend_inputs.as_slice()[index].guest_path.is_none()
+                    && is_url(path.as_str())
+                    && !is_file_url(path.as_str())
                 {
                     urls.push((path.clone(), index));
                 }
@@ -721,7 +726,8 @@ impl<'a> State<'a> {
             downloads.spawn(async move {
                 downloader
                     .download(
-                        &url.parse()
+                        &url.as_str()
+                            .parse()
                             .with_context(|| format!("invalid URL `{url}`"))?,
                     )
                     .await
@@ -735,65 +741,42 @@ impl<'a> State<'a> {
             let (url, location, index) =
                 result.unwrap_or_else(|e| Err(anyhow!("download task failed: {e}")))?;
 
-            let guest_path = Arc::new(
-                location
-                    .to_str()
-                    .with_context(|| {
-                        format!(
-                            "download location `{location}` is not UTF-8",
-                            location = location.display()
-                        )
-                    })?
-                    .to_string(),
-            );
+            let guest_path = GuestPath::new(location.to_str().with_context(|| {
+                format!(
+                    "download location `{location}` is not UTF-8",
+                    location = location.display()
+                )
+            })?);
 
             // Map the URL to the guest path
-            self.host_to_guest.insert(url.clone(), guest_path.clone());
-            self.guest_to_host.insert(guest_path.clone(), url.clone());
-            self.inputs.as_slice_mut()[index].set_location(location);
+            self.path_map.insert(url, guest_path);
+
+            // Finally, set the location of the input
+            self.backend_inputs.as_slice_mut()[index].set_location(location);
         }
 
         Ok(())
     }
 
-    /// Inserts an input into the state.
+    /// Inserts a backend input into the state.
     ///
     /// Responsible for mapping host and guest paths.
-    fn insert_input(&mut self, kind: InputKind, path: &Arc<String>) -> Result<Option<usize>> {
+    fn insert_backend_input(&mut self, kind: InputKind, path: &HostPath) -> Result<Option<usize>> {
         // Insert an input for the path
-        if let Some(index) = self.inputs.insert(kind, path.as_str(), &self.base_dir)? {
+        if let Some(index) = self
+            .backend_inputs
+            .insert(kind, path.as_str(), &self.base_dir)?
+        {
             // If the input has a guest path, map it
-            let input = &self.inputs.as_slice()[index];
+            let input = &self.backend_inputs.as_slice()[index];
             if let Some(guest_path) = &input.guest_path {
-                self.host_to_guest.insert(path.clone(), guest_path.clone());
-                self.guest_to_host.insert(guest_path.clone(), path.clone());
+                self.path_map.insert(path.clone(), guest_path.clone());
             }
 
             return Ok(Some(index));
         }
 
         Ok(None)
-    }
-}
-
-impl CoercionContext for State<'_> {
-    fn file_to_string(&self, file: &Arc<String>) -> Arc<String> {
-        self.host_to_guest.get(file).unwrap_or(file).clone()
-    }
-
-    fn directory_to_string(&self, directory: &Arc<String>) -> Arc<String> {
-        self.host_to_guest
-            .get(directory)
-            .unwrap_or(directory)
-            .clone()
-    }
-
-    fn string_to_file(&self, string: &Arc<String>) -> Arc<String> {
-        self.guest_to_host.get(string).unwrap_or(string).clone()
-    }
-
-    fn string_to_directory(&self, string: &Arc<String>) -> Arc<String> {
-        self.guest_to_host.get(string).unwrap_or(string).clone()
     }
 }
 
@@ -1164,12 +1147,19 @@ impl TaskEvaluator {
 
         // Coerce the value to the expected type
         let mut value = value
-            .coerce(Some(state), &ty)
+            .coerce(
+                Some(&TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    ROOT_SCOPE_INDEX,
+                )),
+                &ty,
+            )
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), span))?;
 
-        // Add any file or directory inputs to the state
+        // Add any file or directory backend inputs
         state
-            .add_inputs(
+            .add_backend_inputs(
                 decl_ty.is_optional(),
                 &mut value,
                 &self.downloader,
@@ -1195,7 +1185,11 @@ impl TaskEvaluator {
             let value = value
                 .as_primitive()
                 .expect("value should be primitive")
-                .raw(Some(state))
+                .raw(Some(&TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    ROOT_SCOPE_INDEX,
+                )))
                 .to_string();
             state.env.insert(name.text().to_string(), value);
         }
@@ -1231,12 +1225,19 @@ impl TaskEvaluator {
         let expr = decl.expr().expect("private decls should have expressions");
         let value = evaluator.evaluate_expr(&expr).await?;
         let mut value = value
-            .coerce(Some(state), &ty)
+            .coerce(
+                Some(&TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    ROOT_SCOPE_INDEX,
+                )),
+                &ty,
+            )
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span()))?;
 
-        // Add any file or directory inputs to the state
+        // Add any file or directory backend inputs
         state
-            .add_inputs(
+            .add_backend_inputs(
                 decl_ty.is_optional(),
                 &mut value,
                 &self.downloader,
@@ -1254,7 +1255,11 @@ impl TaskEvaluator {
             let value = value
                 .as_primitive()
                 .expect("value should be primitive")
-                .raw(Some(state))
+                .raw(Some(&TaskEvaluationContext::new(
+                    state,
+                    &self.downloader,
+                    ROOT_SCOPE_INDEX,
+                )))
                 .to_string();
             state.env.insert(name.text().to_string(), value);
         }
@@ -1321,7 +1326,18 @@ impl TaskEvaluator {
             if let Some(types) = types {
                 value = types
                     .iter()
-                    .find_map(|ty| value.coerce(Some(state), ty).ok())
+                    .find_map(|ty| {
+                        value
+                            .coerce(
+                                Some(&TaskEvaluationContext::new(
+                                    state,
+                                    &self.downloader,
+                                    ROOT_SCOPE_INDEX,
+                                )),
+                                ty,
+                            )
+                            .ok()
+                    })
                     .ok_or_else(|| {
                         multiple_type_mismatch(types, name.span(), &value.ty(), expr.span())
                     })?;
@@ -1379,7 +1395,18 @@ impl TaskEvaluator {
             let value = evaluator.evaluate_expr(&expr).await?;
             let value = types
                 .iter()
-                .find_map(|ty| value.coerce(Some(state), ty).ok())
+                .find_map(|ty| {
+                    value
+                        .coerce(
+                            Some(&TaskEvaluationContext::new(
+                                state,
+                                &self.downloader,
+                                ROOT_SCOPE_INDEX,
+                            )),
+                            ty,
+                        )
+                        .ok()
+                })
                 .ok_or_else(|| {
                     multiple_type_mismatch(types, name.span(), &value.ty(), expr.span())
                 })?;
@@ -1620,10 +1647,10 @@ impl TaskEvaluator {
 
         // Coerce the output value to the expected type
         let mut value = value
-            .coerce(Some(state), &ty)
+            .coerce(Some(evaluator.context()), &ty)
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span()))?;
 
-        // Translate `File` and `Directory` values to host paths
+        // Translate `File` and `Directory` values to host paths.
         // For output section evaluation, paths are relative to the task's work
         // directory
         value
@@ -1634,9 +1661,9 @@ impl TaskEvaluator {
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                // Join the path with the work directory
+                // Join the path with the work directory.
                 // The work directory returned by the backend is already a host path
-                let mut output_path = evaluated.result.work_dir.join(path)?;
+                let mut output_path = evaluated.result.work_dir.join(path.as_str())?;
 
                 // Ensure the output's path is valid
                 let output_path = match (&mut output_path, &evaluated.result.work_dir) {
@@ -1646,33 +1673,37 @@ impl TaskEvaluator {
                     {
                         // The joined path is contained within the work directory or attempt
                         // directory
-                        output_path
-                            .into_string()
-                            .with_context(|| format!("path `{path}` is not UTF-8"))?
-                            .into()
+                        HostPath::new(
+                            output_path
+                                .into_string()
+                                .with_context(|| format!("path `{path}` is not UTF-8"))?,
+                        )
                     }
                     (EvaluationPath::Local(_), EvaluationPath::Local(_)) => {
                         // The joined path is not within the work or attempt directory; therefore,
                         // it is required to be an input
                         state
-                            .guest_to_host
-                            .get(path)
+                            .path_map
+                            .get_by_left(path)
                             .ok_or_else(|| {
                                 anyhow!(
                                     "guest path `{path}` is not an input or within the task's \
                                      working directory"
                                 )
                             })?
+                            .0
                             .clone()
+                            .into()
                     }
                     (EvaluationPath::Local(_), EvaluationPath::Remote(_)) => {
                         // Path is local (and absolute) and the working directory is remote
                         bail!("cannot access guest path `{path}` from a remotely executing task")
                     }
-                    (EvaluationPath::Remote(_), _) => output_path
-                        .into_string()
-                        .with_context(|| format!("path `{path}` is not UTF-8"))?
-                        .into(),
+                    (EvaluationPath::Remote(_), _) => HostPath::new(
+                        output_path
+                            .into_string()
+                            .with_context(|| format!("path `{path}` is not UTF-8"))?,
+                    ),
                 };
 
                 *path = output_path;
@@ -1709,7 +1740,7 @@ impl TaskEvaluator {
             let mut downloads = JoinSet::new();
 
             // Download any necessary files
-            for (idx, input) in state.inputs.as_slice_mut().iter_mut().enumerate() {
+            for (idx, input) in state.backend_inputs.as_slice_mut().iter_mut().enumerate() {
                 if input.local_path().is_some() {
                     continue;
                 }
@@ -1731,7 +1762,7 @@ impl TaskEvaluator {
             while let Some(result) = downloads.join_next().await {
                 match result.unwrap_or_else(|e| Err(anyhow!("download task failed: {e}"))) {
                     Ok((idx, location)) => {
-                        state.inputs.as_slice_mut()[idx].set_location(location);
+                        state.backend_inputs.as_slice_mut()[idx].set_location(location);
                     }
                     Err(e) => {
                         return Err(EvaluationError::new(
@@ -1744,7 +1775,7 @@ impl TaskEvaluator {
         }
 
         if enabled!(Level::DEBUG) {
-            for input in state.inputs.as_slice() {
+            for input in state.backend_inputs.as_slice() {
                 match (input.local_path(), input.guest_path()) {
                     (None, None) => {}
                     (None, Some(guest_path)) => {
@@ -1781,6 +1812,6 @@ impl TaskEvaluator {
             }
         }
 
-        Ok(state.inputs.as_slice().into())
+        Ok(state.backend_inputs.as_slice().into())
     }
 }

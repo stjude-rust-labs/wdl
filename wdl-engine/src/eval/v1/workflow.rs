@@ -1169,7 +1169,7 @@ impl WorkflowEvaluator {
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
+                if !path::is_url(path.as_str()) && Path::new(path.as_str()).is_relative() {
                     bail!("relative path `{path}` cannot be used as a workflow output");
                 }
 

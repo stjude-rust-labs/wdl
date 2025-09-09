@@ -12,6 +12,7 @@ use anyhow::Result;
 use anyhow::bail;
 use url::Url;
 
+use crate::GuestPath;
 use crate::Input;
 use crate::InputKind;
 use crate::eval::ROOT_NAME;
@@ -199,7 +200,7 @@ impl InputTrie {
         }
 
         let guest_path = self.guest_inputs_dir.map(|d| {
-            format!(
+            GuestPath::new(format!(
                 "{d}{parent_id}/{last}",
                 // On Windows, `last_component` might be `Some` despite being a root due to the
                 // prefix (e.g. `C:`); instead check if the path has a parent
@@ -208,8 +209,7 @@ impl InputTrie {
                 } else {
                     last_component.unwrap_or(ROOT_NAME)
                 }
-            )
-            .into()
+            ))
         });
 
         let index = self.inputs.len();
@@ -265,11 +265,10 @@ impl InputTrie {
         }
 
         let guest_path = self.guest_inputs_dir.as_ref().map(|d| {
-            format!(
+            GuestPath::new(format!(
                 "{d}{parent_id}/{last}",
                 last = last_segment.unwrap_or(ROOT_NAME)
-            )
-            .into()
+            ))
         });
 
         let index = self.inputs.len();
