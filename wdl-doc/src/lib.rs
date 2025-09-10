@@ -148,12 +148,17 @@ impl Render for Css<'_> {
 ///
 /// Requires a relative path to the root where `style.css` and `index.js` files
 /// are expected.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P, script: Option<&str>) -> Markup {
+pub(crate) fn header<P: AsRef<Path>>(
+    page_title: &str,
+    root: P,
+    script: &AdditionalScript,
+) -> Markup {
     let root = root.as_ref();
     html! {
         head {
-            @if let Some(s) = script {
-                script { (PreEscaped(s)) }
+            @match script {
+                AdditionalScript::HeadOpen(s) => script { (PreEscaped(s)) }
+                _ => {}
             }
             meta charset="utf-8";
             meta name="viewport" content="width=device-width, initial-scale=1.0";
@@ -165,6 +170,10 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, root: P, script: Option<&
             script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" {}
             script defer src=(root.join("index.js").to_string_lossy()) {}
             (Css(&root.join("style.css").to_string_lossy()))
+            @match script {
+                AdditionalScript::HeadClose(s) => script { (PreEscaped(s)) }
+                _ => {}
+            }
         }
     }
 }
@@ -175,14 +184,22 @@ pub(crate) fn full_page<P: AsRef<Path>>(
     page_title: &str,
     body: Markup,
     root: P,
-    script: Option<&str>,
+    script: &AdditionalScript,
 ) -> Markup {
     html! {
         (DOCTYPE)
         html class="dark" {
             (header(page_title, root, script))
             body class="body--base" {
+                @match script {
+                    AdditionalScript::BodyOpen(s) => script { (PreEscaped(s)) }
+                    _ => {}
+                }
                 (body)
+                @match script {
+                    AdditionalScript::BodyClose(s) => script { (PreEscaped(s)) }
+                    _ => {}
+                }
             }
         }
     }
@@ -333,6 +350,22 @@ async fn analyze_workspace(
     Ok(results)
 }
 
+/// The location to embed an arbitrary JaveScript `<script>` tag into each HTML
+/// page.
+#[derive(Debug)]
+pub enum AdditionalScript {
+    /// Embed the contents immediately after the opening `<head>` tag.
+    HeadOpen(String),
+    /// Embed the contents immediately before the closing `</head>` tag.
+    HeadClose(String),
+    /// Embed the contents immediately after the opening `<body>` tag.
+    BodyOpen(String),
+    /// Embed the contents immediately before the closing `</body>` tag.
+    BodyClose(String),
+    /// Don't embed any script.
+    None,
+}
+
 /// Configuration for documentation generation.
 #[derive(Debug)]
 pub struct Config {
@@ -348,8 +381,8 @@ pub struct Config {
     custom_theme: Option<PathBuf>,
     /// An optional custom logo to embed in the left sidebar.
     custom_logo: Option<PathBuf>,
-    /// An optional JavaScript file to embed in each HTML page's `<head>` tag.
-    additional_javascript: Option<PathBuf>,
+    /// Optional JavaScript to embed in each HTML page.
+    additional_javascript: AdditionalScript,
     /// Prefer the "Full Directory" view over the "Workflows" view of the left
     /// sidebar.
     prefer_full_directory: bool,
@@ -369,37 +402,37 @@ impl Config {
             homepage: None,
             custom_theme: None,
             custom_logo: None,
-            additional_javascript: None,
+            additional_javascript: AdditionalScript::None,
             prefer_full_directory: PREFER_FULL_DIRECTORY,
         }
     }
 
     /// Overwrite the config's homepage with the new value.
-    pub fn set_homepage(mut self, homepage: Option<PathBuf>) -> Self {
+    pub fn homepage(mut self, homepage: Option<PathBuf>) -> Self {
         self.homepage = homepage;
         self
     }
 
     /// Overwrite the config's custom theme with the new value.
-    pub fn set_custom_theme(mut self, custom_theme: Option<PathBuf>) -> Self {
+    pub fn custom_theme(mut self, custom_theme: Option<PathBuf>) -> Self {
         self.custom_theme = custom_theme;
         self
     }
 
     /// Overwrite the config's custom logo with the new value.
-    pub fn set_custom_logo(mut self, custom_logo: Option<PathBuf>) -> Self {
+    pub fn custom_logo(mut self, custom_logo: Option<PathBuf>) -> Self {
         self.custom_logo = custom_logo;
         self
     }
 
     /// Overwrite the config's additional JS with the new value.
-    pub fn set_additional_javascript(mut self, additional_javascript: Option<PathBuf>) -> Self {
+    pub fn additional_javascript(mut self, additional_javascript: AdditionalScript) -> Self {
         self.additional_javascript = additional_javascript;
         self
     }
 
     /// Overwrite the config's prefer_full_directory with the new value.
-    pub fn set_prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
+    pub fn prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
         self.prefer_full_directory = prefer_full_directory;
         self
     }
@@ -459,7 +492,7 @@ pub async fn document_workspace(config: Config) -> Result<()> {
         .maybe_homepage(homepage)
         .maybe_custom_theme(config.custom_theme)?
         .maybe_logo(config.custom_logo)
-        .maybe_additional_javascript(config.additional_javascript)
+        .additional_javascript(config.additional_javascript)
         .prefer_full_directory(config.prefer_full_directory)
         .build()
         .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
