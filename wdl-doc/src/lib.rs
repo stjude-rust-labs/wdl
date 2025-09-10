@@ -383,9 +383,9 @@ pub struct Config {
     custom_logo: Option<PathBuf>,
     /// Optional JavaScript to embed in each HTML page.
     additional_javascript: AdditionalScript,
-    /// Prefer the "Full Directory" view over the "Workflows" view of the left
-    /// sidebar.
-    prefer_full_directory: bool,
+    /// Initialize pages on the "Full Directory" view instead of the "Workflows"
+    /// view of the left sidebar.
+    init_on_full_directory: bool,
 }
 
 impl Config {
@@ -403,7 +403,7 @@ impl Config {
             custom_theme: None,
             custom_logo: None,
             additional_javascript: AdditionalScript::None,
-            prefer_full_directory: PREFER_FULL_DIRECTORY,
+            init_on_full_directory: PREFER_FULL_DIRECTORY,
         }
     }
 
@@ -431,9 +431,9 @@ impl Config {
         self
     }
 
-    /// Overwrite the config's prefer_full_directory with the new value.
+    /// Overwrite the config's init_on_full_directory with the new value.
     pub fn prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
-        self.prefer_full_directory = prefer_full_directory;
+        self.init_on_full_directory = prefer_full_directory;
         self
     }
 }
@@ -493,7 +493,7 @@ pub async fn document_workspace(config: Config) -> Result<()> {
         .maybe_custom_theme(config.custom_theme)?
         .maybe_logo(config.custom_logo)
         .additional_javascript(config.additional_javascript)
-        .prefer_full_directory(config.prefer_full_directory)
+        .prefer_full_directory(config.init_on_full_directory)
         .build()
         .with_context(|| "failed to build documentation tree with provided paths".to_string())?;
 

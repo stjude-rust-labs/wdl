@@ -218,11 +218,13 @@ pub struct DocsTreeBuilder {
     custom_theme: Option<PathBuf>,
     /// The path to a custom logo to embed at the top of the left sidebar.
     logo: Option<PathBuf>,
-    /// An optional JavaScript file to embed in each HTML page.
+    /// Optional JavaScript to embed in each HTML page.
     additional_javascript: AdditionalScript,
     /// Start on the "Full Directory" left sidebar view instead of the
     /// "Workflows" view.
-    prefer_full_directory: bool,
+    ///
+    /// Users can toggle the view. This only impacts the initialized value.
+    init_on_full_directory: bool,
 }
 
 impl DocsTreeBuilder {
@@ -237,7 +239,7 @@ impl DocsTreeBuilder {
             custom_theme: None,
             logo: None,
             additional_javascript: AdditionalScript::None,
-            prefer_full_directory: crate::PREFER_FULL_DIRECTORY,
+            init_on_full_directory: crate::PREFER_FULL_DIRECTORY,
         }
     }
 
@@ -293,10 +295,10 @@ impl DocsTreeBuilder {
         self
     }
 
-    /// Set whether the "Full Directory" view should be preferred over the
-    /// "Workflows" view of the left sidebar.
+    /// Set whether the "Full Directory" view should be initialized instead of
+    /// the "Workflows" view of the left sidebar.
     pub fn prefer_full_directory(mut self, prefer_full_directory: bool) -> Self {
-        self.prefer_full_directory = prefer_full_directory;
+        self.init_on_full_directory = prefer_full_directory;
         self
     }
 
@@ -321,7 +323,7 @@ impl DocsTreeBuilder {
             path: self.root,
             homepage: self.homepage,
             additional_javascript: self.additional_javascript,
-            prefer_full_directory: self.prefer_full_directory,
+            init_on_full_directory: self.init_on_full_directory,
         })
     }
 
@@ -426,9 +428,9 @@ pub struct DocsTree {
     homepage: Option<PathBuf>,
     /// Optional JavaScript to embed in each HTML page.
     additional_javascript: AdditionalScript,
-    /// Prefer the "Full Directory" view over the "Workflows" view of the left
-    /// sidebar.
-    prefer_full_directory: bool,
+    /// Initialize pages on the "Full Directory" view instead of the "Workflows"
+    /// view of the left sidebar.
+    init_on_full_directory: bool,
 }
 
 impl DocsTree {
@@ -898,7 +900,7 @@ impl DocsTree {
                     }});
                 }}
             }}"#,
-            !self.prefer_full_directory,
+            !self.init_on_full_directory,
             self.get_asset(base, "chevron-up.svg"),
             self.get_asset(base, "chevron-down.svg"),
             all_nodes
