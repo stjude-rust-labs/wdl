@@ -1568,10 +1568,7 @@ pub(crate) mod test {
     }
 
     impl Transferer for TestEnv {
-        fn download<'a, 'b, 'c>(
-            &'a self,
-            url: &'b Url,
-        ) -> BoxFuture<'c, Result<crate::http::Location<'static>>>
+        fn download<'a, 'b, 'c>(&'a self, url: &'b Url) -> BoxFuture<'c, Result<Location>>
         where
             'a: 'c,
             'b: 'c,
@@ -1583,8 +1580,7 @@ pub(crate) mod test {
                     return Ok(Location::Path(
                         self.test_dir
                             .path()
-                            .join(url.path().strip_prefix('/').unwrap_or(url.path()))
-                            .into(),
+                            .join(url.path().strip_prefix('/').unwrap_or(url.path())),
                     ));
                 }
 

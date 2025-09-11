@@ -94,26 +94,16 @@ impl Events {
 
     /// Subscribes to the Crankshaft events channel.
     ///
-    /// # Panics
-    ///
-    /// Panics if the Crankshaft events channel cannot be subscribed to.
-    pub fn subscribe_crankshaft(&self) -> broadcast::Receiver<CrankshaftEvent> {
-        self.crankshaft
-            .as_ref()
-            .expect("Crankshaft events were not enabled")
-            .subscribe()
+    /// Returns `None` if Crankshaft events are not enabled.
+    pub fn subscribe_crankshaft(&self) -> Option<broadcast::Receiver<CrankshaftEvent>> {
+        self.crankshaft.as_ref().map(|s| s.subscribe())
     }
 
     /// Subscribes to the transfer events channel.
     ///
-    /// # Panics
-    ///
-    /// Panics if the transfer events channel cannot be subscribed to.
-    pub fn subscribe_transfer(&self) -> broadcast::Receiver<TransferEvent> {
-        self.transfer
-            .as_ref()
-            .expect("transfer events were not enabled")
-            .subscribe()
+    /// Returns `None` if transfer events are not enabled.
+    pub fn subscribe_transfer(&self) -> Option<broadcast::Receiver<TransferEvent>> {
+        self.transfer.as_ref().map(|s| s.subscribe())
     }
 
     /// Gets the sender for the Crankshaft events.
@@ -734,7 +724,7 @@ pub struct Input {
     /// The download location for the input.
     ///
     /// This is `Some` if the input has been downloaded to a known location.
-    location: Option<Location<'static>>,
+    location: Option<Location>,
 }
 
 impl Input {
@@ -777,7 +767,7 @@ impl Input {
     /// Sets the location of the input.
     ///
     /// This is used during localization to set a local path for remote inputs.
-    pub fn set_location(&mut self, location: Location<'static>) {
+    pub fn set_location(&mut self, location: Location) {
         self.location = Some(location);
     }
 }

@@ -1931,7 +1931,7 @@ workflow w {
         let state = Arc::<State>::default();
         let events_state = state.clone();
         let events = Events::crankshaft_only(100);
-        let mut crankshaft_rx = events.subscribe_crankshaft();
+        let mut crankshaft_rx = events.subscribe_crankshaft().unwrap();
         let task = tokio::spawn(async move {
             loop {
                 match crankshaft_rx.recv().await {

@@ -4,6 +4,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread::available_parallelism;
@@ -38,24 +39,14 @@ const DEFAULT_CACHE_SUBDIR: &str = "wdl";
 
 /// Represents a location of a downloaded file.
 #[derive(Debug, Clone)]
-pub enum Location<'a> {
+pub enum Location {
     /// The location is a temporary file.
     Temp(Arc<TempPath>),
     /// The location is a path to a non-temporary file.
-    Path(Cow<'a, Path>),
+    Path(PathBuf),
 }
 
-impl Location<'_> {
-    /// Converts the location into an owned representation.
-    pub fn into_owned(self) -> Location<'static> {
-        match self {
-            Self::Temp(path) => Location::Temp(path),
-            Self::Path(path) => Location::Path(Cow::Owned(path.into_owned())),
-        }
-    }
-}
-
-impl Deref for Location<'_> {
+impl Deref for Location {
     type Target = Path;
 
     fn deref(&self) -> &Self::Target {
@@ -66,7 +57,7 @@ impl Deref for Location<'_> {
     }
 }
 
-impl AsRef<Path> for Location<'_> {
+impl AsRef<Path> for Location {
     fn as_ref(&self) -> &Path {
         match self {
             Self::Temp(path) => path.as_ref(),
@@ -78,7 +69,7 @@ impl AsRef<Path> for Location<'_> {
 /// Represents a file transferer.
 pub trait Transferer: Send + Sync {
     /// Downloads a file or directory to a temporary path.
-    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location<'static>>>
+    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location>>
     where
         'a: 'c,
         'b: 'c,
@@ -128,7 +119,7 @@ enum DownloadStatus {
     /// The specified `Notify` will be notified when the download completes.
     Downloading(Arc<Notify>),
     /// The requested resource has already been downloaded.
-    Downloaded(Location<'static>),
+    Downloaded(Location),
 }
 
 /// Represents the status of an upload.
@@ -231,7 +222,7 @@ impl HttpTransferer {
 }
 
 impl Transferer for HttpTransferer {
-    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location<'static>>>
+    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location>>
     where
         'a: 'c,
         'b: 'c,
@@ -245,24 +236,18 @@ impl Transferer for HttpTransferer {
                 return Ok(Location::Path(
                     source
                         .to_file_path()
-                        .map_err(|_| anyhow!("invalid file URL `{source}`"))?
-                        .into(),
+                        .map_err(|_| anyhow!("invalid file URL `{source}`"))?,
                 ));
             }
 
             // This loop exists so that all requests to download the same URL will block
             // waiting for a notification that the download has completed.
             // When the notification is received, the lookup into the downloads is retried
-            let mut waited = false;
             loop {
                 let notified = {
                     let mut downloads = self.0.downloads.lock().expect("failed to lock downloads");
                     match downloads.get(source.as_ref()) {
                         Some(DownloadStatus::Downloading(notify)) => {
-                            assert!(
-                                !waited,
-                                "file should not be downloading again after a notification"
-                            );
                             Notify::notified_owned(notify.clone())
                         }
                         Some(DownloadStatus::Downloaded(r)) => {
@@ -280,7 +265,6 @@ impl Transferer for HttpTransferer {
                 };
 
                 notified.await;
-                waited = true;
             }
 
             // Wrap the copy code in a future so we don't accidentally return early without
@@ -365,16 +349,11 @@ impl Transferer for HttpTransferer {
             // This loop exists so that all requests to upload the same URL will block
             // waiting for a notification that the upload has completed.
             // When the notification is received, the lookup into the uploads is retried
-            let mut waited = false;
             loop {
                 let notified = {
                     let mut uploads = self.0.uploads.lock().expect("failed to lock uploads");
                     match uploads.get(&destination) {
                         Some(UploadStatus::Uploading(notify)) => {
-                            assert!(
-                                !waited,
-                                "file should not be uploading again after a notification"
-                            );
                             Notify::notified_owned(notify.clone())
                         }
                         Some(UploadStatus::Uploaded) => {
@@ -392,7 +371,6 @@ impl Transferer for HttpTransferer {
                 };
 
                 notified.await;
-                waited = true;
             }
 
             // Wrap the copy code in a future so we don't accidentally return early without
@@ -420,13 +398,7 @@ impl Transferer for HttpTransferer {
                 .await
                 {
                     Ok(_) | Err(cloud_copy::Error::RemoteDestinationExists(_)) => Ok(()),
-                    Err(e) => Err(e).with_context(|| {
-                        format!(
-                            "failed to upload `{source}` to `{destination}`",
-                            source = source.display(),
-                            destination = destination.display()
-                        )
-                    }),
+                    Err(e) => Err(e.into()),
                 }
             };
 
