@@ -65,144 +65,15 @@ workflow chip {
     }
 
     parameter_meta {
-        align_bowtie2_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task align with bowtie2 (default) as aligner.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of FASTQs to determine required disk size of instance on GCP/AWS.",
+        docker: {
+            description: "Default Docker image URI to run WDL tasks.",
+            group: "runtime_environment",
+            example: "ubuntu:20.04",
         }
-        align_bowtie2_mem_factor: {
-            description: "Multiplication factor to determine memory required for task align with bowtie2 (default) as aligner.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of FASTQs to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        align_bwa_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task align with bwa as aligner.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of FASTQs to determine required disk size of instance on GCP/AWS.",
-        }
-        align_bwa_mem_factor: {
-            description: "Multiplication factor to determine memory required for task align with bwa as aligner.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of FASTQs to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        align_cpu: {
-            description: "Number of cores for task align.",
-            group: "resource_parameter",
-            help: "Task align merges/crops/maps FASTQs.",
-        }
-        align_only: {
-            description: "Align only mode.",
-            group: "pipeline_parameter",
-            help: "Reads will be aligned but there will be no peak-calling on them. It is turned on automatically if chip.pipeline_type is control.",
-        }
-        align_time_hr: {
-            description: "Walltime (h) required for task align.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        align_trimmomatic_java_heap: {
-            description: "Maximum Java heap (java -Xmx) in task align.",
-            group: "resource_parameter",
-            help: "Maximum memory for Trimmomatic. If not defined, 90% of align task's memory will be used.",
-        }
-        aligner: {
-            description: "Aligner. bowtie2, bwa or custom",
-            group: "alignment",
-            help: "It is bowtie2 by default. To use a custom aligner, define chip.custom_align_py and chip.custom_aligner_idx_tar.",
-            choices: [
-                "bowtie2",
-                "bwa",
-                "custom",
-            ],
-            example: "bowtie2",
-        }
-        always_use_pooled_ctl: {
-            description: "Always choose a pooled control for each experiment replicate.",
-            group: "peak_calling",
-            help: "If turned on, ignores chip.ctl_depth_ratio.",
-        }
-        bam2ta_cpu: {
-            description: "Number of cores for task bam2ta.",
-            group: "resource_parameter",
-            help: "Task bam2ta converts filtered/deduped BAM in to TAG-ALIGN (6-col BED) format.",
-        }
-        bam2ta_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task bam2ta.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
-        }
-        bam2ta_mem_factor: {
-            description: "Multiplication factor to determine memory required for task bam2ta.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        bam2ta_time_hr: {
-            description: "Walltime (h) required for task bam2ta.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        bams: {
-            description: "List of unfiltered/raw BAM files for each biological replicate.",
-            group: "input_genomic_data",
-            help: "Define if you want to start pipeline from BAM files. Unfiltered/raw BAM file generated from aligner (e.g. bowtie2). Each entry for each biological replicate. e.g. [rep1.bam, rep2.bam, rep3.bam, ...].",
-        }
-        blacklist: {
-            description: "Blacklist file in BED format.",
-            group: "reference_genome",
-            help: "Peaks will be filtered with this file.",
-        }
-        blacklist2: {
-            description: "Secondary blacklist file in BED format.",
-            group: "reference_genome",
-            help: "If it is defined, it will be merged with chip.blacklist. Peaks will be filtered with merged blacklist.",
-        }
-        bowtie2_idx_tar: {
-            description: "BWA index TAR file.",
-            group: "reference_genome",
-        }
-        bwa_mem_read_len_limit: {
-            description: "Read length limit for bwa mem (for PE FASTQs only).",
-            group: "alignment",
-            help: "If chip.use_bwa_mem_for_pe is activated and reads are shorter than this limit, then bwa aln will be used instead of bwa mem.",
-        }
-        call_peak_cpu: {
-            description: "Number of cores for task call_peak. IF MACS2 is chosen as peak_caller (or chip.pipeline_type is histone), then cpu will be fixed at 2.",
-            group: "resource_parameter",
-            help: "Task call_peak call peaks on TAG-ALIGNs by using SPP/MACS2 peak caller. MACS2 is single-threaded so cpu will be fixed at 2 for MACS2.",
-        }
-        call_peak_macs2_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task call_peak with macs2 as peak_caller.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
-        }
-        call_peak_macs2_mem_factor: {
-            description: "Multiplication factor to determine memory required for task call_peak with macs2 as peak_caller.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        call_peak_spp_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task call_peak with spp as peak_caller.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
-        }
-        call_peak_spp_mem_factor: {
-            description: "Multiplication factor to determine memory required for task call_peak with spp as peak_caller.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        call_peak_time_hr: {
-            description: "Walltime (h) required for task call_peak.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        cap_num_peak: {
-            description: "Upper limit on the number of peaks.",
-            group: "peak_calling",
-            help: "It is 30000000 and 50000000 by default for spp and macs2, respectively.",
-        }
-        chrsz: {
-            description: "2-col chromosome sizes file.",
-            group: "reference_genome",
+        singularity: {
+            description: "Default Singularity image URI to run WDL tasks. For Singularity users only.",
+            group: "runtime_environment",
+            example: "docker://ubuntu:20.04",
         }
         conda: {
             description: "Default Conda environment name to run WDL tasks. For Conda users only.",
@@ -219,223 +90,76 @@ workflow chip {
             group: "runtime_environment",
             example: "encd-chip-spp",
         }
-        crop_length: {
-            description: "Crop FASTQs' reads longer than this length.",
-            group: "alignment",
-            help: "Also drop all reads shorter than chip.crop_length - chip.crop_length_tol.",
-        }
-        crop_length_tol: {
-            description: "Tolerance for cropping reads in FASTQs.",
-            group: "alignment",
-            help: "Drop all reads shorter than chip.crop_length - chip.crop_length_tol. Activated only when chip.crop_length is defined.",
-        }
-        ctl_bams: {
-            description: "List of unfiltered/raw BAM files for each control replicate.",
-            group: "input_genomic_data_control",
-            help: "Define if you want to start pipeline from BAM files. Unfiltered/raw BAM file generated from aligner (e.g. bowtie2). Each entry for each control replicate. e.g. [ctl1.bam, ctl2.bam, ctl3.bam, ...].",
-        }
-        ctl_depth_limit: {
-            description: "Hard limit for chosen control's depth.",
-            group: "peak_calling",
-            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than this hard limit, then such control is subsampled.",
-        }
-        ctl_depth_ratio: {
-            description: "Maximum depth ratio between control replicates.",
-            group: "peak_calling",
-            help: "If ratio of depth between any two controls is higher than this, then always use a pooled control for all experiment replicates.",
-        }
-        ctl_fastqs_rep10_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 10.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep10_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep10_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 10.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep10_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep1_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 1.",
-            group: "input_genomic_data_control",
-            help: "Define if you want to start pipeline from FASTQs files. Pipeline can start from any type of controls (e.g. FASTQs, BAMs, ...). Choose one type and fill paramters for that type and leave other undefined.  Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep1_R2).",
-            example: [
-                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl1-R1.subsampled.80.fastq.gz",
-            ],
-        }
-        ctl_fastqs_rep1_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 1.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep1_R1). These FASTQs are usually technical replicates to be merged.",
-            example: [
-                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl1-R2.subsampled.80.fastq.gz",
-            ],
-        }
-        ctl_fastqs_rep2_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 2.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep2_R2). These FASTQs are usually technical replicates to be merged.",
-            example: [
-                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl2-R1.subsampled.80.fastq.gz",
-            ],
-        }
-        ctl_fastqs_rep2_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 2.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep2_R1). These FASTQs are usually technical replicates to be merged.",
-            example: [
-                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl2-R2.subsampled.80.fastq.gz",
-            ],
-        }
-        ctl_fastqs_rep3_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 3.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep3_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep3_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 3.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep3_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep4_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 4.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep4_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep4_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 4.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep4_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep5_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 5.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep5_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep5_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 5.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep5_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep6_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 6.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep6_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep6_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 6.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep6_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep7_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 7.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep7_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep7_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 7.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep7_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep8_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 8.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep8_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep8_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 8.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep8_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep9_R1: {
-            description: "Read1 FASTQs to be merged for a control replicate 9.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep9_R2). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_fastqs_rep9_R2: {
-            description: "Read2 FASTQs to be merged for a control replicate 9.",
-            group: "input_genomic_data_control",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep9_R1). These FASTQs are usually technical replicates to be merged.",
-        }
-        ctl_nodup_bams: {
-            description: "List of filtered/deduped BAM files for each control replicate",
-            group: "input_genomic_data_control",
-            help: "Define if you want to start pipeline from filtered BAM files. Filtered/deduped BAM file. Each entry for each control replicate. e.g. [ctl1.nodup.bam, ctl2.nodup.bam, ctl3.nodup.bam, ...].",
-        }
-        ctl_paired_end: {
-            description: "Sequencing endedness for all controls.",
-            group: "input_genomic_data_control",
-            help: "Setting this on means that all control replicates are paired ended. For mixed controls, use chip.ctl_paired_ends array instead.",
-        }
-        ctl_paired_ends: {
-            description: "Sequencing endedness array for mixed SE/PE controls.",
-            group: "input_genomic_data_control",
-            help: "Whether each control replicate is paired ended or not.",
-        }
-        ctl_subsample_reads: {
-            description: "Subsample control reads. Shuffle and subsample control reads.",
-            group: "alignment",
-            help: "This affects all downstream analyses after filtering control BAM. (e.g. all TAG-ALIGN files, peak-calling). Reads will be shuffled only if actual number of reads in BAM exceeds this number. 0 means disabled.",
-        }
-        ctl_tas: {
-            description: "List of TAG-ALIGN files for each biological replicate.",
-            group: "input_genomic_data_control",
-            help: "Define if you want to start pipeline from TAG-ALIGN files. TAG-ALIGN is in a 6-col BED format. It is a simplified version of BAM. Each entry for each control replicate. e.g. [ctl1.tagAlign.gz, ctl2.tagAlign.gz, ...].",
-        }
-        custom_align_py: {
-            description: "Python script for a custom aligner.",
-            group: "alignment",
-            help: "There is a template included in the documentation for inputs. Defining this parameter will automatically change \"chip.aligner\" to \"custom\". You should also define \"chip.custom_aligner_idx_tar\".",
-        }
-        custom_aligner_idx_tar: {
-            description: "Index TAR file for a custom aligner. To use a custom aligner, define \"chip.custom_align_py\" too.",
-            group: "reference_genome",
+        title: {
+            description: "Experiment title.",
+            group: "pipeline_metadata",
+            example: "ENCSR936XTK (subsampled 1/50)",
         }
         description: {
             description: "Experiment description.",
             group: "pipeline_metadata",
             example: "ZNF143 ChIP-seq on human GM12878 (subsampled 1/50)",
         }
-        docker: {
-            description: "Default Docker image URI to run WDL tasks.",
-            group: "runtime_environment",
-            example: "ubuntu:20.04",
+        genome_tsv: {
+            description: "Reference genome database TSV.",
+            group: "reference_genome",
+            help: "This TSV files includes all genome specific parameters (e.g. reference FASTA, bowtie2 index). You can still invidiaully define any parameters in it. Parameters defined in input JSON will override those defined in genome TSV.",
+            example: "https://storage.googleapis.com/encode-pipeline-genome-data/genome_tsv/v1/hg38_caper.tsv",
         }
-        dup_marker: {
-            description: "Marker for duplicate reads. picard or sambamba.",
-            group: "alignment",
-            help: "picard for Picard MarkDuplicates or sambamba for sambamba markdup.",
-            choices: [
-                "picard",
-                "sambamba",
-            ],
-            example: "picard",
+        genome_name: {
+            description: "Genome name.",
+            group: "reference_genome",
         }
-        enable_count_signal_track: {
-            description: "Enables generation of count signal tracks.",
-            group: "pipeline_parameter",
+        ref_fa: {
+            description: "Reference FASTA file.",
+            group: "reference_genome",
         }
-        enable_gc_bias: {
-            description: "Enables GC bias calculation.",
-            group: "pipeline_parameter",
+        bowtie2_idx_tar: {
+            description: "BWA index TAR file.",
+            group: "reference_genome",
         }
-        enable_jsd: {
-            description: "Enables Jensen-Shannon Distance (JSD) plot generation.",
-            group: "pipeline_parameter",
+        custom_aligner_idx_tar: {
+            description: "Index TAR file for a custom aligner. To use a custom aligner, define \"chip.custom_align_py\" too.",
+            group: "reference_genome",
         }
-        exp_ctl_depth_ratio_limit: {
-            description: "Second limit for chosen control's depth.",
-            group: "peak_calling",
-            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than experiment replicate's read depth multiplied by this factor then such control is subsampled down to maximum of multiplied value and hard limit chip.ctl_depth_limit.",
+        chrsz: {
+            description: "2-col chromosome sizes file.",
+            group: "reference_genome",
         }
-        fastqs_rep10_R1: {
-            description: "Read1 FASTQs to be merged for a biological replicate 10.",
+        blacklist: {
+            description: "Blacklist file in BED format.",
+            group: "reference_genome",
+            help: "Peaks will be filtered with this file.",
+        }
+        blacklist2: {
+            description: "Secondary blacklist file in BED format.",
+            group: "reference_genome",
+            help: "If it is defined, it will be merged with chip.blacklist. Peaks will be filtered with merged blacklist.",
+        }
+        mito_chr_name: {
+            description: "Mitochondrial chromosome name.",
+            group: "reference_genome",
+            help: "e.g. chrM, MT. Mitochondrial reads defined here will be filtered out during filtering BAMs in \"filter\" task.",
+        }
+        regex_bfilt_peak_chr_name: {
+            description: "Reg-ex for chromosomes to keep while filtering peaks.",
+            group: "reference_genome",
+            help: "Chromosomes defined here will be kept. All other chromosomes will be filtered out in .bfilt. peak file. This is done along with blacklist filtering peak file.",
+        }
+        gensz: {
+            description: "Genome sizes. \"hs\" for human, \"mm\" for mouse or sum of 2nd columnin chromosome sizes file.",
+            group: "reference_genome",
+        }
+        paired_end: {
+            description: "Sequencing endedness.",
             group: "input_genomic_data",
-            help: "Make sure that they are consistent with read2 FASTQs (chip.fastqs_rep10_R2). These FASTQs are usually technical replicates to be merged.",
+            help: "Setting this on means that all replicates are paired ended. For mixed samples, use chip.paired_ends array instead.",
+            example: true,
         }
-        fastqs_rep10_R2: {
-            description: "Read2 FASTQs to be merged for a biological replicate 10.",
+        paired_ends: {
+            description: "Sequencing endedness array (for mixed SE/PE datasets).",
             group: "input_genomic_data",
-            help: "Make sure that they are consistent with read1 FASTQs (chip.fastqs_rep10_R1). These FASTQs are usually technical replicates to be merged.",
+            help: "Whether each biological replicate is paired ended or not.",
         }
         fastqs_rep1_R1: {
             description: "Read1 FASTQs to be merged for a biological replicate 1.",
@@ -539,155 +263,30 @@ workflow chip {
             group: "input_genomic_data",
             help: "Make sure that they are consistent with read1 FASTQs (chip.fastqs_rep9_R1). These FASTQs are usually technical replicates to be merged.",
         }
-        fdr_thresh: {
-            description: "FDR threshold for spp peak caller (phantompeakqualtools).",
-            group: "peak_calling",
-            help: "run_spp.R -fdr=",
+        fastqs_rep10_R1: {
+            description: "Read1 FASTQs to be merged for a biological replicate 10.",
+            group: "input_genomic_data",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.fastqs_rep10_R2). These FASTQs are usually technical replicates to be merged.",
         }
-        filter_chrs: {
-            description: "List of chromosomes to be filtered out while filtering BAM.",
-            group: "alignment",
-            help: "It is empty by default, hence no filtering out of specfic chromosomes. It is case-sensitive. Use exact word for chromosome names.",
+        fastqs_rep10_R2: {
+            description: "Read2 FASTQs to be merged for a biological replicate 10.",
+            group: "input_genomic_data",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.fastqs_rep10_R1). These FASTQs are usually technical replicates to be merged.",
         }
-        filter_cpu: {
-            description: "Number of cores for task filter.",
-            group: "resource_parameter",
-            help: "Task filter filters raw/unfiltered BAM to get filtered/deduped BAM.",
-        }
-        filter_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task filter.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of BAMs to determine required disk size of instance on GCP/AWS.",
-        }
-        filter_mem_factor: {
-            description: "Multiplication factor to determine memory required for task filter.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        filter_picard_java_heap: {
-            description: "Maximum Java heap (java -Xmx) in task filter.",
-            group: "resource_parameter",
-            help: "Maximum memory for Picard tools MarkDuplicates. If not defined, 90% of filter task's memory will be used.",
-        }
-        filter_time_hr: {
-            description: "Walltime (h) required for task filter.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        fraglen: {
-            description: "Fragment length for each biological replicate.",
-            group: "peak_calling",
-            help: "Fragment length is estimated by cross-correlation analysis, which is valid only when pipeline started from FASTQs. If defined, fragment length estimated by cross-correlation analysis is ignored.",
-        }
-        gc_bias_picard_java_heap: {
-            description: "Maximum Java heap (java -Xmx) in task gc_bias.",
-            group: "resource_parameter",
-            help: "Maximum memory for Picard tools CollectGcBiasMetrics. If not defined, 90% of gc_bias task's memory will be used.",
-        }
-        genome_name: {
-            description: "Genome name.",
-            group: "reference_genome",
-        }
-        genome_tsv: {
-            description: "Reference genome database TSV.",
-            group: "reference_genome",
-            help: "This TSV files includes all genome specific parameters (e.g. reference FASTA, bowtie2 index). You can still invidiaully define any parameters in it. Parameters defined in input JSON will override those defined in genome TSV.",
-            example: "https://storage.googleapis.com/encode-pipeline-genome-data/genome_tsv/v1/hg38_caper.tsv",
-        }
-        gensz: {
-            description: "Genome sizes. \"hs\" for human, \"mm\" for mouse or sum of 2nd columnin chromosome sizes file.",
-            group: "reference_genome",
-        }
-        idr_thresh: {
-            description: "IDR threshold.",
-            group: "peak_calling",
-        }
-        jsd_cpu: {
-            description: "Number of cores for task jsd.",
-            group: "resource_parameter",
-            help: "Task jsd plots Jensen-Shannon distance and metrics related to it.",
-        }
-        jsd_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task jsd.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
-        }
-        jsd_mem_factor: {
-            description: "Multiplication factor to determine memory required for task jsd.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        jsd_time_hr: {
-            description: "Walltime (h) required for task jsd.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        macs2_signal_track_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task macs2_signal_track.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
-        }
-        macs2_signal_track_mem_factor: {
-            description: "Multiplication factor to determine memory required for task macs2_signal_track.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        macs2_signal_track_time_hr: {
-            description: "Walltime (h) required for task macs2_signal_track.",
-            group: "resource_parameter",
-            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
-        }
-        mapq_thresh: {
-            description: "Threshold for low MAPQ reads removal.",
-            group: "alignment",
-            help: "Low MAPQ reads are filtered out while filtering BAM.",
-        }
-        mito_chr_name: {
-            description: "Mitochondrial chromosome name.",
-            group: "reference_genome",
-            help: "e.g. chrM, MT. Mitochondrial reads defined here will be filtered out during filtering BAMs in \"filter\" task.",
-        }
-        no_dup_removal: {
-            description: "Disable removal of duplicate reads during filtering BAM.",
-            group: "alignment",
-            help: "Duplicate reads are filtererd out during filtering BAMs to gerenate NODUP_BAM. This flag will keep all duplicate reads in NODUP_BAM. This flag does not affect naming of NODUP_BAM. NODUP_BAM will still have .nodup. suffix in its filename.",
+        bams: {
+            description: "List of unfiltered/raw BAM files for each biological replicate.",
+            group: "input_genomic_data",
+            help: "Define if you want to start pipeline from BAM files. Unfiltered/raw BAM file generated from aligner (e.g. bowtie2). Each entry for each biological replicate. e.g. [rep1.bam, rep2.bam, rep3.bam, ...].",
         }
         nodup_bams: {
             description: "List of filtered/deduped BAM files for each biological replicate",
             group: "input_genomic_data",
             help: "Define if you want to start pipeline from filtered BAM files. Filtered/deduped BAM file. Each entry for each biological replicate. e.g. [rep1.nodup.bam, rep2.nodup.bam, rep3.nodup.bam, ...].",
         }
-        paired_end: {
-            description: "Sequencing endedness.",
+        tas: {
+            description: "List of TAG-ALIGN files for each biological replicate.",
             group: "input_genomic_data",
-            help: "Setting this on means that all replicates are paired ended. For mixed samples, use chip.paired_ends array instead.",
-            example: true,
-        }
-        paired_ends: {
-            description: "Sequencing endedness array (for mixed SE/PE datasets).",
-            group: "input_genomic_data",
-            help: "Whether each biological replicate is paired ended or not.",
-        }
-        peak_caller: {
-            description: "Peak caller.",
-            group: "peak_calling",
-            help: "It is spp and macs2 by default for TF ChIP-seq and histone ChIP-seq, respectively. e.g. you can use macs2 for TF ChIP-Seq even though spp is by default for TF ChIP-Seq (chip.pipeline_type == tf).",
-            example: "spp",
-        }
-        peak_pooled: {
-            description: "NARROWPEAK file for pooled true replicate.",
-            group: "input_genomic_data",
-            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates. Pooled true replicate means analysis on pooled biological replicates.",
-        }
-        peak_ppr1: {
-            description: "NARROWPEAK file for pooled pseudo replicate 1.",
-            group: "input_genomic_data",
-            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 1st pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 1st pseudos.",
-        }
-        peak_ppr2: {
-            description: "NARROWPEAK file for pooled pseudo replicate 2.",
-            group: "input_genomic_data",
-            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 2nd pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 2nd pseudos.",
+            help: "Define if you want to start pipeline from TAG-ALIGN files. TAG-ALIGN is in a 6-col BED format. It is a simplified version of BAM. Each entry for each biological replicate. e.g. [rep1.tagAlign.gz, rep2.tagAlign.gz, ...].",
         }
         peaks: {
             description: "List of NARROWPEAK files (not blacklist filtered) for each biological replicate.",
@@ -704,6 +303,158 @@ workflow chip {
             group: "input_genomic_data",
             help: "Define if you want to start pipeline from PEAK files. Define if chip.true_rep_only flag is off.",
         }
+        peak_pooled: {
+            description: "NARROWPEAK file for pooled true replicate.",
+            group: "input_genomic_data",
+            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates. Pooled true replicate means analysis on pooled biological replicates.",
+        }
+        peak_ppr1: {
+            description: "NARROWPEAK file for pooled pseudo replicate 1.",
+            group: "input_genomic_data",
+            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 1st pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 1st pseudos.",
+        }
+        peak_ppr2: {
+            description: "NARROWPEAK file for pooled pseudo replicate 2.",
+            group: "input_genomic_data",
+            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 2nd pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 2nd pseudos.",
+        }
+        ctl_paired_end: {
+            description: "Sequencing endedness for all controls.",
+            group: "input_genomic_data_control",
+            help: "Setting this on means that all control replicates are paired ended. For mixed controls, use chip.ctl_paired_ends array instead.",
+        }
+        ctl_paired_ends: {
+            description: "Sequencing endedness array for mixed SE/PE controls.",
+            group: "input_genomic_data_control",
+            help: "Whether each control replicate is paired ended or not.",
+        }
+        ctl_fastqs_rep1_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 1.",
+            group: "input_genomic_data_control",
+            help: "Define if you want to start pipeline from FASTQs files. Pipeline can start from any type of controls (e.g. FASTQs, BAMs, ...). Choose one type and fill paramters for that type and leave other undefined.  Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep1_R2).",
+            example: [
+                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl1-R1.subsampled.80.fastq.gz",
+            ],
+        }
+        ctl_fastqs_rep1_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 1.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep1_R1). These FASTQs are usually technical replicates to be merged.",
+            example: [
+                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl1-R2.subsampled.80.fastq.gz",
+            ],
+        }
+        ctl_fastqs_rep2_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 2.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep2_R2). These FASTQs are usually technical replicates to be merged.",
+            example: [
+                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl2-R1.subsampled.80.fastq.gz",
+            ],
+        }
+        ctl_fastqs_rep2_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 2.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep2_R1). These FASTQs are usually technical replicates to be merged.",
+            example: [
+                "https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/fastq_subsampled/ctl2-R2.subsampled.80.fastq.gz",
+            ],
+        }
+        ctl_fastqs_rep3_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 3.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep3_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep3_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 3.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep3_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep4_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 4.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep4_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep4_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 4.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep4_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep5_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 5.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep5_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep5_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 5.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep5_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep6_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 6.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep6_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep6_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 6.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep6_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep7_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 7.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep7_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep7_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 7.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep7_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep8_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 8.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep8_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep8_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 8.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep8_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep9_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 9.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep9_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep9_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 9.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep9_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep10_R1: {
+            description: "Read1 FASTQs to be merged for a control replicate 10.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read2 FASTQs (chip.ctl_fastqs_rep10_R2). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_fastqs_rep10_R2: {
+            description: "Read2 FASTQs to be merged for a control replicate 10.",
+            group: "input_genomic_data_control",
+            help: "Make sure that they are consistent with read1 FASTQs (chip.ctl_fastqs_rep10_R1). These FASTQs are usually technical replicates to be merged.",
+        }
+        ctl_bams: {
+            description: "List of unfiltered/raw BAM files for each control replicate.",
+            group: "input_genomic_data_control",
+            help: "Define if you want to start pipeline from BAM files. Unfiltered/raw BAM file generated from aligner (e.g. bowtie2). Each entry for each control replicate. e.g. [ctl1.bam, ctl2.bam, ctl3.bam, ...].",
+        }
+        ctl_nodup_bams: {
+            description: "List of filtered/deduped BAM files for each control replicate",
+            group: "input_genomic_data_control",
+            help: "Define if you want to start pipeline from filtered BAM files. Filtered/deduped BAM file. Each entry for each control replicate. e.g. [ctl1.nodup.bam, ctl2.nodup.bam, ctl3.nodup.bam, ...].",
+        }
+        ctl_tas: {
+            description: "List of TAG-ALIGN files for each biological replicate.",
+            group: "input_genomic_data_control",
+            help: "Define if you want to start pipeline from TAG-ALIGN files. TAG-ALIGN is in a 6-col BED format. It is a simplified version of BAM. Each entry for each control replicate. e.g. [ctl1.tagAlign.gz, ctl2.tagAlign.gz, ...].",
+        }
         pipeline_type: {
             description: "Pipeline type. tf for TF ChIP-Seq, histone for Histone ChIP-Seq or control for mapping controls only.",
             group: "pipeline_parameter",
@@ -715,69 +466,73 @@ workflow chip {
             ],
             example: "tf",
         }
-        pseudoreplication_random_seed: {
-            description: "Random seed (positive integer) used for pseudo-replication (shuffling reads in TAG-ALIGN and then split it into two).",
-            group: "alignment",
-            help: "Pseudo-replication (task spr) is done by using GNU \"shuf --random-source=sha256(random_seed)\". If this parameter == 0, then pipeline uses input TAG-ALIGN file's size (in bytes) for the random_seed.",
-        }
-        pval_thresh: {
-            description: "p-value Threshold for MACS2 peak caller.",
-            group: "peak_calling",
-            help: "macs2 callpeak -p",
-        }
         redact_nodup_bam: {
             description: "Redact filtered/nodup BAM.",
             group: "pipeline_parameter",
             help: "Redact filtered/nodup BAM at the end of the filtering step (task filter). Raw BAM from the aligner (task align) will still remain unredacted. Quality metrics on filtered BAM will be calculated before being redacted. However, all downstream analyses (e.g. peak-calling) will be done on the redacted BAM. If you start from nodup BAM then this flag will not be active.",
         }
-        ref_fa: {
-            description: "Reference FASTA file.",
-            group: "reference_genome",
+        align_only: {
+            description: "Align only mode.",
+            group: "pipeline_parameter",
+            help: "Reads will be aligned but there will be no peak-calling on them. It is turned on automatically if chip.pipeline_type is control.",
         }
-        regex_bfilt_peak_chr_name: {
-            description: "Reg-ex for chromosomes to keep while filtering peaks.",
-            group: "reference_genome",
-            help: "Chromosomes defined here will be kept. All other chromosomes will be filtered out in .bfilt. peak file. This is done along with blacklist filtering peak file.",
+        true_rep_only: {
+            description: "Disables all analyses related to pseudo-replicates.",
+            group: "pipeline_parameter",
+            help: "Pipeline generates 2 pseudo-replicate from one biological replicate. This flag turns off all analyses related to pseudos (with prefix/suffix pr, ppr).",
         }
-        singularity: {
-            description: "Default Singularity image URI to run WDL tasks. For Singularity users only.",
-            group: "runtime_environment",
-            example: "docker://ubuntu:20.04",
+        enable_count_signal_track: {
+            description: "Enables generation of count signal tracks.",
+            group: "pipeline_parameter",
         }
-        spr_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task spr.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
+        enable_jsd: {
+            description: "Enables Jensen-Shannon Distance (JSD) plot generation.",
+            group: "pipeline_parameter",
         }
-        spr_mem_factor: {
-            description: "Multiplication factor to determine memory required for task spr.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        enable_gc_bias: {
+            description: "Enables GC bias calculation.",
+            group: "pipeline_parameter",
         }
-        subsample_ctl_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task subsample_ctl.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
-        }
-        subsample_ctl_mem_factor: {
-            description: "Multiplication factor to determine memory required for task subsample_ctl.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
-        }
-        subsample_reads: {
-            description: "Subsample reads. Shuffle and subsample reads.",
+        aligner: {
+            description: "Aligner. bowtie2, bwa or custom",
             group: "alignment",
-            help: "This affects all downstream analyses after filtering experiment BAM. (e.g. all TAG-ALIGN files, peak-calling). Reads will be shuffled only if actual number of reads in BAM exceeds this number. 0 means disabled.",
+            help: "It is bowtie2 by default. To use a custom aligner, define chip.custom_align_py and chip.custom_aligner_idx_tar.",
+            choices: [
+                "bowtie2",
+                "bwa",
+                "custom",
+            ],
+            example: "bowtie2",
         }
-        tas: {
-            description: "List of TAG-ALIGN files for each biological replicate.",
-            group: "input_genomic_data",
-            help: "Define if you want to start pipeline from TAG-ALIGN files. TAG-ALIGN is in a 6-col BED format. It is a simplified version of BAM. Each entry for each biological replicate. e.g. [rep1.tagAlign.gz, rep2.tagAlign.gz, ...].",
+        custom_align_py: {
+            description: "Python script for a custom aligner.",
+            group: "alignment",
+            help: "There is a template included in the documentation for inputs. Defining this parameter will automatically change \"chip.aligner\" to \"custom\". You should also define \"chip.custom_aligner_idx_tar\".",
         }
-        title: {
-            description: "Experiment title.",
-            group: "pipeline_metadata",
-            example: "ENCSR936XTK (subsampled 1/50)",
+        use_bwa_mem_for_pe: {
+            description: "For paired end dataset with read length >= chip.bwa_mem_read_len_limit (default 70) bp, use bwa mem instead of bwa aln.",
+            group: "alignment",
+            help: "Use it only for paired end reads >= chip.bwa_mem_read_len_limit (default 70) bp. Otherwise keep using bwa aln.",
+        }
+        bwa_mem_read_len_limit: {
+            description: "Read length limit for bwa mem (for PE FASTQs only).",
+            group: "alignment",
+            help: "If chip.use_bwa_mem_for_pe is activated and reads are shorter than this limit, then bwa aln will be used instead of bwa mem.",
+        }
+        use_bowtie2_local_mode: {
+            description: "Use bowtie2's local mode (soft-clipping).",
+            group: "alignment",
+            help: "This will add --local to bowtie2 command line so that it will replace the default end-to-end mode.",
+        }
+        crop_length: {
+            description: "Crop FASTQs' reads longer than this length.",
+            group: "alignment",
+            help: "Also drop all reads shorter than chip.crop_length - chip.crop_length_tol.",
+        }
+        crop_length_tol: {
+            description: "Tolerance for cropping reads in FASTQs.",
+            group: "alignment",
+            help: "Drop all reads shorter than chip.crop_length - chip.crop_length_tol. Activated only when chip.crop_length is defined.",
         }
         trimmomatic_phred_score_format: {
             description: "Base encoding (format) for Phred score in FASTQs.",
@@ -789,65 +544,310 @@ workflow chip {
             ],
             help: "This is used for Trimmomatic only. It is auto by default, which means that Trimmomatic automatically detect it from FASTQs. Otherwise -phred33 or -phred64 will be passed to the Trimmomatic command line. Use this if you see an error like \"Error: Unable to detect quality encoding\".",
         }
-        true_rep_only: {
-            description: "Disables all analyses related to pseudo-replicates.",
-            group: "pipeline_parameter",
-            help: "Pipeline generates 2 pseudo-replicate from one biological replicate. This flag turns off all analyses related to pseudos (with prefix/suffix pr, ppr).",
-        }
-        use_bowtie2_local_mode: {
-            description: "Use bowtie2's local mode (soft-clipping).",
+        xcor_trim_bp: {
+            description: "Trim experiment read1 FASTQ (for both SE and PE) for cross-correlation analysis.",
             group: "alignment",
-            help: "This will add --local to bowtie2 command line so that it will replace the default end-to-end mode.",
-        }
-        use_bwa_mem_for_pe: {
-            description: "For paired end dataset with read length >= chip.bwa_mem_read_len_limit (default 70) bp, use bwa mem instead of bwa aln.",
-            group: "alignment",
-            help: "Use it only for paired end reads >= chip.bwa_mem_read_len_limit (default 70) bp. Otherwise keep using bwa aln.",
+            help: "This does not affect alignment of experimental/control replicates. Pipeline additionaly aligns R1 FASTQ only for cross-correlation analysis only. This parameter is used for it.",
         }
         use_filt_pe_ta_for_xcor: {
             description: "Use filtered PE BAM for cross-correlation analysis.",
             group: "alignment",
             help: "If not defined, pipeline uses SE BAM generated from trimmed read1 FASTQ for cross-correlation analysis.",
         }
-        xcor_cpu: {
-            description: "Number of cores for task xcor.",
-            group: "resource_parameter",
-            help: "Task xcor does cross-correlation analysis (including a plot) on subsampled TAG-ALIGNs.",
-        }
-        xcor_disk_factor: {
-            description: "Multiplication factor to determine persistent disk size for task xcor.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
-        }
-        xcor_exclusion_range_max: {
-            description: "Exclusion maximum for cross-coorrelation analysis.",
+        dup_marker: {
+            description: "Marker for duplicate reads. picard or sambamba.",
             group: "alignment",
-            help: "For run_spp.R -s. If not defined default value of `max(read length + 10, 50)` for TF and `max(read_len + 10, 100)` for histone are used",
+            help: "picard for Picard MarkDuplicates or sambamba for sambamba markdup.",
+            choices: [
+                "picard",
+                "sambamba",
+            ],
+            example: "picard",
         }
-        xcor_exclusion_range_min: {
-            description: "Exclusion minimum for cross-correlation analysis.",
+        no_dup_removal: {
+            description: "Disable removal of duplicate reads during filtering BAM.",
             group: "alignment",
-            help: "For run_spp.R -s. Make sure that it is consistent with default strand shift -s=-500:5:1500 in run_spp.R.",
+            help: "Duplicate reads are filtererd out during filtering BAMs to gerenate NODUP_BAM. This flag will keep all duplicate reads in NODUP_BAM. This flag does not affect naming of NODUP_BAM. NODUP_BAM will still have .nodup. suffix in its filename.",
         }
-        xcor_mem_factor: {
-            description: "Multiplication factor to determine memory required for task xcor.",
-            group: "resource_parameter",
-            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        mapq_thresh: {
+            description: "Threshold for low MAPQ reads removal.",
+            group: "alignment",
+            help: "Low MAPQ reads are filtered out while filtering BAM.",
+        }
+        filter_chrs: {
+            description: "List of chromosomes to be filtered out while filtering BAM.",
+            group: "alignment",
+            help: "It is empty by default, hence no filtering out of specfic chromosomes. It is case-sensitive. Use exact word for chromosome names.",
+        }
+        subsample_reads: {
+            description: "Subsample reads. Shuffle and subsample reads.",
+            group: "alignment",
+            help: "This affects all downstream analyses after filtering experiment BAM. (e.g. all TAG-ALIGN files, peak-calling). Reads will be shuffled only if actual number of reads in BAM exceeds this number. 0 means disabled.",
+        }
+        ctl_subsample_reads: {
+            description: "Subsample control reads. Shuffle and subsample control reads.",
+            group: "alignment",
+            help: "This affects all downstream analyses after filtering control BAM. (e.g. all TAG-ALIGN files, peak-calling). Reads will be shuffled only if actual number of reads in BAM exceeds this number. 0 means disabled.",
         }
         xcor_subsample_reads: {
             description: "Subsample reads for cross-corrlelation analysis only.",
             group: "alignment",
             help: "This does not affect downstream analyses after filtering BAM. It is for cross-correlation analysis only.  0 means disabled.",
         }
+        xcor_exclusion_range_min: {
+            description: "Exclusion minimum for cross-correlation analysis.",
+            group: "alignment",
+            help: "For run_spp.R -s. Make sure that it is consistent with default strand shift -s=-500:5:1500 in run_spp.R.",
+        }
+        xcor_exclusion_range_max: {
+            description: "Exclusion maximum for cross-coorrelation analysis.",
+            group: "alignment",
+            help: "For run_spp.R -s. If not defined default value of `max(read length + 10, 50)` for TF and `max(read_len + 10, 100)` for histone are used",
+        }
+        pseudoreplication_random_seed: {
+            description: "Random seed (positive integer) used for pseudo-replication (shuffling reads in TAG-ALIGN and then split it into two).",
+            group: "alignment",
+            help: "Pseudo-replication (task spr) is done by using GNU \"shuf --random-source=sha256(random_seed)\". If this parameter == 0, then pipeline uses input TAG-ALIGN file's size (in bytes) for the random_seed.",
+        }
+        ctl_depth_limit: {
+            description: "Hard limit for chosen control's depth.",
+            group: "peak_calling",
+            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than this hard limit, then such control is subsampled.",
+        }
+        exp_ctl_depth_ratio_limit: {
+            description: "Second limit for chosen control's depth.",
+            group: "peak_calling",
+            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than experiment replicate's read depth multiplied by this factor then such control is subsampled down to maximum of multiplied value and hard limit chip.ctl_depth_limit.",
+        }
+        fraglen: {
+            description: "Fragment length for each biological replicate.",
+            group: "peak_calling",
+            help: "Fragment length is estimated by cross-correlation analysis, which is valid only when pipeline started from FASTQs. If defined, fragment length estimated by cross-correlation analysis is ignored.",
+        }
+        peak_caller: {
+            description: "Peak caller.",
+            group: "peak_calling",
+            help: "It is spp and macs2 by default for TF ChIP-seq and histone ChIP-seq, respectively. e.g. you can use macs2 for TF ChIP-Seq even though spp is by default for TF ChIP-Seq (chip.pipeline_type == tf).",
+            example: "spp",
+        }
+        always_use_pooled_ctl: {
+            description: "Always choose a pooled control for each experiment replicate.",
+            group: "peak_calling",
+            help: "If turned on, ignores chip.ctl_depth_ratio.",
+        }
+        ctl_depth_ratio: {
+            description: "Maximum depth ratio between control replicates.",
+            group: "peak_calling",
+            help: "If ratio of depth between any two controls is higher than this, then always use a pooled control for all experiment replicates.",
+        }
+        cap_num_peak: {
+            description: "Upper limit on the number of peaks.",
+            group: "peak_calling",
+            help: "It is 30000000 and 50000000 by default for spp and macs2, respectively.",
+        }
+        pval_thresh: {
+            description: "p-value Threshold for MACS2 peak caller.",
+            group: "peak_calling",
+            help: "macs2 callpeak -p",
+        }
+        fdr_thresh: {
+            description: "FDR threshold for spp peak caller (phantompeakqualtools).",
+            group: "peak_calling",
+            help: "run_spp.R -fdr=",
+        }
+        idr_thresh: {
+            description: "IDR threshold.",
+            group: "peak_calling",
+        }
+        align_cpu: {
+            description: "Number of cores for task align.",
+            group: "resource_parameter",
+            help: "Task align merges/crops/maps FASTQs.",
+        }
+        align_bowtie2_mem_factor: {
+            description: "Multiplication factor to determine memory required for task align with bowtie2 (default) as aligner.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of FASTQs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        align_bwa_mem_factor: {
+            description: "Multiplication factor to determine memory required for task align with bwa as aligner.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of FASTQs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        align_time_hr: {
+            description: "Walltime (h) required for task align.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        align_bowtie2_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task align with bowtie2 (default) as aligner.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of FASTQs to determine required disk size of instance on GCP/AWS.",
+        }
+        align_bwa_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task align with bwa as aligner.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of FASTQs to determine required disk size of instance on GCP/AWS.",
+        }
+        filter_cpu: {
+            description: "Number of cores for task filter.",
+            group: "resource_parameter",
+            help: "Task filter filters raw/unfiltered BAM to get filtered/deduped BAM.",
+        }
+        filter_mem_factor: {
+            description: "Multiplication factor to determine memory required for task filter.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        filter_time_hr: {
+            description: "Walltime (h) required for task filter.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        filter_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task filter.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of BAMs to determine required disk size of instance on GCP/AWS.",
+        }
+        bam2ta_cpu: {
+            description: "Number of cores for task bam2ta.",
+            group: "resource_parameter",
+            help: "Task bam2ta converts filtered/deduped BAM in to TAG-ALIGN (6-col BED) format.",
+        }
+        bam2ta_mem_factor: {
+            description: "Multiplication factor to determine memory required for task bam2ta.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        bam2ta_time_hr: {
+            description: "Walltime (h) required for task bam2ta.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        bam2ta_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task bam2ta.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
+        }
+        spr_mem_factor: {
+            description: "Multiplication factor to determine memory required for task spr.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        spr_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task spr.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
+        }
+        jsd_cpu: {
+            description: "Number of cores for task jsd.",
+            group: "resource_parameter",
+            help: "Task jsd plots Jensen-Shannon distance and metrics related to it.",
+        }
+        jsd_mem_factor: {
+            description: "Multiplication factor to determine memory required for task jsd.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        jsd_time_hr: {
+            description: "Walltime (h) required for task jsd.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        jsd_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task jsd.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of filtered BAMs to determine required disk size of instance on GCP/AWS.",
+        }
+        xcor_cpu: {
+            description: "Number of cores for task xcor.",
+            group: "resource_parameter",
+            help: "Task xcor does cross-correlation analysis (including a plot) on subsampled TAG-ALIGNs.",
+        }
+        xcor_mem_factor: {
+            description: "Multiplication factor to determine memory required for task xcor.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
         xcor_time_hr: {
             description: "Walltime (h) required for task xcor.",
             group: "resource_parameter",
             help: "This is for HPCs only. e.g. SLURM, SGE, ...",
         }
-        xcor_trim_bp: {
-            description: "Trim experiment read1 FASTQ (for both SE and PE) for cross-correlation analysis.",
-            group: "alignment",
-            help: "This does not affect alignment of experimental/control replicates. Pipeline additionaly aligns R1 FASTQ only for cross-correlation analysis only. This parameter is used for it.",
+        xcor_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task xcor.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
+        }
+        subsample_ctl_mem_factor: {
+            description: "Multiplication factor to determine memory required for task subsample_ctl.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        subsample_ctl_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task subsample_ctl.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
+        }
+        call_peak_cpu: {
+            description: "Number of cores for task call_peak. IF MACS2 is chosen as peak_caller (or chip.pipeline_type is histone), then cpu will be fixed at 2.",
+            group: "resource_parameter",
+            help: "Task call_peak call peaks on TAG-ALIGNs by using SPP/MACS2 peak caller. MACS2 is single-threaded so cpu will be fixed at 2 for MACS2.",
+        }
+        call_peak_spp_mem_factor: {
+            description: "Multiplication factor to determine memory required for task call_peak with spp as peak_caller.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        call_peak_macs2_mem_factor: {
+            description: "Multiplication factor to determine memory required for task call_peak with macs2 as peak_caller.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        call_peak_time_hr: {
+            description: "Walltime (h) required for task call_peak.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        call_peak_spp_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task call_peak with spp as peak_caller.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
+        }
+        call_peak_macs2_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task call_peak with macs2 as peak_caller.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
+        }
+        macs2_signal_track_mem_factor: {
+            description: "Multiplication factor to determine memory required for task macs2_signal_track.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required memory of instance (GCP/AWS) or job (HPCs).",
+        }
+        macs2_signal_track_time_hr: {
+            description: "Walltime (h) required for task macs2_signal_track.",
+            group: "resource_parameter",
+            help: "This is for HPCs only. e.g. SLURM, SGE, ...",
+        }
+        macs2_signal_track_disk_factor: {
+            description: "Multiplication factor to determine persistent disk size for task macs2_signal_track.",
+            group: "resource_parameter",
+            help: "This factor will be multiplied to the size of TAG-ALIGNs (BEDs) to determine required disk size of instance on GCP/AWS.",
+        }
+        align_trimmomatic_java_heap: {
+            description: "Maximum Java heap (java -Xmx) in task align.",
+            group: "resource_parameter",
+            help: "Maximum memory for Trimmomatic. If not defined, 90% of align task's memory will be used.",
+        }
+        filter_picard_java_heap: {
+            description: "Maximum Java heap (java -Xmx) in task filter.",
+            group: "resource_parameter",
+            help: "Maximum memory for Picard tools MarkDuplicates. If not defined, 90% of filter task's memory will be used.",
+        }
+        gc_bias_picard_java_heap: {
+            description: "Maximum Java heap (java -Xmx) in task gc_bias.",
+            group: "resource_parameter",
+            help: "Maximum memory for Picard tools CollectGcBiasMetrics. If not defined, 90% of gc_bias task's memory will be used.",
         }
     }
 

@@ -60,6 +60,16 @@ workflow seaseq {
     }
 
     parameter_meta {
+        reference: {
+            description: "Reference FASTA file",
+            group: "reference_genome",
+            patterns: [
+                "*.fa",
+                "*.fasta",
+                "*.fa.gz",
+                "*.fasta.gz",
+            ],
+        }
         blacklist: {
             description: "Blacklist file in BED format",
             group: "reference_genome",
@@ -67,14 +77,6 @@ workflow seaseq {
             patterns: [
                 "*.bed",
                 "*.bed.gz",
-            ],
-        }
-        bowtie_index: {
-            description: "bowtie v1 index files (*.ebwt)",
-            group: "reference_genome",
-            help: "If not defined, bowtie v1 index files are generated, will take a longer compute time.",
-            patterns: [
-                "*.ebwt",
             ],
         }
         gtf: {
@@ -90,6 +92,14 @@ workflow seaseq {
                 "*.gff3.gz",
             ],
         }
+        bowtie_index: {
+            description: "bowtie v1 index files (*.ebwt)",
+            group: "reference_genome",
+            help: "If not defined, bowtie v1 index files are generated, will take a longer compute time.",
+            patterns: [
+                "*.ebwt",
+            ],
+        }
         motif_databases: {
             description: "One or more of the MEME suite motif databases (*.meme)",
             group: "reference_genome",
@@ -98,14 +108,19 @@ workflow seaseq {
                 "*.meme",
             ],
         }
-        reference: {
-            description: "Reference FASTA file",
-            group: "reference_genome",
+        sample_sraid: {
+            description: "One or more sample SRA (Sequence Read Archive) run identifiers",
+            group: "input_genomic_data",
+            help: "Input publicly available FASTQs (SRRs). Multiple SRRs are separated by commas (,).",
+            example: "SRR12345678",
+        }
+        sample_fastq: {
+            description: "One or more sample FASTQs",
+            group: "input_genomic_data",
+            help: "Upload zipped FASTQ files.",
             patterns: [
-                "*.fa",
-                "*.fasta",
-                "*.fa.gz",
-                "*.fasta.gz",
+                "*.fq.gz",
+                "*.fastq.gz",
             ],
         }
         results_name: {
@@ -119,21 +134,6 @@ workflow seaseq {
             group: "analysis_parameter",
             help: "Setting this means Motif Discovery and Enrichment analysis will be performed.",
             example: true,
-        }
-        sample_fastq: {
-            description: "One or more sample FASTQs",
-            group: "input_genomic_data",
-            help: "Upload zipped FASTQ files.",
-            patterns: [
-                "*.fq.gz",
-                "*.fastq.gz",
-            ],
-        }
-        sample_sraid: {
-            description: "One or more sample SRA (Sequence Read Archive) run identifiers",
-            group: "input_genomic_data",
-            help: "Input publicly available FASTQs (SRRs). Multiple SRRs are separated by commas (,).",
-            example: "SRR12345678",
         }
     }
 

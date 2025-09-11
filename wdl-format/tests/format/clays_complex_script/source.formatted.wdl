@@ -38,17 +38,17 @@ task a_task {
     parameter_meta
         # Here is a comment between `parameter_meta` and the open brace.
     {
-        a_false: false
-        a_float: -0.0e123
+        # Here is a comment within `parameter_meta`.
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
+        a_false: false
+        an_integer: 42
+        a_float: -0.0e123
         an_array: [
             true,
             -42,
             "hello, world",
         ]
-        # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
-        an_integer: 42
         an_object: {
             subkey_one: "a",
             subkey_two: 73,
@@ -128,17 +128,17 @@ workflow hello {
     parameter_meta
         # Here is a comment between `parameter_meta` and the open brace.
     {
-        a_false: false
-        a_float: -0.0e123
+        # Here is a comment within `parameter_meta`.
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
+        a_false: false
+        an_integer: 42
+        a_float: -0.0e123
         an_array: [
             true,
             -42,
             "hello, world",
         ]  ## This is a double-pound-sign comment at the end of the line.
-        # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
-        an_integer: 42
         an_object: {
             subkey_one: "a",
             subkey_two: 73,

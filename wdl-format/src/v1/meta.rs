@@ -1,6 +1,5 @@
 //! Formatting functions for meta and parameter_meta sections.
 
-use wdl_ast::AstToken;
 use wdl_ast::SyntaxKind;
 
 use crate::PreToken;
@@ -234,22 +233,6 @@ pub fn format_parameter_metadata_section(
             ),
         }
     }
-
-    items.sort_by(|a, b| {
-        let a_item = a
-            .element()
-            .as_node()
-            .unwrap()
-            .as_metadata_object_item()
-            .unwrap();
-        let b_item = b
-            .element()
-            .as_node()
-            .unwrap()
-            .as_metadata_object_item()
-            .unwrap();
-        a_item.name().text().cmp(b_item.name().text())
-    });
 
     for item in items {
         (&item).write(stream);
