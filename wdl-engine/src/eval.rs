@@ -348,7 +348,7 @@ pub trait EvaluationContext: Send + Sync {
         None
     }
 
-    /// Gets the transferrer to use for evaluating expressions.
+    /// Gets the transferer to use for evaluating expressions.
     fn transferer(&self) -> &dyn Transferer;
 
     /// Gets a guest path representation of a host path.
