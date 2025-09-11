@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-* Added support for sorting input and parameter_meta sections ([#597](https://github.com/stjude-rust-labs/wdl/pull/597)).
+* Added support for sorting input sections ([#597](https://github.com/stjude-rust-labs/wdl/pull/597)).
 
 ## 0.10.0 - 08-13-2025
 
