@@ -38,17 +38,17 @@ task a_task {
     parameter_meta
         # Here is a comment between `parameter_meta` and the open brace.
     {
-        # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
-        a_true: true
         a_false: false
-        an_integer: 42
         a_float: -0.0e123
+        a_true: true
         an_array: [
             true,
             -42,
             "hello, world",
         ]
+        # Here is a comment within `parameter_meta`.
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_integer: 42
         an_object: {
             subkey_one: "a",
             subkey_two: 73,
@@ -61,12 +61,12 @@ task a_task {
     input
         # Here is a comment between `input` and the open brace.
     {
+        AStruct a_struct  # This should not be higlighted, as it's not known within
         Object an_object
         String a_string
         Boolean a_boolean
-        Int an_integer
         Float a_float
-        AStruct a_struct  # This should not be higlighted, as it's not known within
+        Int an_integer
     # the TextMate language that it's a custom struct.
     }
 
@@ -128,17 +128,17 @@ workflow hello {
     parameter_meta
         # Here is a comment between `parameter_meta` and the open brace.
     {
-        # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
-        a_true: true
         a_false: false
-        an_integer: 42
         a_float: -0.0e123
+        a_true: true
         an_array: [
             true,
             -42,
             "hello, world",
         ]  ## This is a double-pound-sign comment at the end of the line.
+        # Here is a comment within `parameter_meta`.
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_integer: 42
         an_object: {
             subkey_one: "a",
             subkey_two: 73,
@@ -149,12 +149,12 @@ workflow hello {
     }
 
     input {
+        AStruct a_struct  # This should not be higlighted, as it's not known within
         Object an_object
         String a_string
         Boolean a_boolean
-        Int an_integer
         Float a_float
-        AStruct a_struct  # This should not be higlighted, as it's not known within
+        Int an_integer
     # the TextMate language that it's a custom struct.
     }
 
