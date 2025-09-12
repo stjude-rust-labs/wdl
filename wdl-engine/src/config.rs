@@ -403,11 +403,11 @@ impl S3StorageAuthConfig {
     /// Validates the AWS S3 storage authentication configuration.
     pub fn validate(&self) -> Result<()> {
         if self.access_key_id.is_empty() {
-            bail!("configuration value `storage.s3.auth.access_key_id`");
+            bail!("configuration value `storage.s3.auth.access_key_id` is required");
         }
 
         if self.secret_access_key.inner.expose_secret().is_empty() {
-            bail!("configuration value `storage.s3.auth.secret_access_key`");
+            bail!("configuration value `storage.s3.auth.secret_access_key` is required");
         }
 
         Ok(())
@@ -467,11 +467,11 @@ impl GoogleStorageAuthConfig {
     /// Validates the Google Cloud Storage authentication configuration.
     pub fn validate(&self) -> Result<()> {
         if self.access_key.is_empty() {
-            bail!("configuration value `storage.google.auth.access_key`");
+            bail!("configuration value `storage.google.auth.access_key` is required");
         }
 
         if self.secret.inner.expose_secret().is_empty() {
-            bail!("configuration value `storage.google.auth.secret`");
+            bail!("configuration value `storage.google.auth.secret` is required");
         }
 
         Ok(())
