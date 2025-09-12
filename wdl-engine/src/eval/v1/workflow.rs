@@ -176,7 +176,7 @@ impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
     }
 
     fn transferer(&self) -> &dyn Transferer {
-        &self.state.transferer
+        self.state.transferer.as_ref()
     }
 }
 
@@ -561,7 +561,7 @@ struct State {
     /// The calls directory path.
     calls_dir: PathBuf,
     /// The transferer for expression evaluation.
-    transferer: HttpTransferer,
+    transferer: Arc<dyn Transferer>,
 }
 
 /// Represents a WDL V1 workflow evaluator.
@@ -576,7 +576,7 @@ pub struct WorkflowEvaluator {
     /// The cancellation token for cancelling workflow evaluation.
     token: CancellationToken,
     /// The transferer for expression evaluation.
-    transferer: HttpTransferer,
+    transferer: Arc<dyn Transferer>,
 }
 
 impl WorkflowEvaluator {
@@ -598,7 +598,7 @@ impl WorkflowEvaluator {
             config,
             backend,
             token,
-            transferer,
+            transferer: Arc::new(transferer),
         })
     }
 

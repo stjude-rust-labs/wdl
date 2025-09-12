@@ -830,13 +830,13 @@ impl TaskEvaluator {
         config: Arc<Config>,
         backend: Arc<dyn TaskExecutionBackend>,
         token: CancellationToken,
-        transferer: HttpTransferer,
+        transferer: Arc<dyn Transferer>,
     ) -> Self {
         Self {
             config,
             backend,
             token,
-            transferer: Arc::new(transferer),
+            transferer,
         }
     }
 
