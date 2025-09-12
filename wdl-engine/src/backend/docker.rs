@@ -8,7 +8,6 @@ use std::sync::Mutex;
 
 use anyhow::Context;
 use anyhow::Result;
-use anyhow::anyhow;
 use anyhow::bail;
 use crankshaft::config::backend;
 use crankshaft::engine::Task;
@@ -469,6 +468,7 @@ impl TaskExecutionBackend for DockerBackend {
         'b: 'c,
         Self: 'c,
     {
+        use anyhow::anyhow;
         use futures::FutureExt;
 
         /// The guest path for the output directory.
