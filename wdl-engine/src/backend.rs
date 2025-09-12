@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::fmt;
 use std::future::Future;
 use std::ops::Add;
 use std::ops::Range;
@@ -126,7 +127,21 @@ impl TaskSpawnInfo {
     }
 }
 
+impl fmt::Debug for TaskSpawnInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("TaskSpawnInfo")
+            .field("command", &self.command)
+            .field("inputs", &self.inputs)
+            .field("requirements", &self.requirements)
+            .field("hints", &self.hints)
+            .field("env", &self.env)
+            .field("transferer", &"<transferer>")
+            .finish()
+    }
+}
+
 /// Represents a request to spawn a task.
+#[derive(Debug)]
 pub struct TaskSpawnRequest {
     /// The id of the task being spawned.
     id: String,

@@ -10,6 +10,7 @@ use std::sync::Mutex;
 use std::thread::available_parallelism;
 
 use anyhow::Context;
+use anyhow::Error;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
@@ -22,7 +23,7 @@ use futures::future::BoxFuture;
 use secrecy::ExposeSecret;
 use tempfile::NamedTempFile;
 use tempfile::TempPath;
-use tokio::sync::Notify;
+use tokio::sync::OnceCell;
 use tokio::sync::Semaphore;
 use tokio::sync::broadcast;
 use tokio_util::sync::CancellationToken;
@@ -69,11 +70,7 @@ impl AsRef<Path> for Location {
 /// Represents a file transferer.
 pub trait Transferer: Send + Sync {
     /// Downloads a file or directory to a temporary path.
-    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location>>
-    where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c;
+    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>>;
 
     /// Uploads a local file or directory to a cloud storage URL.
     ///
@@ -81,16 +78,11 @@ pub trait Transferer: Send + Sync {
     /// specific to the content being uploaded).
     ///
     /// Returns the destination URL with any Azure authentication applied.
-    fn upload<'a, 'b, 'c, 'd>(
+    fn upload<'a>(
         &'a self,
-        source: &'b Path,
-        destination: &'c Url,
-    ) -> BoxFuture<'d, Result<()>>
-    where
-        'a: 'd,
-        'b: 'd,
-        'c: 'd,
-        Self: 'd;
+        source: &'a Path,
+        destination: &'a Url,
+    ) -> BoxFuture<'a, Result<(), Arc<Error>>>;
 
     /// Gets the size of a resource at a given URL.
     ///
@@ -98,11 +90,7 @@ pub trait Transferer: Send + Sync {
     ///
     /// Returns `Ok(None)` if the URL is valid but the size cannot be
     /// determined.
-    fn size<'a, 'b, 'c>(&'a self, url: &'b Url) -> BoxFuture<'c, Result<Option<u64>>>
-    where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c;
+    fn size<'a>(&'a self, url: &'a Url) -> BoxFuture<'a, Result<Option<u64>>>;
 
     /// Applies any required authentication to the URL.
     ///
@@ -112,25 +100,11 @@ pub trait Transferer: Send + Sync {
     fn apply_auth<'a>(&self, url: &'a Url) -> Result<Cow<'a, Url>>;
 }
 
-/// Represents the status of a download.
-enum DownloadStatus {
-    /// The requested resource is currently being downloaded.
-    ///
-    /// The specified `Notify` will be notified when the download completes.
-    Downloading(Arc<Notify>),
-    /// The requested resource has already been downloaded.
-    Downloaded(Location),
-}
+/// Represents a result of a download that is initialized exactly once.
+type CachedDownloadResult = Result<Location, Arc<Error>>;
 
-/// Represents the status of an upload.
-enum UploadStatus {
-    /// The requested resource is currently being uploaded.
-    ///
-    /// The specified `Notify` will be notified when the upload completes.
-    Uploading(Arc<Notify>),
-    /// The requested resource has already been uploaded.
-    Uploaded,
-}
+/// Represents the result of an upload that is initialized exactly once.
+type CachedUploadResult = Result<(), Arc<Error>>;
 
 /// Represents the internal state of `HttpTransferer`.
 struct HttpTransfererInner {
@@ -140,10 +114,10 @@ struct HttpTransfererInner {
     copy_config: cloud_copy::Config,
     /// The HTTP client to use.
     client: HttpClient,
-    /// Stores the status of downloads by URL.
-    downloads: Mutex<HashMap<Url, DownloadStatus>>,
-    /// Stores the status of uploads by URL.
-    uploads: Mutex<HashMap<Url, UploadStatus>>,
+    /// Stores the results of downloading files.
+    downloads: Mutex<HashMap<Url, Arc<OnceCell<CachedDownloadResult>>>>,
+    /// Stores the results of uploading files.
+    uploads: Mutex<HashMap<Url, Arc<OnceCell<CachedUploadResult>>>>,
     /// The cancellation token for canceling transfers.
     cancel: CancellationToken,
     /// The events sender to use for transfer events.
@@ -222,12 +196,7 @@ impl HttpTransferer {
 }
 
 impl Transferer for HttpTransferer {
-    fn download<'a, 'b, 'c>(&'a self, source: &'b Url) -> BoxFuture<'c, Result<Location>>
-    where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c,
-    {
+    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>> {
         async move {
             let source = self.apply_auth(source)?;
 
@@ -240,203 +209,112 @@ impl Transferer for HttpTransferer {
                 ));
             }
 
-            // This loop exists so that all requests to download the same URL will block
-            // waiting for a notification that the download has completed.
-            // When the notification is received, the lookup into the downloads is retried
-            loop {
-                let notified = {
-                    let mut downloads = self.0.downloads.lock().expect("failed to lock downloads");
-                    match downloads.get(source.as_ref()) {
-                        Some(DownloadStatus::Downloading(notify)) => {
-                            Notify::notified_owned(notify.clone())
-                        }
-                        Some(DownloadStatus::Downloaded(r)) => {
-                            return Ok(r.clone());
-                        }
-                        None => {
-                            // Insert an entry to notify others a download is in progress
-                            downloads.insert(
-                                source.as_ref().clone(),
-                                DownloadStatus::Downloading(Arc::new(Notify::new())),
-                            );
-                            break;
-                        }
-                    }
-                };
-
-                notified.await;
-            }
-
-            // Wrap the copy code in a future so we don't accidentally return early without
-            // notifying
-            let copy = async {
-                // Acquire a permit for the transfer
-                let _permit = self
-                    .0
-                    .semaphore
-                    .acquire()
-                    .await
-                    .expect("semaphore should not be closed");
-
-                // Create a temporary path to where the download will go
-                let temp_path = NamedTempFile::new()
-                    .context("failed to create temporary file")?
-                    .into_temp_path();
-
-                // Perform the download (always overwrite the local temp file)
-                let mut config = self.0.copy_config.clone();
-                config.overwrite = true;
-                cloud_copy::copy(
-                    config,
-                    self.0.client.clone(),
-                    source.as_ref(),
-                    &*temp_path,
-                    self.0.cancel.clone(),
-                    self.0.events.clone(),
-                )
-                .await
-                .with_context(|| {
-                    format!("failed to download `{source}`", source = source.display())
-                })
-                .map(|_| Location::Temp(Arc::new(temp_path)))
-            };
-
-            let result = copy.await;
-
-            // Update the status and notify any waiters
-            let notify = {
+            let download = {
                 let mut downloads = self.0.downloads.lock().expect("failed to lock downloads");
-                let status = downloads.get_mut(&source).expect("should have status");
-                let notify = match status {
-                    DownloadStatus::Downloading(notify) => notify.clone(),
-                    DownloadStatus::Downloaded(_) => {
-                        panic!("expected to find a downloading status")
-                    }
-                };
-
-                match &result {
-                    Ok(location) => {
-                        *status = DownloadStatus::Downloaded(location.clone());
-                    }
-                    Err(_) => {
-                        downloads.remove(&source);
-                    }
-                }
-
-                notify
+                downloads
+                    .entry(source.as_ref().clone())
+                    .or_default()
+                    .clone()
             };
 
-            notify.notify_waiters();
-            result
+            // Get an existing result or initialize a new one exactly once
+            download
+                .get_or_init(|| async {
+                    {
+                        // Acquire a permit for the transfer
+                        let _permit = self
+                            .0
+                            .semaphore
+                            .acquire()
+                            .await
+                            .context("failed to acquire transfer permit")?;
+
+                        // Create a temporary path to where the download will go
+                        let temp_path = NamedTempFile::new()
+                            .context("failed to create temporary file")?
+                            .into_temp_path();
+
+                        // Perform the download (always overwrite the local temp file)
+                        let mut config = self.0.copy_config.clone();
+                        config.overwrite = true;
+                        cloud_copy::copy(
+                            config,
+                            self.0.client.clone(),
+                            source.as_ref(),
+                            &*temp_path,
+                            self.0.cancel.clone(),
+                            self.0.events.clone(),
+                        )
+                        .await
+                        .with_context(|| {
+                            format!("failed to download `{source}`", source = source.display())
+                        })
+                        .map(|_| Location::Temp(Arc::new(temp_path)))
+                    }
+                    .map_err(Into::into)
+                })
+                .await
+                .clone()
         }
         .boxed()
     }
 
-    fn upload<'a, 'b, 'c, 'd>(
+    fn upload<'a>(
         &'a self,
-        source: &'b Path,
-        destination: &'c Url,
-    ) -> BoxFuture<'d, Result<()>>
-    where
-        'a: 'd,
-        'b: 'd,
-        'c: 'd,
-        Self: 'd,
-    {
+        source: &'a Path,
+        destination: &'a Url,
+    ) -> BoxFuture<'a, Result<(), Arc<Error>>> {
         async move {
             let destination = self.apply_auth(destination)?;
 
-            // This loop exists so that all requests to upload the same URL will block
-            // waiting for a notification that the upload has completed.
-            // When the notification is received, the lookup into the uploads is retried
-            loop {
-                let notified = {
-                    let mut uploads = self.0.uploads.lock().expect("failed to lock uploads");
-                    match uploads.get(&destination) {
-                        Some(UploadStatus::Uploading(notify)) => {
-                            Notify::notified_owned(notify.clone())
-                        }
-                        Some(UploadStatus::Uploaded) => {
-                            return Ok(());
-                        }
-                        None => {
-                            // Insert an entry to notify others a upload is in progress
-                            uploads.insert(
-                                destination.as_ref().clone(),
-                                UploadStatus::Uploading(Arc::new(Notify::new())),
-                            );
-                            break;
-                        }
-                    }
-                };
-
-                notified.await;
-            }
-
-            // Wrap the copy code in a future so we don't accidentally return early without
-            // notifying
-            let copy = async {
-                // Acquire a permit for the transfer
-                let _permit = self
-                    .0
-                    .semaphore
-                    .acquire()
-                    .await
-                    .expect("semaphore should not be closed");
-
-                // Perform the upload (do not overwrite)
-                let mut config = self.0.copy_config.clone();
-                config.overwrite = false;
-                match cloud_copy::copy(
-                    config,
-                    self.0.client.clone(),
-                    source,
-                    destination.as_ref(),
-                    self.0.cancel.clone(),
-                    self.0.events.clone(),
-                )
-                .await
-                {
-                    Ok(_) | Err(cloud_copy::Error::RemoteDestinationExists(_)) => Ok(()),
-                    Err(e) => Err(e.into()),
-                }
-            };
-
-            let result = copy.await;
-
-            // Update the status and notify any waiters
-            let notify = {
+            let upload = {
                 let mut uploads = self.0.uploads.lock().expect("failed to lock uploads");
-                let status = uploads.get_mut(&destination).expect("should have status");
-                let notify = match status {
-                    UploadStatus::Uploading(notify) => notify.clone(),
-                    UploadStatus::Uploaded => panic!("expected to find an uploading status"),
-                };
-
-                match &result {
-                    Ok(_) => {
-                        *status = UploadStatus::Uploaded;
-                    }
-                    Err(_) => {
-                        uploads.remove(&destination);
-                    }
-                }
-
-                notify
+                uploads
+                    .entry(destination.as_ref().clone())
+                    .or_default()
+                    .clone()
             };
 
-            notify.notify_waiters();
-            result
+            // Get an existing result or initialize a new one exactly once
+            upload
+                .get_or_init(|| async {
+                    {
+                        // Acquire a permit for the transfer
+                        let _permit = self
+                            .0
+                            .semaphore
+                            .acquire()
+                            .await
+                            .context("failed to acquire transfer permit")?;
+
+                        // Perform the upload (do not overwrite)
+                        let mut config = self.0.copy_config.clone();
+                        config.overwrite = false;
+                        match cloud_copy::copy(
+                            config,
+                            self.0.client.clone(),
+                            source,
+                            destination.as_ref(),
+                            self.0.cancel.clone(),
+                            self.0.events.clone(),
+                        )
+                        .await
+                        {
+                            Ok(_) | Err(cloud_copy::Error::RemoteDestinationExists(_)) => {
+                                anyhow::Ok(())
+                            }
+                            Err(e) => Err(e.into()),
+                        }
+                    }
+                    .map_err(Into::into)
+                })
+                .await
+                .clone()
         }
         .boxed()
     }
 
-    fn size<'a, 'b, 'c>(&'a self, url: &'b Url) -> BoxFuture<'c, Result<Option<u64>>>
-    where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c,
-    {
+    fn size<'a>(&'a self, url: &'a Url) -> BoxFuture<'a, Result<Option<u64>>> {
         async move {
             let url = self.apply_auth(url)?;
 

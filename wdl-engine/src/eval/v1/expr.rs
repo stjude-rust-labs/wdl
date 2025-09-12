@@ -1493,6 +1493,7 @@ pub(crate) mod test {
     use std::fs;
     use std::path::Path;
 
+    use anyhow::Error;
     use anyhow::Result;
     use pretty_assertions::assert_eq;
     use tempfile::TempDir;
@@ -1568,12 +1569,7 @@ pub(crate) mod test {
     }
 
     impl Transferer for TestEnv {
-        fn download<'a, 'b, 'c>(&'a self, url: &'b Url) -> BoxFuture<'c, Result<Location>>
-        where
-            'a: 'c,
-            'b: 'c,
-            Self: 'c,
-        {
+        fn download<'a>(&'a self, url: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>> {
             async {
                 // For tests, redirect requests to example.com to files relative to the work dir
                 if url.authority() == "example.com" {
@@ -1589,22 +1585,11 @@ pub(crate) mod test {
             .boxed()
         }
 
-        fn upload<'a, 'b, 'c, 'd>(&'a self, _: &'b Path, _: &'c Url) -> BoxFuture<'d, Result<()>>
-        where
-            'a: 'd,
-            'b: 'd,
-            'c: 'd,
-            Self: 'd,
-        {
+        fn upload<'a>(&'a self, _: &'a Path, _: &'a Url) -> BoxFuture<'a, Result<(), Arc<Error>>> {
             unimplemented!()
         }
 
-        fn size<'a, 'b, 'c>(&'a self, _: &'b Url) -> BoxFuture<'c, anyhow::Result<Option<u64>>>
-        where
-            'a: 'c,
-            'b: 'c,
-            Self: 'c,
-        {
+        fn size<'a>(&'a self, _: &'a Url) -> BoxFuture<'a, anyhow::Result<Option<u64>>> {
             std::future::ready(Ok(Some(1234))).boxed()
         }
 

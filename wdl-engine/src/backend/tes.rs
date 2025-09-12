@@ -89,6 +89,7 @@ const DEFAULT_TES_INTERVAL: u64 = 60;
 ///
 /// This request contains the requested cpu and memory reservations for the task
 /// as well as the result receiver channel.
+#[derive(Debug)]
 struct TesTaskRequest {
     /// The engine configuration.
     config: Arc<Config>,
@@ -196,16 +197,25 @@ impl TaskManagerRequest for TesTaskRequest {
                 .build(),
         ];
 
-        // Determine the inputs we need to upload
+        // Spawn upload tasks for inputs available locally, and apply authentication to
+        // the URLs for remote inputs.
         let mut uploads = JoinSet::new();
         for (i, input) in self.inner.inputs().iter().enumerate() {
             match input.path() {
                 EvaluationPath::Local(path) => {
+                    // Input is local, spawn an upload of it
                     let path = path.to_path_buf();
                     let transferer = self.inner.transferer().clone();
                     let inputs_url = inputs_url.clone();
                     uploads.spawn(async move {
-                        let url = inputs_url.join_digest(calculate_path_digest(&path).await?);
+                        let url = inputs_url.join_digest(
+                            calculate_path_digest(&path).await.map_err(|e| {
+                                anyhow!(
+                                    "failed to calculate digest of `{path}`: {e:#}",
+                                    path = path.display()
+                                )
+                            })?,
+                        );
                         transferer
                             .upload(&path, &url)
                             .await
@@ -220,7 +230,7 @@ impl TaskManagerRequest for TesTaskRequest {
                     });
                 }
                 EvaluationPath::Remote(url) => {
-                    // Input is already remote, push it now
+                    // Input is already remote, add it to the Crankshaft inputs list
                     let url = match self.inner.transferer().apply_auth(url)? {
                         Cow::Borrowed(_) => url.clone(),
                         Cow::Owned(url) => url,
@@ -242,9 +252,9 @@ impl TaskManagerRequest for TesTaskRequest {
             }
         }
 
-        // Wait for the uploads to complete
+        // Wait for any uploads to complete
         while let Some(result) = uploads.join_next().await {
-            let (i, url) = result.map_err(|e| anyhow!("upload task failed: {e}"))??;
+            let (i, url) = result.context("upload task")??;
             let input = &self.inner.inputs()[i];
             let url = match self.inner.transferer().apply_auth(&url)? {
                 Cow::Borrowed(_) => url,

@@ -34,6 +34,9 @@ pub const DEFAULT_TASK_SHELL: &str = "bash";
 /// The default backend name.
 pub const DEFAULT_BACKEND_NAME: &str = "default";
 
+/// The string that replaces redacted serialization fields.
+const REDACTED: &str = "<REDACTED>";
+
 /// Represents a secret string that is, by default, redacted for serialization.
 ///
 /// This type is a wrapper around [`secrecy::SecretString`].
@@ -107,7 +110,7 @@ impl serde::Serialize for SecretString {
         use secrecy::ExposeSecret;
 
         if self.redacted {
-            serializer.serialize_str("<REDACTED>")
+            serializer.serialize_str(REDACTED)
         } else {
             serializer.serialize_str(self.inner.expose_secret())
         }
@@ -1043,13 +1046,19 @@ mod test {
     fn redacted_secret() {
         let mut secret: SecretString = "secret".into();
 
-        assert_eq!(serde_json::to_string(&secret).unwrap(), r#""<REDACTED>""#);
+        assert_eq!(
+            serde_json::to_string(&secret).unwrap(),
+            format!(r#""{REDACTED}""#)
+        );
 
         secret.unredact();
         assert_eq!(serde_json::to_string(&secret).unwrap(), r#""secret""#);
 
         secret.redact();
-        assert_eq!(serde_json::to_string(&secret).unwrap(), r#""<REDACTED>""#);
+        assert_eq!(
+            serde_json::to_string(&secret).unwrap(),
+            format!(r#""{REDACTED}""#)
+        );
     }
 
     #[test]
