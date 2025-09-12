@@ -730,7 +730,7 @@ impl<'a> State<'a> {
                             .with_context(|| format!("invalid URL `{url}`"))?,
                     )
                     .await
-                    .map_err(|e| anyhow!("failed to localize `{url}`: {e:#}"))
+                    .with_context(|| anyhow!("failed to localize `{url}`"))
                     .map(|l| (url, l, index))
             });
         }
@@ -1754,7 +1754,7 @@ impl TaskEvaluator {
                             .download(&url)
                             .await
                             .map(|l| (idx, l))
-                            .map_err(|e| anyhow!("failed to localize `{url}`: {e:#}"))
+                            .with_context(|| anyhow!("failed to localize `{url}`"))
                     });
                 }
             }

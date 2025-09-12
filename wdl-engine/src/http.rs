@@ -10,7 +10,6 @@ use std::sync::Mutex;
 use std::thread::available_parallelism;
 
 use anyhow::Context;
-use anyhow::Error;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
@@ -70,7 +69,7 @@ impl AsRef<Path> for Location {
 /// Represents a file transferer.
 pub trait Transferer: Send + Sync {
     /// Downloads a file or directory to a temporary path.
-    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>>;
+    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location>>;
 
     /// Uploads a local file or directory to a cloud storage URL.
     ///
@@ -78,11 +77,7 @@ pub trait Transferer: Send + Sync {
     /// specific to the content being uploaded).
     ///
     /// Returns the destination URL with any Azure authentication applied.
-    fn upload<'a>(
-        &'a self,
-        source: &'a Path,
-        destination: &'a Url,
-    ) -> BoxFuture<'a, Result<(), Arc<Error>>>;
+    fn upload<'a>(&'a self, source: &'a Path, destination: &'a Url) -> BoxFuture<'a, Result<()>>;
 
     /// Gets the size of a resource at a given URL.
     ///
@@ -100,12 +95,6 @@ pub trait Transferer: Send + Sync {
     fn apply_auth<'a>(&self, url: &'a Url) -> Result<Cow<'a, Url>>;
 }
 
-/// Represents a result of a download that is initialized exactly once.
-type CachedDownloadResult = Result<Location, Arc<Error>>;
-
-/// Represents the result of an upload that is initialized exactly once.
-type CachedUploadResult = Result<(), Arc<Error>>;
-
 /// Represents the internal state of `HttpTransferer`.
 struct HttpTransfererInner {
     /// The evaluation configuration to use.
@@ -115,9 +104,9 @@ struct HttpTransfererInner {
     /// The HTTP client to use.
     client: HttpClient,
     /// Stores the results of downloading files.
-    downloads: Mutex<HashMap<Url, Arc<OnceCell<CachedDownloadResult>>>>,
+    downloads: Mutex<HashMap<Url, Arc<OnceCell<Location>>>>,
     /// Stores the results of uploading files.
-    uploads: Mutex<HashMap<Url, Arc<OnceCell<CachedUploadResult>>>>,
+    uploads: Mutex<HashMap<Url, Arc<OnceCell<()>>>>,
     /// The cancellation token for canceling transfers.
     cancel: CancellationToken,
     /// The events sender to use for transfer events.
@@ -196,7 +185,7 @@ impl HttpTransferer {
 }
 
 impl Transferer for HttpTransferer {
-    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>> {
+    fn download<'a>(&'a self, source: &'a Url) -> BoxFuture<'a, Result<Location>> {
         async move {
             let source = self.apply_auth(source)?;
 
@@ -218,8 +207,8 @@ impl Transferer for HttpTransferer {
             };
 
             // Get an existing result or initialize a new one exactly once
-            download
-                .get_or_init(|| async {
+            Ok(download
+                .get_or_try_init(|| async {
                     {
                         // Acquire a permit for the transfer
                         let _permit = self
@@ -251,19 +240,14 @@ impl Transferer for HttpTransferer {
                         })
                         .map(|_| Location::Temp(Arc::new(temp_path)))
                     }
-                    .map_err(Into::into)
                 })
-                .await
-                .clone()
+                .await?
+                .clone())
         }
         .boxed()
     }
 
-    fn upload<'a>(
-        &'a self,
-        source: &'a Path,
-        destination: &'a Url,
-    ) -> BoxFuture<'a, Result<(), Arc<Error>>> {
+    fn upload<'a>(&'a self, source: &'a Path, destination: &'a Url) -> BoxFuture<'a, Result<()>> {
         async move {
             let destination = self.apply_auth(destination)?;
 
@@ -277,7 +261,7 @@ impl Transferer for HttpTransferer {
 
             // Get an existing result or initialize a new one exactly once
             upload
-                .get_or_init(|| async {
+                .get_or_try_init(|| async {
                     {
                         // Acquire a permit for the transfer
                         let _permit = self
@@ -306,10 +290,10 @@ impl Transferer for HttpTransferer {
                             Err(e) => Err(e.into()),
                         }
                     }
-                    .map_err(Into::into)
                 })
-                .await
-                .clone()
+                .await?;
+
+            Ok(())
         }
         .boxed()
     }

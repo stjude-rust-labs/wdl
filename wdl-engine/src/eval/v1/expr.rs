@@ -1493,7 +1493,6 @@ pub(crate) mod test {
     use std::fs;
     use std::path::Path;
 
-    use anyhow::Error;
     use anyhow::Result;
     use pretty_assertions::assert_eq;
     use tempfile::TempDir;
@@ -1569,7 +1568,7 @@ pub(crate) mod test {
     }
 
     impl Transferer for TestEnv {
-        fn download<'a>(&'a self, url: &'a Url) -> BoxFuture<'a, Result<Location, Arc<Error>>> {
+        fn download<'a>(&'a self, url: &'a Url) -> BoxFuture<'a, Result<Location>> {
             async {
                 // For tests, redirect requests to example.com to files relative to the work dir
                 if url.authority() == "example.com" {
@@ -1585,7 +1584,7 @@ pub(crate) mod test {
             .boxed()
         }
 
-        fn upload<'a>(&'a self, _: &'a Path, _: &'a Url) -> BoxFuture<'a, Result<(), Arc<Error>>> {
+        fn upload<'a>(&'a self, _: &'a Path, _: &'a Url) -> BoxFuture<'a, Result<()>> {
             unimplemented!()
         }
 

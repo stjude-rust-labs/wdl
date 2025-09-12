@@ -8,7 +8,6 @@ use std::sync::LazyLock;
 use std::sync::Mutex;
 
 use anyhow::Context;
-use anyhow::Error;
 use anyhow::Result;
 use blake3::Hash;
 use blake3::Hasher;
@@ -26,9 +25,6 @@ pub enum Digest {
     Directory(Hash),
 }
 
-/// Represents a cached digest result.
-type CachedDigestResult = Result<Digest, Arc<Error>>;
-
 /// Keeps track of previously calculated digests.
 ///
 /// As WDL evaluation cannot write to existing files, it is assumed that files
@@ -36,7 +32,7 @@ type CachedDigestResult = Result<Digest, Arc<Error>>;
 ///
 /// We check for changes to files and directories when we get a cache hit and
 /// error if the source has been modified.
-static DIGESTS: LazyLock<Mutex<HashMap<PathBuf, Arc<OnceCell<CachedDigestResult>>>>> =
+static DIGESTS: LazyLock<Mutex<HashMap<PathBuf, Arc<OnceCell<Digest>>>>> =
     LazyLock::new(Mutex::default);
 
 /// An extension trait for joining a digest to a URL.
@@ -102,7 +98,7 @@ impl UrlDigestExt for Url {
 /// * The total number of entries in the directory.
 ///
 /// [blake3]: https://github.com/BLAKE3-team/BLAKE3
-pub async fn calculate_path_digest(path: impl AsRef<Path>) -> Result<Digest, Arc<Error>> {
+pub async fn calculate_path_digest(path: impl AsRef<Path>) -> Result<Digest> {
     let path = path.as_ref();
 
     let digest = {
@@ -111,8 +107,8 @@ pub async fn calculate_path_digest(path: impl AsRef<Path>) -> Result<Digest, Arc
     };
 
     // Get an existing result or initialize a new one exactly once
-    digest
-        .get_or_init(|| async {
+    Ok(*digest
+        .get_or_try_init(|| async {
             let path = path.to_path_buf();
             spawn_blocking(move || {
                 let metadata = path.metadata().with_context(|| {
@@ -131,7 +127,7 @@ pub async fn calculate_path_digest(path: impl AsRef<Path>) -> Result<Digest, Arc
                             path = path.display()
                         )
                     })?;
-                    return Ok(Digest::File(hasher.finalize()));
+                    return anyhow::Ok(Digest::File(hasher.finalize()));
                 }
 
                 // Otherwise, walk the directory and calculate a directory digest.
@@ -189,6 +185,5 @@ pub async fn calculate_path_digest(path: impl AsRef<Path>) -> Result<Digest, Arc
             .await
             .expect("digest task failed")
         })
-        .await
-        .clone()
+        .await?)
 }

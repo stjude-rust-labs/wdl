@@ -8,7 +8,6 @@ use std::sync::Mutex;
 
 use anyhow::Context;
 use anyhow::Result;
-use anyhow::anyhow;
 use anyhow::bail;
 use cloud_copy::UrlExt;
 use crankshaft::config::backend;
@@ -209,9 +208,9 @@ impl TaskManagerRequest for TesTaskRequest {
                     let inputs_url = inputs_url.clone();
                     uploads.spawn(async move {
                         let url = inputs_url.join_digest(
-                            calculate_path_digest(&path).await.map_err(|e| {
-                                anyhow!(
-                                    "failed to calculate digest of `{path}`: {e:#}",
+                            calculate_path_digest(&path).await.with_context(|| {
+                                format!(
+                                    "failed to calculate digest of `{path}`",
                                     path = path.display()
                                 )
                             })?,
@@ -219,9 +218,9 @@ impl TaskManagerRequest for TesTaskRequest {
                         transferer
                             .upload(&path, &url)
                             .await
-                            .map_err(|e| {
-                                anyhow!(
-                                    "failed to upload `{path}` to `{url}`: {e:#}",
+                            .with_context(|| {
+                                format!(
+                                    "failed to upload `{path}` to `{url}`",
                                     path = path.display(),
                                     url = url.display()
                                 )
@@ -366,12 +365,7 @@ impl TaskManagerRequest for TesTaskRequest {
                 )
                 .build();
 
-            let statuses = match self
-                .backend
-                .run(task, self.token.clone())
-                .map_err(|e| anyhow!("{e:#}"))?
-                .await
-            {
+            let statuses = match self.backend.run(task, self.token.clone())?.await {
                 Ok(statuses) => statuses,
                 Err(TaskRunError::Preempted) if preemptible > 0 => {
                     // Decrement the preemptible count and retry

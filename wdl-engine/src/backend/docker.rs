@@ -221,12 +221,7 @@ impl TaskManagerRequest for DockerTaskRequest {
             )
             .build();
 
-        let statuses = self
-            .backend
-            .run(task, self.token.clone())
-            .map_err(|e| anyhow!("{e:#}"))?
-            .await
-            .map_err(|e| anyhow!("{e:#}"))?;
+        let statuses = self.backend.run(task, self.token.clone())?.await?;
 
         assert_eq!(statuses.len(), 1, "there should only be one exit status");
         let status = statuses.first();
@@ -295,7 +290,6 @@ impl DockerBackend {
             events,
         )
         .await
-        .map_err(|e| anyhow!("{e:#}"))
         .context("failed to initialize Docker backend")?;
 
         let resources = *backend.resources();
