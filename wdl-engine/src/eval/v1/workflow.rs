@@ -1,6 +1,5 @@
 //! Implementation of evaluation for V1 workflows.
 
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt::Write;
@@ -14,7 +13,6 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
-use crankshaft::events::Event;
 use futures::FutureExt;
 use futures::future::BoxFuture;
 use indexmap::IndexMap;
@@ -24,12 +22,12 @@ use petgraph::graph::NodeIndex;
 use petgraph::visit::Bfs;
 use petgraph::visit::EdgeRef;
 use tokio::sync::RwLock;
-use tokio::sync::broadcast;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::debug;
 use tracing::trace;
 use wdl_analysis::Document;
+use wdl_analysis::diagnostics::Io;
 use wdl_analysis::diagnostics::only_one_namespace;
 use wdl_analysis::diagnostics::recursive_workflow_call;
 use wdl_analysis::diagnostics::type_is_not_array;
@@ -57,6 +55,7 @@ use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::ScatterStatement;
+use wdl_ast::version::V1;
 
 use crate::Array;
 use crate::CallLocation;
@@ -65,6 +64,7 @@ use crate::Coercible;
 use crate::EvaluationContext;
 use crate::EvaluationError;
 use crate::EvaluationResult;
+use crate::Events;
 use crate::Inputs;
 use crate::Outputs;
 use crate::PrimitiveValue;
@@ -75,11 +75,11 @@ use crate::TaskExecutionBackend;
 use crate::Value;
 use crate::WorkflowInputs;
 use crate::config::Config;
+use crate::diagnostics::decl_evaluation_failed;
 use crate::diagnostics::if_conditional_mismatch;
-use crate::diagnostics::output_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
-use crate::http::Downloader;
-use crate::http::HttpDownloader;
+use crate::http::HttpTransferer;
+use crate::http::Transferer;
 use crate::path;
 use crate::path::EvaluationPath;
 use crate::tree::SyntaxNode;
@@ -135,36 +135,23 @@ const SCATTER_INDEX_VAR: &str = "$idx";
 
 /// Used to evaluate expressions in workflows.
 struct WorkflowEvaluationContext<'a, 'b> {
-    /// The document being evaluated.
-    document: &'a Document,
+    /// The evaluation state.
+    state: &'a State,
     /// The scope being evaluated.
     scope: ScopeRef<'b>,
-    /// The workflow's temporary directory.
-    temp_dir: &'a Path,
-    /// The downloader for expression evaluation.
-    downloader: &'a HttpDownloader,
 }
 
 impl<'a, 'b> WorkflowEvaluationContext<'a, 'b> {
     /// Constructs a new expression evaluation context.
-    pub fn new(
-        document: &'a Document,
-        scope: ScopeRef<'b>,
-        temp_dir: &'a Path,
-        downloader: &'a HttpDownloader,
-    ) -> Self {
-        Self {
-            document,
-            scope,
-            temp_dir,
-            downloader,
-        }
+    pub fn new(state: &'a State, scope: ScopeRef<'b>) -> Self {
+        Self { state, scope }
     }
 }
 
 impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
     fn version(&self) -> SupportedVersion {
-        self.document
+        self.state
+            .document
             .version()
             .expect("document should have a version")
     }
@@ -177,35 +164,19 @@ impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
     }
 
     fn resolve_type_name(&self, name: &str, span: Span) -> Result<Type, Diagnostic> {
-        crate::resolve_type_name(self.document, name, span)
+        crate::resolve_type_name(&self.state.document, name, span)
     }
 
-    fn work_dir(&self) -> Option<&EvaluationPath> {
-        None
+    fn base_dir(&self) -> &EvaluationPath {
+        &self.state.base_dir
     }
 
     fn temp_dir(&self) -> &Path {
-        self.temp_dir
+        &self.state.temp_dir
     }
 
-    fn stdout(&self) -> Option<&Value> {
-        None
-    }
-
-    fn stderr(&self) -> Option<&Value> {
-        None
-    }
-
-    fn task(&self) -> Option<&Task> {
-        None
-    }
-
-    fn translate_path(&self, _path: &str) -> Option<Cow<'_, Path>> {
-        None
-    }
-
-    fn downloader(&self) -> &dyn Downloader {
-        self.downloader
+    fn transferer(&self) -> &dyn Transferer {
+        self.state.transferer.as_ref()
     }
 }
 
@@ -581,12 +552,16 @@ struct State {
     graph: DiGraph<WorkflowGraphNode<SyntaxNode>, ()>,
     /// The map from graph node index to subgraph.
     subgraphs: HashMap<NodeIndex, Subgraph>,
-    /// The workflow evaluation temp directory path.
+    /// The base directory for evaluation.
+    ///
+    /// This is the document's directory.
+    base_dir: EvaluationPath,
+    /// The workflow evaluation temp directory.
     temp_dir: PathBuf,
     /// The calls directory path.
     calls_dir: PathBuf,
-    /// The downloader for expression evaluation.
-    downloader: HttpDownloader,
+    /// The transferer for expression evaluation.
+    transferer: Arc<dyn Transferer>,
 }
 
 /// Represents a WDL V1 workflow evaluator.
@@ -600,8 +575,8 @@ pub struct WorkflowEvaluator {
     backend: Arc<dyn TaskExecutionBackend>,
     /// The cancellation token for cancelling workflow evaluation.
     token: CancellationToken,
-    /// The downloader for expression evaluation.
-    downloader: HttpDownloader,
+    /// The transferer for expression evaluation.
+    transferer: Arc<dyn Transferer>,
 }
 
 impl WorkflowEvaluator {
@@ -611,22 +586,19 @@ impl WorkflowEvaluator {
     /// This method creates a default task execution backend.
     ///
     /// Returns an error if the configuration isn't valid.
-    pub async fn new(
-        config: Config,
-        token: CancellationToken,
-        events: Option<broadcast::Sender<Event>>,
-    ) -> Result<Self> {
+    pub async fn new(config: Config, token: CancellationToken, events: Events) -> Result<Self> {
         config.validate()?;
 
         let config = Arc::new(config);
-        let backend = config.create_backend(events).await?;
-        let downloader = HttpDownloader::new(config.clone())?;
+        let backend = config.create_backend(events.crankshaft().clone()).await?;
+        let transferer =
+            HttpTransferer::new(config.clone(), token.clone(), events.transfer().clone())?;
 
         Ok(Self {
             config,
             backend,
             token,
-            downloader,
+            transferer: Arc::new(transferer),
         })
     }
 
@@ -739,7 +711,14 @@ impl WorkflowEvaluator {
             )
         })?;
 
+        let document_path = document.path();
         let effective_output_dir = root_dir.to_path_buf();
+
+        let mut base_dir = EvaluationPath::parent_of(&document_path).with_context(|| {
+            format!("document `{document_path}` does not have a parent directory")
+        })?;
+
+        base_dir.make_absolute();
 
         let state = Arc::new(State {
             config: self.config.clone(),
@@ -750,9 +729,10 @@ impl WorkflowEvaluator {
             scopes: Default::default(),
             graph,
             subgraphs,
+            base_dir,
             temp_dir,
             calls_dir,
-            downloader: self.downloader.clone(),
+            transferer: self.transferer.clone(),
         });
 
         // Evaluate the root graph to completion
@@ -1046,9 +1026,36 @@ impl WorkflowEvaluator {
         };
 
         // Coerce the value to the expected type
-        let value = value
-            .coerce(&expected_ty)
+        let mut value = value
+            .coerce(None, &expected_ty)
             .map_err(|e| runtime_type_mismatch(e, &expected_ty, name.span(), &value.ty(), span))?;
+
+        // Ensure paths exist for WDL 1.2+
+        if state
+            .document
+            .version()
+            .expect("document should have a version")
+            >= SupportedVersion::V1(V1::Two)
+        {
+            value
+                .visit_paths_mut(expected_ty.is_optional(), &mut |optional, value| {
+                    value.ensure_path_exists(optional, state.base_dir.as_local())
+                })
+                .map_err(|e| {
+                    decl_evaluation_failed(
+                        e,
+                        state
+                            .document
+                            .workflow()
+                            .expect("should have workflow")
+                            .name(),
+                        false,
+                        name.text(),
+                        Some(Io::Input),
+                        name.span(),
+                    )
+                })?;
+        }
 
         // Write the value into the root scope
         state
@@ -1083,9 +1090,36 @@ impl WorkflowEvaluator {
         let value = Self::evaluate_expr(state, scope, &expr).await?;
 
         // Coerce the value to the expected type
-        let value = value.coerce(&expected_ty).map_err(|e| {
+        let mut value = value.coerce(None, &expected_ty).map_err(|e| {
             runtime_type_mismatch(e, &expected_ty, name.span(), &value.ty(), expr.span())
         })?;
+
+        // Ensure paths exist for WDL 1.2+
+        if state
+            .document
+            .version()
+            .expect("document should have a version")
+            >= SupportedVersion::V1(V1::Two)
+        {
+            value
+                .visit_paths_mut(expected_ty.is_optional(), &mut |optional, value| {
+                    value.ensure_path_exists(optional, state.base_dir.as_local())
+                })
+                .map_err(|e| {
+                    decl_evaluation_failed(
+                        e,
+                        state
+                            .document
+                            .workflow()
+                            .expect("should have workflow")
+                            .name(),
+                        false,
+                        name.text(),
+                        None,
+                        name.span(),
+                    )
+                })?;
+        }
 
         state
             .scopes
@@ -1118,7 +1152,7 @@ impl WorkflowEvaluator {
         let value = Self::evaluate_expr(state, Scopes::OUTPUT_INDEX, &expr).await?;
 
         // Coerce the value to the expected type
-        let mut value = value.coerce(&expected_ty).map_err(|e| {
+        let mut value = value.coerce(None, &expected_ty).map_err(|e| {
             runtime_type_mismatch(e, &expected_ty, name.span(), &value.ty(), expr.span())
         })?;
 
@@ -1131,14 +1165,14 @@ impl WorkflowEvaluator {
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                if !path::is_url(path) && Path::new(path.as_str()).is_relative() {
-                    bail!("relative path `{path}` cannot be a workflow output");
+                if !path::is_url(path.as_str()) && Path::new(path.as_str()).is_relative() {
+                    bail!("relative path `{path}` cannot be used as a workflow output");
                 }
 
-                value.ensure_path_exists(optional)
+                value.ensure_path_exists(optional, state.base_dir.as_local())
             })
             .map_err(|e| {
-                output_evaluation_failed(
+                decl_evaluation_failed(
                     e,
                     state
                         .document
@@ -1147,6 +1181,7 @@ impl WorkflowEvaluator {
                         .name(),
                     false,
                     name.text(),
+                    Some(Io::Output),
                     name.span(),
                 )
             })?;
@@ -1186,7 +1221,7 @@ impl WorkflowEvaluator {
             .map_err(|d| EvaluationError::new(state.document.clone(), d))?;
 
         if value
-            .coerce(&PrimitiveType::Boolean.into())
+            .coerce(None, &PrimitiveType::Boolean.into())
             .map_err(|e| {
                 EvaluationError::new(
                     state.document.clone(),
@@ -1517,7 +1552,7 @@ impl WorkflowEvaluator {
                         state.config.clone(),
                         state.backend.clone(),
                         state.token.clone(),
-                        state.downloader.clone(),
+                        state.transferer.clone(),
                     ),
                 ),
             ),
@@ -1528,7 +1563,7 @@ impl WorkflowEvaluator {
                         config: state.config.clone(),
                         backend: state.backend.clone(),
                         token: state.token.clone(),
-                        downloader: state.downloader.clone(),
+                        transferer: state.transferer.clone(),
                     }),
                 ),
                 _ => {
@@ -1606,10 +1641,8 @@ impl WorkflowEvaluator {
     ) -> Result<Value, Diagnostic> {
         let scopes = state.scopes.read().await;
         ExprEvaluator::new(WorkflowEvaluationContext::new(
-            &state.document,
+            state,
             scopes.reference(scope),
-            &state.temp_dir,
-            &state.downloader,
         ))
         .evaluate_expr(expr)
         .await
@@ -1632,10 +1665,8 @@ impl WorkflowEvaluator {
             let value = match input.expr() {
                 Some(expr) => {
                     let mut evaluator = ExprEvaluator::new(WorkflowEvaluationContext::new(
-                        &state.document,
+                        state,
                         scopes.reference(scope),
-                        &state.temp_dir,
-                        &state.downloader,
                     ));
 
                     evaluator.evaluate_expr(&expr).await?
@@ -1665,6 +1696,7 @@ mod test {
     use std::sync::atomic::AtomicUsize;
     use std::sync::atomic::Ordering;
 
+    use crankshaft::events::Event;
     use pretty_assertions::assert_eq;
     use tempfile::TempDir;
     use tokio::sync::broadcast::error::RecvError;
@@ -1751,7 +1783,7 @@ workflow test {
             .into(),
             ..Default::default()
         };
-        let evaluator = WorkflowEvaluator::new(config, CancellationToken::new(), None)
+        let evaluator = WorkflowEvaluator::new(config, CancellationToken::new(), Events::none())
             .await
             .unwrap();
 
@@ -1762,6 +1794,7 @@ workflow test {
         inputs.set(
             "c",
             Array::new(
+                None,
                 ArrayType::new(PrimitiveType::String),
                 ["jam".to_string(), "cakes".to_string()],
             )
@@ -1897,10 +1930,11 @@ workflow w {
         };
         let state = Arc::<State>::default();
         let events_state = state.clone();
-        let (events_tx, mut events_rx) = broadcast::channel(100);
-        let events = tokio::spawn(async move {
+        let events = Events::crankshaft_only(100);
+        let mut crankshaft_rx = events.subscribe_crankshaft().unwrap();
+        let task = tokio::spawn(async move {
             loop {
-                match events_rx.recv().await {
+                match crankshaft_rx.recv().await {
                     Ok(event) => match event {
                         Event::TaskCreated { name, tes_id, .. } => {
                             assert!(name.starts_with("t-"));
@@ -1923,7 +1957,7 @@ workflow w {
             }
         });
 
-        let evaluator = WorkflowEvaluator::new(config, CancellationToken::new(), Some(events_tx))
+        let evaluator = WorkflowEvaluator::new(config, CancellationToken::new(), events)
             .await
             .unwrap();
 
@@ -1944,7 +1978,7 @@ workflow w {
             .expect("failed to evaluate workflow");
 
         drop(evaluator);
-        events.await.expect("failed to await events");
+        task.await.expect("failed to await events task");
 
         assert_eq!(outputs.iter().count(), 0, "expected no outputs");
 

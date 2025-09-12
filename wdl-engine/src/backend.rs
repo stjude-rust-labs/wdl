@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::fmt;
 use std::future::Future;
 use std::ops::Add;
 use std::ops::Range;
@@ -24,7 +25,7 @@ use tracing::debug;
 
 use crate::Input;
 use crate::Value;
-use crate::http::HttpDownloader;
+use crate::http::Transferer;
 use crate::path::EvaluationPath;
 
 mod docker;
@@ -90,7 +91,6 @@ pub struct TaskExecutionConstraints {
 }
 
 /// Represents information for spawning a task.
-#[derive(Debug)]
 pub struct TaskSpawnInfo {
     /// The command of the task.
     command: String,
@@ -102,6 +102,8 @@ pub struct TaskSpawnInfo {
     hints: Arc<HashMap<String, Value>>,
     /// The environment variables of the task.
     env: Arc<IndexMap<String, String>>,
+    /// The transferer to use for uploading inputs.
+    transferer: Arc<dyn Transferer>,
 }
 
 impl TaskSpawnInfo {
@@ -112,6 +114,7 @@ impl TaskSpawnInfo {
         requirements: Arc<HashMap<String, Value>>,
         hints: Arc<HashMap<String, Value>>,
         env: Arc<IndexMap<String, String>>,
+        transferer: Arc<dyn Transferer>,
     ) -> Self {
         Self {
             command,
@@ -119,7 +122,21 @@ impl TaskSpawnInfo {
             requirements,
             hints,
             env,
+            transferer,
         }
+    }
+}
+
+impl fmt::Debug for TaskSpawnInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("TaskSpawnInfo")
+            .field("command", &self.command)
+            .field("inputs", &self.inputs)
+            .field("requirements", &self.requirements)
+            .field("hints", &self.hints)
+            .field("env", &self.env)
+            .field("transferer", &"<transferer>")
+            .finish()
     }
 }
 
@@ -177,6 +194,11 @@ impl TaskSpawnRequest {
         &self.info.env
     }
 
+    /// Gets the transferer to use for uploading inputs.
+    pub fn transferer(&self) -> &Arc<dyn Transferer> {
+        &self.info.transferer
+    }
+
     /// Gets the attempt number for the task's execution.
     ///
     /// The attempt number starts at 0.
@@ -193,8 +215,6 @@ impl TaskSpawnRequest {
 /// Represents the result of a task's execution.
 #[derive(Debug)]
 pub struct TaskExecutionResult {
-    /// The inputs that were given to the task.
-    pub inputs: Vec<Input>,
     /// Stores the task process exit code.
     pub exit_code: i32,
     /// The task's working directory.
@@ -220,25 +240,18 @@ pub trait TaskExecutionBackend: Send + Sync {
         hints: &HashMap<String, Value>,
     ) -> Result<TaskExecutionConstraints>;
 
-    /// Gets the guest path the task working directory (e.g. `/mnt/work`).
+    /// Gets the guest (container) inputs directory of the backend.
     ///
-    /// Returns `None` if the task execution does not use a container.
-    fn guest_work_dir(&self) -> Option<&Path>;
+    /// Returns `None` if the backend does not execute tasks in a container.
+    ///
+    /// The returned path is expected to be Unix style and end with a backslash.
+    fn guest_inputs_dir(&self) -> Option<&'static str>;
 
-    /// Localizes the given set of inputs for the backend.
+    /// Determines if the backend needs local inputs.
     ///
-    /// This may involve downloading remote inputs to the host and updating the
-    /// input's guest paths.
-    fn localize_inputs<'a, 'b, 'c, 'd>(
-        &'a self,
-        downloader: &'b HttpDownloader,
-        inputs: &'c mut [Input],
-    ) -> BoxFuture<'d, Result<()>>
-    where
-        'a: 'd,
-        'b: 'd,
-        'c: 'd,
-        Self: 'd;
+    /// Backends that run tasks locally or from a shared file system will return
+    /// `true`.
+    fn needs_local_inputs(&self) -> bool;
 
     /// Spawns a task with the execution backend.
     ///
