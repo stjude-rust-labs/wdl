@@ -119,7 +119,7 @@ impl Analysis {
     /// Runs the analysis and returns all results (if any exist).
     pub async fn run(self) -> std::result::Result<AnalysisResults, NonEmpty<Arc<Error>>> {
         warn_unknown_rules(&self.exceptions);
-        if tracing::enabled!(tracing::Level::INFO) {
+        if self.enabled_lint_tags.count() > 0 && tracing::enabled!(tracing::Level::INFO) {
             let mut enabled_rules = vec![];
             let mut disabled_rules = vec![];
             for rule in wdl_lint::rules() {
