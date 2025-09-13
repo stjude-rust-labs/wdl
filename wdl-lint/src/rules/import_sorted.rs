@@ -57,7 +57,7 @@ impl Rule for ImportSortedRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Sorting])
+        TagSet::new(&[Tag::Sorting])
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
