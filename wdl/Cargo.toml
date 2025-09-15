@@ -1,6 +1,6 @@
 [package]
 name = "wdl"
-version = "0.17.0"
+version = "0.18.0"
 authors.workspace = true
 description = "Lexing, parsing, validation, linting, documentation, analysis, and execution for Workflow Description Language (WDL) documents"
 rust-version.workspace = true
