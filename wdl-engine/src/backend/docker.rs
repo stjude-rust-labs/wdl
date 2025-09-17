@@ -2,7 +2,6 @@
 
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -23,7 +22,6 @@ use crankshaft::engine::task::input::Contents;
 use crankshaft::engine::task::input::Type as InputType;
 use crankshaft::engine::task::output::Type as OutputType;
 use crankshaft::events::Event;
-use futures::future::BoxFuture;
 use nonempty::NonEmpty;
 use tokio::sync::broadcast;
 use tokio::sync::oneshot;
@@ -476,9 +474,9 @@ impl TaskExecutionBackend for DockerBackend {
     #[cfg(unix)]
     fn cleanup<'a>(
         &'a self,
-        work_dir: &'a Path,
+        work_dir: &'a std::path::Path,
         token: CancellationToken,
-    ) -> Option<BoxFuture<'a, ()>> {
+    ) -> Option<futures::future::BoxFuture<'a, ()>> {
         use futures::FutureExt;
         use tracing::debug;
 
