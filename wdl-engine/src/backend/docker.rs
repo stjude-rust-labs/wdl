@@ -487,6 +487,7 @@ impl TaskExecutionBackend for DockerBackend {
         /// Amount of memory to reserve for the cleanup task.
         const CLEANUP_MEMORY: f64 = 0.05;
 
+        // SAFETY: the work directory is always local for the Docker backend
         let work_dir = work_dir.as_local().expect("path should be local");
         assert!(work_dir.is_absolute(), "work directory should be absolute");
 
