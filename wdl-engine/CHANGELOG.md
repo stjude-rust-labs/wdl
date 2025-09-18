@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.8.1 - 09-17-2025
+
+#### Fixed
+
+* Fixed incorrect assertion for the TES backend ([#606](https://github.com/stjude-rust-labs/wdl/pull/606)).
+* Fixed permissions issue in the Docker backend when a container runs with a
+  different user ([#605](https://github.com/stjude-rust-labs/wdl/pull/605)).
+
+## 0.8.0 - 09-15-2025
+
 #### Added
 
 * Added support for uploading inputs to the TES backend ([#599](https://github.com/stjude-rust-labs/wdl/pull/599)).
@@ -22,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Fixed
 
+* Use `IndexMap` for stable serialization of `Config` ([#602](https://github.com/stjude-rust-labs/wdl/pull/602)).
 * Fixed deserialization of `Object` to no longer require keys be WDL
   identifiers ([#586](https://github.com/stjude-rust-labs/wdl/pull/586)).
 * Fixed a panic caused by an incorrect type calculation of non-empty array
