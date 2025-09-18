@@ -32,7 +32,7 @@ blake3 = { version = "1.8.2", features = ["mmap"] }
 chrono = "0.4.41"
 clap = { version = "4.5.38", features = ["derive"] }
 clap-verbosity-flag = { version = "3.0.3", features = ["tracing"] }
-cloud-copy = "0.2.1"
+cloud-copy = "0.3.0"
 codespan-reporting = "0.12.0"
 colored = "3.0.0"
 convert_case = "0.8.0"
@@ -83,6 +83,7 @@ serde_with = "3.14.0"
 serde_yaml_ng = "0.10.0"
 shellexpand = "3.1.1"
 strsim = "0.11.1"
+strum = { version = "0.27", features = ["derive"] }
 sysinfo = "0.37.0"
 tempfile = "3.21.0"
 thiserror = "2.0.12"

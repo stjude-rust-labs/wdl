@@ -1,6 +1,6 @@
 [package]
 name = "wdl-grammar"
-version = "0.16.0"
+version = "0.17.0"
 authors.workspace = true
 rust-version.workspace = true
 edition.workspace = true
@@ -19,7 +19,7 @@ logos = { workspace = true }
 rowan = { workspace = true }
 serde = { workspace = true }
 serde_with = { workspace = true }
-strum = { version = "0.27", features = ["derive"] }
+strum = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }
